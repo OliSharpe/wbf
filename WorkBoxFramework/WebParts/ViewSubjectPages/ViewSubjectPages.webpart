@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<webParts>
+  <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
+    <metaData>
+      <type name="WorkBoxFramework.ViewSubjectPages.ViewSubjectPages, $SharePoint.Project.AssemblyFullName$" />
+      <importErrorMessage>$Resources:core,ImportErrorMessage;</importErrorMessage>
+    </metaData>
+    <data>
+      <properties>
+        <property name="Title" type="string">View Subject Pages</property>
+        <property name="Description" type="string">View dynamic web pages based on subject tag terms</property>
+        <property name="OnlyLiveRecords" type="bool">True</property>
+        <property name="ShowAToZ" type="bool">True</property>
+      </properties>
+    </data>
+  </webPart>
+</webParts>

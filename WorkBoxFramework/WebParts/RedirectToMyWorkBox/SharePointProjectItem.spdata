@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ProjectItem Type="Microsoft.VisualStudio.SharePoint.VisualWebPart" DefaultFile="RedirectToMyWorkBoxUserControl.ascx" SupportedTrustLevels="FullTrust" SupportedDeploymentScopes="Site" xmlns="http://schemas.microsoft.com/VisualStudio/2010/SharePointTools/SharePointProjectItemModel">
+  <Files>
+    <ProjectItemFile Source="Elements.xml" Target="RedirectToMyWorkBox\" Type="ElementManifest" />
+    <ProjectItemFile Source="RedirectToMyWorkBox.webpart" Target="RedirectToMyWorkBox\" Type="ElementFile" />
+    <ProjectItemFile Source="RedirectToMyWorkBoxUserControl.ascx" Target="CONTROLTEMPLATES\WorkBoxFramework\RedirectToMyWorkBox\" Type="TemplateFile" />
+  </Files>
+  <SafeControls>
+    <SafeControl Name="SafeControlEntry1" Assembly="$SharePoint.Project.AssemblyFullName$" Namespace="WorkBoxFramework.RedirectToMyWorkBox" TypeName="*" IsSafe="true" IsSafeAgainstScript="false" />
+  </SafeControls>
+</ProjectItem>

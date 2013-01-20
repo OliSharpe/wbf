@@ -1,0 +1,1960 @@
+﻿#region Copyright and License
+
+// Copyright (c) Islington Council 2010-2013
+// Author: Oli Sharpe  (oli@gometa.co.uk)
+//
+// This file is part of the Work Box Framework.
+//
+// The Work Box Framework is free software: you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public License as  
+// published by the Free Software Foundation, either version 2.1 of the 
+// License, or (at your option) any later version.
+//
+// The Work Box Framework is distributed in the hope that it will be 
+// useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+
+#endregion
+
+using System;
+using System.Data;
+using System.IO;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Security.Principal;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Utilities;
+using Microsoft.SharePoint.WebControls;
+using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint.Taxonomy;
+using Microsoft.SharePoint.Taxonomy.Generic;
+
+namespace WorkBoxFramework
+{
+    public static class WBExtensions
+    {
+
+        #region General Object Extensions
+        public static String WBxToString(this Object value)
+        {
+            if (value == null) return "";
+            return value.ToString();
+        }
+
+        #endregion
+
+        #region String extensions
+
+        public static String WBxTrim(this String value)
+        {
+            if (value == null) return "";
+            return value.Trim();
+        }
+
+        public static String WBxToUpperFirstLetter(this String theString)
+        {
+            if (string.IsNullOrEmpty(theString))
+            {
+                return string.Empty;
+            }
+
+            return char.ToUpper(theString[0]) + theString.Substring(1);
+        }
+
+        public static String WBxReplaceTokens(this String text, WorkBox workBox)
+        {
+            text = text.Replace("[ID]", workBox.Item.ID.ToString());
+
+            text = text.Replace("~WorkBoxCollection", workBox.Collection.Web.Url);
+
+            text = text.Replace("~WorkBox", workBox.Web.Url);
+
+            text = text.Replace("[CollectionURL]", workBox.Collection.Web.Url);
+
+            text = text.Replace("[WorkBoxURL]", workBox.Web.Url);
+
+            text = text.Replace("[AllWorkBoxesListName]", workBox.Collection.ListName);
+
+            return text;
+        }
+
+
+        public static Control WBxFindNestedControlByID(this Control root, String id)
+        {
+            if (root == null) return null;
+            if (root.ID != null && root.ID.Equals(id)) return root;
+            if (root.Controls == null) return null;
+
+            Control found = null;
+
+            foreach (Control child in root.Controls)
+            {
+                found = child.WBxFindNestedControlByID(id);
+                if (found != null) return found;
+            }
+
+            return null;
+        }
+
+        public static Control WBxAddWithIDInTableCell(this TableRow row, Control control, String id)
+        {
+            return WBxAddWithIDInTableCell(row, control, id, "");
+        }
+
+        public static Control WBxAddWithIDInTableCell(this TableRow row, Control control, String id, String cssClass)
+        {
+            control.ID = id;
+            return row.WBxAddInTableCell(control, cssClass);
+        }
+
+        public static Control WBxAddInTableCell(this TableRow row, Control control)
+        {
+            return WBxAddInTableCell(row, control, "");
+        }
+
+        public static Control WBxAddInTableCell(this TableRow row, Control control, String cssClass)
+        {
+            TableCell cell = new TableCell();
+            cell.CssClass = cssClass;
+            cell.Controls.Add(control);
+            row.Controls.Add(cell);
+
+            if (control.GetType().Name.Equals("CheckBox"))
+            {
+                cell.HorizontalAlign = HorizontalAlign.Center;
+            }
+
+            return control;
+        }
+
+        public static System.Web.UI.WebControls.Label WBxAddTableHeaderCell(this TableRow row, String text)
+        {
+            TableHeaderCell cell = new TableHeaderCell();
+
+            System.Web.UI.WebControls.Label label = new System.Web.UI.WebControls.Label();
+            label.Text = text;
+            cell.Controls.Add(label);
+            row.Controls.Add(cell);
+
+            return label;
+        }
+
+        public static String WBxMakeControlID(this Object obj, String outerName, String innerName)
+        {
+            return string.Format("WBF__{0}__{1}__{2}",
+                obj.GetType().Name.ToUpper(),
+                outerName.WBxTrim().ToUpper(),
+                innerName.WBxTrim().ToUpper());
+        }
+
+
+        #endregion
+
+
+
+        #region SPFarm SPWeb and Term Property Set and Get Extensions
+
+        public static int WBxGetIntProperty(this SPWeb web, String key)
+        {
+            string value = web.WBxGetProperty(key);
+            if (value == "") return 0;
+            return Convert.ToInt32(value);
+        }
+
+        public static void WBxSetIntProperty(this SPWeb web, String key, int value)
+        {
+            web.WBxSetProperty(key, value);
+        }
+
+        public static int WBxGetIntProperty(this Term term, String key)
+        {
+            string value = term.WBxGetProperty(key);
+            if (value == "") return 0;
+            return Convert.ToInt32(value);
+        }
+
+        public static void WBxSetIntProperty(this Term term, String key, int value)
+        {
+            term.WBxSetProperty(key, value);
+        }
+
+        public static int WBxGetIntProperty(this SPList list, String key)
+        {
+            string value = list.WBxGetProperty(key);
+            if (value == "") return 0;
+            return Convert.ToInt32(value);
+        }
+
+        public static void WBxSetIntProperty(this SPList list, String key, int value)
+        {
+            list.WBxSetProperty(key, value);
+        }
+
+
+        public static bool WBxGetBoolPropertyOrDefault(this SPWeb web, String key, bool defaultValue)
+        {
+            string stringValue = web.WBxGetProperty(key);
+
+            if (stringValue == "") return defaultValue;
+            return true.ToString().Equals(stringValue);
+        }
+
+        public static bool WBxGetBoolProperty(this SPWeb web, String key)
+        {
+            return true.ToString().Equals(web.WBxGetProperty(key));
+        }
+
+        public static void WBxSetBoolProperty(this SPWeb web, String key, bool value)
+        {
+            web.WBxSetProperty(key, value);
+        }
+
+        public static String WBxGetProperty(this SPList list, String key)
+        {
+            if (list == null) return "";
+            string value = safeGetPropertyAsString(list.RootFolder.Properties, key);
+            return value;
+        }
+
+        public static String WBxGetProperty(this SPWeb web, String key)
+        {
+            if (web == null) return "";
+            string value = safeGetPropertyAsString(web.AllProperties, key);
+            //WBUtils.logMessage("Get: " + key + " = " + value + " from: " + web.Url);
+            return value;
+        }
+
+        public static String WBxGetPropertyOrDefault(this SPWeb web, String key, String defaultValue)
+        {
+            string value = web.WBxGetProperty(key);
+            if (value == "") return defaultValue;
+            return value;
+        }
+
+        public static String WBxGetProperty(this SPFarm farm, String key)
+        {
+            if (farm == null) return "";
+            return safeGetPropertyAsString(farm.Properties, key);
+        }
+
+        public static String WBxGetPropertyOrDefault(this SPFarm farm, String key, String defaultValue)
+        {
+            string value = farm.WBxGetProperty(key);
+            if (value == "") return defaultValue;
+            return value;
+        }
+
+
+
+        public static String WBxGetProperty(this Term term, String key)
+        {
+            if (term == null) return "";
+//            string value = safeGetPropertyAsString(term.CustomProperties, key);
+//            WBUtils.logMessage("Getting the term value: term | key | has value : " + term.Name + " | " + key + " | " + value);
+//            return value;
+            return safeGetPropertyAsString(term.CustomProperties, key);
+        }
+
+        public static String WBxGetPropertyOrDefault(this Term term, String key, String defaultValue)
+        {
+            string value = term.WBxGetProperty(key);
+            if (value == "") return defaultValue;
+            return value;
+        }
+
+        public static bool WBxGetBoolProperty(this Term term, String key)
+        {
+            if (term == null) return false;
+            return true.ToString().Equals(term.WBxGetProperty(key));
+        }
+
+        public static bool WBxGetBoolPropertyOrDefault(this Term term, String key, bool defaultValue)
+        {
+            string value = term.WBxGetProperty(key);
+            if (value == "") return defaultValue;
+            return true.ToString().Equals(value);
+        }
+
+
+
+
+        public static void WBxSetProperty(this Term term, String key, Object value)
+        {
+            term.WBxSetProperty(key, value.WBxToString());
+        }
+
+        public static void WBxSetBoolProperty(this Term term, String key, bool value)
+        {
+            term.WBxSetProperty(key, value.WBxToString());
+        }                           
+
+        public static void WBxSetProperty(this Term term, String key, String value)
+        {
+            value = value.WBxTrim();
+            if (value == "") 
+            {
+                if (term.CustomProperties.ContainsKey(key))
+                {
+                    term.DeleteCustomProperty(key);
+                }
+            }
+            else
+            {
+//                WBUtils.logMessage("Setting term | key | value: " + term.Name + " | " + key + " | " + value);
+                term.SetCustomProperty(key, value);
+            }
+        }
+
+        public static void WBxSetProperty(this SPWeb web, String key, Object value)
+        {
+            web.WBxSetProperty(key, value.WBxToString());
+        }
+        
+        public static void WBxSetProperty(this SPWeb web, String key, String value)
+        {
+            //WBUtils.logMessage("Setting: " + key + " = " + value + " on: " + web.Url);
+            safeSetPropertyAsString(web.AllProperties, key, value);
+        }
+
+        public static void WBxSetProperty(this SPList list, String key, Object value)
+        {
+            list.WBxSetProperty(key, value.WBxToString());
+        }
+
+        public static void WBxSetProperty(this SPList list, String key, String value)
+        {
+            safeSetPropertyAsString(list.RootFolder.Properties, key, value);
+        }
+
+
+        public static void WBxSetProperty(this SPFarm farm, String key, Object value)
+        {
+            farm.WBxSetProperty(key, value.WBxToString());
+        }
+
+        public static void WBxSetProperty(this SPFarm farm, String key, String value)
+        {
+            safeSetPropertyAsString(farm.Properties, key, value);
+        }
+
+        #endregion
+
+
+        #region Private Safe Get Set Helper Methods
+
+        private static string safeGetPropertyAsString(ReadOnlyDictionary<string, string> readOnlyDictionary, string key)
+        {
+            if (readOnlyDictionary.ContainsKey(key))
+            {
+                return readOnlyDictionary[key].WBxToString();
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        private static String safeGetPropertyAsString(Hashtable properties, String key)
+        {
+            if (properties.ContainsKey(key))
+            {
+                return properties[key].WBxToString();
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        private static void safeSetPropertyAsString(Hashtable properties, String key, Object value)
+        {
+            safeSetPropertyAsString(properties, key, value.WBxToString());
+        }
+
+        private static void safeSetPropertyAsString(Hashtable properties, String key, String value)
+        {
+            properties[key] = value.WBxTrim();            
+        }
+
+        private static void migratePropertyKeyName(Hashtable properties, String oldKey, String newKey)
+        {
+            String value = safeGetPropertyAsString(properties, oldKey);
+            properties[newKey] = value;
+        }
+
+        #endregion
+
+
+        #region UIControlValue Extensions
+
+        public static String WBxUIControlValue(this Term term)
+        {
+            if (term == null) return "";
+            return string.Format("{0}|{1}", term.Name, term.Id.ToString());
+        }
+
+        public static String WBxUIControlValue(this TaxonomyFieldValue value)
+        {
+            if (value == null) return "";
+            return string.Format("{0}|{1}", value.Label, value.TermGuid.ToString());
+        }
+
+        public static String WBxUIControlValue(this TaxonomyFieldValueCollection values)
+        {
+            if (values == null) return "";
+
+            List<String> textParts = new List<String>();
+            foreach (TaxonomyFieldValue value in values)
+            {
+                textParts.Add(string.Format("{0}|{1}", value.Label, value.TermGuid.ToString()));
+            }
+
+            return String.Join(TaxonomyField.TaxonomyMultipleTermDelimiter.ToString(), textParts.ToArray());
+        }
+
+        #endregion
+
+
+        #region SPSite Extensions
+        public static SPWebTemplate WBxGetWebTemplateByName(this SPSite site, String name)
+        {
+            if (site == null || name == null || name == "") return null;
+
+            SPWebTemplateCollection Templates = site.GetWebTemplates(Convert.ToUInt32(WorkBox.LOCALE_ID_ENGLISH));
+
+            return Templates[name];
+        }
+
+        public static SPWebTemplate WBxGetWebTemplateByTitle(this SPSite site, String title)
+        {
+            WBUtils.logMessage("Getting WBxGetWebTemplateByTitle with site | title:  " + site + " | " + title);
+
+            if (site == null || title == null || title == "") return null;
+
+            SPWebTemplateCollection Templates = site.GetWebTemplates(Convert.ToUInt32(WorkBox.LOCALE_ID_ENGLISH));
+
+            title = title.Trim();
+            foreach (SPWebTemplate template in Templates)
+            {
+                if (template.Title.Trim().Equals(title))
+                {
+                    WBUtils.logMessage("Found template: " + template.Name);
+                    return template;
+                }
+            }
+
+            return null;
+        }
+
+        #endregion
+
+        #region SPListItem Extensions
+
+        public static bool WBxColumnExists(this SPListItem item, String columnName)
+        {
+            return (item.Fields.ContainsField(columnName));
+        }
+
+        public static bool WBxExists(this SPListItem item, WBColumn column)
+        {
+            return (item.Fields.ContainsField(column.DisplayName));
+        }
+
+
+        public static bool WBxColumnHasValue(this SPListItem item, String columnName)
+        {
+            return (item.WBxGetColumnAsString(columnName) != "");            
+        }
+
+        public static bool WBxHasValue(this SPListItem item, WBColumn column)
+        {
+            return (item.WBxGetAsString(column) != "");
+        }
+
+        public static bool WBxIsNotBlank(this SPListItem item, WBColumn column)
+        {
+            return (item.WBxGetAsString(column).Trim() != "");
+        }
+
+        public static Object WBxGet(this SPListItem item, WBColumn column)
+        {
+            WBLogging.Generic.Verbose("Trying to call WBxGet");
+            WBLogging.Generic.Verbose("Trying to get with WBxGet column: " + column.DisplayName);
+
+
+            if (item == null)
+            {
+                WBUtils.shouldThrowError("Calling WBxGet with a null item!");
+                return null;
+            }
+
+            if (column == null)
+            {
+                WBUtils.shouldThrowError("Calling WBxGet with a null column!");
+                return null;
+            }
+
+            if (String.IsNullOrEmpty(column.DisplayName))
+            {
+                WBUtils.shouldThrowError("Calling WBxGet with a column object that has no display name!");
+                return null;
+            }
+
+
+            if (!item.WBxExists(column)) return null;
+
+            switch (column.DataType)
+            {
+                case WBColumn.DataTypes.Text:
+                    {
+                        return item[column.DisplayName];
+                    }
+                case WBColumn.DataTypes.Integer:
+                    {
+                        return item[column.DisplayName];
+                    }
+                case WBColumn.DataTypes.Count:
+                    {
+                        return item[column.DisplayName];
+                    }
+                case WBColumn.DataTypes.DateTime:
+                    {
+                        return item[column.DisplayName];
+                    }
+                case WBColumn.DataTypes.ManagedMetadata:
+                    {
+                        if (column.AllowMultipleValues)
+                        {
+                            WBTermCollection<WBTerm> terms = item.WBxGetMultiTermColumn<WBTerm>(null, column.DisplayName);
+                            return terms.WBxToString();
+                        }
+                        else
+                        {
+                            WBTerm term = item.WBxGetSingleTermColumn<WBTerm>(null, column.DisplayName);
+                            return term.WBxToString();
+                        }
+                    }
+
+                case WBColumn.DataTypes.Choice:
+                    {
+                        return item[column.DisplayName];
+                    }
+
+
+                default: throw new Exception("There is no WBxGet implementation (yet) for WBColumn of type : " + column.DataType);
+            }
+        }
+
+
+        public static String WBxGetAsString(this SPListItem item, WBColumn column)
+        {
+            return WBxGetColumnAsString(item, column.DisplayName);
+        }
+
+        public static String WBxGetColumnAsString(this SPListItem item, String columnName)
+        {
+            if (!item.WBxColumnExists(columnName)) return "";
+
+            string value = "";
+            try {
+                value = item[columnName].WBxToString();
+            }
+            catch  {}
+
+            return value;
+        }
+
+
+        public static bool WBxGetColumnAsBool(this SPListItem item, String columnName)
+        {
+            return (item.WBxGetColumnAsString(columnName) == "True");
+        }
+
+        public static int WBxGetColumnAsInt(this SPListItem item, String columnName, int defaultValue)
+        {
+            if (!item.WBxColumnHasValue(columnName)) return defaultValue;
+            return (Convert.ToInt32(item.WBxGetColumnAsString(columnName)));
+        }
+
+
+        public static void WBxSetFrom(this SPListItem destination, WBItem source)
+        {
+            destination.WBxSetFrom(source, source.Columns);
+        }
+
+        public static void WBxSetFrom(this SPListItem destination, SPListItem source, IEnumerable<WBColumn> columnsToCopy)
+        {
+            foreach (WBColumn column in columnsToCopy)
+            {
+                destination.WBxSet(column, source.WBxGet(column));
+            }
+        }
+
+
+        public static void WBxSetFrom(this SPListItem destination, WBItem source, IEnumerable<WBColumn> columnsToCopy)
+        {
+            foreach (WBColumn column in columnsToCopy)
+            {
+                destination.WBxSet(column, source[column]);
+            }
+        }
+
+        public static void WBxCopyFrom(this SPListItem destination, SPListItem source, IEnumerable<WBColumn> columnsToCopy)
+        {
+            foreach (WBColumn column in columnsToCopy)
+            {
+                destination.WBxCopyFrom(source, column);
+            }
+        }
+
+        public static void WBxCopyFrom(this SPListItem destination, SPListItem source, WBColumn column)
+        {
+            if (source.WBxExists(column) && destination.WBxExists(column))
+                destination.WBxSet(column, source.WBxGet(column));
+        }
+
+        public static void WBxSet(this SPListItem item, WBColumn column, Object value)
+        {
+            if (item == null)
+            {
+                WBUtils.shouldThrowError("An attempt to save a value to an item that is null !!");
+                if (column != null) WBUtils.shouldThrowError(" Column: " + column.DisplayName + " Value: " + value.WBxToString());
+                return;
+            }
+
+            if (column == null)
+            {
+                WBUtils.shouldThrowError("An attempt to save a value to a column that is null !!");
+                WBUtils.shouldThrowError("Value: " + value.WBxToString());
+                return;
+            }
+
+            if (String.IsNullOrEmpty(column.DisplayName))
+            {
+                WBUtils.shouldThrowError("An attempt to save a value to a column that has no display name!!");
+                WBUtils.shouldThrowError("Value: " + value.WBxToString());
+                return;
+            }
+
+            WBLogging.Generic.Verbose("WBxSet(): Trying to set Column: " + column.DisplayName + " Value: " + value.WBxToString());
+
+            if (!item.WBxExists(column)) 
+            {
+                WBUtils.shouldThrowError("An attempt to save a value to column that doesn't exist for the given item: Column: " + column.DisplayName + " Value: " + value.WBxToString());
+                return;
+            }
+
+            switch (column.DataType)
+            {
+                case WBColumn.DataTypes.Text:
+                    {
+                        item[column.DisplayName] = value.WBxToString();
+                        break;
+                    }
+                case WBColumn.DataTypes.Integer:
+                    {
+                        item[column.DisplayName] = value;
+                        break;
+                    }
+                case WBColumn.DataTypes.Count:
+                    {
+                        item[column.DisplayName] = value;
+                        break;
+                    }
+                case WBColumn.DataTypes.DateTime:
+                    {
+                        if (value == null || value is DateTime)
+                        {
+                            item[column.DisplayName] = value;
+                        }
+                        else
+                        {
+                            WBUtils.shouldThrowError("You can only set DateTime columns with null or with DateTime objects. Column: " + column.DisplayName + " Value: " + value);
+                        }
+
+                        break;
+                    }
+                case WBColumn.DataTypes.ManagedMetadata:
+                    {
+                        if (value == null)
+                        {
+                            WBLogging.Debug("Called to WBxSet for a ManagedMetadata column but the value was null");
+                            value = "";
+                        }
+
+                        if (column.AllowMultipleValues)
+                        {
+                            if (value is String)
+                            {
+                                item.WBxSetMultiTermColumn(column.DisplayName, value as String);
+                            }
+                            else if (value is WBTermCollection<WBTerm>)
+                            {
+                                WBTermCollection<WBTerm> collection = value as WBTermCollection<WBTerm>;
+                                //WBLogging.Debug("Setting " + column.DisplayName + " to value: " + collection.ToString());
+                                item.WBxSetMultiTermColumn<WBTerm>(column.DisplayName, collection);
+                            }
+                            else if (value is WBTermCollection<WBRecordsType>)
+                            {
+                                WBTermCollection<WBRecordsType> collection = value as WBTermCollection<WBRecordsType>;
+                                //WBLogging.Debug("Setting " + column.DisplayName + " to value: " + collection.ToString());
+                                item.WBxSetMultiTermColumn<WBRecordsType>(column.DisplayName, collection);
+                            }
+                            else if (value is WBTermCollection<WBTeam>)
+                            {
+                                WBTermCollection<WBTeam> collection = value as WBTermCollection<WBTeam>;
+                                //WBLogging.Debug("Setting " + column.DisplayName + " to value: " + collection.ToString());
+                                item.WBxSetMultiTermColumn<WBTeam>(column.DisplayName, collection);
+                            }
+                            else
+                            {
+                                WBUtils.shouldThrowError("You can only set multi ManagedMetadata columns with values of type String or WBTermCollection<WBTerm>. Column: " + column.DisplayName + " Value: " + value);
+                            }
+
+                            break;
+                        }
+                        else
+                        {
+                            if (value is String)
+                            {
+                                item.WBxSetSingleTermColumn(column.DisplayName, value as String);
+                            }
+                            else if (value is WBTerm)
+                            {
+                                item.WBxSetSingleTermColumn(column.DisplayName, value as WBTerm);
+                            }
+                            else
+                            {
+                                WBUtils.shouldThrowError("You can only set singular ManagedMetadata columns with values of type String or WBTerm. Column: " + column.DisplayName + " Value: " + value);
+                            }
+
+                            break;
+                        }
+                    }
+
+                case WBColumn.DataTypes.Choice:
+                    {
+                        string choice = value.WBxToString();
+
+                        if (column.Choices.Contains(choice))
+                        {
+                            item[column.DisplayName] = choice;
+                        }
+                        else
+                        {
+                            WBUtils.shouldThrowError("You can only set valid choices for a choice field. Disallowed value was: " + choice);
+                        }
+
+                        break; 
+                    }
+
+
+                default: throw new Exception("There is no WBxSet implementation (yet) for WBColumn of type : " + column.DataType);
+            }
+
+            WBLogging.Generic.Verbose("WBxSet(): Completed the setting of Column: " + column.DisplayName + " Value: " + value.WBxToString());
+
+        }
+
+        public static void WBxSetColumnAsString(this SPListItem item, WBColumn column, Object value)
+        {
+            item[column.DisplayName] = value.WBxToString();
+        }
+
+        public static void WBxSetColumnAsString(this SPListItem item, String columnName, Object value)
+        {
+            item[columnName] = value.WBxToString();
+        }
+
+        public static T WBxGetSingleTermColumn<T>(this SPListItem item, WBTaxonomy taxonomy, WBColumn column) where T : WBTerm, new()
+        {
+            return WBxGetSingleTermColumn<T>(item, taxonomy, column.DisplayName);
+        }
+
+        public static T WBxGetSingleTermColumn<T>(this SPListItem item, WBTaxonomy taxonomy, String columnName) where T : WBTerm, new()
+        {
+            TaxonomyFieldValue taxonomyFieldValue = item[columnName] as TaxonomyFieldValue;
+
+            if (taxonomyFieldValue == null || taxonomyFieldValue.TermGuid == null || taxonomyFieldValue.TermGuid == "") return null;
+
+            //WBUtils.logMessage("Getting a single term from a column with guid = " + taxonomyFieldValue.TermGuid);
+
+            T term = new T();
+            term.Initialise(taxonomy, taxonomyFieldValue.Label, new Guid(taxonomyFieldValue.TermGuid));
+
+            return term;
+        }
+
+        public static WBTermCollection<T> WBxGetMultiTermColumn<T>(this SPListItem item, WBTaxonomy taxonomy, String columnName) where T : WBTerm, new()
+        {
+            TaxonomyFieldValueCollection taxonomyFieldValueCollection = item[columnName] as TaxonomyFieldValueCollection;
+
+            if (taxonomyFieldValueCollection == null) return null;
+
+            List<T> terms = new List<T>();
+
+            foreach (TaxonomyFieldValue value in taxonomyFieldValueCollection)                                
+            {
+                T term = new T();
+                term.Initialise(taxonomy, value.Label, new Guid(value.TermGuid));
+                terms.Add(term);
+            }
+
+            return new WBTermCollection<T>(taxonomy, terms);
+        }
+
+        public static void WBxSetSingleTermColumn(this SPListItem item, String columnName, String termUIControlValue)
+        {
+            TaxonomyField taxonomyField = item.Fields[columnName] as TaxonomyField;
+
+            TaxonomyFieldValue taxonomyFieldValue = new TaxonomyFieldValue(taxonomyField);
+
+            taxonomyFieldValue.PopulateFromLabelGuidPair(termUIControlValue);
+
+            taxonomyField.SetFieldValue(item, taxonomyFieldValue);
+        }
+
+
+        public static void WBxSetSingleTermColumn(this SPListItem item, String columnName, WBTerm term)
+        {
+            if (term.TermNotResolvedYet)
+            {
+                WBxSetSingleTermColumn(item, columnName, term.UIControlValue);
+            }
+            else
+            {
+                TaxonomyField taxonomyField = item.Fields[columnName] as TaxonomyField;
+                taxonomyField.SetFieldValue(item, term.Term);
+            }
+        }
+
+
+        public static void WBxSetMultiTermColumn(this SPListItem item, String columnName, String termsUIControlValue) 
+        {
+            TaxonomyField taxonomyField = item.Fields[columnName] as TaxonomyField;
+
+            TaxonomyFieldValueCollection taxonomyFieldValueCollection = new TaxonomyFieldValueCollection(taxonomyField);
+
+            taxonomyFieldValueCollection.PopulateFromLabelGuidPairs(termsUIControlValue);
+
+            taxonomyField.SetFieldValue(item, taxonomyFieldValueCollection);
+        }
+
+
+        public static void WBxSetMultiTermColumn<T>(this SPListItem item, String columnName, WBTermCollection<T> terms) where T : WBTerm, new()
+        {
+            WBxSetMultiTermColumn(item, columnName, terms.UIControlValue);
+        }
+
+        public static List<SPUser> WBxGetMultiUserColumn(this SPListItem item, String columnName)
+        {
+            SPFieldUserValueCollection userValueCollection = item[columnName] as SPFieldUserValueCollection;
+            List<SPUser> users = new List<SPUser>();
+
+            if (userValueCollection != null)
+            {
+                foreach (SPFieldUserValue userValue in userValueCollection)
+                {
+                    users.Add(userValue.User);
+                }
+            }
+
+            return users;
+        }
+
+        public static void WBxSetMultiUserColumn(this SPListItem item, SPWeb web, String columnName, List<SPUser> users)
+        {
+            SPFieldUserValueCollection userValueCollection = new SPFieldUserValueCollection();
+
+            if (users != null)
+            {
+                foreach (SPUser user in users)
+                {
+                    userValueCollection.Add(new SPFieldUserValue(web, user.ID, user.LoginName));
+                }
+            }
+
+            item[columnName] = userValueCollection;
+        }
+
+        #endregion
+
+        #region PeoeplEditor
+
+        public static void WBxInitialise(this PeopleEditor peopleEditor, List<SPUser> users)
+        {
+            ArrayList entityArrayList = new ArrayList();
+
+            if (users != null)
+            {
+                foreach (SPUser user in users)
+                {
+                    PickerEntity entity = new PickerEntity();
+                    entity.Key = user.LoginName;
+                    entity.DisplayText = user.Name;
+                    entityArrayList.Add(entity);
+                }
+            }
+
+            peopleEditor.UpdateEntities(entityArrayList);
+        }
+
+        public static List<SPUser> WBxGetMultiResolvedUsers(this PeopleEditor peopleEditor, SPWeb web)
+        {
+
+            List<SPUser> users = new List<SPUser>();
+
+            if (peopleEditor.ResolvedEntities.Count > 0)
+            {
+
+                foreach (PickerEntity pickedEntity in peopleEditor.ResolvedEntities)
+                {
+                    WBUtils.logMessage("Found picked entity: " + pickedEntity.Key);
+
+                    SPUser user = web.EnsureUser(pickedEntity.Key);
+
+                    users.Add(user);
+                }
+            }
+            else
+            {
+                WBUtils.logMessage("Couldn't find any resolved entities. comma sep value: " + peopleEditor.CommaSeparatedAccounts);
+            }
+
+            return users;
+        }
+
+
+        /*
+        public static List<SPUser> WBxGetMultiUserColumn(this SPListItem item, String columnName)
+        {
+            SPFieldUserValueCollection userValueCollection = item[columnName] as SPFieldUserValueCollection;
+
+            List<SPUser> users = new List<SPUser>();
+
+            if (userValueCollection != null)
+            {
+                foreach (SPFieldUserValue userValue in userValueCollection)
+                {
+                    users.Add(userValue.User);
+                }
+            }
+
+            return users;
+        }
+         */ 
+
+        /*
+        public static void WBxSetMultiUserColumn(this SPListItem item, SPWeb web, String columnName, List<SPUser> users)
+        {
+            SPFieldUserValueCollection userValueCollection = new SPFieldUserValueCollection();
+
+            if (users != null)
+            {
+                foreach (SPUser user in users)
+                {
+                    SPFieldUserValue userValue = new SPFieldUserValue(web, 
+                }
+            }
+
+        }
+        */
+
+        #endregion
+
+
+        #region SPList Extensions
+
+        public static bool WBxIsDocumentLibrary(this SPList list)
+        {
+            return (list.BaseType == SPBaseType.DocumentLibrary);
+        }
+      
+
+        #endregion
+
+
+        #region SPFile Extensions
+
+        public static string WBxCopyTo(this SPFile sourceFile, String destinationRootFolderUrlString, String folderPathString)
+        {
+            return sourceFile.WBxCopyTo(destinationRootFolderUrlString, folderPathString, false);
+        }
+
+        public static string WBxCopyTo(this SPFile sourceFile, String destinationRootFolderUrlString, String folderPathString, bool forPublicWeb)
+        {
+            if (forPublicWeb)
+            {
+                folderPathString = WBUtils.PrepareFilenameForPublicWeb(folderPathString);
+            }
+
+            string[] steps = folderPathString.Split('/');
+            List<string> folderPath = new List<String>(steps);
+
+            return WBxCopyTo(sourceFile, destinationRootFolderUrlString, folderPath, true, forPublicWeb);
+        }
+
+
+        public static string WBxCopyTo(this SPFile sourceFile, String destinationRootFolderUrlString, List<String> folderPath)
+        {
+            return WBxCopyTo(sourceFile, destinationRootFolderUrlString, folderPath, true);
+        }
+
+        public static string WBxCopyTo(this SPFile sourceFile, String destinationRootFolderUrlString, List<String> folderPath, bool allowDuplicateNames)
+        {
+            return WBxCopyTo(sourceFile, destinationRootFolderUrlString, folderPath, allowDuplicateNames, false);
+        }
+
+        public static string WBxCopyTo(this SPFile sourceFile, String destinationRootFolderUrlString, List<String> folderPath, bool allowDuplicateNames, bool forPublicWeb)
+        {
+            // The following sources gave various ideas for this method:
+            // http://social.technet.microsoft.com/Forums/en-ph/sharepoint2010programming/thread/6600b7ca-3211-4476-8ee1-7d60d8f50a1a
+            // http://sharepoint.stackexchange.com/questions/17951/programmatically-move-a-document-in-a-library-to-another-site-collection
+            // http://sharepointfieldnotes.blogspot.com/2009/11/how-to-copy-files-across-site.html
+            // http://stackoverflow.com/questions/1059175/copy-files-to-document-library-in-sharepoint
+
+
+            string errorMessage = "";
+
+            Uri destinationRootFolderUrl = new Uri(destinationRootFolderUrlString);
+            Uri destinationFileUrl = new Uri(destinationRootFolderUrl, sourceFile.Name);
+
+            //IIdentity userIdentity = System.Web.HttpContext.Current.User.Identity;
+            //WBLogging.Debug("In  IIdentity info: " + userIdentity.AuthenticationType + "  " + userIdentity.Name + "  " + userIdentity.IsAuthenticated);
+
+            using (SPSite destinationSite = new SPSite(destinationRootFolderUrl.AbsoluteUri))
+            using (SPWeb destinationWeb = destinationSite.OpenWeb())
+            {
+
+                WBLogging.Debug("In  WBxCopyTo(): Running as current user: " + destinationWeb.CurrentUser.Name); 
+
+                SPFile copiedFile = null;
+
+                destinationWeb.AllowUnsafeUpdates = true;
+
+                SPDocumentLibrary library = sourceFile.DocumentLibrary;
+
+                if (library.EnableVersioning)
+                {
+                    WBUtils.logMessage("Versioning is indeed enabled");
+
+                    WBUtils.logMessage("sourceFile.Versions.Count = " + sourceFile.Versions.Count);
+
+                    SPListItem docAsItem = sourceFile.Item;
+                    SPListItemVersionCollection versionCollection = docAsItem.Versions;
+
+                    WBUtils.logMessage("docAsItem.Versions.Count = " + docAsItem.Versions.Count);
+
+                    SPListItemVersion version = versionCollection[0];
+
+                    sourceFile = version.ListItem.File;
+                }
+
+                WBUtils.logMessage("1 About to create copy of file with sourceFile.Name = " + sourceFile.Name);
+
+                SPFolder destinationRootFolder = destinationWeb.GetFolder(destinationRootFolderUrl.AbsolutePath);
+                SPFolder actualDestinationFolder = destinationRootFolder.WBxGetOrCreateFolderPath(folderPath, forPublicWeb);
+
+                string filename = sourceFile.Name;
+
+                if (forPublicWeb)
+                {
+                    filename = WBUtils.PrepareFilenameForPublicWeb(filename);
+                }
+
+                if (destinationWeb.WBxFileExists(actualDestinationFolder, filename))
+                {
+                    if (allowDuplicateNames)
+                    {
+                        filename = destinationWeb.WBxMakeFilenameUnique(actualDestinationFolder, filename);
+                    }
+                    else
+                    {
+                        return "The filename " + filename + " already exists in the destination folder";
+                    }
+                }
+
+                using (Stream stream = sourceFile.OpenBinaryStream())
+                {
+                    copiedFile = actualDestinationFolder.Files.Add(filename, stream);
+                    stream.Close();
+                }
+
+                SPListItem destinationItem = copiedFile.Item;
+                SPListItem sourceItem = sourceFile.Item;
+
+                List<SPField> fieldsNotCopied = new List<SPField>();
+
+                foreach (SPField field in sourceItem.Fields)
+                {
+                    // Note we're not copying the name field as we may have altered the name so that it is unique in the destination location.
+                    if (!field.ReadOnlyField && field.Title != "Name")
+                    {
+                        if (destinationItem.Fields.ContainsField(field.Title))
+                        {
+                            WBUtils.logMessage("Attempting to update field: " + field.Title + " with value: " + sourceItem[field.Title]);
+
+                            destinationItem[field.Title] = sourceItem[field.Title];
+                        }
+                        else
+                        {
+                            fieldsNotCopied.Add(field);
+                        }
+                    }
+                    else
+                    {
+                        fieldsNotCopied.Add(field);
+                    }
+
+                }
+
+                if (fieldsNotCopied.Count > 0)
+                {
+                    string notCopied = "The following fields were not copied: ";
+                    foreach (SPField field in fieldsNotCopied)
+                    {
+                        notCopied += " '" + field.Title + "' ";
+                    }
+
+                    WBUtils.logMessage(notCopied);
+                }
+
+                destinationItem.UpdateOverwriteVersion();
+
+                // If the new file is checked out by this creation process - then check it in:
+                if (copiedFile.CheckOutType != SPFile.SPCheckOutType.None)
+                {
+                    copiedFile.CheckIn("Document published here from a workbox. The original source URL was: " + sourceFile.Web.Url + sourceFile.Url, SPCheckinType.MajorCheckIn);
+                }
+
+                destinationWeb.AllowUnsafeUpdates = false;
+
+            }
+
+            return errorMessage;
+        }
+
+        public static SPFolder WBxGetOrCreateFolderPath(this SPFolder rootFolder, String folderPathString, SPContentTypeId contentTypeId)
+        {
+            if (rootFolder == null) return null;
+            if (String.IsNullOrEmpty(folderPathString)) return rootFolder;
+
+            if (folderPathString.Length == 1 && folderPathString.Equals("/")) return rootFolder;
+
+            string[] steps = folderPathString.Split('/');
+
+            if (steps.Length == 1) return rootFolder.WBxGetOrCreateSubFolder(steps[0], contentTypeId);
+
+            List<string> folderPath = new List<String>(steps);
+            return rootFolder.WBxGetOrCreateFolderPath(folderPath, contentTypeId);
+        }
+
+        public static SPFolder WBxGetOrCreateFolderPath(this SPFolder rootFolder, List<string> folderPath, SPContentTypeId contentTypeId)
+        {
+            SPFolder actualFolder = rootFolder;
+
+            foreach (String step in folderPath)
+            {
+                actualFolder = actualFolder.WBxGetOrCreateSubFolder(step, contentTypeId);
+            }
+
+            return actualFolder;
+        }
+
+
+        public static SPFolder WBxGetOrCreateSubFolder(this SPFolder parent, String childName, SPContentTypeId contentTypeId)
+        {
+            if (String.IsNullOrEmpty(childName)) return parent;
+
+            SPFolderCollection subFolders = parent.SubFolders;
+            SPFolder found = null;
+            foreach (SPFolder subFolder in subFolders)
+            {
+                if (subFolder.Name.Equals(childName))
+                {
+                    found = subFolder;
+                    break;
+                }
+            }
+
+            if (found == null)
+            {
+                found = parent.SubFolders.Add(childName);
+
+                found.Item.SystemUpdate();
+                found.Update();
+
+                found.Item[SPBuiltInFieldId.ContentTypeId] = contentTypeId;
+                found.Item.SystemUpdate();
+            }
+
+            return found;
+        }
+
+        public static SPFolder WBxGetOrCreateFolderPath(this SPFolder rootFolder, String folderPathString)
+        {
+            return WBxGetOrCreateFolderPath(rootFolder, folderPathString, false);
+        }
+
+        public static SPFolder WBxGetOrCreateFolderPath(this SPFolder rootFolder, String folderPathString, bool forPublicWeb)
+        {
+            if (rootFolder == null) return null;
+            if (String.IsNullOrEmpty(folderPathString)) return rootFolder;
+
+            if (folderPathString.Length == 1 && folderPathString.Equals("/")) return rootFolder;
+
+            string[] steps = folderPathString.Split('/');
+
+            if (steps.Length == 1) return rootFolder.WBxGetOrCreateSubFolder(steps[0], forPublicWeb);
+
+            List<string> folderPath = new List<String>(steps);
+            return rootFolder.WBxGetOrCreateFolderPath(folderPath, forPublicWeb);
+        }
+
+        public static SPFolder WBxGetOrCreateFolderPath(this SPFolder rootFolder, List<string> folderPath)
+        {
+            return WBxGetOrCreateFolderPath(rootFolder, folderPath, false);
+        }
+
+        public static SPFolder WBxGetOrCreateFolderPath(this SPFolder rootFolder, List<string> folderPath, bool forPublicWeb)
+        {
+            SPFolder actualFolder = rootFolder;
+
+            foreach (String step in folderPath)
+            {
+                actualFolder = actualFolder.WBxGetOrCreateSubFolder(step, forPublicWeb);
+            }
+
+            return actualFolder;
+        }
+
+        public static SPFolder WBxGetOrCreateSubFolder(this SPFolder parent, String childName)
+        {
+            return WBxGetOrCreateSubFolder(parent, childName, false);
+        }
+
+        public static SPFolder WBxGetOrCreateSubFolder(this SPFolder parent, String childName, bool forPublicWeb)
+        {
+            if (String.IsNullOrEmpty(childName)) return parent;
+
+            if (forPublicWeb) childName = WBUtils.PrepareFilenameForPublicWeb(childName);
+
+            SPFolderCollection subFolders = parent.SubFolders;
+            SPFolder found = null;
+            foreach (SPFolder subFolder in subFolders)
+            {
+                if (subFolder.Name.Equals(childName))
+                {
+                    found = subFolder;
+                    break;
+                }
+            }
+
+            if (found == null)
+            {
+                found = parent.SubFolders.Add(childName);
+            }
+
+            return found;
+        }
+
+
+        public static SPFolder WBxGetFolderPath(this SPFolder rootFolder, String folderPathString)
+        {
+            return WBxGetFolderPath(rootFolder, folderPathString, false);
+        }
+
+        public static SPFolder WBxGetFolderPath(this SPFolder rootFolder, String folderPathString, bool forPublicWeb)
+        {
+            if (rootFolder == null) return null;
+            if (String.IsNullOrEmpty(folderPathString)) return rootFolder;
+
+            if (folderPathString.Length == 1 && folderPathString.Equals("/")) return rootFolder;
+
+            string[] steps = folderPathString.Split('/');
+
+            if (steps.Length == 1) return rootFolder.WBxGetSubFolder(steps[0], forPublicWeb);
+
+            List<string> folderPath = new List<String>(steps);
+            return rootFolder.WBxGetFolderPath(folderPath, forPublicWeb);
+        }
+
+        public static SPFolder WBxGetFolderPath(this SPFolder rootFolder, List<string> folderPath)
+        {
+            return WBxGetFolderPath(rootFolder, folderPath, false);
+        }
+
+        public static SPFolder WBxGetFolderPath(this SPFolder rootFolder, List<string> folderPath, bool forPublicWeb)
+        {
+            SPFolder actualFolder = rootFolder;
+
+            foreach (String step in folderPath)
+            {
+                actualFolder = actualFolder.WBxGetSubFolder(step, forPublicWeb);
+                if (actualFolder == null) break;
+            }
+
+            return actualFolder;
+        }
+
+        public static SPFolder WBxGetSubFolder(this SPFolder parent, String childName)
+        {
+            return WBxGetSubFolder(parent, childName, false);
+        }
+
+        public static SPFolder WBxGetSubFolder(this SPFolder parent, String childName, bool forPublicWeb)
+        {
+            if (parent == null) return null;
+            if (String.IsNullOrEmpty(childName)) return parent;
+
+            if (forPublicWeb) childName = WBUtils.PrepareFilenameForPublicWeb(childName);
+
+            SPFolderCollection subFolders = parent.SubFolders;
+            SPFolder found = null;
+            foreach (SPFolder subFolder in subFolders)
+            {
+                if (subFolder.Name.Equals(childName))
+                {
+                    found = subFolder;
+                    break;
+                }
+            }
+
+            return found;
+        }
+
+
+        public static bool WBxCopyIntoFolder(this SPFolder folder, SPListItem item)
+        {
+            bool success = true;
+
+            try
+            {
+                if (item.Folder == null)
+                {
+                    String filename = item.Name;
+
+                    filename = item.Web.WBxMakeFilenameUnique(folder, filename);
+
+                    SPFile copiedFile = null;
+
+                    using (Stream stream = item.File.OpenBinaryStream())
+                    {
+                        copiedFile = folder.Files.Add(filename, stream);
+                        stream.Close();
+                    }
+                }
+                else
+                {
+                    String folderName = item.Name;
+
+                    folderName = folder.WBxMakeSubFolderNameUnique(folderName);
+
+                    SPFolder subFolder = folder.SubFolders.Add(folderName);
+
+                    foreach (SPFile file in item.Folder.Files)
+                    {
+                        subFolder.WBxCopyIntoFolder(file.Item);
+                    }
+
+                    foreach (SPFolder child in item.Folder.SubFolders)
+                    {
+                        subFolder.WBxCopyIntoFolder(child.Item);
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                WBLogging.Generic.Unexpected(e);
+                success = false;
+            }
+
+            return success;
+        }
+
+        public static String WBxMakeSubFolderNameUnique(this SPFolder folder, String folderName)
+        {
+            String suggestedName = folderName;
+
+            int count = 0;
+            while (folder.WBxSubFolderExists(suggestedName))
+            {
+                count++;
+                suggestedName = folderName + " (" + count + ")";
+
+                //WBLogging.Debug(string.Format("New suggested name: {0}    ", suggestedName));
+
+                if (count > 1000) throw new Exception("You are trying to create more than 1000 sub-folders with the same name in the same folder!");
+            }
+
+            return suggestedName;
+        }
+
+        public static bool WBxSubFolderExists(this SPFolder folder, String folderName)
+        {
+            SPFolderCollection subFolders = folder.SubFolders;
+
+            foreach (SPFolder subFolder in subFolders)
+            {
+                if (subFolder.Name == folderName) return true;
+            }
+
+            return false;
+        }
+
+        #endregion
+
+        #region Extensions For Creating and Executing CAML Queries
+
+        public static SPListItemCollection WBxGetItems(this SPList list, SPSite site, WBQuery query)
+        {
+            return WBxGetItems(list, site, query, 0);
+        }
+
+        public static SPListItemCollection WBxGetItems(this SPList list, SPSite site, WBQuery query, int max)
+        {
+            return list.GetItems(query.AsSPQuery(site, list));
+        }
+
+        public static DataTable WBxGetDataTable(this SPList list, SPSite site, WBQuery query)
+        {
+            return WBxGetDataTable(list, site, query, 0);
+        }
+
+        public static DataTable WBxGetDataTable(this SPList list, SPSite site, WBQuery query, int max)
+        {
+//            WBLogging.Debug("About to do the query");
+
+            SPListItemCollection items = list.WBxGetItems(site, query, max);
+
+            DataTable dataTable = query.MakeResultsDataTable();
+
+            int count = 0;
+
+//            WBLogging.Debug("The number of items returned by query was: " + items.Count);
+
+            foreach (SPListItem item in items)
+            {
+//                WBLogging.Debug("Looking at item number: " + count);
+                count++;
+                if (max > 0 && count > max) break;
+
+                DataRow row = dataTable.NewRow();
+
+                foreach (WBColumn column in query.ViewColumns)
+                {
+//                    WBLogging.Debug("Copying data from column: " + column.InternalName);
+
+                    try
+                    {
+                        switch (column.DataType)
+                        {
+                            case WBColumn.DataTypes.ManagedMetadata:
+                                {
+                                    if (column.AllowMultipleValues)
+                                    {
+                                        WBTermCollection<WBTerm> terms = item.WBxGetMultiTermColumn<WBTerm>(null, column.DisplayName);
+                                        if (terms != null)
+                                            row[column.InternalName] = terms.Names();
+                                    }
+                                    else
+                                    {
+                                        WBTerm term = item.WBxGetSingleTermColumn<WBTerm>(null, column.DisplayName);
+                                        if (term != null)
+                                            row[column.InternalName] = term.Name;
+                                    }
+                                    break;
+                                }
+
+                            case WBColumn.DataTypes.VirtualFormattedString:
+                                {
+                                    if (column.InternalName == WBColumn.TitleOrName.InternalName)
+                                    {
+                                        string title = row[WBColumn.Title.InternalName].WBxToString();
+                                        if (String.IsNullOrEmpty(title))
+                                        {
+                                            title = row[WBColumn.Name.InternalName].WBxToString();
+                                        }
+                                        row[column.InternalName] = title;
+                                    }
+                                    else if (column.InternalName == WBColumn.DisplayFileSize.InternalName)
+                                    {
+                                        string displaySize = "(unknown)";
+                                        string sizeInBytesString = row[WBColumn.FileSize.InternalName].WBxToString();
+                                        if (!String.IsNullOrEmpty(sizeInBytesString))
+                                        {
+                                            displaySize = SPUtility.FormatSize(Convert.ToInt32(sizeInBytesString));
+                                        }
+
+                                        row[column.InternalName] = displaySize;
+                                    }
+                                    else if (column.InternalName == WBColumn.FileType.InternalName)
+                                    {
+                                        string displayType = "(unknown)";
+                                        string filename = row[WBColumn.Name.InternalName].WBxToString();
+                                        if (!String.IsNullOrEmpty(filename))
+                                        {
+                                            displayType = Path.GetExtension(filename).Replace(".", "").ToUpper();
+                                        }
+
+                                        row[column.InternalName] = displayType;
+                                    }
+                                    else
+                                    {
+
+                                        List<String> values = new List<String>();
+
+                                        foreach (WBColumn placeHolder in column.FormatStringPlaceHolders)
+                                        {
+                                            WBLogging.Debug("Looking for placeholder value for column: " + placeHolder.InternalName);
+                                            WBLogging.Debug("Found value: " + row[placeHolder.InternalName].WBxToString());
+
+
+                                            values.Add(row[placeHolder.InternalName].WBxToString());
+                                        }
+
+                                        row[column.InternalName] = String.Format(column.FormatString, values.ToArray());
+                                    }
+
+                                    break;
+                                }
+
+                            case WBColumn.DataTypes.VirtualConditional:
+                                {
+                                    if (row[column.TestColumnInternalName].ToString() == column.TestColumnValue)
+                                        row[column.InternalName] = column.ValueIfEqual;
+                                    else
+                                        row[column.InternalName] = "";
+                                    break;
+                                }
+
+                            case WBColumn.DataTypes.VirtualFileTypeIcon:
+                                {
+                                    row[column.InternalName] = WBUtils.DocumentIcon16(row[WBColumn.Name.InternalName].WBxToString());
+                                    break;
+                                }
+                                
+
+                            default:
+                                {
+                                    if (item[column.DisplayName] != null)
+                                        row[column.InternalName] = item[column.DisplayName];
+                                    break;
+                                }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        WBLogging.Debug("Something went wrong: " + e.Message);
+                    }
+
+                }
+
+                dataTable.Rows.Add(row);
+            }
+
+            return dataTable;
+        }
+
+
+
+        public static SPQuery WBxMakeCAMLQueryFilterBy(this SPSite site, WBTeam team, WBRecordsType recordsType, bool includeRecordsTypeDescendants)
+        {
+            WBTaxonomy teams = team.Taxonomy;
+            WBTaxonomy recordsTypes = recordsType.Taxonomy;
+
+            string teamFilter = site.WBxMakeCAMLClauseFilterBy("Involved_x0020_Teams", team, false);
+            string recordsFilter = site.WBxMakeCAMLClauseFilterBy("Records_x0020_Type", recordsType, includeRecordsTypeDescendants);
+
+            // Using the null value to represent 'nothing passes this filter' ... or query:
+            if (teamFilter == null || recordsFilter == null) return null;
+
+            string queryString = "";
+            string queryFilters = "";
+            if (teamFilter != "" && recordsFilter != "")
+            {
+                queryFilters += "<And>" + teamFilter + recordsFilter + "</And>";
+            }
+            else
+            {
+                // NB (at least!) one of these is blank so we wont have two clauses here:
+                queryFilters += teamFilter + recordsFilter;
+            }
+
+            if (queryFilters != "")
+            {
+                queryString = "<Where>" + queryFilters + "</Where>";
+            }
+
+            WBUtils.logMessage("The query string was: \n" + queryString);
+
+            SPQuery query = new SPQuery();
+            query.Query = queryString;
+            query.ViewAttributes = "Scope='RecursiveAll'";
+
+            return query;
+        }
+
+
+        public static SPQuery WBxMakeCAMLQueryFilterBy(this SPSite site, WBRecordsType recordsType, String status, bool includeRecordsTypeDescendants)
+        {
+            WBTaxonomy recordsTypes = recordsType.Taxonomy;
+
+            string statusFilter = WBUtils.MakeCAMLClauseFilterBy("WorkBoxStatus", "Text", status);
+            string recordsFilter = site.WBxMakeCAMLClauseFilterBy("Records_x0020_Type", recordsType, includeRecordsTypeDescendants);
+
+            // Using the null value to represent 'nothing passes this filter' ... or query:
+            if (statusFilter == null || recordsFilter == null) return null;
+
+            string queryString = "";
+            string queryFilters = "";
+            if (statusFilter != "" && recordsFilter != "")
+            {
+                queryFilters += "<And>" + statusFilter + recordsFilter + "</And>";
+            }
+            else
+            {
+                // NB (at least!) one of these is blank so we wont have two clauses here:
+                queryFilters += statusFilter + recordsFilter;
+            }
+
+            if (queryFilters != "")
+            {
+                queryString = "<Where>" + queryFilters + "</Where>";
+            }
+
+            WBUtils.logMessage("The query string was: \n" + queryString);
+
+            SPQuery query = new SPQuery();
+            query.Query = queryString;
+            query.ViewAttributes = "Scope='RecursiveAll'";
+
+            return query;
+        }
+
+        
+        public static int[] WBxGetWssIdsOfTerm(this SPSite site, WBTerm term) {                    
+            return WBxGetWssIdsOfTerm(site, term, false);                
+        }
+
+        public static int[] WBxGetWssIdsOfTerm(this SPSite site, WBTerm term, bool includeDescendants)
+        {
+            return TaxonomyField.GetWssIdsOfTerm(site, term.Taxonomy.TermStore.Id, term.Taxonomy.TermSet.Id, term.Id, includeDescendants, 500);
+        }
+
+
+        // For this method returning "" means everything passes
+        public static string WBxMakeCAMLClauseFilterBy(this SPSite site, string fieldName, WBTerm term, bool includeDescendants)
+        {
+
+            if (term == null) return "";
+            int[] wssIds = site.WBxGetWssIdsOfTerm(term, includeDescendants);
+
+            // If the site had no matching WssIds that means the term isn't being used in the site
+            // so it can't possibly match - hence returning a filter clause that should always fail:
+            if (wssIds.Length == 0) 
+                return "<Eq><FieldRef Name='ContentType'/><Value Type='Text'>NoSuchContentTypeExists</Value></Eq>";
+
+            string queryString = "";
+            if (wssIds.Length == 1)
+            {
+
+                queryString = "<Eq><FieldRef Name='" + fieldName + "' LookupId='TRUE'/>";
+
+                foreach (int wssId in wssIds)
+                {
+                    queryString += string.Format(@"<Value Type='Lookup'>{0}</Value>", wssId);
+                }
+
+                queryString += "</Eq>";
+
+            }
+            else
+            {
+
+                queryString = "<In><FieldRef Name='" + fieldName + "'  LookupId='TRUE'/><Values>";
+
+                foreach (int wssId in wssIds)
+                {
+                    queryString += string.Format(@"<Value Type='Lookup'>{0}</Value>", wssId);
+                }
+
+                queryString += "</Values></In>";
+            }
+
+            return queryString;
+        }
+
+
+        #endregion
+
+        #region SPWeb extensions
+
+        public static String WBxMakeFilenameUnique(this SPWeb web, SPFolder folder, String suggestedName)
+        {
+            string fileNamePart = Path.GetFileNameWithoutExtension(suggestedName);
+            string extension = Path.GetExtension(suggestedName);
+
+            WBUtils.logMessage(string.Format("Trying to make the name unique: {0}    {1}", fileNamePart, extension));
+            WBUtils.logMessage(string.Format("Suggested name: {0}    ", suggestedName));
+
+            int count = 0;
+            while (web.WBxFileExists(folder, suggestedName))
+            {
+                count++;
+                suggestedName = fileNamePart + " (" + count + ")" + extension;
+
+                WBUtils.logMessage(string.Format("New suggested name: {0}    ", suggestedName));
+
+                if (count > 1000) throw new Exception("You are trying to create more than 1000 files with the same name in the same folder!");
+            }
+
+            return suggestedName;
+        }
+
+        public static bool WBxFileExists(this SPWeb web, SPFolder folder, String suggestedName)
+        {
+            string fullPath = folder.Url + "/" + suggestedName;
+
+            WBUtils.logMessage("About to GetFile : " + fullPath);
+            SPFile file = web.GetFile(fullPath);
+            return file.Exists;
+        }
+
+
+        #endregion
+
+        #region Permissions management extentions
+
+
+        public static SPGroup WBxGetGroupOrNull(this SPWeb web, String groupName)
+        {
+            if (String.IsNullOrEmpty(groupName)) return null;
+
+            foreach (SPGroup group in web.SiteGroups)
+            {
+                if (group.Name.ToLower() == groupName.ToLower())
+                    return group;
+            }
+
+            return null;
+        }
+
+        public static SPUser WBxEnsureUserOrNull(this SPWeb web, String loginName)
+        {
+            SPUser user = null;
+            try
+            {
+                user = web.EnsureUser(loginName);
+            }
+            catch (Exception e)
+            {                
+            }
+
+            return user;
+        }
+
+        public static void WBxAssignADNameWithRole(this SPWeb web, String loginName, String roleName)
+        {
+            if (loginName == null || loginName == "") return;
+            if (roleName == null || roleName == "") return;
+
+            WBUtils.logMessage("Assigning ADName | Role: " + loginName + " | " + roleName);
+
+            SPUser user = web.EnsureUser(loginName);
+            SPRoleDefinition roleDefinition = web.RoleDefinitions[roleName];
+
+            SPRoleAssignment roleAssignment = new SPRoleAssignment(user);
+            roleAssignment.RoleDefinitionBindings.Add(roleDefinition);
+
+            web.RoleAssignments.Add(roleAssignment);
+        }
+
+
+
+        public static void WBxAssignGroupWithRole(this SPWeb web, String groupName, String roleName) 
+        {
+            if (groupName == null || groupName == "") return;
+            if (roleName == null || roleName == "") return;
+
+            SPGroup group = web.SiteGroups[groupName];
+            SPRoleDefinition roleDefinition = web.RoleDefinitions[roleName];
+
+            SPRoleAssignment roleAssignment = new SPRoleAssignment(group);
+            roleAssignment.RoleDefinitionBindings.Add(roleDefinition);
+
+            web.RoleAssignments.Add(roleAssignment);
+            web.AssociatedGroups.Add(group);
+        }
+
+        public static void WBxAssignTeamWithRole(this SPWeb web, SPSite site, WBTeam team, String roleName)
+        {
+            if (team == null) return;
+            if (roleName == null || roleName == "") return;
+
+            team.SyncSPGroup(site);
+            String groupName = team.MembersGroupName;
+            if (groupName == "")
+            {
+                WBUtils.shouldThrowError("There was no associated group name to define this team");
+                return;
+            }
+
+            WBUtils.logMessage("Just about to add team | to have role: " + team.Name + " | " + roleName);
+            web.WBxAssignGroupWithRole(groupName, roleName);
+        }
+
+        public static void WBxRemoveGroupAssignment(this SPWeb web, String groupName)
+        {
+            if (groupName == null || groupName == "") return;
+
+            SPGroup group = web.SiteGroups[groupName];
+            web.RoleAssignments.Remove(group);
+        }
+
+        public static void WBxRemoveAllPermissionBindings(this SPWeb web)
+        {
+            List<SPPrincipal> membersToRemove = new List<SPPrincipal>();
+            foreach (SPRoleAssignment assignment in web.RoleAssignments)
+            {
+                membersToRemove.Add(assignment.Member);
+            }
+
+            web.AllowUnsafeUpdates = true;
+            foreach (SPPrincipal member in membersToRemove)
+            {
+                web.RoleAssignments.RemoveFromCurrentScopeOnly(member);
+            }
+        }
+
+
+        public static void WBxRemoveAllPermissionBindings(this SPListItem item)
+        {
+            List<SPPrincipal> membersToRemove = new List<SPPrincipal>();
+            foreach (SPRoleAssignment assignment in item.RoleAssignments)
+            {
+                membersToRemove.Add(assignment.Member);
+            }
+
+            foreach (SPPrincipal member in membersToRemove)
+            {
+                item.RoleAssignments.RemoveFromCurrentScopeOnly(member);
+            }
+        }
+
+
+        public static void WBxAssignGroupWithRole(this SPListItem item, SPWeb web, String groupName, String roleName)
+        {
+            if (groupName == null || groupName == "") return;
+            if (roleName == null || roleName == "") return;
+
+            SPGroup group = web.SiteGroups[groupName];
+            SPRoleDefinition roleDefinition = web.RoleDefinitions[roleName];
+
+            SPRoleAssignment roleAssignment = new SPRoleAssignment(group);
+            roleAssignment.RoleDefinitionBindings.Add(roleDefinition);
+
+            item.RoleAssignments.Add(roleAssignment);
+            web.AssociatedGroups.Add(group);
+        }
+
+
+
+        #endregion
+
+
+        #region SPGroup extensions
+
+        public static void WBxRemoveAllUsers(this SPGroup group)
+        {
+            SPUserCollection allUsers = group.Users;
+            foreach (SPUser user in allUsers)
+            {
+                group.RemoveUser(user);
+            }
+
+            group.Update();
+        }
+
+        public static void WBxCopyUsersInto(this SPGroup group, SPGroup intoGroup)
+        {
+            SPUserCollection allUsers = group.Users;
+            foreach (SPUser user in allUsers)
+            {
+                intoGroup.AddUser(user);
+            }
+
+            intoGroup.Update();
+        }
+
+        public static bool WBxContainsUser(this SPGroup group, SPUser user)
+        {
+            if (user == null) return false;
+
+            SPUserCollection allUsers = group.Users;
+            foreach (SPUser groupMember in allUsers)
+            {
+                if (user.LoginName == groupMember.LoginName) return true;
+            }
+            return false;
+        }
+
+        #endregion
+
+
+        #region Taxonomy extensions
+
+        public static String WBxFullPath(this Term term)
+        {
+            if (term == null) return "";
+            if (term.Parent == null) return term.Name;
+            return term.Parent.WBxFullPath() + "/" + term.Name;
+        }
+
+        #endregion
+
+
+
+        public static void WBxSafeSetSelectedValue(this DropDownList dropDownList, string value)
+        {
+            if (dropDownList.Items.FindByValue(value) != null)
+            {
+                dropDownList.SelectedValue = value;
+            }
+            else
+            {
+                WBLogging.Generic.Unexpected("Could not safely set the value for the drop down list. Value = " + value);
+            }
+        }
+
+        /*
+public static DateTime? safeStringToNullableDateTime(String value)
+{
+    if (value == null || value == "") return null;
+    return Convert.ToDateTime(value);
+}
+
+public static String safeNullableDateTimeToString(DateTime? value)
+{
+    if (value == null) return "";
+    return value.Value.ToString();
+}
+*/
+
+    }
+
+
+
+
+}
