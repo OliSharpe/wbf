@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkBoxFramework", "WorkBoxFramework\WorkBoxFramework.csproj", "{0E53B68A-6901-49B0-B614-7C859A434430}"
+EndProject
+Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "WBF Documentation", "WBF Documentation\WBF Documentation.shfbproj", "{A646268E-5EE8-4550-9E1A-86F44DC9B1F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WBFWebParts", "WBFWebParts\WBFWebParts.csproj", "{F5A04E6D-21D4-4CA9-A67D-8F0BFFC5A36A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0E53B68A-6901-49B0-B614-7C859A434430} = {0E53B68A-6901-49B0-B614-7C859A434430}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs35
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = WBF\u0020Documentation\\WBF\u0020Documentation.shfbproj
+		SccProjectName1 = WBF\u0020Documentation
+		SccLocalPath1 = WBF\u0020Documentation
+		SccProjectUniqueName2 = WBFWebParts\\WBFWebParts.csproj
+		SccProjectName2 = WBFWebParts
+		SccLocalPath2 = WBFWebParts
+		SccProjectUniqueName3 = WorkBoxFramework\\WorkBoxFramework.csproj
+		SccProjectName3 = WorkBoxFramework
+		SccLocalPath3 = WorkBoxFramework
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Documentation|Any CPU = Documentation|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0E53B68A-6901-49B0-B614-7C859A434430}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E53B68A-6901-49B0-B614-7C859A434430}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E53B68A-6901-49B0-B614-7C859A434430}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{0E53B68A-6901-49B0-B614-7C859A434430}.Documentation|Any CPU.ActiveCfg = Release|Any CPU
+		{0E53B68A-6901-49B0-B614-7C859A434430}.Documentation|Any CPU.Build.0 = Release|Any CPU
+		{0E53B68A-6901-49B0-B614-7C859A434430}.Documentation|Any CPU.Deploy.0 = Release|Any CPU
+		{0E53B68A-6901-49B0-B614-7C859A434430}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E53B68A-6901-49B0-B614-7C859A434430}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E53B68A-6901-49B0-B614-7C859A434430}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A646268E-5EE8-4550-9E1A-86F44DC9B1F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A646268E-5EE8-4550-9E1A-86F44DC9B1F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A646268E-5EE8-4550-9E1A-86F44DC9B1F3}.Documentation|Any CPU.ActiveCfg = Documentation|Any CPU
+		{A646268E-5EE8-4550-9E1A-86F44DC9B1F3}.Documentation|Any CPU.Build.0 = Documentation|Any CPU
+		{A646268E-5EE8-4550-9E1A-86F44DC9B1F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5A04E6D-21D4-4CA9-A67D-8F0BFFC5A36A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5A04E6D-21D4-4CA9-A67D-8F0BFFC5A36A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5A04E6D-21D4-4CA9-A67D-8F0BFFC5A36A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{F5A04E6D-21D4-4CA9-A67D-8F0BFFC5A36A}.Documentation|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5A04E6D-21D4-4CA9-A67D-8F0BFFC5A36A}.Documentation|Any CPU.Build.0 = Debug|Any CPU
+		{F5A04E6D-21D4-4CA9-A67D-8F0BFFC5A36A}.Documentation|Any CPU.Deploy.0 = Debug|Any CPU
+		{F5A04E6D-21D4-4CA9-A67D-8F0BFFC5A36A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5A04E6D-21D4-4CA9-A67D-8F0BFFC5A36A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5A04E6D-21D4-4CA9-A67D-8F0BFFC5A36A}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

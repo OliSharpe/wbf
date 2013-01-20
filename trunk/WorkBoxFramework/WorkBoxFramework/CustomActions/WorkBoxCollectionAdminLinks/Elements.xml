@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  
+  <CustomAction Id="WorkBoxCollectionSettingsLink"
+              GroupId="WorkBoxFramework.SiteSettingsGroup"
+              Location="Microsoft.SharePoint.SiteSettings"
+              Sequence="5000"
+              Title="Work Box Collection Settings"
+              RequireSiteAdministrator="TRUE">
+    <UrlAction Url="_layouts/WorkBoxFramework/WorkBoxCollectionSettingsPage.aspx"/>
+  </CustomAction>
+
+  <CustomAction Id="EditRibbonButtonsSettingsLink"
+              GroupId="WorkBoxFramework.SiteSettingsGroup"
+              Location="Microsoft.SharePoint.SiteSettings"
+              Sequence="5010"
+              Title="Edit Ribbon Buttons Settings"
+              RequireSiteAdministrator="TRUE">
+    <UrlAction Url="_layouts/WorkBoxFramework/EditRibbonButtonsSettings.aspx"/>
+  </CustomAction>
+
+  
+  <CustomAction Id="WorkBoxFramework.Scripts"
+                 Location="ScriptLink"
+                 ScriptSrc="~site/_layouts/WorkBoxFramework/jquery-1.7.2.min.js" />
+
+  <CustomAction Id="WorkBoxFramework.Scripts"
+                  Location="ScriptLink"
+                  ScriptSrc="~site/_layouts/WorkBoxFramework/WorkBoxFramework.js" />
+
+
+</Elements>

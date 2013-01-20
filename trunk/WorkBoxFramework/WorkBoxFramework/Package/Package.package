@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="122d1e78-156a-4d31-adc1-66fee258b162" solutionId="122d1e78-156a-4d31-adc1-66fee258b162" resetWebServer="false" name="WorkBoxFramework" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+  <assemblies>
+    <customAssembly location="Newtonsoft.Json.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="Include\Newtonsoft.Json.dll" />
+  </assemblies>
+  <features>
+    <featureReference itemId="d6611606-4769-4ad3-b59d-0042b58731b5" />
+    <featureReference itemId="a415a88a-d669-4b39-834a-1ea20cab0d2d" />
+    <featureReference itemId="240226a7-44cf-4523-be68-5fe549b1b9fe" />
+    <featureReference itemId="a09d6d96-ebfb-48e7-972c-23134ece170a" />
+    <featureReference itemId="a75cfbd3-a45e-4a8f-b299-b54cd916259d" />
+    <featureReference itemId="74e762ae-b6db-41a8-b172-ba79a277fb4f" />
+    <featureReference itemId="9c028719-6c00-44bc-9773-dcccc9ff9374" />
+    <featureReference itemId="393c4749-9940-4be0-bf37-54a9a940b836" />
+    <featureReference itemId="025aa9ef-ed4c-4433-8ee7-3b8a7b3e14da" />
+  </features>
+  <projectItems>
+    <projectItemReference itemId="6301f556-5cc1-47b3-a9d0-eb1439485ef6" />
+    <projectItemReference itemId="a90b15d8-3fc1-4466-b5c6-72c2d902ae6d" />
+    <projectItemReference itemId="9517df5e-7212-4ae7-98a4-141ea4c73939" />
+    <projectItemReference itemId="ab4dfa97-7233-44ec-b9d1-2ad3515f0a68" />
+    <projectItemReference itemId="ad111b85-98d1-4df8-8f5f-ef3141011c5c" />
+  </projectItems>
+</package>

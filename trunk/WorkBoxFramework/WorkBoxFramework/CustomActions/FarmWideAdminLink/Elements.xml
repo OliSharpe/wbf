@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+
+  <CustomActionGroup
+    Description = "Farm Wide Administration for the Work Box Framework"
+    Id = "WorkBoxFrameworkAdmin"
+    Location = "Microsoft.SharePoint.Administration.Applications"
+    Sequence = "1123"
+    Title = "Work Box Framework"
+    ImageUrl="/_layouts/images/WorkBoxFramework/work-box-32.png">
+  </CustomActionGroup>
+
+  <CustomAction Id="WorkBoxFramework.FarmWideAdmin" GroupId="WorkBoxFrameworkAdmin"
+    Location="Microsoft.SharePoint.Administration.Applications"
+    Sequence="10"
+    Title="Farm Wide Admin" Description="">
+    <UrlAction Url="_admin/WorkBoxFramework/FarmWideAdmin.aspx" />
+  </CustomAction>
+
+  <CustomAction Id="WorkBoxFramework.DefaultInviteEmailTemplates" GroupId="WorkBoxFrameworkAdmin"
+    Location="Microsoft.SharePoint.Administration.Applications"
+    Sequence="20"
+    Title="Default Invite Email Templates" Description="">
+    <UrlAction Url="_admin/WorkBoxFramework/DefaultInviteEmailTemplates.aspx" />
+  </CustomAction>
+  
+  <CustomAction Id="WorkBoxFramework.MigrationAdmin" GroupId="WorkBoxFrameworkAdmin"
+  Location="Microsoft.SharePoint.Administration.Applications"
+  Sequence="30"
+  Title="Migrate Documents or Web Pages" Description="">
+    <UrlAction Url="_admin/WorkBoxFramework/MigrationAdmin.aspx" />
+  </CustomAction>
+
+</Elements>

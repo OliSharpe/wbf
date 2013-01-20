@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<webParts>
+  <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
+    <metaData>
+      <type name="WBFWebParts.CentralListOfLinks.CentralListOfLinks, $SharePoint.Project.AssemblyFullName$" />
+      <importErrorMessage>$Resources:core,ImportErrorMessage;</importErrorMessage>
+    </metaData>
+    <data>
+      <properties>
+        <property name="Title" type="string">Central List Of Links</property>
+        <property name="Description" type="string">Display a list of centrally managed links.</property>
+      </properties>
+    </data>
+  </webPart>
+</webParts>

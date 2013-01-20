@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ProjectItem Type="Microsoft.VisualStudio.SharePoint.VisualWebPart" DefaultFile="CentralListOfLinksUserControl.ascx" SupportedTrustLevels="FullTrust" SupportedDeploymentScopes="Site" xmlns="http://schemas.microsoft.com/VisualStudio/2010/SharePointTools/SharePointProjectItemModel">
+  <Files>
+    <ProjectItemFile Source="Elements.xml" Target="CentralListOfLinks\" Type="ElementManifest" />
+    <ProjectItemFile Source="CentralListOfLinks.webpart" Target="CentralListOfLinks\" Type="ElementFile" />
+    <ProjectItemFile Source="CentralListOfLinksUserControl.ascx" Target="CONTROLTEMPLATES\WBFWebParts\CentralListOfLinks\" Type="TemplateFile" />
+  </Files>
+  <SafeControls>
+    <SafeControl Name="SafeControlEntry1" Assembly="$SharePoint.Project.AssemblyFullName$" Namespace="WBFWebParts.CentralListOfLinks" TypeName="*" IsSafe="true" IsSafeAgainstScript="false" />
+  </SafeControls>
+</ProjectItem>

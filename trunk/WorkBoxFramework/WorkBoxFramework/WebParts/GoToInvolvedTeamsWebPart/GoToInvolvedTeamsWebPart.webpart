@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<webParts>
+  <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
+    <metaData>
+      <type name="WorkBoxFramework.GoToInvolvedTeamsWebPart.GoToInvolvedTeamsWebPart, $SharePoint.Project.AssemblyFullName$" />
+      <importErrorMessage>$Resources:core,ImportErrorMessage;</importErrorMessage>
+    </metaData>
+    <data>
+      <properties>
+        <property name="Title" type="string">Go To Involved Teams</property>
+        <property name="Description" type="string">Shows a list of links to the various teams involved with the work box.</property>
+      </properties>
+    </data>
+  </webPart>
+</webParts>

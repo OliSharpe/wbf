@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+
+  <CustomAction Id="WorkBoxFramework.UpdateRecordsMetadataAction" 
+                RegistrationType="List"
+                RegistrationId="1302"
+                Location="EditControlBlock" 
+                Sequence="10105" 
+                Title="Update Record's Metadata" 
+                Description="Allows records managers to update specific metadata fields of a record." >
+    <UrlAction Url="javascript:                
+               function ReturnFromDialog(dialogResult, returnValue)  
+               { 
+                   SP.UI.ModalDialog.RefreshPage(SP.UI.DialogResult.OK); 
+               } 
+               var options = {
+                   url: '{SiteUrl}' + '/_layouts/WorkBoxFramework/UpdateRecordsMetadata.aspx?ListID={ListId}&amp;ItemID={ItemId}', 
+                   title: 'Update Records Metadata',
+                   allowMaximize: false, 
+                   showClose: true, 
+                   width: 700, 
+                   height: 350, 
+                   dialogReturnValueCallback: ReturnFromDialog 
+               };
+               SP.UI.ModalDialog.showModalDialog(options);" />
+  </CustomAction>
+  
+</Elements>

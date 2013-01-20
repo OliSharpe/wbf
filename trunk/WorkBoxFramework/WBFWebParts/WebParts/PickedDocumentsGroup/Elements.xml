@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/" >
+  <Module Name="PickedDocumentsGroup" List="113" Url="_catalogs/wp">
+    <File Path="PickedDocumentsGroup\PickedDocumentsGroup.webpart" Url="PickedDocumentsGroup.webpart" Type="GhostableInLibrary" >
+      <Property Name="Group" Value="LBI" />
+    </File>
+  </Module>
+</Elements>
