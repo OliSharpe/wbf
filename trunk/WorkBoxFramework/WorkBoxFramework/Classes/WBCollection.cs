@@ -714,6 +714,19 @@ namespace WorkBoxFramework
         }
         */
 
+        public List<WorkBox> GetWorkBoxes(WBQuery query)
+        {
+            SPListItemCollection items = List.WBxGetItems(Site, query);
+
+            List<WorkBox> workBoxes = new List<WorkBox>();
+            foreach (SPListItem item in items)
+            {
+                workBoxes.Add(new WorkBox(this, item));
+            }
+
+            return workBoxes;
+        }
+
         public DataTable Query(WBQuery query)
         {
             // Maybe should be using: SPSiteDataQuery  class as the basis for this instead of GetItems()
