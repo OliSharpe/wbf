@@ -161,10 +161,35 @@ namespace WorkBoxFramework.ViewSubjectPages
                     List<String> terms = new List<String>(allTermPaths.Keys);
                     terms.Sort();
 
+                    List<String> termsWithLetterFirst = new List<String>();
+                    List<String> remainingTerms = new List<String>();
+
                     foreach (String term in terms)
+                    {
+                        if (term.IndexOf(pickedLetter) == 0)
+                        {
+                            termsWithLetterFirst.Add(term);
+                        }
+                        else
+                        {
+                            remainingTerms.Add(term);
+                        }
+                    }
+
+                    foreach (String term in termsWithLetterFirst)
                     {
                         html += "<div class='lbi-a-to-z-child-subject'><a href='?AdditionalPath=" + allTermPaths[term] + recordsTypeParameter + "'>" + term + "</a></div>\n";
                     }
+
+                    if (remainingTerms.Count > 0)
+                    {
+                        html += "<div>&nbsp;</div>\n";
+                        foreach (String term in remainingTerms)
+                        {
+                            html += "<div class='lbi-a-to-z-child-subject'><a href='?AdditionalPath=" + allTermPaths[term] + recordsTypeParameter + "'>" + term + "</a></div>\n";
+                        }
+                    }
+
                 }
                 else
                 {
@@ -177,7 +202,14 @@ namespace WorkBoxFramework.ViewSubjectPages
                 List<String> path = new List<String>(names);
                 path.RemoveAt(0);
 
-                PageName.Text = BuildPageNamePath(names, path);
+
+                String justRecordsType = "";
+                if (!String.IsNullOrEmpty(recordsTypeFullPath) && recordsTypeFullPath != NO_RECORDS_TYPE_SELECTED)
+                {
+                    justRecordsType = GetJustRecordsTypeName(recordsTypeFullPath);
+                }
+
+                PageName.Text = BuildPageNamePath(names, path, justRecordsType);
 
                 PageSubjectTagDescription.Text = pageSubjectTag.Description;
 
@@ -226,11 +258,11 @@ namespace WorkBoxFramework.ViewSubjectPages
                                     List<String> justRecordsTypes = new List<String>(recordsTypesToList.Keys);
                                     justRecordsTypes.Sort();
 
-                                    foreach (String justRecordsType in justRecordsTypes)
+                                    foreach (String recordsType in justRecordsTypes)
                                     {
-                                        String recordsTypePath = recordsTypesToList[justRecordsType];
+                                        String recordsTypePath = recordsTypesToList[recordsType];
 
-                                        html += "<div class='lbi-a-to-z-child-subject'><a href='?AdditionalPath=" + additionalPath + "&RecordsType=" + recordsTypePath + "'>" + justRecordsType + "</a></div>\n";
+                                        html += "<div class='lbi-a-to-z-child-subject'><a href='?AdditionalPath=" + additionalPath + "&RecordsType=" + recordsTypePath + "'>" + recordsType + "</a></div>\n";
                                     }
                                 }
 
@@ -311,7 +343,7 @@ namespace WorkBoxFramework.ViewSubjectPages
         }
 
 
-        private string BuildPageNamePath(List<String> names, List<String> path)
+        private string BuildPageNamePath(List<String> names, List<String> path, String justRecordsType)
         {
             if (names == null || names.Count == 0) return "";
             string name = names[names.Count - 1];
@@ -345,9 +377,13 @@ namespace WorkBoxFramework.ViewSubjectPages
                 path.RemoveAt(path.Count - 1);
             }
 
+            if (!String.IsNullOrEmpty(justRecordsType))
+            {
+                justRecordsType = " &gt;&gt; " + justRecordsType;
+            }
 
-            return String.Format("{0} &gt; <a href=\"?AdditionalPath={1}\">{2}</a>",
-                BuildPageNamePath(names, path), additionalPath, name);
+            return String.Format("{0} &gt; <a href=\"?AdditionalPath={1}\">{2}</a>{3}",
+                BuildPageNamePath(names, path, ""), additionalPath, name, justRecordsType);
         }
 
         /*
@@ -373,6 +409,82 @@ namespace WorkBoxFramework.ViewSubjectPages
             return html;
         }
         */
+
+
+        private int CountArchivedDocsOfThisSelection()
+        {
+            WBFarm farm = WBFarm.Local;
+
+            int foundDocuments = 0;
+
+            using (SPSite site = new SPSite(farm.ProtectedRecordsLibraryUrl))
+            {
+                WBTaxonomy subjectTags = WBTaxonomy.GetSubjectTags(site);
+                WBTaxonomy teamsTaxonomy = WBTaxonomy.GetTeams(subjectTags);
+                WBTaxonomy recordsTypesTaxonomy = WBTaxonomy.GetRecordsTypes(teamsTaxonomy);
+
+                Term pageSeriesTagTerm = subjectTags.GetSelectedTermByPath(FullSubjectTagPath);
+                WBTerm localPageSubjectTag = null;
+                if (pageSeriesTagTerm != null)
+                    localPageSubjectTag = new WBTerm(subjectTags, pageSeriesTagTerm);
+
+                if (localPageSubjectTag != null)
+                {
+                    using (SPWeb web = site.OpenWeb())
+                    {
+                        WBQuery query = new WBQuery();
+
+                        WBQueryClause subjectTagClause = new WBQueryClause(WBColumn.SubjectTags, WBQueryClause.Comparators.Equals, localPageSubjectTag);
+                        subjectTagClause.UseDescendants = false;
+                        query.AddClause(subjectTagClause);
+
+                        WBQueryClause isArchivedClause = new WBQueryClause(WBColumn.LiveOrArchived, WBQueryClause.Comparators.Equals, WBColumn.LIVE_OR_ARCHIVED__ARCHIVED);
+                        query.AddClause(isArchivedClause);
+
+
+                        WBTeam team = null;
+                        if (!String.IsNullOrEmpty(webPart.FilterByOwningTeam))
+                        {
+                            team = teamsTaxonomy.GetSelectedTeam(webPart.FilterByOwningTeam);
+
+                            if (team != null)
+                            {
+                                query.AddEqualsFilter(WBColumn.OwningTeam, team);
+                            }
+                        }
+
+
+                        if (webPart.ShowRecordTypes && !String.IsNullOrEmpty(recordsTypeFullPath) && recordsTypeFullPath != NO_RECORDS_TYPE_SELECTED)
+                        {
+                            WBRecordsType recordsTypeToFilterBy = recordsTypesTaxonomy.GetSelectedRecordsType(recordsTypeFullPath);
+
+                            if (recordsTypeToFilterBy != null)
+                            {
+                                query.AddEqualsFilter(WBColumn.RecordsType, recordsTypeToFilterBy);
+                            }
+                        }
+
+                        query.AddViewColumn(WBColumn.Name);
+                        query.AddViewColumn(WBColumn.Title);
+                        query.AddViewColumn(WBColumn.RecordID);
+                        
+
+                        SPList recordsLibrary = web.GetList(farm.ProtectedRecordsLibraryUrl); //"Documents"]; //farm.RecordsCenterRecordsLibraryName];
+
+                        SPListItemCollection foundArchivedItems = recordsLibrary.WBxGetItems(site, query);
+
+                        foundDocuments = foundArchivedItems.Count;
+                    }
+                }
+                else
+                {
+                    WBUtils.logMessage("pageSubjectTag was null");
+                }
+
+            }
+
+            return foundDocuments;
+        }
 
 
         private void RefreshBoundDocumentsList()
@@ -540,12 +652,28 @@ namespace WorkBoxFramework.ViewSubjectPages
 
             if (!foundDocuments && !foundChildSubjectTags && !(onRootOfAtoZ))
             {
-                DynamicNoDocumentsMessage.Text = "(No documents have been found)";
+                int archivedDocs = 0;
 
                 if (!webPart.OnlyLiveRecords)
                 {
+                    if (SelectedLiveOrArchivedStatusFilter == WBColumn.LIVE_OR_ARCHIVED__LIVE)
+                    {
+                        archivedDocs = this.CountArchivedDocsOfThisSelection();
+                    }
+
                     showFilters = true;
                 }
+
+
+                if (archivedDocs > 0)
+                {
+                    DynamicNoDocumentsMessage.Text = "(No live documents have been found. There are " + archivedDocs + " archived documents of this type.)";
+                }
+                else
+                {
+                    DynamicNoDocumentsMessage.Text = "(No documents have been found)";
+                }
+
             }
             else
             {
@@ -586,6 +714,8 @@ namespace WorkBoxFramework.ViewSubjectPages
                             WBQueryClause isLiveClause = new WBQueryClause(WBColumn.LiveOrArchived, WBQueryClause.Comparators.Equals, WBColumn.LIVE_OR_ARCHIVED__LIVE);
                             query.AddClause(isLiveClause);
                         }
+
+                            /*
                         else
                         {
                             string statusFilter = SelectedLiveOrArchivedStatusFilter;
@@ -595,6 +725,7 @@ namespace WorkBoxFramework.ViewSubjectPages
                                 query.AddEqualsFilter(WBColumn.LiveOrArchived, statusFilter);
                             }
                         }
+                             */ 
 
                         WBTeam team = null;
                         if (!String.IsNullOrEmpty(webPart.FilterByOwningTeam))
@@ -627,20 +758,7 @@ namespace WorkBoxFramework.ViewSubjectPages
                         foreach (SPListItem item in listOfFoundDocuments)
                         {
                             WBRecordsType recordsType = item.WBxGetSingleTermColumn<WBRecordsType>(recordsTypesTaxonomy, WBColumn.RecordsType);
-
-                            String justRecordsType = recordsType.Name;
-                            if (justRecordsType.Contains(":"))
-                            {
-                                int split = justRecordsType.IndexOf(':');
-                                justRecordsType = justRecordsType.Substring(split);
-                            }
-
-                            if (justRecordsType.Contains("/"))
-                            {
-                                int split = justRecordsType.IndexOf('/');
-                                justRecordsType = justRecordsType.Substring(split);
-                            }
-
+                            String justRecordsType = GetJustRecordsTypeName(recordsType.Name);
 
                             if (!typesToList.ContainsKey(justRecordsType))
                             {
@@ -659,6 +777,23 @@ namespace WorkBoxFramework.ViewSubjectPages
             return typesToList;
         }
 
+        private String GetJustRecordsTypeName(String fullRecordsTypePath)
+        {
+            String justRecordsType = fullRecordsTypePath;
+            if (justRecordsType.Contains(":"))
+            {
+                int split = justRecordsType.IndexOf(':');
+                justRecordsType = justRecordsType.Substring(split+1);
+            }
+
+            if (justRecordsType.Contains("/"))
+            {
+                int split = justRecordsType.IndexOf('/');
+                justRecordsType = justRecordsType.Substring(split+1);
+            }
+
+            return justRecordsType;
+        }
 
         void DocumentsForSubject_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
