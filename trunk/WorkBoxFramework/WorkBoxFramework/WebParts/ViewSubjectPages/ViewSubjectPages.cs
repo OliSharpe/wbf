@@ -10,13 +10,13 @@
 // published by the Free Software Foundation, either version 2.1 of the 
 // License, or (at your option) any later version.
 //
-// The Work Box Framework is distributed in the hope that it will be 
+// The Work Box Framework (WBF) is distributed in the hope that it will be 
 // useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+// along with the WBF.  If not, see <http://www.gnu.org/licenses/>.
 
 #endregion
 
@@ -73,10 +73,17 @@ namespace WorkBoxFramework.ViewSubjectPages
 
         [WebBrowsable(true)]
         [Personalizable(PersonalizationScope.Shared)]
-        [WebDisplayName("Hide Document on Root Page")]
-        [WebDescription("Hide documents from showing on the root page.")]
+        [WebDisplayName("Show Documents on A to Z Root Page")]
+        [WebDescription("Show documents when viewing the root subject page.")]
         [System.ComponentModel.Category("Configuration")]
-        public bool HideDocumentsOnRootPage { get; set; }
+        public bool ShowDocumentsOnAtoZRootPage { get; set; }
+
+        [WebBrowsable(true)]
+        [Personalizable(PersonalizationScope.Shared)]
+        [WebDisplayName("Only Show Documents on Leaf Pages")]
+        [WebDescription("Only show documents when the user has selected a leaf page.")]
+        [System.ComponentModel.Category("Configuration")]
+        public bool OnlyShowDocumentsOnLeafPages { get; set; }
 
 
         [WebBrowsable(true)]

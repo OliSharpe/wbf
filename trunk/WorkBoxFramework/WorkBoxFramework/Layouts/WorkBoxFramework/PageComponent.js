@@ -8,13 +8,13 @@
 // published by the Free Software Foundation, either version 2.1 of the 
 // License, or (at your option) any later version.
 //
-// The Work Box Framework is distributed in the hope that it will be 
+// The Work Box Framework (WBF) is distributed in the hope that it will be 
 // useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+// along with the WBF.  If not, see <http://www.gnu.org/licenses/>.
 
 // Inspired by blogs:
 // http://www.sharepointnutsandbolts.com/2010/02/ribbon-customizations-dropdown-controls.html
