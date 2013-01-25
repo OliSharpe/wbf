@@ -10,13 +10,13 @@
 // published by the Free Software Foundation, either version 2.1 of the 
 // License, or (at your option) any later version.
 //
-// The Work Box Framework is distributed in the hope that it will be 
+// The Work Box Framework (WBF) is distributed in the hope that it will be 
 // useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+// along with the WBF.  If not, see <http://www.gnu.org/licenses/>.
 
 #endregion
 
@@ -234,7 +234,10 @@ namespace WorkBoxFramework.ViewSubjectPages
 
                     if (termLabels.Count > 0)
                     {
-                        showDocuments = false;
+                        if (webPart.OnlyShowDocumentsOnLeafPages)
+                        {
+                            showDocuments = false;
+                        }
 
                         termLabels.Sort();
 
@@ -250,10 +253,13 @@ namespace WorkBoxFramework.ViewSubjectPages
                         {
                             if (recordsTypeFullPath == NO_RECORDS_TYPE_SELECTED)
                             {
-                                Dictionary<String,String> recordsTypesToList = FindRecordsTypesToList();
+                                Dictionary<String, String> recordsTypesToList = FindRecordsTypesToList();
                                 if (recordsTypesToList.Count > 0)
                                 {
-                                    showDocuments = false;
+                                    if (webPart.OnlyShowDocumentsOnLeafPages)
+                                    {
+                                        showDocuments = false;
+                                    }
 
                                     List<String> justRecordsTypes = new List<String>(recordsTypesToList.Keys);
                                     justRecordsTypes.Sort();
@@ -270,8 +276,18 @@ namespace WorkBoxFramework.ViewSubjectPages
                         }
                     }
                 }
+                else
+                {
+                    if (webPart.ShowDocumentsOnAtoZRootPage)
+                    {
+                        showDocuments = true;
+                    }
+                    else
+                    {
+                        showDocuments = false;
+                    }
+                }
 
-                if (webPart.HideDocumentsOnRootPage && pageSubjectTag.Name == webPart.RootSubjectTag) showDocuments = false;
 
                 if (showDocuments)
                 {
