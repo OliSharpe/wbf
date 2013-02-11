@@ -367,7 +367,7 @@ namespace WorkBoxFramework
         }
 
 
-        public void InitialFarmSetup(SPSite site, String adminTeamSiteURL)
+        public void InitialFarmSetup(SPSite site, String adminTeamSiteURL, String serverForTimerJobs)
         {
             WBLogging.Generic.Monitorable("Running WBFarm.InitialFarmSetup()");
 
@@ -393,7 +393,11 @@ namespace WorkBoxFramework
                 this.TimerJobsManagementSiteUrl = adminTeamSiteURL;
                 this.OpenWorkBoxesCachedDetailsListUrl = adminSite.Url + "/Lists/CachedWorkBoxDetails";
 
+                this.TimerJobsServerName = serverForTimerJobs;
+
                 this.Update();
+
+                RegisterTimerJobs(adminSite);
 
                 if (rootTeamSiteWeb != adminWeb && (SPContext.Current == null || rootTeamSiteWeb != SPContext.Current.Web))
                 {
@@ -1013,7 +1017,96 @@ namespace WorkBoxFramework
         }
 
 
+        internal void RegisterTimerJobs(SPSite site)
+        {
+            SPWebApplication webApplication = site.WebApplication;
 
+                        // make sure the job isn't already registered
+            foreach (SPJobDefinition job in webApplication.JobDefinitions) {
+                if (job.Name == WBTimerTasksJob.DAILY_TIMER_TASKS__TIMER_JOB_NAME)
+                    job.Delete();
+
+                if (job.Name == WBTimerTasksJob.FREQUENT_TIMER_TASKS__TIMER_JOB_NAME)
+                    job.Delete();
+
+                if (job.Name == WBMigrationTimerJob.MIGRATION_TIMER_JOB__TIMER_JOB_NAME)
+                    job.Delete();
+            }
+
+            SPServer server = null;
+            WBFarm farm = WBFarm.Local;
+
+            if (farm.TimerJobsServerName != "")
+            {
+                server = farm.SPFarm.Servers[farm.TimerJobsServerName];
+
+                if (server != null)
+                {
+
+                    /* */
+                    /* First adding the Daily Timer Job  */
+                    /* */
+
+                    WBLogging.Generic.Monitorable("WBFarm.RegisterTimerJobs(): Adding a timer job to server : " + server.Name + " with name: " + WBTimerTasksJob.DAILY_TIMER_TASKS__TIMER_JOB_NAME);
+
+                    WBTimerTasksJob timerJob = new WBTimerTasksJob(
+                        WBTimerTasksJob.DAILY_TIMER_TASKS__TIMER_JOB_NAME,
+                        WBTimerTasksJob.DAILY_TIMER_TASKS__LIST_NAME,
+                        WBTimerTasksJob.DAILY_TIMER_TASKS__ORDERED_VIEW_NAME,
+                        webApplication,
+                        server,
+                        SPJobLockType.Job);
+
+                    SPDailySchedule schedule = new SPDailySchedule();
+
+                    schedule.BeginHour = 5;
+                    schedule.BeginMinute = 0;
+                    schedule.BeginSecond = 0;
+
+                    schedule.EndHour = 5;
+                    schedule.EndMinute = 10;
+                    schedule.EndSecond = 0;
+
+                    timerJob.Schedule = schedule;
+
+                    timerJob.Update();
+
+                    /* */
+                    /* Now adding the Frequent Timer Job  */
+                    /* */
+
+                    WBLogging.Generic.Monitorable("WBFarm.RegisterTimerJobs(): Adding a timer job to server : " + server.Name + " with name: " + WBTimerTasksJob.FREQUENT_TIMER_TASKS__TIMER_JOB_NAME);
+
+                    WBTimerTasksJob frequentTimerJob = new WBTimerTasksJob(
+                        WBTimerTasksJob.FREQUENT_TIMER_TASKS__TIMER_JOB_NAME,
+                        WBTimerTasksJob.FREQUENT_TIMER_TASKS__LIST_NAME,
+                        WBTimerTasksJob.FREQUENT_TIMER_TASKS__ORDERED_VIEW_NAME,
+                        webApplication,
+                        server,
+                        SPJobLockType.Job);
+
+                    SPMinuteSchedule frequentSchedule = new SPMinuteSchedule();
+
+                    frequentSchedule.BeginSecond = 0;
+                    frequentSchedule.EndSecond = 59;
+                    frequentSchedule.Interval = 10;
+
+                    frequentTimerJob.Schedule = frequentSchedule;
+
+                    frequentTimerJob.Update();
+
+                }
+                else
+                {
+                    WBLogging.Generic.Unexpected("WBFarm.RegisterTimerJobs(): Couldn't find the server with the name: " + farm.TimerJobsServerName);
+                }
+            }
+            else
+            {
+                WBLogging.Generic.Unexpected("WBFarm.RegisterTimerJobs(): The WBF farm wide setting of which server to use for the timer job has not been set.");
+            }
+
+        }
 
 
 

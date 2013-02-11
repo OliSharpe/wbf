@@ -25,7 +25,10 @@ td.wbf-buttons-panel { border-top:solid 1px grey; text-align: center; vertical-a
 td.wbf-create-new-title { padding: 6px; }
 div.wbf-create-new-title { font-weight: bold; font-size: 16px; vertical-align: top; padding-bottom: 4px; }
 table.wbf-title-table { padding: 6px 0px 12px 10px; }
+.wbf-admin-page { padding: 10px }
 </style>
+
+<div class="wbf-admin-page">
 
 <h2>Configure the default invitation email templates</h2>
 
@@ -153,6 +156,7 @@ table.wbf-title-table { padding: 6px 0px 12px 10px; }
 
 </table>
 
+</div>
 
 </asp:Content>
 
