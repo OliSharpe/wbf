@@ -24,11 +24,11 @@
     <UrlAction Url="_admin/WorkBoxFramework/DefaultInviteEmailTemplates.aspx" />
   </CustomAction>
   
-  <CustomAction Id="WorkBoxFramework.MigrationAdmin" GroupId="WorkBoxFrameworkAdmin"
+  <CustomAction Id="WorkBoxFramework.CheckConfiguration" GroupId="WorkBoxFrameworkAdmin"
   Location="Microsoft.SharePoint.Administration.Applications"
   Sequence="30"
-  Title="Migrate Documents or Web Pages" Description="">
-    <UrlAction Url="_admin/WorkBoxFramework/MigrationAdmin.aspx" />
+  Title="Check Configuration" Description="">
+    <UrlAction Url="_admin/WorkBoxFramework/CheckConfiguration.aspx" />
   </CustomAction>
 
 </Elements>

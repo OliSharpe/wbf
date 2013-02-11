@@ -56,7 +56,7 @@ Are you sure you wish to close this Work Box?
 <td colspan="2" align="center" valign="top">
     <asp:Button ID="CloseWorkBoxButton" runat="server" Text="Close Work Box"  OnClick="closeWorkBoxButton_OnClick"/>
 &nbsp;
-    <asp:Button ID="CancelButton" runat="server" Text="Cancel" OnClick="cancelButton_OnClick"/>
+    <asp:Button ID="CancelButton" runat="server" Text="Cancel" CausesValidation="False" OnClick="cancelButton_OnClick"/>
 
 </td>
 </tr>
