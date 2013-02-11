@@ -73,6 +73,16 @@
     <Compile Include="Classes\WBConstant.cs" />
     <Compile Include="Classes\WBIconItemTemplateField.cs" />
     <Compile Include="Classes\WBQueryClause.cs" />
+    <Compile Include="Features\WorkBoxCollections\WorkBoxCollections.EventReceiver.cs">
+      <DependentUpon>WorkBoxCollections.feature</DependentUpon>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\CheckConfiguration.aspx.cs">
+      <DependentUpon>CheckConfiguration.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\CheckConfiguration.aspx.designer.cs">
+      <DependentUpon>CheckConfiguration.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
@@ -125,9 +135,6 @@
     </Compile>
     <Compile Include="Features\FarmWideAdmin\FarmWideAdmin.EventReceiver.cs">
       <DependentUpon>FarmWideAdmin.feature</DependentUpon>
-    </Compile>
-    <Compile Include="Features\InitialSetup\InitialSetup.EventReceiver.cs">
-      <DependentUpon>InitialSetup.feature</DependentUpon>
     </Compile>
     <Compile Include="Features\TimerJobs\TimerJobs.EventReceiver.cs">
       <DependentUpon>TimerJobs.feature</DependentUpon>
@@ -638,9 +645,6 @@
     <None Include="Features\ErrorPages\ErrorPages.feature">
       <FeatureId>{9c028719-6c00-44bc-9773-dcccc9ff9374}</FeatureId>
     </None>
-    <None Include="Features\InitialSetup\InitialSetup.feature">
-      <FeatureId>{025aa9ef-ed4c-4433-8ee7-3b8a7b3e14da}</FeatureId>
-    </None>
     <None Include="Features\UpdateRecordsMetadata\UpdateRecordsMetadata.feature">
       <FeatureId>{393c4749-9940-4be0-bf37-54a9a940b836}</FeatureId>
     </None>
@@ -808,6 +812,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="ADMIN\WorkBoxFramework\CheckConfiguration.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -815,9 +822,6 @@
     <Content Include="CustomActions\UpdateRecordsMetadataAction\Elements.xml" />
     <Content Include="Features\ErrorPages\ErrorPages.Template.xml">
       <DependentUpon>ErrorPages.feature</DependentUpon>
-    </Content>
-    <Content Include="Features\InitialSetup\InitialSetup.Template.xml">
-      <DependentUpon>InitialSetup.feature</DependentUpon>
     </Content>
     <Content Include="Features\UpdateRecordsMetadata\UpdateRecordsMetadata.Template.xml">
       <DependentUpon>UpdateRecordsMetadata.feature</DependentUpon>
@@ -1071,7 +1075,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\DisplayUserProfileInfo.aspx" />
-    <Content Include="ADMIN\WorkBoxFramework\FarmWideAdmin.aspx" />
+    <Content Include="ADMIN\WorkBoxFramework\FarmWideAdmin.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\GenericOKPage.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

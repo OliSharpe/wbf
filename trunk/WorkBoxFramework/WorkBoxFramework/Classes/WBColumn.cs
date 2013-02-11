@@ -47,6 +47,8 @@ namespace WorkBoxFramework
         public enum DataTypes
         {
             Text,
+            MultiLineText,
+            User,
             Integer,
             Count,
             DateTime,
@@ -181,6 +183,27 @@ namespace WorkBoxFramework
             return textColumn;
         }
 
+
+        public static WBColumn MultiLineTextColumn(String displayName)
+        {
+            WBColumn textColumn = new WBColumn(displayName, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, DataTypes.MultiLineText);
+            return textColumn;
+        }
+
+        public static WBColumn BooleanColumn(String displayName)
+        {
+            return new WBColumn(displayName, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, DataTypes.Boolean);
+        }
+
+
+        public static WBColumn URLColumn(String displayName, String prettyName)
+        {
+            WBColumn urlColumn = new WBColumn(displayName, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, DataTypes.URL);
+            urlColumn.PrettyName = prettyName;
+            return urlColumn;
+        }
+
+
         public static WBColumn IntegerColumn(String displayName, bool internalNameHasSpaceCharacters)
         {
             return new WBColumn(displayName, internalNameHasSpaceCharacters, DataTypes.Integer);
@@ -283,6 +306,14 @@ namespace WorkBoxFramework
         }
 
 
+        public static WBColumn UserColumn(String displayName, bool internalNameHasSpaceCharacters, bool allowMultipleValues)
+        {
+            WBColumn column = new WBColumn(displayName, internalNameHasSpaceCharacters, DataTypes.User);
+            column.AllowMultipleValues = allowMultipleValues;
+            return column;
+        }
+
+
         #endregion
 
         #region Properties
@@ -369,19 +400,30 @@ namespace WorkBoxFramework
         }
 
 
-        public bool CreateIfDoesNotExist(SPSite site)
+        public bool CreateOrCheck(SPSite site)
         {
             using (SPWeb rootWeb = site.RootWeb)
             {
-                return CreateIfDoesNotExist(site, rootWeb);
+                return CreateOrCheck(site, rootWeb);
             }        
         }
 
-        public bool CreateIfDoesNotExist(SPSite site, SPWeb web)
+        /// <summary>
+        /// The idea is that this method will allow the simple ability to either create this column as a field on the given
+        /// SPWeb if it does not already exist, or to check that the existing field conforms to the definition of the column.
+        /// <para>
+        /// Currenlty the method does not do the 'check' part of this intended behaviour. But in the future the idea is that this
+        /// could be used to update existing fields when an update happens (e.g. choice fields with new options.) 
+        /// </para>
+        /// 
+        /// </summary>
+        /// <param name="site"></param>
+        /// <param name="web"></param>
+        /// <returns></returns>
+        public bool CreateOrCheck(SPSite site, SPWeb web)
         {
             if (String.IsNullOrEmpty(InternalName)) throw new NotImplementedException("Cannot create a column that doesn't have an internal name set!");
             if (String.IsNullOrEmpty(DisplayName)) throw new NotImplementedException("Cannot create a column that doesn't have a display name set!");
-            if (DataType == null) throw new NotImplementedException("Cannot create a column that doesn't have a data type set!");
 
             if (web.Fields.ContainsField(InternalName) || web.Fields.ContainsField(DisplayName))
             {
@@ -389,13 +431,17 @@ namespace WorkBoxFramework
                 return false;
             }
 
+            WBLogging.Generic.Monitorable("Creating a column with the internal name: " + InternalName + " and the display name: " + DisplayName);
+
+
             switch (DataType)
             {
                 case DataTypes.Text:
                     {
-                        SPFieldText textField = web.Fields.CreateNewField(SPFieldType.Text.ToString(), InternalName) as SPFieldText;
-                        textField.Title = DisplayName;
+                        SPFieldText textField = web.Fields.CreateNewField(SPFieldType.Text.ToString(), DisplayName) as SPFieldText;
                         textField.Group = "Work Box Framework";
+                        textField.StaticName = InternalName;
+                        textField.Title = DisplayName;
 
                         web.Fields.Add(textField);
                         web.Update();
@@ -403,10 +449,26 @@ namespace WorkBoxFramework
                         break;
                     }
 
+                case DataTypes.MultiLineText:
+                    {
+                        SPFieldMultiLineText multiLineTextField = web.Fields.CreateNewField(SPFieldType.Note.ToString(), DisplayName) as SPFieldMultiLineText;
+
+                        multiLineTextField.Title = DisplayName;
+                        multiLineTextField.StaticName = InternalName;
+                        multiLineTextField.Group = "Work Box Framework";
+                        multiLineTextField.RichText = false;
+
+                        web.Fields.Add(multiLineTextField);
+                        web.Update();
+
+                        break;
+                    }
+
                 case DataTypes.Count:
                     {
-                        SPFieldNumber numberField = web.Fields.CreateNewField(SPFieldType.Number.ToString(), InternalName) as SPFieldNumber;
+                        SPFieldNumber numberField = web.Fields.CreateNewField(SPFieldType.Number.ToString(), DisplayName) as SPFieldNumber;
                         numberField.Title = DisplayName;
+                        numberField.StaticName = InternalName;
                         numberField.Group = "Work Box Framework";
 
                         numberField.EnforceUniqueValues = true;
@@ -421,8 +483,9 @@ namespace WorkBoxFramework
 
                 case DataTypes.Integer:
                     {
-                        SPFieldNumber numberField = web.Fields.CreateNewField(SPFieldType.Number.ToString(), InternalName) as SPFieldNumber;
+                        SPFieldNumber numberField = web.Fields.CreateNewField(SPFieldType.Number.ToString(), DisplayName) as SPFieldNumber;
                         numberField.Title = DisplayName;
+                        numberField.StaticName = InternalName;
                         numberField.Group = "Work Box Framework";
 
                         numberField.DisplayFormat = SPNumberFormatTypes.NoDecimal;
@@ -435,8 +498,9 @@ namespace WorkBoxFramework
 
                 case DataTypes.DateTime:
                     {
-                        SPFieldDateTime dateTimeField = web.Fields.CreateNewField(SPFieldType.DateTime.ToString(), InternalName) as SPFieldDateTime;
+                        SPFieldDateTime dateTimeField = web.Fields.CreateNewField(SPFieldType.DateTime.ToString(), DisplayName) as SPFieldDateTime;
                         dateTimeField.Title = DisplayName;
+                        dateTimeField.StaticName = InternalName;
                         dateTimeField.Group = "Work Box Framework";
 
                         dateTimeField.DisplayFormat = SPDateTimeFieldFormatType.DateTime;
@@ -455,8 +519,9 @@ namespace WorkBoxFramework
                         Group group = termStore.Groups[WorkBox.TERM_STORE_GROUP_NAME];
                         TermSet termSet = group.TermSets[TermSetName];
 
-                        TaxonomyField taxonomyField = web.Fields.CreateNewField("TaxonomyFieldType", InternalName) as TaxonomyField;
+                        TaxonomyField taxonomyField = web.Fields.CreateNewField("TaxonomyFieldType", DisplayName) as TaxonomyField;
                         taxonomyField.Title = DisplayName;
+                        taxonomyField.StaticName = InternalName;
                         taxonomyField.Group = "Work Box Framework";
 
                         taxonomyField.SspId = termStore.Id;
@@ -479,9 +544,11 @@ namespace WorkBoxFramework
 
                 case DataTypes.Boolean:
                     {
-                        SPFieldBoolean booleanField = web.Fields.CreateNewField(SPFieldType.Boolean.ToString(), InternalName) as SPFieldBoolean;
+                        SPFieldBoolean booleanField = web.Fields.CreateNewField(SPFieldType.Boolean.ToString(), DisplayName) as SPFieldBoolean;
                         booleanField.Title = DisplayName;
+                        booleanField.StaticName = InternalName;
                         booleanField.Group = "Work Box Framework";
+                        booleanField.DefaultValue = "0";
 
                         web.Fields.Add(booleanField);
                         web.Update();
@@ -491,13 +558,25 @@ namespace WorkBoxFramework
 
                 case DataTypes.Choice:
                     {
-                        SPFieldChoice choiceField = web.Fields.CreateNewField(SPFieldType.Choice.ToString(), InternalName) as SPFieldChoice;
+                        SPFieldChoice choiceField = web.Fields.CreateNewField(SPFieldType.Choice.ToString(), DisplayName) as SPFieldChoice;
                         choiceField.Title = DisplayName;
+                        choiceField.StaticName = InternalName;
                         choiceField.Group = "Work Box Framework";
 
-                        choiceField.Choices.AddRange(Choices.ToArray());
-
                         web.Fields.Add(choiceField);
+                        web.Update();
+
+
+                        choiceField = web.Fields[DisplayName] as SPFieldChoice;
+                        foreach (String choice in Choices)
+                        {
+                            if (!String.IsNullOrEmpty(choice))
+                            {
+                                WBLogging.Generic.Monitorable(DisplayName + ": Adding choice: " + choice);
+                                choiceField.Choices.Add(choice);
+                            }
+                        }
+                        choiceField.Update();
                         web.Update();
 
                         break;
@@ -505,11 +584,28 @@ namespace WorkBoxFramework
 
                 case DataTypes.URL:
                     {
-                        SPFieldUrl urlField = web.Fields.CreateNewField(SPFieldType.URL.ToString(), InternalName) as SPFieldUrl;
+                        SPFieldUrl urlField = web.Fields.CreateNewField(SPFieldType.URL.ToString(), DisplayName) as SPFieldUrl;
                         urlField.Title = DisplayName;
+                        urlField.StaticName = InternalName;
                         urlField.Group = "Work Box Framework";
 
                         web.Fields.Add(urlField);
+                        web.Update();
+
+                        break;
+                    }
+
+                case DataTypes.User:
+                    {
+                        SPFieldUser userField = web.Fields.CreateNewField(SPFieldType.User.ToString(), DisplayName) as SPFieldUser;
+                        userField.Title = DisplayName;
+                        userField.StaticName = InternalName;
+                        userField.Group = "Work Box Framework";
+
+                        userField.AllowMultipleValues = AllowMultipleValues;
+                        userField.SelectionMode = SPFieldUserSelectionMode.PeopleOnly;
+
+                        web.Fields.Add(userField);
                         web.Update();
 
                         break;
@@ -547,19 +643,23 @@ namespace WorkBoxFramework
         public static readonly WBColumn WorkBoxUniqueID = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_UNIQUE_ID);
         public static readonly WBColumn WorkBoxLocalID = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_LOCAL_ID);
 
-                               
+                      
+        public static readonly WBColumn WorkBoxAuditLog = WBColumn.MultiLineTextColumn(WorkBox.COLUMN_NAME__WORK_BOX_AUDIT_LOG);
+        public static readonly WBColumn WorkBoxErrorMessage = WBColumn.MultiLineTextColumn(WorkBox.COLUMN_NAME__WORK_BOX_ERROR_MESSAGE);
 
-        // These two are multiple lines of text:
-        // WorkBoxAuditLog
-        // WorkBoxErrorMessage
+        public static readonly WBColumn WorkBoxLink = WBColumn.URLColumn(WorkBox.COLUMN_NAME__WORK_BOX_LINK, "Link to work box");
 
-        //HyperLink:
-        //WorkBoxLink
 
-        // Choice
-        //WorkBoxStatusChangeRequest
+        public static readonly WBColumn WorkBoxShortTitle = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_SHORT_TITLE, "Short Title");
 
-        //WorkBoxShortTitle
+        private static string[] changeRequestOptions = 
+        {
+            "Create",
+            "Open",
+            "Close",
+            "Delete"                                        
+        };
+        public static readonly WBColumn WorkBoxStatusChangeRequest = WBColumn.ChoiceColumn(WorkBox.COLUMN_NAME__WORK_BOX_STATUS_CHANGE_REQUEST, changeRequestOptions);
 
         public static readonly WBColumn WorkBoxCachedListItemID = WBColumn.IntegerColumn(WorkBox.COLUMN_NAME__WORK_BOX_CACHED_LIST_ITEM_ID);
 
@@ -571,7 +671,6 @@ namespace WorkBoxFramework
         public static readonly WBColumn WorkBoxDateLastClosed = WBColumn.DateTimeColumn(WorkBox.COLUMN_NAME__WORK_BOX_DATE_LAST_CLOSED, false, "Closed");
         public static readonly WBColumn WorkBoxDateLastOpened = WBColumn.DateTimeColumn(WorkBox.COLUMN_NAME__WORK_BOX_DATE_LAST_OPENED, false, "Opened");
         public static readonly WBColumn WorkBoxRetentionEndDate = WBColumn.DateTimeColumn(WorkBox.COLUMN_NAME__WORK_BOX_RETENTION_END_DATE, false, "Retention End Date");
-
 
         public static readonly WBColumn FunctionalArea = WBColumn.ManagedMedataColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, WorkBox.TERM_SET_NAME__FUNCTIONAL_AREAS, true);
         public static readonly WBColumn RecordsType = WBColumn.ManagedMedataColumn(WorkBox.COLUMN_NAME__RECORDS_TYPE, INTERNAL_NAME_USES_SPACE_CHARACTERS, WorkBox.TERM_SET_NAME__RECORDS_TYPES, false);
@@ -586,6 +685,10 @@ namespace WorkBoxFramework
         public static readonly WBColumn InvolvedTeams = WBColumn.ManagedMedataColumn(WorkBox.COLUMN_NAME__INVOLVED_TEAMS, INTERNAL_NAME_USES_SPACE_CHARACTERS, WorkBox.TERM_SET_NAME__TEAMS, true);
         public static readonly WBColumn VisitingTeams = WBColumn.ManagedMedataColumn(WorkBox.COLUMN_NAME__VISITING_TEAMS, INTERNAL_NAME_USES_SPACE_CHARACTERS, WorkBox.TERM_SET_NAME__TEAMS, true);
 
+        public static readonly WBColumn InvolvedIndividuals = WBColumn.UserColumn(WorkBox.COLUMN_NAME__INVOLVED_INDIVIDUALS, INTERNAL_NAME_USES_SPACE_CHARACTERS, true);
+        public static readonly WBColumn VisitingIndividuals = WBColumn.UserColumn(WorkBox.COLUMN_NAME__VISITING_INDIVIDUALS, INTERNAL_NAME_USES_SPACE_CHARACTERS, true);
+
+
         public static readonly WBColumn ProtectiveZone = WBColumn.ChoiceColumn(WorkBox.COLUMN_NAME__PROTECTIVE_ZONE, WBRecordsType.getProtectiveZones());
 
         public static readonly WBColumn DeclaredRecord = WBColumn.DateTimeColumn("Declared Record", "_vti_ItemDeclaredRecord", "Published Date");
@@ -595,7 +698,40 @@ namespace WorkBoxFramework
         public static readonly WBColumn SourceID = WBColumn.TextColumn("Source ID");
         public static readonly WBColumn RecordID = WBColumn.CountColumn("Record ID");
 
-        
+
+        public static readonly WBColumn WorkBoxTemplateTitle = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE_TITLE);
+
+        private static string[] templateStatusChoices = 
+        {
+            WorkBox.WORK_BOX_TEMPLATE_STATUS__ACTIVE,
+            WorkBox.WORK_BOX_TEMPLATE_STATUS__ACTIVE_DEFAULT,
+            WorkBox.WORK_BOX_TEMPLATE_STATUS__DISABLED
+        };
+
+        public static readonly WBColumn WorkBoxTemplateStatus = WBColumn.ChoiceColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE_STATUS, templateStatusChoices);                           
+
+        public static readonly WBColumn WorkBoxDocumentTemplates = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_DOCUMENT_TEMPLATES);
+        public static readonly WBColumn WorkBoxInviteInvovledEmailSubject = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_INVITE_INVOLVED_EMAIL_SUBJECT);
+        public static readonly WBColumn WorkBoxInviteInvovledEmailBody = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_INVITE_INVOLVED_EMAIL_BODY);
+        public static readonly WBColumn WorkBoxInviteVisitingEmailSubject = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_INVITE_VISITING_EMAIL_SUBJECT);
+        public static readonly WBColumn WorkBoxInviteVisitingEmailBody = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_INVITE_VISITING_EMAIL_BODY);
+        public static readonly WBColumn WorkBoxTemplateUseFolderPattern = WBColumn.BooleanColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE_USE_FOLDER_PATTERN);
+        public static readonly WBColumn WorkBoxTemplateName = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE_NAME);
+
+        private static string[] commands = 
+        {
+            WBTimerTask.COMMAND__COMPOSITE_TEAMS,
+            WBTimerTask.COMMAND__SYNCHRONISE_ALL_TEAMS,
+            WBTimerTask.COMMAND__FOLDER_GROUPS_MAPPING,
+            WBTimerTask.COMMAND__WORK_BOX_STATUS_UPDATES,
+            WBTimerTask.COMMAND__CACHE_WORK_BOX_DETAILS,
+            WBTimerTask.COMMAND__UPDATE_RECENTLY_VISITED_WORK_BOXES
+        };
+
+        public static readonly WBColumn Command = WBColumn.ChoiceColumn(WBTimerTask.COLUMN_NAME__COMMAND, commands);
+        public static readonly WBColumn TargetURL = WBColumn.TextColumn(WBTimerTask.COLUMN_NAME__TARGET_URL);
+        public static readonly WBColumn Argument1 = WBColumn.TextColumn(WBTimerTask.COLUMN_NAME__ARGUMENT_1);
+        public static readonly WBColumn ExecutionOrder = WBColumn.IntegerColumn(WBTimerTask.COLUMN_NAME__EXECUTION_ORDER);
 
         // The Perspecuity source id column:
         public static readonly WBColumn Source_ID = WBColumn.TextColumn("Source_ID");
@@ -678,6 +814,7 @@ namespace WorkBoxFramework
             switch (dataType)
             {
                 case DataTypes.Text: return "Text";
+                case DataTypes.MultiLineText: return "MultiLineText";
                 case DataTypes.Count: return "Count";
                 case DataTypes.Integer: return "Integer";
                 case DataTypes.DateTime: return "DateTime";

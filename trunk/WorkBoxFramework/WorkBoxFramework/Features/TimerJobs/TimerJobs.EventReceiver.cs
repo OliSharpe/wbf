@@ -71,8 +71,6 @@ namespace WorkBoxFramework.Features.TimerJobs
 
             WBLogging.Generic.Verbose("TimerJobsEventReceiver.FeatureActivated(): Activation is happening on SharePointHub.");
 
-
-
             // make sure the job isn't already registered
             foreach (SPJobDefinition job in webApplication.JobDefinitions) {
                 if (job.Name == WBTimerTasksJob.DAILY_TIMER_TASKS__TIMER_JOB_NAME)

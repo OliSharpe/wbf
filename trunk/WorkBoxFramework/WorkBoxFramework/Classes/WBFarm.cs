@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.Specialized;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Taxonomy;
 using Microsoft.SharePoint.Administration;
@@ -366,20 +367,61 @@ namespace WorkBoxFramework
         }
 
 
-        public void InitialSetup(SPSite site)
+        public void InitialFarmSetup(SPSite site, String adminTeamSiteURL)
         {
-            WBLogging.Generic.Monitorable("Running WBFarm.InitialSetup()");
+            WBLogging.Generic.Monitorable("Running WBFarm.InitialFarmSetup()");
 
             InitialSetupOfTermSets(site);
 
-            InitialSetupOfSiteColumns(site);
-
-            InitialSetupOfSiteContentTypes(site);
-
             InitialSetupOfUserProfileProperties(site);
 
-            WBLogging.Generic.Monitorable("Completed WBFarm.InitialSetup()");
+            using (SPSite adminSite = new SPSite(adminTeamSiteURL))
+            using (SPWeb adminWeb = adminSite.OpenWeb())
+            {
+                SPWeb rootTeamSiteWeb = adminSite.RootWeb;
+
+                CreateOrCheckWBFSiteColumns(adminSite, rootTeamSiteWeb);
+
+                CreateOrCheckTeamSitesContentTypes(adminSite, rootTeamSiteWeb);
+
+                CreateOrCheckCachedDetailsList(rootTeamSiteWeb);
+
+                CreateOrCheckTimerTasksLists(rootTeamSiteWeb, adminWeb);
+
+
+                this.TeamSitesSiteCollectionUrl = adminSite.Url;
+                this.TimerJobsManagementSiteUrl = adminTeamSiteURL;
+                this.OpenWorkBoxesCachedDetailsListUrl = adminSite.Url + "/Lists/CachedWorkBoxDetails";
+
+                this.Update();
+
+                if (rootTeamSiteWeb != adminWeb && (SPContext.Current == null || rootTeamSiteWeb != SPContext.Current.Web))
+                {
+                    rootTeamSiteWeb.Dispose();
+                }
+            }
+
+            WBLogging.Generic.Monitorable("Completed WBFarm.InitialFarmSetup()");
         }
+
+        internal void InitialWBCollectionSetup(SPSite site)
+        {
+            WBLogging.Generic.Monitorable("Running WBFarm.InitialWBCollectionSetup()");
+
+            SPWeb rootWeb = site.RootWeb;
+
+            CreateOrCheckWBFSiteColumns(site, rootWeb);
+
+            CreateOrCheckWBCSiteContentTypes(site, rootWeb);
+
+            if (SPContext.Current == null || rootWeb != SPContext.Current.Web)
+            {
+                rootWeb.Dispose();
+            }
+
+            WBLogging.Generic.Monitorable("Completed WBFarm.InitialWBCollectionSetup()");
+        }
+
 
         private void InitialSetupOfTermSets(SPSite site)
         {
@@ -454,16 +496,129 @@ namespace WorkBoxFramework
             WBLogging.Generic.Monitorable("Finished term set initial setup.");
         }
 
-        private void InitialSetupOfSiteColumns(SPSite site)
-        {
-            WBLogging.Generic.Monitorable("Creating site columns");
 
-            WBColumn[] columnsToCreate = {
+
+        internal void CreateOrCheckCachedDetailsList(SPWeb rootWeb)
+        {
+            WBColumn[] columns = 
+            {             
                 WBColumn.WorkBoxStatus,
+                WBColumn.WorkBoxURL,
+                WBColumn.WorkBoxGUID,
+
+                WBColumn.WorkBoxDateLastModified,
+                WBColumn.WorkBoxDateLastVisited,
+                WBColumn.WorkBoxDateCreated,
+
+                WBColumn.FunctionalArea,
+                WBColumn.RecordsType,
+                WBColumn.SubjectTags,
+                WBColumn.ReferenceID,
+                WBColumn.ReferenceDate,
+                WBColumn.SeriesTag,
+                WBColumn.OwningTeam,
+                WBColumn.InvolvedTeams,
+                WBColumn.VisitingTeams
+            };
+
+            CreateOrCheckCustomList(rootWeb, rootWeb, "CachedWorkBoxDetails", columns);
+
+        }
+
+        internal void CreateOrCheckTimerTasksLists(SPWeb rootweb, SPWeb web)
+        {
+            WBColumn[] columns = 
+            {             
+                WBColumn.ExecutionOrder,
+                WBColumn.Command,
+                WBColumn.TargetURL,
+                WBColumn.Argument1
+            };
+
+            SPList dailyList = CreateOrCheckCustomList(rootweb, web, WBTimerTasksJob.DAILY_TIMER_TASKS__LIST_NAME, columns);
+
+            SPViewCollection dailyViews = dailyList.Views;
+
+            StringCollection viewFields = new StringCollection();
+
+            viewFields.Add(WBColumn.ExecutionOrder.DisplayName); 
+            viewFields.Add(WBColumn.Title.DisplayName); 
+            viewFields.Add(WBColumn.Command.DisplayName);
+            viewFields.Add(WBColumn.TargetURL.DisplayName);
+            viewFields.Add(WBColumn.Argument1.DisplayName);
+          
+            string orderByCAML = "<OrderBy><FieldRef Name=\"ExecutionOrder\" Ascending=\"TRUE\" /></OrderBy>";
+
+            dailyViews.Add(WBTimerTasksJob.DAILY_TIMER_TASKS__ORDERED_VIEW_NAME, viewFields, orderByCAML, 500, true, true);
+            dailyList.Update();
+            web.Update();
+
+            SPList frequentList = CreateOrCheckCustomList(rootweb, web, WBTimerTasksJob.FREQUENT_TIMER_TASKS__LIST_NAME, columns);
+
+            SPViewCollection frequentViews = frequentList.Views;
+
+            frequentViews.Add(WBTimerTasksJob.FREQUENT_TIMER_TASKS__ORDERED_VIEW_NAME, viewFields, orderByCAML, 500, true, true);
+            frequentList.Update();
+            web.Update();
+
+        }
+
+
+
+        internal SPList CreateOrCheckCustomList(SPWeb rootWeb, SPWeb web, String listName, IEnumerable<WBColumn> columns)
+        {
+            WBLogging.Generic.Monitorable("Starting CreateOrCheckCustomList for: " + listName);
+
+            SPList list = web.Lists.TryGetList(listName);
+
+            bool listNeedsUpdating = false;
+            if (list == null)
+            {
+                Guid listGuid = web.Lists.Add(listName, "A WBF configuration list", SPListTemplateType.GenericList);
+
+                list = web.Lists[listGuid];
+                listNeedsUpdating = true;
+            }
+
+
+            foreach (WBColumn column in columns)
+            {
+                if (!list.Fields.ContainsField(column.DisplayName))
+                {
+                    SPField field = rootWeb.Fields[column.DisplayName];
+
+                    list.Fields.Add(field);
+                    listNeedsUpdating = true;
+                }
+            }
+
+            if (listNeedsUpdating)
+            {
+                list.Update();
+                web.Update();
+            }
+
+            WBLogging.Generic.Monitorable("Finished CreateOrCheckCustomList for: " + listName);
+
+            return list;
+        }
+
+        internal void CreateOrCheckWBFSiteColumns(SPSite site, SPWeb rootWeb)
+        {
+            WBLogging.Generic.Monitorable("Starting CreateOrCheckWBFSiteColumns");
+
+            WBColumn[] columnsToCreate = 
+            {
+                WBColumn.WorkBoxStatus,
+                WBColumn.WorkBoxStatusChangeRequest,
+                WBColumn.WorkBoxLink,
                 WBColumn.WorkBoxURL,
                 WBColumn.WorkBoxGUID,
                 WBColumn.WorkBoxLocalID,
                 WBColumn.WorkBoxUniqueID,
+                WBColumn.WorkBoxShortTitle,
+                WBColumn.WorkBoxAuditLog,
+                WBColumn.WorkBoxErrorMessage,
 
                 WBColumn.WorkBoxCachedListItemID,
 
@@ -485,33 +640,240 @@ namespace WorkBoxFramework
                 WBColumn.OwningTeam,
                 WBColumn.InvolvedTeams,
                 WBColumn.VisitingTeams,
+                WBColumn.InvolvedIndividuals,
+                WBColumn.VisitingIndividuals,
+                WBColumn.ProtectiveZone,
+                WBColumn.OriginalFilename,
+                WBColumn.SourceSystem,
+                WBColumn.SourceID,
+                WBColumn.RecordID,
+                WBColumn.LiveOrArchived,
+
+                WBColumn.WorkBoxTemplateTitle,
+                WBColumn.WorkBoxTemplateStatus,
+                WBColumn.WorkBoxDocumentTemplates,
+                WBColumn.WorkBoxInviteInvovledEmailSubject,
+                WBColumn.WorkBoxInviteInvovledEmailBody,
+                WBColumn.WorkBoxInviteVisitingEmailSubject,
+                WBColumn.WorkBoxInviteVisitingEmailBody,
+                WBColumn.WorkBoxTemplateUseFolderPattern,
+                WBColumn.WorkBoxTemplateName,
+           
+                WBColumn.ExecutionOrder,
+                WBColumn.Command,
+                WBColumn.TargetURL,
+                WBColumn.Argument1
+                                          
+            };
+
+            foreach (WBColumn column in columnsToCreate)
+            {
+                column.CreateOrCheck(site, rootWeb);
+            }
+
+            WBLogging.Generic.Monitorable("Finished CreateOrCheckWBFSiteColumns");
+        }
+
+        internal void CreateOrCheckWBCSiteContentTypes(SPSite site, SPWeb rootWeb)
+        {
+            WBLogging.Generic.Monitorable("Starting CreateOrCheckWBCSiteContentTypes");
+
+            CreateOrCheckWorkBoxMetadataItemContentType(rootWeb);
+
+            CreateOrCheckWorkBoxTemplatesItemContentType(rootWeb);
+
+            CreateOrCheckWorkBoxDocumentContentType(rootWeb);
+
+            // Not really the right place to be creating this content type:
+            CreateOrCheckWorkBoxRecordContentType(rootWeb);
+
+            WBLogging.Generic.Monitorable("Completed CreateOrCheckWBCSiteContentTypes");
+        }
+
+        internal void CreateOrCheckTeamSitesContentTypes(SPSite site, SPWeb rootWeb)
+        {
+            WBLogging.Generic.Monitorable("Starting CreateOrCheckTeamSitesContentTypes");
+
+            CreateOrCheckWorkBoxDocumentContentType(rootWeb);
+
+            // Not really the right place to be creating this content type:
+            CreateOrCheckWorkBoxRecordContentType(rootWeb);
+
+            WBLogging.Generic.Monitorable("Completed CreateOrCheckTeamSitesContentTypes");
+        }
+
+
+        private void CreateOrCheckWorkBoxMetadataItemContentType(SPWeb web)
+        {
+            WBColumn[] requiredFields = {};
+
+            WBColumn[] optionalFields = 
+            {
+                WBColumn.WorkBoxStatus,
+                WBColumn.WorkBoxStatusChangeRequest,
+                WBColumn.WorkBoxLink,
+                WBColumn.WorkBoxURL,
+                WBColumn.WorkBoxGUID,
+                WBColumn.WorkBoxLocalID,
+                WBColumn.WorkBoxUniqueID,
+                WBColumn.WorkBoxShortTitle,
+                WBColumn.WorkBoxAuditLog,
+                WBColumn.WorkBoxErrorMessage,
+
+                WBColumn.WorkBoxCachedListItemID,
+
+                WBColumn.WorkBoxDateLastModified,
+                WBColumn.WorkBoxDateLastVisited,
+                WBColumn.WorkBoxDateCreated,
+                WBColumn.WorkBoxDateDeleted,
+                WBColumn.WorkBoxDateLastClosed,
+                WBColumn.WorkBoxDateLastOpened,
+                WBColumn.WorkBoxRetentionEndDate,
+
+                WBColumn.FunctionalArea,
+                WBColumn.RecordsType,
+                WBColumn.ReferenceID,
+                WBColumn.ReferenceDate,
+                WBColumn.SeriesTag,
+                WBColumn.OwningTeam,
+                WBColumn.InvolvedTeams,
+                WBColumn.VisitingTeams,
+                WBColumn.InvolvedIndividuals,
+                WBColumn.VisitingIndividuals
+            };
+
+            CreateOrCheckContentType(web, "Work Box Metadata Item", "Item", requiredFields, optionalFields);
+        }
+
+        private void CreateOrCheckWorkBoxTemplatesItemContentType(SPWeb web)
+        {
+            WBColumn[] requiredFields = 
+            { 
+                WBColumn.RecordsType,
+                WBColumn.WorkBoxTemplateTitle,
+                WBColumn.WorkBoxTemplateStatus                           
+            };
+
+
+            WBColumn descriptionField = new WBColumn("Description", "RoutingRuleDescription", WBColumn.DataTypes.Text);
+
+            WBColumn[] optionalFields = 
+            {
+                descriptionField,
+                WBColumn.WorkBoxDocumentTemplates,
+                WBColumn.WorkBoxInviteInvovledEmailSubject,
+                WBColumn.WorkBoxInviteInvovledEmailBody,
+                WBColumn.WorkBoxInviteVisitingEmailSubject,
+                WBColumn.WorkBoxInviteVisitingEmailBody,
+                WBColumn.WorkBoxTemplateUseFolderPattern,
+                WBColumn.WorkBoxTemplateName
+            };
+
+            CreateOrCheckContentType(web, "Work Box Templates Item", "Item", requiredFields, optionalFields);
+        }
+
+        private void CreateOrCheckWorkBoxDocumentContentType(SPWeb web)
+        {
+            WBColumn[] requiredFields = 
+            { 
+            };
+
+            WBColumn[] optionalFields = 
+            {
+                WBColumn.FunctionalArea,
+                WBColumn.RecordsType,
+                WBColumn.SubjectTags,
+                WBColumn.ReferenceID,
+                WBColumn.ReferenceDate,
+                WBColumn.ScanDate,
+                WBColumn.SeriesTag,
+                WBColumn.OwningTeam,
+                WBColumn.InvolvedTeams,
+                WBColumn.VisitingTeams,
+                WBColumn.InvolvedIndividuals,
+                WBColumn.VisitingIndividuals,
                 WBColumn.ProtectiveZone,
                 WBColumn.OriginalFilename,
                 WBColumn.SourceSystem,
                 WBColumn.SourceID,
                 WBColumn.RecordID,
                 WBColumn.LiveOrArchived
-                                          };
+            };
 
-            SPWeb rootWeb = site.RootWeb;
-            foreach (WBColumn column in columnsToCreate)
-            {
-                column.CreateIfDoesNotExist(site, rootWeb);
-            }
-
-            if (rootWeb != null && rootWeb != SPContext.Current.Web)
-            {
-                rootWeb.Dispose();
-            }
-
-            WBLogging.Generic.Monitorable("Finished creating site columns");
+            CreateOrCheckContentType(web, WorkBox.WORK_BOX_DOCUMENT_CONTENT_TYPE, "Document", requiredFields, optionalFields);
         }
 
-        private void InitialSetupOfSiteContentTypes(SPSite site)
+        private void CreateOrCheckWorkBoxRecordContentType(SPWeb web)
         {
-            WBLogging.Generic.Monitorable("Initial setup of site content types is not implemented yet.");
+            WBColumn[] requiredFields = 
+            { 
+                WBColumn.RecordID,
+                WBColumn.LiveOrArchived
+            };
+            
+            WBColumn[] optionalFields = 
+            {
+            };
+
+
+            SPContentType recordContentType = CreateOrCheckContentType(web, WorkBox.WORK_BOX_RECORD_CONTENT_TYPE, WorkBox.WORK_BOX_DOCUMENT_CONTENT_TYPE, requiredFields, optionalFields);
+
+            // Really need to make some of the optional fields required:
+
         }
-        
+
+
+        private SPContentType CreateOrCheckContentType(
+            SPWeb web,
+            String contentTypeName,
+            String parentContentTypeName,
+            IEnumerable<WBColumn> requiredFields,
+            IEnumerable<WBColumn> optionalFields)
+        {
+
+            // We're only going to create this content type if it doesn't already exist:
+            SPContentType existingContentType = web.ContentTypes.Cast<SPContentType>()
+                .FirstOrDefault(c => c.Name == contentTypeName);
+
+            if (existingContentType != null)
+            {
+                WBLogging.Generic.Monitorable("The content type " + contentTypeName + " already exists - so not trying to re-create it.");
+                WBLogging.Generic.Unexpected("Not yet checking existing content types have the right columns!!");
+                return null;
+            } 
+
+            // OK so now we can create the content type:
+            WBLogging.Generic.Monitorable("Creating content type: " + contentTypeName);
+
+            SPContentType newContentType = new SPContentType(
+                web.ContentTypes[parentContentTypeName],                    
+                web.ContentTypes, 
+                contentTypeName);
+
+            newContentType.Group = "Work Box Framework";
+
+            foreach (WBColumn column in requiredFields)
+            {
+                SPFieldLink fieldLink = new SPFieldLink(web.Fields[column.DisplayName]);
+                newContentType.FieldLinks.Add(fieldLink);
+                fieldLink.Required = true;
+            }
+
+            foreach (WBColumn column in optionalFields)
+            {
+                SPFieldLink fieldLink = new SPFieldLink(web.Fields[column.DisplayName]);
+                newContentType.FieldLinks.Add(fieldLink);
+                fieldLink.Required = false;
+            }
+
+            // And finally add this content type to the web (should be a root web):
+            web.ContentTypes.Add(newContentType);
+            newContentType.Update();
+
+            return newContentType;
+        }
+
+
 
         // This is based on code ideas from:
         // http://www.sharemuch.com/2010/03/30/how-to-create-custom-sharepoint-2010-user-profile-properties-programatically/

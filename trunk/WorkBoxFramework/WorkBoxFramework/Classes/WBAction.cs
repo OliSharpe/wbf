@@ -307,7 +307,9 @@ namespace WorkBoxFramework
                         ShowClose = true;
                         AllowMaximise = true;
 
-                        ActionUrl = "[CollectionURL]/Lists/[AllWorkBoxesListName]/DispForm.aspx?ID=[ID]";
+                        //ActionUrl = "[CollectionURL]/Lists/[AllWorkBoxesListName]/DispForm.aspx?ID=[ID]";
+                        ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/ViewWorkBoxProperties.aspx";
+                        
                         Width = 700;
                         Height = 500;
 
@@ -327,7 +329,8 @@ namespace WorkBoxFramework
                         ShowClose = true;
                         AllowMaximise = true;
 
-                        ActionUrl = "[CollectionURL]/Lists/[AllWorkBoxesListName]/EditForm.aspx?ID=[ID]";
+                        //ActionUrl = "[CollectionURL]/Lists/[AllWorkBoxesListName]/EditForm.aspx?ID=[ID]";
+                        ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/EditWorkBoxProperties.aspx";
                         Width = 700;
                         Height = 500;
 
@@ -387,9 +390,9 @@ namespace WorkBoxFramework
                         ShowClose = true;
                         AllowMaximise = false;
 
-                        ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/InviteTeams.aspx";
-                        Width = 600;
-                        Height = 200;
+                        ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/InviteTeamsWithEmail.aspx";
+                        Width = 660;
+                        Height = 500;
 
                         break;
                     }
@@ -407,9 +410,9 @@ namespace WorkBoxFramework
                         ShowClose = true;
                         AllowMaximise = false;
 
-                        ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/InviteIndividuals.aspx";
-                        Width = 600;
-                        Height = 200;
+                        ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/InviteIndividualsWithEmail.aspx";
+                        Width = 660;
+                        Height = 600;
 
                         break;
                     }

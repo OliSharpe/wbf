@@ -57,7 +57,7 @@ Are you sure you wish to re-open this Work Box?
 <td colspan="2" align="center" valign="top">
     <asp:Button ID="ReOpenWorkBoxButton" runat="server" Text="Re-Open Work Box"  OnClick="reopenWorkBoxButton_OnClick"/>
 &nbsp;
-    <asp:Button ID="CancelButton" runat="server" Text="Cancel" OnClick="cancelButton_OnClick"/>
+    <asp:Button ID="CancelButton" runat="server" Text="Cancel" CausesValidation="False" OnClick="cancelButton_OnClick"/>
 
 </td>
 </tr>

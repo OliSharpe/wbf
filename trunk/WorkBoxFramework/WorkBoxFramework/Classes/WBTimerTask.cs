@@ -37,6 +37,7 @@ namespace WorkBoxFramework
         internal const string COLUMN_NAME__COMMAND = "Command";
         internal const string COLUMN_NAME__TARGET_URL = "Target URL";
         internal const string COLUMN_NAME__ARGUMENT_1 = "Argument 1";
+        internal const string COLUMN_NAME__EXECUTION_ORDER = "Execution Order";
 
         internal const string COMMAND__COMPOSITE_TEAMS = "Composite Teams (Management Site | [List Name])";
         internal const string COMMAND__SYNCHRONISE_ALL_TEAMS = "Synchronise All Teams (Site Collection)";
