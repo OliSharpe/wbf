@@ -37,7 +37,11 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void DoInitialSetup_OnClick(object sender, EventArgs e)
         {
-            WBFarm.Local.InitialFarmSetup(SPContext.Current.Site, AdminTeamSiteURL.Text);
+            WBLogging.Debug("AdminTeamSiteURL: " + AdminTeamSiteURL.Text);
+            WBLogging.Debug("TimerJobsServerName: " + TimerJobsServerName.Text);
+            WBLogging.Debug("TimerJobsServerName to upper: " + TimerJobsServerName.Text.ToUpper());
+
+            WBFarm.Local.InitialFarmSetup(SPContext.Current.Site, AdminTeamSiteURL.Text, TimerJobsServerName.Text.ToUpper());
 
             SPUtility.Redirect("/applications.aspx", SPRedirectFlags.Static, Context);
         }
