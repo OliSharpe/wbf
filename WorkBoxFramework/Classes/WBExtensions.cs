@@ -1765,6 +1765,42 @@ namespace WorkBoxFramework
             return user;
         }
 
+        public static String WBxToHTML(this SPUser user)
+        {
+            return WBxToHTML(user, SPContext.Current.Site.RootWeb);
+        }
+
+        // Based on ideas picked up from: 
+        // http://blogs.msdn.com/b/uksharepoint/archive/2010/05/07/office-communicator-integration-presence-in-a-custom-webpart-for-sharepoint-2010.aspx
+        public static String WBxToHTML(this SPUser user, SPWeb rootWeb)
+        {
+            SPListItem userListItem = rootWeb.SiteUserInfoList.GetItemById(user.ID);
+            string sipAddress = userListItem.WBxGetColumnAsString("SipAddress");
+
+            // return the html for this user
+            return String.Concat(
+            "<div id\"PresenceLink"
+            , sipAddress
+            , "\">"
+            , "<img border=\"0\" height=\"12\" src=\"/_layouts/images/imnhdr.gif\" onload=\"IMNRC('"
+            , sipAddress
+            , "')\" ShowOfflinePawn=\"1\" style=\"padding-right: 3px;\" id=\"PresencePawn"
+            , sipAddress
+            , "\" alt=\"presence pawn for "
+            , sipAddress
+            , "\"/>"
+            , "<a href=\""
+            , rootWeb.Url
+            , "/_layouts/userdisp.aspx?ID="
+            , user.ID
+            , "\" id=\"ProfileLink"
+            , sipAddress
+            , "\">"
+            , user.Name
+            , "</a></div>"
+            );
+        }
+
         public static void WBxAssignADNameWithRole(this SPWeb web, String loginName, String roleName)
         {
             if (loginName == null || loginName == "") return;

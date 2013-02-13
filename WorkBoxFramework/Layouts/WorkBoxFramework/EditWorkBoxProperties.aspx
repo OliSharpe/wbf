@@ -21,6 +21,7 @@ border-top:solid 1px grey;
 }
 </style>
 
+<h2>Edit Work Box Properties</h2>
 
 <table width="100%" cellpadding="5" cellspacing="0">
 
@@ -31,7 +32,7 @@ border-top:solid 1px grey;
 </td>
 <td class="ms-authoringcontrols" valign="top">
 
-<asp:Label ID="WorkBoxTitle" runat="server" Text=""></asp:Label>
+<b><asp:Label ID="WorkBoxTitle" runat="server" Text=""></asp:Label></b>
 
 </td>
 </tr>
@@ -72,6 +73,31 @@ border-top:solid 1px grey;
 </td>
 </tr>
 
+
+<tr>
+<td valign="top">
+<b>Work Box Template</b>
+<p></p>
+</td>
+<td class="ms-authoringcontrols" valign="top">
+
+<asp:Label ID="WorkBoxTemplate" runat="server" Text=""></asp:Label>
+
+</td>
+</tr>
+
+
+<tr>
+<td valign="top">
+<b>Work Box Status</b>
+<p></p>
+</td>
+<td class="ms-authoringcontrols" valign="top">
+
+<asp:Label ID="WorkBoxStatus" runat="server" Text=""></asp:Label>
+
+</td>
+</tr>
 
 
 
@@ -137,7 +163,7 @@ border-top:solid 1px grey;
 </td>
 <td class="ms-authoringcontrols" valign="top">
 
-<SharePoint:DateTimeControl ID="ReferenceDate" runat="server" Text="" />
+<SharePoint:DateTimeControl ID="ReferenceDate" runat="server" />
 
 </td>
 </tr>

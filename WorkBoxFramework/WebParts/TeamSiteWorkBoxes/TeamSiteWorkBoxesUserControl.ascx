@@ -47,12 +47,14 @@
 <tr>
 <td align="left">
 <asp:Panel ID="RecentViews" class="wbf-tree-selection-filters" runat="server">
+<!-- 
 Recently: 
 <asp:LinkButton ID="ViewRecentlyCreated" runat="server" Text="Created" OnClick="ViewRecentlyCreated_OnClick"/>
- | 
-<asp:LinkButton ID="ViewRecentlyModified" runat="server" Text="Modified" OnClick="ViewRecentlyModified_OnClick"/>
- | 
+ | -->
+<asp:LinkButton ID="ViewRecentlyModified" runat="server" Text="Recently Modified" OnClick="ViewRecentlyModified_OnClick"/>
+ <!-- | 
 <asp:LinkButton ID="ViewRecentlyVisited" runat="server" Text="Visited" OnClick="ViewRecentlyVisited_OnClick"/>
+-->
 </asp:Panel>
 </td>
 <td align="center">

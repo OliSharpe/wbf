@@ -51,6 +51,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 OwningTeam.Text = WorkBox.OwningTeam.Name;
                 FunctionalArea.Text = WorkBox.FunctionalArea(WBTaxonomy.GetFunctionalAreas(WorkBox.RecordsTypes)).Names();
                 RecordsType.Text = recordsType.FullPath;
+                WorkBoxTemplate.Text = WorkBox.Template.Title;
+                WorkBoxStatus.Text = WorkBox.Status;
                 WorkBoxURL.Text = WorkBox.Url;
                 WorkBoxShortTitle.Text = WorkBox.ShortTitle;
                 WorkBoxPrettyTitle.Text = WorkBox.Web.Title;
