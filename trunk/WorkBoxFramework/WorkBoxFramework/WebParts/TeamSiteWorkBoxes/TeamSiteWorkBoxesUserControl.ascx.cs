@@ -214,7 +214,7 @@ namespace WorkBoxFramework.TeamSiteWorkBoxes
                 string currentView = ViewState["WBF_SelectedWorkBoxView"].WBxToString();
                 if (currentView == "")
                 {
-                    currentView = VIEW__RECENTLY_CREATED;
+                    currentView = VIEW__RECENTLY_MODIFIED;
                     ViewState["WBF_SelectedWorkBoxView"] = currentView;
 
                     SetSortColumn(WBColumn.WorkBoxDateCreated);

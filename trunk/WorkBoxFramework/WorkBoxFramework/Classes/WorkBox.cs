@@ -1696,8 +1696,12 @@ namespace WorkBoxFramework
                 case WBRecordsType.LOCAL_ID_SOURCE__GENERATE_LOCAL_ID:
                     {
                         int offsetValue = Collection.InitialIDOffset;
-                        int numberOfDigits = WBRecordsType.NUMBER_OF_DIGITS_IN_GENERATED_LOCAL_IDS;
-
+                        int numberOfDigits = Collection.NumberOfDigitsInIDs;
+                        if (numberOfDigits == 0)
+                        {
+                            numberOfDigits = WBRecordsType.NUMBER_OF_DIGITS_IN_GENERATED_LOCAL_IDS;
+                        }
+                        
                         int localIDValue = Item.ID + offsetValue;
 
                         localID = localIDValue.ToString("D" + numberOfDigits.ToString());

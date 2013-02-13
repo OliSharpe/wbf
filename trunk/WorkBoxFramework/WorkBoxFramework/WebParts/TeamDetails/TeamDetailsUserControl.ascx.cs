@@ -77,7 +77,7 @@ namespace WorkBoxFramework.TeamDetails
                 html += "<table cellpadding='5'><tr><td><ul>";
                 foreach (SPUser user in group.Users)
                 {
-                    html += "<li>" + renderUser(user);
+                    html += "<li>" + user.WBxToHTML();
 
                     if (userIsTeamOwner)
                     {

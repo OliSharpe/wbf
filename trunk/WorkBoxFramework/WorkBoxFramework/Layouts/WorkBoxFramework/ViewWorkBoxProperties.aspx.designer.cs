@@ -58,6 +58,24 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.Label RecordsType;
         
         /// <summary>
+        /// WorkBoxTemplate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label WorkBoxTemplate;
+        
+        /// <summary>
+        /// WorkBoxStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label WorkBoxStatus;
+        
+        /// <summary>
         /// WorkBoxURL control.
         /// </summary>
         /// <remarks>

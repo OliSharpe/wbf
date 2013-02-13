@@ -42,6 +42,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 OwningTeam.Text = WorkBox.OwningTeam.Name;
                 FunctionalArea.Text = WorkBox.FunctionalArea(WBTaxonomy.GetFunctionalAreas(WorkBox.RecordsTypes)).Names();
                 RecordsType.Text = recordsType.FullPath;
+                WorkBoxTemplate.Text = WorkBox.Template.Title;
+                WorkBoxStatus.Text = WorkBox.Status;
                 WorkBoxURL.Text = WorkBox.Url;
                 WorkBoxShortTitle.Text = WorkBox.ShortTitle;
                 WorkBoxPrettyTitle.Text = WorkBox.Web.Title;
@@ -74,7 +76,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             WBAction editAction = WorkBox.GetAction(WBAction.ACTION_KEY__EDIT_PROPERTIES);
 
-            SPUtility.Redirect(editAction.ActionUrl, SPRedirectFlags.RelativeToLayoutsPage, Context);
+            //WBLogging.Debug("Got an action URL for edit page as being: " + editAction.ActionUrl);
+
+            SPUtility.Redirect(editAction.ActionUrl, SPRedirectFlags.Trusted, Context);
         }
 
         protected void closeButton_OnClick(object sender, EventArgs e)
