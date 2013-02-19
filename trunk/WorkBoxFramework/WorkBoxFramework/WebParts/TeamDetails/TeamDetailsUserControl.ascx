@@ -17,6 +17,34 @@
 }
 </style>
 
+<script type="text/javascript">
+
+    // There's probably a nicer way to do this ....
+    var wbf__user_presence_sips = new Object();
+    var wbf__user_presence_elements = new Object();
+    var wbf__user_presence_ids = new Array();
+
+    function WBF_team_details__add_user_presence(id, sip, element) {
+        wbf__user_presence_sips[id] = sip;
+        wbf__user_presence_elements[id] = element;
+    }
+
+    function WBF_team_details__do_user_presence() {
+
+        for (var id in wbf__user_presence_ids) {
+
+            var sip = wbf__user_presence_sips[id];
+            var element = wbf__user_presence_elements[id];
+
+            IMNRC(sip, element);
+        }
+    }
+
+    // We want to run this function when the page has finished loading:
+    _spBodyOnLoadFunctionNames.push("WBF_team_details__do_user_presence");   
+
+</script>
+
 <div class="wbf-team-details-webpart">
 
 <asp:Literal ID="ListOfTeamOwners" runat="server" />

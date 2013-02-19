@@ -32,6 +32,8 @@ namespace WorkBoxFramework.TeamDetails
     {
         public bool userIsTeamOwner = false;
 
+        private int countPawnsOnPage = 0;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -77,7 +79,7 @@ namespace WorkBoxFramework.TeamDetails
                 html += "<table cellpadding='5'><tr><td><ul>";
                 foreach (SPUser user in group.Users)
                 {
-                    html += "<li>" + user.WBxToHTML();
+                    html += "<li>" + renderUser(user, SPContext.Current.Site.RootWeb);
 
                     if (userIsTeamOwner)
                     {
@@ -106,6 +108,44 @@ namespace WorkBoxFramework.TeamDetails
 
             return html;
         }
+
+        // Based on ideas picked up from: 
+        // http://blogs.msdn.com/b/uksharepoint/archive/2010/05/07/office-communicator-integration-presence-in-a-custom-webpart-for-sharepoint-2010.aspx
+        private String renderUser(SPUser user, SPWeb rootWeb)
+        {
+            countPawnsOnPage++;
+
+            SPListItem userListItem = rootWeb.SiteUserInfoList.GetItemById(user.ID);
+            string sipAddress = userListItem.WBxGetColumnAsString("SipAddress");
+
+            string id = "WBF_PresenceLink_" + countPawnsOnPage;
+
+            // return the html for this user
+            return String.Concat(
+            "<span id\""
+            , id
+            , "\">"
+            , "<img border=\"0\" height=\"12\" src=\"/_layouts/images/imnhdr.gif\" onload=\"WBF_team_details__add_user_presence('"
+            , id
+            , "','"
+            , sipAddress
+            , "', this)\" ShowOfflinePawn=\"1\" style=\"padding-right: 3px;\" id=\"PresencePawn"
+            , sipAddress
+            , "\" alt=\"Presence pawn for "
+            , sipAddress
+            , "\"/>"
+            , "<a href=\""
+            , rootWeb.Url
+            , "/_layouts/userdisp.aspx?ID="
+            , user.ID
+            , "\" id=\"ProfileLink"
+            , sipAddress
+            , "\">"
+            , user.Name
+            , "</a></span>"
+            );
+        }
+
 
     }
 }
