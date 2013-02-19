@@ -975,9 +975,7 @@
     <Content Include="WebParts\TeamDetails\Elements.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="WebParts\TeamDetails\TeamDetailsUserControl.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="WebParts\TeamDetails\TeamDetailsUserControl.ascx" />
     <Content Include="WebParts\ViewWorkBoxLibraryWebPart\Elements.xml">
       <SubType>Designer</SubType>
     </Content>
