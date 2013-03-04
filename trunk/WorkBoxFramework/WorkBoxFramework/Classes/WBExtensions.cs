@@ -1765,39 +1765,52 @@ namespace WorkBoxFramework
             return user;
         }
 
-        public static String WBxToHTML(this SPUser user)
+        public static String WBxToHTML(this SPUser user, HttpContext context)
         {
-            return WBxToHTML(user, SPContext.Current.Site.RootWeb);
+            return WBxToHTML(user, context, SPContext.Current.Site.RootWeb);
         }
 
         // Based on ideas picked up from: 
         // http://blogs.msdn.com/b/uksharepoint/archive/2010/05/07/office-communicator-integration-presence-in-a-custom-webpart-for-sharepoint-2010.aspx
-        public static String WBxToHTML(this SPUser user, SPWeb rootWeb)
+        public static String WBxToHTML(this SPUser user, HttpContext context, SPWeb rootWeb)
         {
+            // Is there a better way of having this page level variable?
+            int currentPawnCount = 0;
+            if (context.Items.Contains("WBF_PresencePawnCount"))
+            {
+                currentPawnCount = (int)context.Items["WBF_PresencePawnCount"];
+            }
+            currentPawnCount++;
+            context.Items["WBF_PresencePawnCount"] = currentPawnCount;
+
             SPListItem userListItem = rootWeb.SiteUserInfoList.GetItemById(user.ID);
             string sipAddress = userListItem.WBxGetColumnAsString("SipAddress");
 
+            string id = "WBF_PresencePawn_" + currentPawnCount;
+
             // return the html for this user
             return String.Concat(
-            "<div id\"PresenceLink"
+            "<span id=\""
+            , id
+            , "_span\">"
+            , "<img border=\"0\" height=\"12\" src=\"/_layouts/images/imnhdr.gif\" onload=\"WorkBoxFramework__add_user_presence('"
+            , id
+            , "','"
             , sipAddress
-            , "\">"
-            , "<img border=\"0\" height=\"12\" src=\"/_layouts/images/imnhdr.gif\" onload=\"IMNRC('"
-            , sipAddress
-            , "')\" ShowOfflinePawn=\"1\" style=\"padding-right: 3px;\" id=\"PresencePawn"
-            , sipAddress
-            , "\" alt=\"presence pawn for "
+            , "', this)\" ShowOfflinePawn=\"1\" style=\"padding-right: 3px;\" id=\""
+            , id 
+            , "\" alt=\"Presence pawn for "
             , sipAddress
             , "\"/>"
             , "<a href=\""
             , rootWeb.Url
             , "/_layouts/userdisp.aspx?ID="
             , user.ID
-            , "\" id=\"ProfileLink"
-            , sipAddress
-            , "\">"
+            , "\" id=\""
+            , id
+            , "_link\">"
             , user.Name
-            , "</a></div>"
+            , "</a></span>"
             );
         }
 

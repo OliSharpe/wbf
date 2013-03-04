@@ -44,13 +44,13 @@ namespace WorkBoxFramework
     {
         public static void logMessage(String message)
         {
-            SPDiagnosticsService.Local.WriteTrace(0, new SPDiagnosticsCategory("WorkBoxFramework", TraceSeverity.Monitorable, EventSeverity.Information), TraceSeverity.Monitorable, message, null);
+            WBLogging.Generic.HighLevel(message);
         }
 
 
         public static void shouldThrowError(String message)
         {
-            SPDiagnosticsService.Local.WriteTrace(0, new SPDiagnosticsCategory("WorkBoxFramework", TraceSeverity.Monitorable, EventSeverity.Information), TraceSeverity.Monitorable, "SHOULD THROW AN ERROR!!: " + message, null);
+            WBLogging.Generic.Unexpected("SHOULD THROW AN ERROR!!: " + message);
         }
 
 

@@ -155,11 +155,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
             catch (Exception exception)
             {
-                SPDiagnosticsService.Local.WriteTrace(0, new SPDiagnosticsCategory("WorkBoxFramework", TraceSeverity.Monitorable, EventSeverity.Information), TraceSeverity.Monitorable, exception.StackTrace, null);
+                WBLogging.WorkBoxCollections.Unexpected(exception.StackTrace);
                 SPUtility.TransferToErrorPage("An exception occurred : " + exception.StackTrace, "Return to site settings page", "/_layouts/settings.aspx");
             }
-
-            SPDiagnosticsService.Local.WriteTrace(0, new SPDiagnosticsCategory("WorkBoxFramework", TraceSeverity.Monitorable, EventSeverity.Information), TraceSeverity.Monitorable, errorMessage, null);
 
             SPUtility.Redirect("settings.aspx", SPRedirectFlags.RelativeToLayoutsPage, Context);
         }

@@ -21,6 +21,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
@@ -34,8 +35,12 @@ namespace WorkBoxFramework.TeamDetails
 
         private int countPawnsOnPage = 0;
 
+        protected TeamDetails webPart = default(TeamDetails);
+
         protected void Page_Load(object sender, EventArgs e)
         {
+            webPart = this.Parent as TeamDetails;
+
             if (!IsPostBack)
             {
                 WBTeam team = WBTeam.getFromTeamSite(SPContext.Current);
@@ -50,8 +55,8 @@ namespace WorkBoxFramework.TeamDetails
                 {
                     if (team.IsCurrentUserTeamOwner()) userIsTeamOwner = true;
                     
-                    ListOfTeamOwners.Text = generateTable(team, team.OwnersGroupName, "Owner", "Team Owners:");
-                    ListOfTeamMembers.Text = generateTable(team, team.MembersGroupName, "Member", "Team Members:");
+                    ListOfTeamOwners.Text = generateTable(team, team.OwnersGroupName, "Owner", "Team Owners");
+                    ListOfTeamMembers.Text = generateTable(team, team.MembersGroupName, "Member", "Team Members");
                 }
             }
         }
@@ -71,15 +76,17 @@ namespace WorkBoxFramework.TeamDetails
                 // 
                 if (group.OnlyAllowMembersViewMembership && !group.ContainsCurrentUser) return "";
 
-                html += "<h3>" + title + "</h3>\n";
+                html += "<h3>" + title + ":</h3>\n";
 
                 // OK so now we have the SPGroup for the team’s owners group. 
                 // Now we can iterate through the SPUser-s in this group … or whatever else we want to do with it, e.g.:
 
+                List<String> teamEmails = new List<String>();
+
                 html += "<table cellpadding='5'><tr><td><ul>";
                 foreach (SPUser user in group.Users)
                 {
-                    html += "<li>" + renderUser(user, SPContext.Current.Site.RootWeb);
+                    html += "<li>" + user.WBxToHTML(Context); //renderUser(user, SPContext.Current.Site.RootWeb);
 
                     if (userIsTeamOwner)
                     {
@@ -89,10 +96,20 @@ namespace WorkBoxFramework.TeamDetails
                     }
 
                     html += "</li>";
+
+                    if (!String.IsNullOrEmpty(user.Email) && !teamEmails.Contains(user.Email))
+                    {
+                        teamEmails.Add(user.Email);
+                    }
                 }
 
                 html += "</ul></td></tr>\n";
                 html += "</table>\n";
+
+                if (webPart.ShowMailToLinks)
+                {
+                    html += "<div class='wbf-mail-to-team'><a href='mailto:" + String.Join(",", teamEmails.ToArray()) + "'>Email all " + title.ToLower() + "</div>";
+                }
             }
 
             return html;
@@ -125,7 +142,7 @@ namespace WorkBoxFramework.TeamDetails
             "<span id\""
             , id
             , "\">"
-            , "<img border=\"0\" height=\"12\" src=\"/_layouts/images/imnhdr.gif\" onload=\"WBF_team_details__add_user_presence('"
+            , "<img border=\"0\" height=\"12\" src=\"/_layouts/images/imnhdr.gif\" onload=\"WorkBoxFramework__add_user_presence('"
             , id
             , "','"
             , sipAddress

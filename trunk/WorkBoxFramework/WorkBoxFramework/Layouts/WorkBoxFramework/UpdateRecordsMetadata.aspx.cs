@@ -182,6 +182,12 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                         Records.BypassLocks(elevatedItem, delegate(SPListItem item)
                         {
+                            if (item.File.CheckOutType != SPFile.SPCheckOutType.None)
+                            {
+                                WBLogging.RecordsTypes.Unexpected("Somehow the record being updated (Record ID = " + RecordID.Text + ") was checked out to: " + item.File.CheckedOutByUser.LoginName);
+                                item.File.UndoCheckOut();
+                            }
+
                             item.File.CheckOut();    
 
                             item[WBColumn.LiveOrArchived.DisplayName] = LiveOrArchived.SelectedValue;

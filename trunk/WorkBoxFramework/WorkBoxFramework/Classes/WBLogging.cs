@@ -72,8 +72,8 @@ namespace WorkBoxFramework
                     new SPDiagnosticsCategory(CATEGORY__TIMER_TASKS, TraceSeverity.High, EventSeverity.Information),
                     new SPDiagnosticsCategory(CATEGORY__WORK_BOXES, TraceSeverity.High, EventSeverity.Information),
                     new SPDiagnosticsCategory(CATEGORY__WORK_BOX_COLLECTIONS, TraceSeverity.High, EventSeverity.Information),
-                    new SPDiagnosticsCategory(CATEGORY__MIGRATION, TraceSeverity.Verbose, EventSeverity.Information),
-                    new SPDiagnosticsCategory(CATEGORY__QUERIES, TraceSeverity.Verbose, EventSeverity.Information),
+                    new SPDiagnosticsCategory(CATEGORY__MIGRATION, TraceSeverity.High, EventSeverity.Information),
+                    new SPDiagnosticsCategory(CATEGORY__QUERIES, TraceSeverity.High, EventSeverity.Information),
                     new SPDiagnosticsCategory(CATEGORY__GENERIC, TraceSeverity.High, EventSeverity.Information)
             })
             };
@@ -102,7 +102,7 @@ namespace WorkBoxFramework
 
         public static void Debug(String message)
         {
-            WriteTrace(CATEGORY__GENERIC, TraceSeverity.Unexpected, "DEBUG: " + message);
+            WriteTrace(CATEGORY__GENERIC, TraceSeverity.Verbose, "DEBUG: " + message);
         }
 
 
