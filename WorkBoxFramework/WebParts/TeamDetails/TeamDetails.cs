@@ -34,6 +34,14 @@ namespace WorkBoxFramework.TeamDetails
     [ToolboxItemAttribute(false)]
     public class TeamDetails : WebPart
     {
+        [WebBrowsable(true)]
+        [Personalizable(PersonalizationScope.Shared)]
+        [WebDisplayName("Show MailTo Links")]
+        [WebDescription("Show the mailto links for the list of owners and members.")]
+        [System.ComponentModel.Category("Configuration")]
+        public bool ShowMailToLinks { get; set; }
+
+
         // Visual Studio might automatically update this path when you change the Visual Web Part project item.
         private const string _ascxPath = @"~/_CONTROLTEMPLATES/WorkBoxFramework/TeamDetails/TeamDetailsUserControl.ascx";
 

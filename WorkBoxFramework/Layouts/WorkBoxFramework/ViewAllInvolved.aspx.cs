@@ -169,11 +169,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         private String renderUser(SPUser user, String involvedOrVisiting)
         {
-            string html = "<span class=\"ms-imnSpan\">\n";
-            html += "<a class=\"ms-imnlink\" onclick=\"IMNImageOnClick(event);return false;\" href=\"javascript:;\"/>\n";
-            html += "<img name=\"imnmark\" width=\"12\" height=\"12\" title=\"\" class=\"ms-imnImg\" id=\"imn_220,type=smtp\" alt=\"Available\" src=\"/_layouts/images/imnon.png\" border=\"0\" complete=\"complete\" sip=\"" + user.Email + "\"/>\n";
+            string html = "<span class=\"wbf-view-involved-user\">\n";
 
-            html += "<a onclick=\"GoToLink(this);return false;\" href=\"/_layouts/userdisp.aspx?ID=" + user.ID + "\">" + user.Name + "</a>";
+            html += user.WBxToHTML(Context);
 
             if (!String.IsNullOrEmpty(involvedOrVisiting) && currentUserCanRemoveIndividuals)
             {

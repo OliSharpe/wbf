@@ -461,3 +461,45 @@ function WorkBoxFramework_triggerWebPartUpdate(guid) {
     }
 
 }
+
+
+// There's probably a nicer way to do this ....
+var wbf__user_presence_sips = new Object();
+var wbf__user_presence_elements = new Object();
+var wbf__user_presence_ids = new Array();
+
+function WorkBoxFramework__add_user_presence(id, sip, element) {
+    wbf__user_presence_sips[id] = sip;
+    wbf__user_presence_elements[id] = element;
+    wbf__user_presence_ids.push(id);
+    // alert("On pawn load for " + sip + " to element with ID = " + id);
+}
+
+function WorkBoxFramework__do_user_presence() {
+
+    // alert("Rendering the user presence information for the user pawns");
+
+    for (var index in wbf__user_presence_ids) {
+
+        var id = wbf__user_presence_ids[index];
+        var sip = wbf__user_presence_sips[id];
+        var element = wbf__user_presence_elements[id];
+
+        if (sip != "") {
+        //    alert("Should be loading presence pawn for " + sip + " to element with ID = " + id);
+            IMNRC(sip, element);
+        }
+        //else {
+          //  alert("User pawn element with ID = " + id + " had a blank SIP value");
+        //}
+    }
+}
+
+function WorkBoxFramework__add_do_user_presence_function() {
+    _spBodyOnLoadFunctionNames.push("WorkBoxFramework__do_user_presence");
+}
+
+// We want to run this function when the page has finished loading:
+if (typeof (_spBodyOnLoadFunctionNames) != 'undefined') {
+    _spBodyOnLoadFunctionNames.push("WorkBoxFramework__add_do_user_presence_function");
+}
