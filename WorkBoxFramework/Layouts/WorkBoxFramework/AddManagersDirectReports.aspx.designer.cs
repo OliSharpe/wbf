@@ -7,36 +7,36 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WorkBoxFramework.TeamDetails {
+namespace WorkBoxFramework.Layouts.WorkBoxFramework {
     
     
-    public partial class TeamDetailsUserControl {
+    public partial class AddManagersDirectReports {
         
         /// <summary>
-        /// ListOfTeamOwners control.
+        /// AreYouSureText control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ListOfTeamOwners;
+        protected global::System.Web.UI.WebControls.Label AreYouSureText;
         
         /// <summary>
-        /// ListOfTeamMembers control.
+        /// AddButton control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ListOfTeamMembers;
+        protected global::System.Web.UI.WebControls.Button AddButton;
         
         /// <summary>
-        /// TeamActions control.
+        /// CancelButton control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal TeamActions;
+        protected global::System.Web.UI.WebControls.Button CancelButton;
     }
 }

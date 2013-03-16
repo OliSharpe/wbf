@@ -38,6 +38,7 @@ using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Taxonomy;
 using Microsoft.SharePoint.Taxonomy.Generic;
+using Microsoft.Office.Server.UserProfiles;
 
 namespace WorkBoxFramework
 {
@@ -909,6 +910,21 @@ namespace WorkBoxFramework
             peopleEditor.UpdateEntities(entityArrayList);
         }
 
+        public static void WBxInitialise(this PeopleEditor peopleEditor, SPUser user)
+        {
+            ArrayList entityArrayList = new ArrayList();
+
+            if (user != null)
+            {
+                PickerEntity entity = new PickerEntity();
+                entity.Key = user.LoginName;
+                entity.DisplayText = user.Name;
+                entityArrayList.Add(entity);
+            }
+
+            peopleEditor.UpdateEntities(entityArrayList);
+        }
+
         public static List<SPUser> WBxGetMultiResolvedUsers(this PeopleEditor peopleEditor, SPWeb web)
         {
 
@@ -934,6 +950,22 @@ namespace WorkBoxFramework
             return users;
         }
 
+        public static SPUser WBxGetSingleResolvedUser(this PeopleEditor peopleEditor, SPWeb web)
+        {
+            SPUser user = null; 
+
+            if (peopleEditor.ResolvedEntities.Count > 0)
+            {
+                PickerEntity pickedEntity = peopleEditor.ResolvedEntities[0] as PickerEntity;
+                user = web.WBxEnsureUserOrNull(pickedEntity.Key);
+            }
+            else
+            {
+                WBUtils.logMessage("Couldn't find any resolved entities. comma sep value: " + peopleEditor.CommaSeparatedAccounts);
+            }
+
+            return user;
+        }
 
         /*
         public static List<SPUser> WBxGetMultiUserColumn(this SPListItem item, String columnName)
@@ -1765,6 +1797,12 @@ namespace WorkBoxFramework
             return user;
         }
 
+        public static WBUser WBxUser(this SPUser user)
+        {
+            if (user == null) return null;
+            return new WBUser(user);
+        }
+
         public static String WBxToHTML(this SPUser user, HttpContext context)
         {
             return WBxToHTML(user, context, SPContext.Current.Site.RootWeb);
@@ -1973,6 +2011,61 @@ namespace WorkBoxFramework
 
         #endregion
 
+
+        #region UserProfile extensions
+
+        public static List<String> WBxGetDirectReportsLogins(this UserProfile profile)
+        {
+            UserProfile[] directReportProfiles = profile.GetDirectReports();
+
+            List<String> directReportsLogins = new List<String>();
+
+            foreach (UserProfile directReportProfile in directReportProfiles)
+            {
+                String userLogin = directReportProfile["AccountName"].Value as String;
+
+                if (!String.IsNullOrEmpty(userLogin))
+                {
+                    directReportsLogins.Add(userLogin);
+                }
+            }
+
+            return directReportsLogins;
+        }
+
+
+        public static List<String> WBxGetAllReportsLogins(this UserProfile profile)
+        {
+            List<String> allReportsLogins = new List<String>();
+            String userLogin = profile["AccountName"].Value as String;
+
+            if (!String.IsNullOrEmpty(userLogin))
+            {
+                allReportsLogins.Add(userLogin);
+            }
+
+
+            UserProfile[] directReportProfiles = profile.GetDirectReports();
+
+            foreach (UserProfile directReportProfile in directReportProfiles)
+            {
+                List<String> subLogins = directReportProfile.WBxGetAllReportsLogins();
+
+                foreach (String subLogin in subLogins)
+                {
+                    if (!allReportsLogins.Contains(subLogin))
+                    {
+                        allReportsLogins.Add(subLogin);
+                    }
+                }
+            }
+
+            return allReportsLogins;
+        }
+
+
+
+        #endregion
 
 
         public static void WBxSafeSetSelectedValue(this DropDownList dropDownList, string value)

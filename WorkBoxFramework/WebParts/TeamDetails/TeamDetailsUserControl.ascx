@@ -24,13 +24,6 @@
 
 <asp:Literal ID="ListOfTeamMembers" runat="server" />
 
-<% if (userIsTeamOwner) { %>
-
-<h3>Manage Team:</h3>
-<ul>
-<li><a href="javascript: WorkBoxFramework_relativeCommandAction('InviteToTeamWithEmail.aspx', 660, 500); ">Invite user to team</a></li>
-</ul>
-
-<% } %>
+<asp:Literal ID="TeamActions" runat="server" />
 
 </div>

@@ -3,6 +3,7 @@
 <%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
+<%@ Register Tagprefix="Taxonomy" Namespace="Microsoft.SharePoint.Taxonomy" Assembly="Microsoft.SharePoint.Taxonomy, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register TagPrefix="wssuc" TagName="InputFormSection" src="/_controltemplates/InputFormSection.ascx" %>
 <%@ Register TagPrefix="wssuc" TagName="InputFormControl" src="/_controltemplates/InputFormControl.ascx" %> 
 <%@ Register TagPrefix="wssuc" TagName="LinkSection" src="/_controltemplates/LinkSection.ascx" %> 
@@ -117,6 +118,16 @@
                         </td>
 						<td class="ms-authoringcontrols" valign="top" align="left">
                             <asp:TextBox ID="TeamSitesSiteCollectionURL" runat="server" columns="50"/>
+                        </td>
+                    </tr>
+
+					<tr>
+                        <td>
+                            <b><nobr>System Admin Team Path</nobr></b><br />
+                            The path to the team that should have system admin priviledges.
+                        </td>
+						<td class="ms-authoringcontrols" valign="top" align="left">
+                               <asp:TextBox ID="SystemAdminTeam" runat="server" columns="50"/>
                         </td>
                     </tr>
 

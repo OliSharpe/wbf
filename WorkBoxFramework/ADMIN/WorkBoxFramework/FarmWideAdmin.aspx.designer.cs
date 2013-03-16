@@ -85,6 +85,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.TextBox TeamSitesSiteCollectionURL;
         
         /// <summary>
+        /// SystemAdminTeam control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox SystemAdminTeam;
+        
+        /// <summary>
         /// OpenWorkBoxesCachedDetailsListURL control.
         /// </summary>
         /// <remarks>

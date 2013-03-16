@@ -969,7 +969,7 @@ namespace WorkBoxFramework
 
                 case WHO_CAN_CREATE_NEW_WORK_BOXES__TEAM_OWNERS:
                     {
-                        if (team.IsCurrentUserTeamOwner())
+                        if (team.IsCurrentUserTeamOwnerOrSystemAdmin())
                             return true;
                         return false;
                     }

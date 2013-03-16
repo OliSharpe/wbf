@@ -83,6 +83,27 @@
     <Compile Include="ADMIN\WorkBoxFramework\CheckConfiguration.aspx.designer.cs">
       <DependentUpon>CheckConfiguration.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\AddAllManagersReports.aspx.cs">
+      <DependentUpon>AddAllManagersReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\AddAllManagersReports.aspx.designer.cs">
+      <DependentUpon>AddAllManagersReports.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\AddManagersDirectReports.aspx.cs">
+      <DependentUpon>AddManagersDirectReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\AddManagersDirectReports.aspx.designer.cs">
+      <DependentUpon>AddManagersDirectReports.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ChangeTeamManager.aspx.cs">
+      <DependentUpon>ChangeTeamManager.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ChangeTeamManager.aspx.designer.cs">
+      <DependentUpon>ChangeTeamManager.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
@@ -813,6 +834,15 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="ADMIN\WorkBoxFramework\CheckConfiguration.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\AddAllManagersReports.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\AddManagersDirectReports.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ChangeTeamManager.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx">

@@ -27,6 +27,20 @@ td.wbf-management-details-title-panel {  text-align:center; background-color: #e
 td.ms-authoringcontrols { border-left: 1px solid gray; }
 td.ms-authoringcontrols td { border: 0px; }
 </style>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#<%=AllTeamsTreeView.ClientID  %> a.ms-navitem").click(function () {
+            WorkBoxFramework_clearPeopleEditors();
+            return true;
+        });
+    });
+
+</script>
+
+
 </asp:Content>
 
 <asp:Content ContentPlaceHolderId="PlaceHolderLeftNavBar" style="display:none" runat="server">
@@ -71,7 +85,8 @@ td.ms-authoringcontrols td { border: 0px; }
 
    				</td>
    				<td valign="top" class="wbf-management-panel">
-                       <asp:UpdatePanel ID="ShowSelectionPanel" runat="server">
+
+                <asp:UpdatePanel ID="ShowSelectionPanel" runat="server">
                             <Triggers>
                                 <asp:AsyncPostBackTrigger ControlID="AllTeamsTreeView" EventName="SelectedNodeChanged" />
                             </Triggers>
@@ -105,6 +120,12 @@ td.ms-authoringcontrols td { border: 0px; }
                             <asp:TextBox ID="TeamName" runat="server" Columns="50"></asp:TextBox>
 						</td>
 					</tr>
+                    <tr>
+						<td class="ms-authoringcontrols" valign="top" align="left" width="50">
+                            <asp:Label ID="TeamGUID" runat="server" Columns="50"></asp:Label>
+						</td>
+					</tr>
+
 				</table>
 			</Template_Control>
 		</wssuc:InputFormControl>
@@ -183,6 +204,35 @@ td.ms-authoringcontrols td { border: 0px; }
 		</wssuc:InputFormControl>
 	</Template_InputFormControls>
 </wssuc:InputFormSection>
+
+<!-- Team Manager User Section -->
+<wssuc:InputFormSection
+	id="TeamManagerUserSection"
+	title="Team Manager"
+	Description="Select the name of the manager for the team (optional)"
+	runat="server"
+	>
+	<Template_InputFormControls>
+		<wssuc:InputFormControl runat="server">
+			<Template_Control>
+				<table border="0" width="100%" cellspacing="0" cellpadding="2">
+					<tr>
+						<td class="ms-authoringcontrols" valign="top" align="left" width="50">
+			<SharePoint:PeopleEditor id="TeamManager" runat="server"
+				SelectionSet="User"
+				ValidatorEnabled="true"
+				AllowEmpty = "true"
+				MultiSelect = "false"
+				/>
+						</td>
+					</tr>
+				</table>
+			</Template_Control>
+		</wssuc:InputFormControl>
+	</Template_InputFormControls>
+</wssuc:InputFormSection>
+
+
 
 <!-- Team Owners SharePoint User Groups Section -->
 <wssuc:InputFormSection
@@ -282,6 +332,8 @@ td.ms-authoringcontrols td { border: 0px; }
                             <asp:TextBox ID="RecordsTypesListUrl" columns=70 runat="server"></asp:TextBox>
 						</td>
                     </tr>
+
+                    <!--
 					<tr>
 						<td class="ms-authoringcontrols" valign="top" align="left" width="50">
                             <asp:TextBox ID="CommonActivitiesListUrl" columns=70 runat="server"></asp:TextBox>
@@ -292,6 +344,8 @@ td.ms-authoringcontrols td { border: 0px; }
                             <asp:TextBox ID="FunctionalActivitiesListUrl" columns=70 runat="server"></asp:TextBox>
 						</td>
                     </tr>
+                    -->
+
 				</table>
 			</Template_Control>
 		</wssuc:InputFormControl>
@@ -316,11 +370,11 @@ td.ms-authoringcontrols td { border: 0px; }
 
 
                     </div>
-
-
+                    
                             </ContentTemplate>
 
                        </asp:UpdatePanel>
+
    				</td>
    			</tr>
    		</table>

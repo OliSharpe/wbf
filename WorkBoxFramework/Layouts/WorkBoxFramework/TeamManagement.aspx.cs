@@ -62,6 +62,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
 
             TeamName.Text = team.Name;
+            TeamGUID.Text = team.Id.ToString();
             TeamAcronym.Text = team.Acronym;
 
             TeamFunctionalAreas.Text = team.FunctionalAreaUIControlValue;
@@ -82,13 +83,20 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             WBLogging.Debug("In TeamManagement.updatePanelWithTeamDetails(): OwnersGroupName = " + team.OwnersGroupName);
             WBLogging.Debug("In TeamManagement.updatePanelWithTeamDetails(): MembersGroupName = " + team.MembersGroupName);
 
-            TeamOwnersSharePointUserGroup.CommaSeparatedAccounts = "";
+            TeamManager.WBxInitialise(team.Manager(SPContext.Current.Web));
+
+            //TeamOwnersSharePointUserGroup.CommaSeparatedAccounts = "";
+            //TeamOwnersSharePointUserGroup.ResolvedEntities.Clear();
+            //TeamOwnersSharePointUserGroup.Entities.Clear();
             TeamOwnersSharePointUserGroup.UpdateEntities(WBUtils.CreateEntitiesArrayList(team.OwnersGroupName));
 
-            TeamMembersSharePointUserGroup.CommaSeparatedAccounts = "";
+
+            //TeamMembersSharePointUserGroup.CommaSeparatedAccounts = "";
+            //TeamMembersSharePointUserGroup.ResolvedEntities.Clear();
+            //TeamMembersSharePointUserGroup.Entities.Clear();
             TeamMembersSharePointUserGroup.UpdateEntities(WBUtils.CreateEntitiesArrayList(team.MembersGroupName));
 
-            TeamPublishersSharePointUserGroup.CommaSeparatedAccounts = "";
+            //TeamPublishersSharePointUserGroup.CommaSeparatedAccounts = "";
             TeamPublishersSharePointUserGroup.UpdateEntities(WBUtils.CreateEntitiesArrayList(team.PublishersGroupName));
 
             RecordsTypesListUrl.Text = team.RecordsTypesListUrl;
@@ -112,14 +120,24 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void saveButton_OnClick(object sender, EventArgs e)
         {
+            WBLogging.Debug("In TeamManagement.saveButton_OnClick(): just started");
+
             WBTeam team = teams.GetSelectedTeam(AllTeamsTreeView.SelectedNode.ValuePath);
 
             team.Name = TeamName.Text;
             team.Acronym = TeamAcronym.Text;
 
+            WBLogging.Debug("Set name and acronym");
+
             team.FunctionalAreaUIControlValue = TeamFunctionalAreas.Text;
 
             team.TeamSiteUrl = TeamsSiteURL.Text;
+
+            WBLogging.Debug("About to set manager");
+
+            team.SetManager(SPContext.Current.Site, TeamManager.WBxGetSingleResolvedUser(SPContext.Current.Web));
+
+            WBLogging.Debug("Set manager");
 
             team.OwnersGroupName = WBUtils.EntitiesToPropertyString(TeamOwnersSharePointUserGroup.ResolvedEntities, 1);
             team.MembersGroupName = WBUtils.EntitiesToPropertyString(TeamMembersSharePointUserGroup.ResolvedEntities, 1);

@@ -47,10 +47,15 @@ namespace WorkBoxFramework
         private const string FARM_PROPERTY__PUBLIC_RECORDS_LIBRARY_URL = "wbf__farm__public_records_library_url";
         private const string FARM_PROPERTY__PUBLIC_EXTRANET_RECORDS_LIBRARY_URL = "wbf__farm__public_extranet_records_library_url";
 
+
+        private const string FARM_PROPERTY__TEAM_SITES_SITE_COLLECTION_URL = "wbf__farm__team_sites_site_collection_url";
+
+        private const string FARM_PROPERTY__SYSTEM_ADMIN_TEAM_GUID = "wbf__farm__system_admin_team_guid";
+
         private const string FARM_PROPERTY__OPEN_WORK_BOXES_CACHED_DETAILS_LIST_URL = "wbf__farm__open_work_boxes_cached_details_list_url";
         private const string FARM_PROPERTY__TICKS_WHEN_LAST_UPDATED_RECENTLY_VISITED = "wbf__farm__ticks_when_last_updated_recently_visited";
 
-        private const string FARM_PROPERTY__TEAM_SITES_SITE_COLLECTION_URL = "wbf__farm__team_sites_site_collection_url";
+
 
         private const string FARM_PROPERTY__RECORDS_MANAGERS_GROUP_NAME = "wbf__farm__records_managers_group_name";
         private const string FARM_PROPERTY__RECORDS_SYSTEM_ADMIN_GROUP_NAME = "wbf__farm__records_system_admin_group_name";
@@ -196,6 +201,12 @@ namespace WorkBoxFramework
         {
             get { return _farm.WBxGetProperty(FARM_PROPERTY__TEAM_SITES_SITE_COLLECTION_URL); }
             set { _farm.WBxSetProperty(FARM_PROPERTY__TEAM_SITES_SITE_COLLECTION_URL, value); }
+        }
+        
+        public String SystemAdminTeamGUIDString
+        {
+            get { return _farm.WBxGetProperty(FARM_PROPERTY__SYSTEM_ADMIN_TEAM_GUID); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__SYSTEM_ADMIN_TEAM_GUID, value); }
         }
         
         public String RecordsManagersGroupName
@@ -364,6 +375,31 @@ namespace WorkBoxFramework
         public void Update()
         {
             _farm.Update();
+        }
+
+
+        public WBTeam SystemAdminTeam(SPSite site)
+        {
+            if (String.IsNullOrEmpty(SystemAdminTeamGUIDString)) return null;
+
+            WBTaxonomy teamsTaxonomy = WBTaxonomy.GetTeams(site);
+            return SystemAdminTeam(teamsTaxonomy);
+        }
+
+        public WBTeam SystemAdminTeam(WBTaxonomy teamsTaxonomy)
+        {
+            if (String.IsNullOrEmpty(SystemAdminTeamGUIDString)) return null;
+            return new WBTeam(teamsTaxonomy, new Guid(SystemAdminTeamGUIDString));
+        }
+
+        public bool IsCurrentUserSystemAdmin()
+        {
+            if (SPContext.Current == null) return false;
+
+            WBTeam sysadminTeam = SystemAdminTeam(SPContext.Current.Site);
+
+            if (sysadminTeam == null) return false; 
+            return sysadminTeam.IsCurrentUserTeamMember();
         }
 
 
