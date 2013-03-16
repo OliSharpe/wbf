@@ -462,6 +462,28 @@ function WorkBoxFramework_triggerWebPartUpdate(guid) {
 
 }
 
+// The function below is to fix the annoying issue where peopleeditors controls don't clear after a post back:
+// The function is derived from the function described here.
+// http: //www.sharemuch.com/2011/12/04/how-to-address-sharepoint-2010-people-editor-issue-not-clearing/
+
+// This function clears all of the hidden data on all of the PeopleEditors on the page:
+function WorkBoxFramework_clearPeopleEditors() {
+
+    var arr = document.getElementsByTagName("div");
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i].id.indexOf("upLevelDiv") > 0) {
+            arr[i].innerHTML = '';
+        }
+    }
+
+    arr = document.getElementsByTagName("input");
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i].name.indexOf("hiddenSpanData") > 0) {
+            arr[i].value = '';
+        }
+    }
+} 
+
 
 // There's probably a nicer way to do this ....
 var wbf__user_presence_sips = new Object();

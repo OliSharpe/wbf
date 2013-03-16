@@ -47,7 +47,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
 
 
-            if (!team.IsCurrentUserTeamOwner())
+            if (!team.IsCurrentUserTeamOwnerOrSystemAdmin())
             {
                 ErrorText.Text = "Only team owners can invite individuals to a team.";
                 return;

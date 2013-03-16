@@ -1008,5 +1008,31 @@ namespace WorkBoxFramework
 
             return newUsersList;
         }
+
+        public static List<SPUser> GetSPUsers(SPWeb web, List<String> loginNames)
+        {
+            List<SPUser> spUsers = new List<SPUser>();
+
+            foreach (String loginName in loginNames)
+            {
+                SPUser spUser = null;
+                try
+                {
+                    spUser = web.EnsureUser(loginName);
+                }
+                catch 
+                {
+                    WBLogging.Generic.Verbose("Couldn't find the SPUser details for login name: " + loginName);                        
+                }
+
+                if (spUser != null)
+                {
+                    spUsers.Add(spUser);
+                }
+
+            }
+
+            return spUsers;
+        }
     }
 }

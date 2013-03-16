@@ -45,6 +45,12 @@ namespace WorkBoxFramework
             Initialise(taxonomy, term);
         }
 
+        public WBTerm(WBTaxonomy taxonomy, Guid guid)
+        {
+            Initialise(taxonomy, taxonomy.TermSet.GetTerm(guid));
+        }
+
+
         public WBTerm(WBTaxonomy taxonomy, String UIControlValue)
         {
             Initialise(taxonomy, UIControlValue);

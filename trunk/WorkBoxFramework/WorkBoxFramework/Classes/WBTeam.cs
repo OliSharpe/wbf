@@ -49,6 +49,7 @@ namespace WorkBoxFramework
         public const string TEAM_TERM_PROPERTY__FUNCTIONAL_ACTIVITIES_LIST_URL = "wbf__team_term__functional_activities_list_url";
         public const string TEAM_TERM_PROPERTY__FUNCTIONAL_AREA = "wbf__team_term__functional_area";
         public const string TEAM_TERM_PROPERTY__ACRONYM = "wbf__team_term__acronym";
+        public const string TEAM_TERM_PROPERTY__MANAGER_LOGIN = "wbf__team_term__manager_login";
 
         public const string TEAM_TERM_STATUS__NEW = "New";
         public const string TEAM_TERM_STATUS__OK = "OK";
@@ -84,6 +85,13 @@ namespace WorkBoxFramework
             _individualCommit = true;
         }
 
+        public WBTeam(WBTaxonomy taxonomy, Guid teamsGuid)
+            : base(taxonomy, teamsGuid)
+        {
+            _individualCommit = true;
+        }
+
+        
         public WBTeam(WBTaxonomy taxonomy, String UIControlValue)
             : base(taxonomy, UIControlValue)
         {
@@ -247,6 +255,15 @@ namespace WorkBoxFramework
             set { Term.WBxSetProperty(TEAM_TERM_PROPERTY__ACRONYM, value); }
         }
 
+        public String ManagerLogin
+        {
+            get { return Term.WBxGetProperty(TEAM_TERM_PROPERTY__MANAGER_LOGIN); }
+            private set {
+                WBLogging.Teams.Verbose("Setting the manager (" + value + ") of the team (" + Name + ")");
+                Term.WBxSetProperty(TEAM_TERM_PROPERTY__MANAGER_LOGIN, value); 
+            }
+        }
+
 
         public bool IsPickable { get { return Term.IsAvailableForTagging; } }
 
@@ -276,6 +293,26 @@ namespace WorkBoxFramework
             return new WBTermCollection<WBTerm>(functionalAreas, FunctionalAreaUIControlValue);
         }
 
+        public SPUser Manager(SPWeb web)
+        {
+            WBLogging.Teams.Verbose("Getting the manager (" + ManagerLogin + ") of the team (" + Name + ")");
+            if (String.IsNullOrEmpty(ManagerLogin)) return null;
+
+            return web.WBxEnsureUserOrNull(ManagerLogin);
+        }
+
+        public void SetManager(SPSite site, SPUser user)
+        {
+            if (user != null)
+            {
+                AddOwner(site, user);
+                ManagerLogin = user.LoginName;
+            }
+            else
+            {
+                ManagerLogin = "";
+            }
+        }
 
         public override void Update()
         {
@@ -434,13 +471,18 @@ namespace WorkBoxFramework
             return members.WBxContainsUser(user);
         }
 
-
         public bool IsCurrentUserTeamOwner()
         {
             if (SPContext.Current == null) return false;
             SPGroup owners = OwnersGroup(SPContext.Current.Site);
             if (owners == null) return false;
             return owners.ContainsCurrentUser;
+        }
+
+
+        public bool IsCurrentUserTeamOwnerOrSystemAdmin()
+        {
+            return (IsCurrentUserTeamOwner() || WBFarm.Local.IsCurrentUserSystemAdmin());
         }
 
         public bool IsUserTeamOwner(SPUser user)
@@ -450,6 +492,27 @@ namespace WorkBoxFramework
             return owners.WBxContainsUser(user);
         }
 
+        public bool IsCurrentUserTeamManager()
+        {
+            if (SPContext.Current == null) return false;
+            if (String.IsNullOrEmpty(ManagerLogin)) return false;
+
+            return (ManagerLogin == SPContext.Current.Web.CurrentUser.LoginName);
+        }
+
+        public bool IsCurrentUserTeamManagerOrSystemAdmin()
+        {
+            return (IsCurrentUserTeamManager() || WBFarm.Local.IsCurrentUserSystemAdmin());
+        }
+
+
+        public bool IsUserTeamManager(SPUser user)
+        {
+            if (user == null) return false;
+            if (String.IsNullOrEmpty(ManagerLogin)) return false;
+
+            return (ManagerLogin == user.LoginName);
+        }
 
 
         public void EmailTeam(SPSite site, SPWeb web, String subject, String body, bool isBodyHTML)
@@ -491,6 +554,24 @@ namespace WorkBoxFramework
 
         #endregion
 
+        internal void AddOwner(SPSite site, SPUser user)
+        {
+            SPGroup owners = this.OwnersGroup(site);
+
+            if (owners == null)
+            {
+                WBLogging.Teams.Unexpected("Trying to add a user to be an owner in a team ("+Name+") where there is no set owners group!");
+                return;
+            }
+
+            if (!owners.WBxContainsUser(user))
+            {
+                owners.AddUser(user);
+                owners.Update();
+            }
+        }
+
+
         internal void AddOwners(SPSite site, List<SPUser> newUsers)
         {
             SPGroup owners = this.OwnersGroup(site);
@@ -526,6 +607,13 @@ namespace WorkBoxFramework
 
         internal void RemoveOwner(SPSite site, SPUser userToRemove)
         {
+            if (userToRemove == null) return;
+            if (IsUserTeamManager(userToRemove))
+            {
+                WBLogging.Teams.HighLevel("You can't remove the team manager ("+ManagerLogin+") from being an owner of the team ("+Name+")");
+                return;
+            }
+
             SPGroup owners = this.OwnersGroup(site);
 
             if (owners != null)
@@ -545,6 +633,50 @@ namespace WorkBoxFramework
                 members.Update();
 
                 SyncRemoveMember(members, userToRemove);
+            }
+        }
+
+        public void AddManagersDirectReports()
+        {
+            AddManagersDirectReports(SPContext.Current.Site, SPContext.Current.Web);
+        }
+
+        public void AddManagersDirectReports(SPSite site, SPWeb web)
+        {
+            // Let's just check that the current user has the rights of an owner in order to perform this method:
+            if (!IsCurrentUserTeamOwnerOrSystemAdmin())
+            {
+                WBLogging.Generic.Verbose("Cannot do 'AddManagersDirectReports' as the current user (" + web.CurrentUser + ") doesn't have owner role on this team (" + Name + ")");
+                return;
+            }
+
+            WBUser manager = Manager(web).WBxUser();
+
+            if (manager != null)
+            {
+                AddMembers(site, WBUtils.GetSPUsers(web, manager.GetUserProfile(site).WBxGetDirectReportsLogins()));
+            }
+        }
+
+        public void AddAllManagersReports()
+        {
+            AddAllManagersReports(SPContext.Current.Site, SPContext.Current.Web);
+        }
+
+        public void AddAllManagersReports(SPSite site, SPWeb web)
+        {
+            // Let's just check that the current user has the rights of an owner in order to perform this method:
+            if (!IsCurrentUserTeamOwnerOrSystemAdmin())
+            {
+                WBLogging.Generic.Verbose("Cannot do 'AddAllManagersReports' as the current user (" + web.CurrentUser + ") doesn't have owner role on this team (" + Name + ")");
+                return;
+            }
+
+            WBUser manager = Manager(web).WBxUser();
+
+            if (manager != null)
+            {
+                AddMembers(site, WBUtils.GetSPUsers(web, manager.GetUserProfile(site).WBxGetAllReportsLogins()));
             }
         }
 
@@ -599,7 +731,7 @@ namespace WorkBoxFramework
 
                                     if (toUser != null)
                                     {
-                                        toGroup.Users.Add(toUser.LoginName, toUser.Email, toUser.Name, toUser.Notes);
+                                        toGroup.AddUser(toUser);
                                     }
                                 }
 

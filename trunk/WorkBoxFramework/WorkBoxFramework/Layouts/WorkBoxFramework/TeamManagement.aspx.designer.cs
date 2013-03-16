@@ -58,6 +58,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.TextBox TeamName;
         
         /// <summary>
+        /// TeamGUID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label TeamGUID;
+        
+        /// <summary>
         /// TeamAcronymSection control.
         /// </summary>
         /// <remarks>
@@ -128,6 +137,24 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label TeamsSiteGUID;
+        
+        /// <summary>
+        /// TeamManagerUserSection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl TeamManagerUserSection;
+        
+        /// <summary>
+        /// TeamManager control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.PeopleEditor TeamManager;
         
         /// <summary>
         /// TeamOwnersUserGroupSection control.

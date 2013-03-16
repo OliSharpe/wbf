@@ -41,7 +41,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 return;
             }
 
-            if (!team.IsCurrentUserTeamOwner())
+            if (!team.IsCurrentUserTeamOwnerOrSystemAdmin())
             {
                 AreYouSureText.Text = "Only team owners can remove users from a team.";
                 RemoveButton.Enabled = false;

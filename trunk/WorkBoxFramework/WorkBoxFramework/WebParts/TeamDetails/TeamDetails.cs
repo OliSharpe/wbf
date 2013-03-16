@@ -41,6 +41,13 @@ namespace WorkBoxFramework.TeamDetails
         [System.ComponentModel.Category("Configuration")]
         public bool ShowMailToLinks { get; set; }
 
+        [WebBrowsable(true)]
+        [Personalizable(PersonalizationScope.Shared)]
+        [WebDisplayName("Show Add Manager Reports Links")]
+        [WebDescription("Show Add Manager Reports Links.")]
+        [System.ComponentModel.Category("Configuration")]
+        public bool ShowAddManagerReportsLinks { get; set; }
+
 
         // Visual Studio might automatically update this path when you change the Visual Web Part project item.
         private const string _ascxPath = @"~/_CONTROLTEMPLATES/WorkBoxFramework/TeamDetails/TeamDetailsUserControl.ascx";

@@ -45,6 +45,26 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 PublicExtranetRecordsLibraryURL.Text = farm.PublicExtranetRecordsLibraryUrl;
 
                 TeamSitesSiteCollectionURL.Text = farm.TeamSitesSiteCollectionUrl;
+
+                WBLogging.Debug("Got here");
+
+                WBTaxonomy teams = WBTaxonomy.GetTeams(SPContext.Current.Site);
+
+                if (teams == null) WBLogging.Debug("teams was null");
+
+                WBTeam systemAdminTeam = farm.SystemAdminTeam(teams);
+
+                if (systemAdminTeam != null)
+                {
+                    SystemAdminTeam.Text = systemAdminTeam.FullPath;
+                }
+                else
+                {
+                    WBLogging.Debug("systemAdminTeam was null");
+                    SystemAdminTeam.Text = "";
+                }
+   //             SystemAdminTeam.Text = farm.SystemAdminTeamGUIDString;
+
                 OpenWorkBoxesCachedDetailsListURL.Text = farm.OpenWorkBoxesCachedDetailsListUrl;
 
                 RecordsManagersGroupName.Text = farm.RecordsManagersGroupName;
@@ -69,6 +89,29 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             farm.PublicExtranetRecordsLibraryUrl = PublicExtranetRecordsLibraryURL.Text;
 
             farm.TeamSitesSiteCollectionUrl = TeamSitesSiteCollectionURL.Text;
+
+            //farm.SystemAdminTeamGUIDString = SystemAdminTeam.Text;
+
+            
+            if (!String.IsNullOrEmpty(SystemAdminTeam.Text))
+            {
+                WBTaxonomy teams = WBTaxonomy.GetTeams(SPContext.Current.Site);
+                WBTeam systemAdminTeam = teams.GetSelectedTeam(SystemAdminTeam.Text);
+                if (systemAdminTeam != null)
+                {
+                    farm.SystemAdminTeamGUIDString = systemAdminTeam.Id.ToString();
+                }
+                else
+                {
+                    farm.SystemAdminTeamGUIDString = "";
+                }
+            }
+            else
+            {
+                farm.SystemAdminTeamGUIDString = "";
+            }
+            
+
             farm.OpenWorkBoxesCachedDetailsListUrl = OpenWorkBoxesCachedDetailsListURL.Text;
 
             farm.RecordsManagersGroupName = RecordsManagersGroupName.Text;

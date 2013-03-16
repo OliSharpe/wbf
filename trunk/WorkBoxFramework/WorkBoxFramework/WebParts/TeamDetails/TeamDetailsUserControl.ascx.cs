@@ -31,7 +31,7 @@ namespace WorkBoxFramework.TeamDetails
 {
     public partial class TeamDetailsUserControl : UserControl
     {
-        public bool userIsTeamOwner = false;
+        public bool userIsTeamOwnerOrSystemAdmin = false;
 
         private int countPawnsOnPage = 0;
 
@@ -53,15 +53,57 @@ namespace WorkBoxFramework.TeamDetails
                 }
                 else
                 {
-                    if (team.IsCurrentUserTeamOwner()) userIsTeamOwner = true;
-                    
-                    ListOfTeamOwners.Text = generateTable(team, team.OwnersGroupName, "Owner", "Team Owners");
-                    ListOfTeamMembers.Text = generateTable(team, team.MembersGroupName, "Member", "Team Members");
+                    if (team.IsCurrentUserTeamOwnerOrSystemAdmin()) userIsTeamOwnerOrSystemAdmin = true;
+
+                    List<String> ownerEmails = new List<String>();
+                    List<String> membersEmails = new List<String>();
+
+                    ListOfTeamOwners.Text = generateTable(team, team.OwnersGroupName, "Owner", "Team Owners", ownerEmails);
+                    ListOfTeamMembers.Text = generateTable(team, team.MembersGroupName, "Member", "Team Members", membersEmails);
+
+                    String teamActionsHTML = "";
+                    if (userIsTeamOwnerOrSystemAdmin || webPart.ShowMailToLinks)
+                    {
+                        teamActionsHTML += "<h3>Team Actions:</h3>\n<ul>";
+
+                        if (webPart.ShowMailToLinks)
+                        {
+                            teamActionsHTML += "<li>" + generateLinkToEmailGroup("Email team owners", ownerEmails) + "</li>";
+                            teamActionsHTML += "<li>" + generateLinkToEmailGroup("Email team members", membersEmails) + "</li>";
+                        }
+
+                        if (userIsTeamOwnerOrSystemAdmin)
+                        {
+                            teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('InviteToTeamWithEmail.aspx', 660, 500); \">Invite user to team</a></li>";
+
+                            if (team.IsCurrentUserTeamManagerOrSystemAdmin())
+                            {
+                                teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('ChangeTeamManager.aspx', 660, 300); \">Change team manager</a></li>";
+                            }
+
+                            if (webPart.ShowAddManagerReportsLinks)
+                            {
+                                if (String.IsNullOrEmpty(team.ManagerLogin))
+                                {
+                                    teamActionsHTML += "<li><i>Add manager's direct reports</i></li>";
+                                    teamActionsHTML += "<li><i>Add all manager's reports</i></li>";
+                                }
+                                else
+                                {
+                                    teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('AddManagersDirectReports.aspx', 400, 200); \">Add manager's direct reports</a></li>";
+                                    teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('AddAllManagersReports.aspx', 400, 200); \">Add all manager's reports</a></li>";
+                                }
+                            }
+                        }
+                        teamActionsHTML += "\n</ul>";
+
+                    }
+                    TeamActions.Text = teamActionsHTML;
                 }
             }
         }
 
-        private String generateTable(WBTeam team, String groupName, String groupType, String title)
+        private String generateTable(WBTeam team, String groupName, String groupType, String title, List<String> groupEmails)
         {
             string html = "";
             SPGroup group = SPContext.Current.Site.RootWeb.WBxGetGroupOrNull(groupName);
@@ -81,38 +123,44 @@ namespace WorkBoxFramework.TeamDetails
                 // OK so now we have the SPGroup for the team’s owners group. 
                 // Now we can iterate through the SPUser-s in this group … or whatever else we want to do with it, e.g.:
 
-                List<String> teamEmails = new List<String>();
-
                 html += "<table cellpadding='5'><tr><td><ul>";
                 foreach (SPUser user in group.Users)
                 {
                     html += "<li>" + user.WBxToHTML(Context); //renderUser(user, SPContext.Current.Site.RootWeb);
 
-                    if (userIsTeamOwner)
+                    if (team.IsUserTeamManager(user))
                     {
-                        string actionURL = "RemoveFromTeam.aspx?userLogin=" + user.LoginName.Replace("\\", "\\\\") + "&role=" + groupType;
+                        html += " (manager)";
+                    }
+                    else
+                    {
+                        if (userIsTeamOwnerOrSystemAdmin)
+                        {
+                            string actionURL = "RemoveFromTeam.aspx?userLogin=" + user.LoginName.Replace("\\", "\\\\") + "&role=" + groupType;
 
-                        html += " <a href=\"javascript: WorkBoxFramework_relativeCommandAction('" + actionURL + "', 400, 200); \">(remove)</a>";
+                            html += " <a href=\"javascript: WorkBoxFramework_relativeCommandAction('" + actionURL + "', 400, 200); \">(remove)</a>";
+                        }
                     }
 
                     html += "</li>";
 
-                    if (!String.IsNullOrEmpty(user.Email) && !teamEmails.Contains(user.Email))
+                    if (!String.IsNullOrEmpty(user.Email) && !groupEmails.Contains(user.Email))
                     {
-                        teamEmails.Add(user.Email);
+                        groupEmails.Add(user.Email);
                     }
                 }
 
                 html += "</ul></td></tr>\n";
                 html += "</table>\n";
 
-                if (webPart.ShowMailToLinks)
-                {
-                    html += "<div class='wbf-mail-to-team'><a href='mailto:" + String.Join(",", teamEmails.ToArray()) + "'>Email all " + title.ToLower() + "</div>";
-                }
             }
 
             return html;
+        }
+
+        private String generateLinkToEmailGroup(String text, List<String> emails)
+        {
+            return "<a href='mailto:" + String.Join(";", emails.ToArray()) + "'>" + text + "</a>";
         }
 
         private String renderUser(SPUser user)
