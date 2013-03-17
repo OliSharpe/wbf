@@ -68,8 +68,6 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
                     isWorkBox = true;
                     SPWeb workBoxWeb = workBox.Web;
 
-                    scriptForSettingGlobalVariables = makeScriptForSettingWorkBoxVariables(workBox);
-
                     if (!currentRibbon.IsTabAvailable("WorkBoxFramework.Ribbon.WorkBox"))
                     {
                         currentRibbon.MakeTabAvailable("WorkBoxFramework.Ribbon.WorkBox");
@@ -126,12 +124,16 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
                     cm.RegisterClientScriptBlock(this.GetType(), "WorkBoxFramework_getDynamicTasksMenu", callbackScript, true);
 
 
-
                     // Now let's check or set the last visited Guid:
-                    SPSite _site = SPContext.Current.Site;
-                    SPServiceContext _serviceContext = SPServiceContext.GetContext(_site);
-                    UserProfileManager _profileManager = new UserProfileManager(_serviceContext);
-                    UserProfile profile = _profileManager.GetUserProfile(true);
+                    WBUser user = new WBUser(workBox.Web.CurrentUser);
+                    UserProfile profile = user.GetUserProfile(workBox.Site);
+
+//                    SPSite _site = SPContext.Current.Site;
+  //                  SPServiceContext _serviceContext = SPServiceContext.GetContext(_site);
+    //                UserProfileManager _profileManager = new UserProfileManager(_serviceContext);
+//                    UserProfile profile = _profileManager.GetUserProfile(true);
+
+                    scriptForSettingGlobalVariables = makeScriptForSettingWorkBoxVariables(workBox, user, profile);
 
                     UserProfileValueCollection lastVisitedGuidUserProfileValueCollection = profile[WorkBox.USER_PROFILE_PROPERTY__WORK_BOX_LAST_VISITED_GUID];
                     bool needsUpdating = false;
@@ -207,7 +209,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
             }
         }
 
-        private String makeScriptForSettingWorkBoxVariables(WorkBox workBox)
+        private String makeScriptForSettingWorkBoxVariables(WorkBox workBox, WBUser user, UserProfile profile)
         {
             string htmlForScript = "<script type=\"text/javascript\">\n";
 
@@ -221,6 +223,8 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
 
             htmlForScript += makeVarDeclaration("wbf_json__all_actions_details", JsonConvert.SerializeObject(allActions));
             htmlForScript += makeVarDeclaration("wbf_json__all_actions_enable_flags", JsonConvert.SerializeObject(allEnableFlags));
+
+            htmlForScript += makeVarDeclaration("wbf__clipboard_action", user.GetClipboardAction(profile));
 
             htmlForScript += makeVarDeclaration("wbf__enable_tasks_button", false);
             htmlForScript += makeVarDeclaration("wbf__enable_document_templates_button", (workBox.DocumentTemplates != null));

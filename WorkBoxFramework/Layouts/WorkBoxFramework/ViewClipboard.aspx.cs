@@ -52,9 +52,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             WBUser user = new WBUser(WorkBox.Web.CurrentUser);
 
-            Dictionary<String, List<int>> clipboard = user.GetClipboard(WorkBox);
+            CutOrCopiedText.Text = user.RenderClipboardAction(SPContext.Current.Site);
 
-            ItemsOnClipboard.Text = WBUser.RenderClipboard(clipboard);
+            ItemsOnClipboard.Text = user.RenderClipboardItems(SPContext.Current.Site);
         }
 
 
@@ -79,7 +79,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             WorkBox.Web.AllowUnsafeUpdates = false;
 
             JustPastedText.Text = "";
-            RenderClipboard();
+//            RenderClipboard();
+
+            returnFromDialogOKAndRefresh();
         }
 
 

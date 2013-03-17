@@ -9,6 +9,15 @@
 
 <script type="text/javascript">
     var wbf__spweb_url = '<%=SPContext.Current.Web.Url %>';
+
+    $(document).ready(function () {
+        $("#<%=RecordsTypeTreeView.ClientID  %> a.ms-navitem").click(function () {
+            $("a.ms-navitem").css("font-weight", "normal");
+            $(this).css("font-weight", "bold");
+            return true;
+        });
+    });
+
 </script>
 
 <div class="wbf-records-type-tree-nav">

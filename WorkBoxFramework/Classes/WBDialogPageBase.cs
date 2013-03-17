@@ -92,9 +92,7 @@ namespace WorkBoxFramework
 
         protected void returnFromDialogError(string returnValue)
         {
-            returnValue = Uri.EscapeDataString(returnValue);
-
-            returnFromDialog(INVALID_RESULT, "An error occurred: " + returnValue);
+            returnFromDialog(INVALID_RESULT, returnValue);
         }
 
         protected void returnFromDialogCancel(string returnValue)

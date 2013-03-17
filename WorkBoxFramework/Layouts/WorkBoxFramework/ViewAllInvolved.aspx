@@ -31,7 +31,6 @@ border-top:solid 1px grey;
 </script>
 </asp:Panel>
 
-
     <asp:Literal ID="GeneratedViewOfAllInvolved" runat="server"></asp:Literal>
 
     <div align="center">

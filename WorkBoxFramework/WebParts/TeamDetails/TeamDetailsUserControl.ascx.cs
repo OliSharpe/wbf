@@ -68,8 +68,8 @@ namespace WorkBoxFramework.TeamDetails
 
                         if (webPart.ShowMailToLinks)
                         {
-                            teamActionsHTML += "<li>" + generateLinkToEmailGroup("Email team owners", ownerEmails) + "</li>";
-                            teamActionsHTML += "<li>" + generateLinkToEmailGroup("Email team members", membersEmails) + "</li>";
+                            teamActionsHTML += "<li>" + WBUtils.GenerateLinkToEmailGroup("Email team owners", ownerEmails) + "</li>";
+                            teamActionsHTML += "<li>" + WBUtils.GenerateLinkToEmailGroup("Email team members", membersEmails) + "</li>";
                         }
 
                         if (userIsTeamOwnerOrSystemAdmin)
@@ -156,11 +156,6 @@ namespace WorkBoxFramework.TeamDetails
             }
 
             return html;
-        }
-
-        private String generateLinkToEmailGroup(String text, List<String> emails)
-        {
-            return "<a href='mailto:" + String.Join(";", emails.ToArray()) + "'>" + text + "</a>";
         }
 
         private String renderUser(SPUser user)

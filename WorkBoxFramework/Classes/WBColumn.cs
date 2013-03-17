@@ -515,8 +515,9 @@ namespace WorkBoxFramework
                 case DataTypes.ManagedMetadata:
                     {
                         TaxonomySession session = new TaxonomySession(site);
-                        TermStore termStore = session.TermStores[WorkBox.TERM_STORE_NAME];
-                        Group group = termStore.Groups[WorkBox.TERM_STORE_GROUP_NAME];
+                        WBFarm farm = WBFarm.Local;
+                        TermStore termStore = session.TermStores[farm.TermStoreName];
+                        Group group = termStore.Groups[farm.TermStoreGroupName];
                         TermSet termSet = group.TermSets[TermSetName];
 
                         TaxonomyField taxonomyField = web.Fields.CreateNewField("TaxonomyFieldType", DisplayName) as TaxonomyField;

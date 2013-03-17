@@ -108,8 +108,77 @@ namespace WorkBoxFramework
 
 
         #region Convenience classes
-        public static class Teams
+
+        public static class Generic
         {
+            public static void Unexpected(Exception exception)
+            {
+                Unexpected(null, exception);
+            }
+
+            public static void Unexpected(String message, Exception exception)
+            {
+                if (!String.IsNullOrEmpty(message))
+                {
+                    WriteTrace(CATEGORY__GENERIC, TraceSeverity.Unexpected, message);
+                }
+
+                WriteTrace(CATEGORY__GENERIC, TraceSeverity.Unexpected, "An exception occurred: " + exception.Message);
+                WriteTrace(CATEGORY__GENERIC, TraceSeverity.Unexpected, "Stack trace: " + exception.StackTrace);
+
+                if (exception.InnerException != null)
+                {
+                    WriteTrace(CATEGORY__GENERIC, TraceSeverity.Unexpected, "Has nested inner exception: ");
+                    Unexpected(exception.InnerException);
+                }
+            }
+
+
+            public static void Unexpected(String message)
+            {
+                WriteTrace(CATEGORY__GENERIC, TraceSeverity.Unexpected, message);
+            }
+
+            public static void Monitorable(String message)
+            {
+                WriteTrace(CATEGORY__GENERIC, TraceSeverity.Monitorable, message);
+            }
+
+            public static void HighLevel(String message)
+            {
+                WriteTrace(CATEGORY__GENERIC, TraceSeverity.High, message);
+            }
+
+            public static void Verbose(String message)
+            {
+                WriteTrace(CATEGORY__GENERIC, TraceSeverity.Verbose, message);
+            }
+        }
+
+        public static class Teams 
+        {
+            public static void Unexpected(Exception exception)
+            {
+                Unexpected(null, exception);
+            }
+
+            public static void Unexpected(String message, Exception exception)
+            {
+                if (!String.IsNullOrEmpty(message))
+                {
+                    WriteTrace(CATEGORY__TEAMS, TraceSeverity.Unexpected, message);
+                }
+
+                WriteTrace(CATEGORY__TEAMS, TraceSeverity.Unexpected, "An exception occurred: " + exception.Message);
+                WriteTrace(CATEGORY__TEAMS, TraceSeverity.Unexpected, "Stack trace: " + exception.StackTrace);
+
+                if (exception.InnerException != null)
+                {
+                    WriteTrace(CATEGORY__TEAMS, TraceSeverity.Unexpected, "Has nested inner exception: ");
+                    Unexpected(exception.InnerException);
+                }
+            }
+
             public static void Unexpected(String message)
             {
                 WriteTrace(CATEGORY__TEAMS, TraceSeverity.Unexpected, message);
@@ -133,6 +202,28 @@ namespace WorkBoxFramework
 
         public static class RecordsTypes
         {
+            public static void Unexpected(Exception exception)
+            {
+                Unexpected(null, exception);
+            }
+
+            public static void Unexpected(String message, Exception exception)
+            {
+                if (!String.IsNullOrEmpty(message))
+                {
+                    WriteTrace(CATEGORY__RECORDS_TYPES, TraceSeverity.Unexpected, message);
+                }
+
+                WriteTrace(CATEGORY__RECORDS_TYPES, TraceSeverity.Unexpected, "An exception occurred: " + exception.Message);
+                WriteTrace(CATEGORY__RECORDS_TYPES, TraceSeverity.Unexpected, "Stack trace: " + exception.StackTrace);
+
+                if (exception.InnerException != null)
+                {
+                    WriteTrace(CATEGORY__RECORDS_TYPES, TraceSeverity.Unexpected, "Has nested inner exception: ");
+                    Unexpected(exception.InnerException);
+                }
+            }
+
             public static void Unexpected(String message)
             {
                 WriteTrace(CATEGORY__RECORDS_TYPES, TraceSeverity.Unexpected, message);
@@ -158,7 +249,17 @@ namespace WorkBoxFramework
         {
             public static void Unexpected(Exception exception)
             {
-                WriteTrace(CATEGORY__TIMER_TASKS, TraceSeverity.Unexpected, "An error occurred: " + exception.Message);
+                Unexpected(null, exception);
+            }
+
+            public static void Unexpected(String message, Exception exception)
+            {
+                if (!String.IsNullOrEmpty(message))
+                {
+                    WriteTrace(CATEGORY__TIMER_TASKS, TraceSeverity.Unexpected, message);
+                }
+
+                WriteTrace(CATEGORY__TIMER_TASKS, TraceSeverity.Unexpected, "An exception occurred: " + exception.Message);
                 WriteTrace(CATEGORY__TIMER_TASKS, TraceSeverity.Unexpected, "Stack trace: " + exception.StackTrace);
 
                 if (exception.InnerException != null)
@@ -191,6 +292,28 @@ namespace WorkBoxFramework
 
         public static class WorkBoxes
         {
+            public static void Unexpected(Exception exception)
+            {
+                Unexpected(null, exception);
+            }
+
+            public static void Unexpected(String message, Exception exception)
+            {
+                if (!String.IsNullOrEmpty(message))
+                {
+                    WriteTrace(CATEGORY__WORK_BOXES, TraceSeverity.Unexpected, message);
+                }
+
+                WriteTrace(CATEGORY__WORK_BOXES, TraceSeverity.Unexpected, "An exception occurred: " + exception.Message);
+                WriteTrace(CATEGORY__WORK_BOXES, TraceSeverity.Unexpected, "Stack trace: " + exception.StackTrace);
+
+                if (exception.InnerException != null)
+                {
+                    WriteTrace(CATEGORY__WORK_BOXES, TraceSeverity.Unexpected, "Has nested inner exception: ");
+                    Unexpected(exception.InnerException);
+                }
+            }
+
             public static void Unexpected(String message)
             {
                 WriteTrace(CATEGORY__WORK_BOXES, TraceSeverity.Unexpected, message);
@@ -214,6 +337,28 @@ namespace WorkBoxFramework
 
         public static class WorkBoxCollections
         {
+            public static void Unexpected(Exception exception)
+            {
+                Unexpected(null, exception);
+            }
+
+            public static void Unexpected(String message, Exception exception)
+            {
+                if (!String.IsNullOrEmpty(message))
+                {
+                    WriteTrace(CATEGORY__WORK_BOX_COLLECTIONS, TraceSeverity.Unexpected, message);
+                }
+
+                WriteTrace(CATEGORY__WORK_BOX_COLLECTIONS, TraceSeverity.Unexpected, "An exception occurred: " + exception.Message);
+                WriteTrace(CATEGORY__WORK_BOX_COLLECTIONS, TraceSeverity.Unexpected, "Stack trace: " + exception.StackTrace);
+
+                if (exception.InnerException != null)
+                {
+                    WriteTrace(CATEGORY__WORK_BOX_COLLECTIONS, TraceSeverity.Unexpected, "Has nested inner exception: ");
+                    Unexpected(exception.InnerException);
+                }
+            }
+
             public static void Unexpected(String message)
             {
                 WriteTrace(CATEGORY__WORK_BOX_COLLECTIONS, TraceSeverity.Unexpected, message);
@@ -237,15 +382,19 @@ namespace WorkBoxFramework
 
         public static class Migration
         {
-            public static void Unexpected(String message)
-            {
-                WriteTrace(CATEGORY__MIGRATION, TraceSeverity.Unexpected, message);
-            }
-
             public static void Unexpected(Exception exception)
             {
+                Unexpected(null, exception);
+            }
 
-                WriteTrace(CATEGORY__MIGRATION, TraceSeverity.Unexpected, "An error occurred: " + exception.Message);
+            public static void Unexpected(String message, Exception exception)
+            {
+                if (!String.IsNullOrEmpty(message))
+                {
+                    WriteTrace(CATEGORY__MIGRATION, TraceSeverity.Unexpected, message);
+                }
+
+                WriteTrace(CATEGORY__MIGRATION, TraceSeverity.Unexpected, "An exception occurred: " + exception.Message);
                 WriteTrace(CATEGORY__MIGRATION, TraceSeverity.Unexpected, "Stack trace: " + exception.StackTrace);
 
                 if (exception.InnerException != null)
@@ -255,7 +404,10 @@ namespace WorkBoxFramework
                 }
             }
 
-
+            public static void Unexpected(String message)
+            {
+                WriteTrace(CATEGORY__MIGRATION, TraceSeverity.Unexpected, message);
+            }
 
             public static void Monitorable(String message)
             {
@@ -275,15 +427,19 @@ namespace WorkBoxFramework
 
         public static class Queries
         {
-            public static void Unexpected(String message)
-            {
-                WriteTrace(CATEGORY__QUERIES, TraceSeverity.Unexpected, message);
-            }
-
             public static void Unexpected(Exception exception)
             {
+                Unexpected(null, exception);
+            }
 
-                WriteTrace(CATEGORY__QUERIES, TraceSeverity.Unexpected, "An error occurred: " + exception.Message);
+            public static void Unexpected(String message, Exception exception)
+            {
+                if (!String.IsNullOrEmpty(message))
+                {
+                    WriteTrace(CATEGORY__QUERIES, TraceSeverity.Unexpected, message);
+                }
+
+                WriteTrace(CATEGORY__QUERIES, TraceSeverity.Unexpected, "An exception occurred: " + exception.Message);
                 WriteTrace(CATEGORY__QUERIES, TraceSeverity.Unexpected, "Stack trace: " + exception.StackTrace);
 
                 if (exception.InnerException != null)
@@ -293,7 +449,10 @@ namespace WorkBoxFramework
                 }
             }
 
-
+            public static void Unexpected(String message)
+            {
+                WriteTrace(CATEGORY__QUERIES, TraceSeverity.Unexpected, message);
+            }
 
             public static void Monitorable(String message)
             {
@@ -313,49 +472,11 @@ namespace WorkBoxFramework
 
 
 
-
-        public static class Generic
-        {
-            public static void Unexpected(String message)
-            {
-                WriteTrace(CATEGORY__GENERIC, TraceSeverity.Unexpected, message);
-            }
-
-            public static void Unexpected(Exception exception)
-            {
-
-                WriteTrace(CATEGORY__GENERIC, TraceSeverity.Unexpected, "An error occurred: " + exception.Message);
-                WriteTrace(CATEGORY__GENERIC, TraceSeverity.Unexpected, "Stack trace: " + exception.StackTrace);
-
-                if (exception.InnerException != null)
-                {
-                    WriteTrace(CATEGORY__GENERIC, TraceSeverity.Unexpected, "Has nested inner exception: ");
-                    Unexpected(exception.InnerException);
-                }
-            }
-
-
-            public static void Monitorable(String message)
-            {
-                WriteTrace(CATEGORY__GENERIC, TraceSeverity.Monitorable, message);
-            }
-
-            public static void HighLevel(String message)
-            {
-                WriteTrace(CATEGORY__GENERIC, TraceSeverity.High, message);
-            }
-
-            public static void Verbose(String message)
-            {
-                WriteTrace(CATEGORY__GENERIC, TraceSeverity.Verbose, message);
-            }
-        }
-
-
         #endregion
 
         #region Unused event trace code
         /*
+
         public static void WriteEvent(String categoryName, EventSeverity eventSeverity, String message)
         {
             if (string.IsNullOrEmpty(message))

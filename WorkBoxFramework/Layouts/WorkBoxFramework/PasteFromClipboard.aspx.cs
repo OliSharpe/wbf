@@ -61,37 +61,20 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 //                    WBLogging.Debug("Now using folder path: " + folderPath);
 
 
-                    SPFolder folder = WorkBox.DocumentLibrary.RootFolder.WBxGetFolderPath(folderPath);
-
                     WBUser user = new WBUser(WorkBox.Web.CurrentUser);
 
-                    Dictionary<String, List<int>> clipboard = user.GetClipboard(WorkBox);
+                    String clipboardAction = user.PasteClipboard(WorkBox, folderPath);
 
-                    WorkBox.Web.AllowUnsafeUpdates = true;
-
-                    foreach (String workBoxURL in clipboard.Keys)
+                    /*
+                    String justReturnOK = "Pasted items are still on clipboard to be copied again.";
+                    if (clipboardAction == WBUser.CLIPBOARD_ACTION__CUT)
                     {
-                        List<int> ids = clipboard[workBoxURL];
-
-                        using (WorkBox clipboardWorkBox = new WorkBox(workBoxURL))
-                        {
-                            SPDocumentLibrary documents = clipboardWorkBox.DocumentLibrary;
-
-                            foreach (int id in ids)
-                            {
-                                SPListItem item = documents.GetItemById(id);
-
-                                folder.WBxCopyIntoFolder(item);
-                            }
-                        }
+                        justReturnOK = "Pasted items removed from original location and clipboard.";
                     }
+                    */
 
-                    WorkBox.Web.AllowUnsafeUpdates = false;
-
-
-                    
-                    string okPageUrl = "WorkBoxFramework/ViewClipboard.aspx";
-                    string queryString = "justPasted=True";
+                    string okPageUrl = "WorkBoxFramework/GenericOKPage.aspx";
+                    string queryString = "justRefreshOK=True";
 
                     longOperation.End(okPageUrl, SPRedirectFlags.RelativeToLayoutsPage, Context, queryString);
                 }

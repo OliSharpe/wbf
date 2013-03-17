@@ -74,6 +74,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 TimerJobsServerName.Text = farm.TimerJobsServerName;
 
                 AllWorkBoxCollections.Text = farm.AllWorkBoxCollectionsPropertyValue;
+
+                TermStoreName.Text = farm.TermStoreName;
+                TermStoreGroupName.Text = farm.TermStoreGroupName;
             }
         }
 
@@ -121,6 +124,10 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             farm.TimerJobsServerName = TimerJobsServerName.Text;
 
             farm.AllWorkBoxCollectionsPropertyValue = AllWorkBoxCollections.Text;
+
+            farm.TermStoreName = TermStoreName.Text;
+            farm.TermStoreGroupName = TermStoreGroupName.Text;
+
 
             farm.Update();
 

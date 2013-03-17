@@ -34,6 +34,9 @@ namespace WorkBoxFramework
 {
     public class WBUser
     {
+        public const String CLIPBOARD_ACTION__COPY = "COPY";
+        public const String CLIPBOARD_ACTION__CUT = "CUT";
+
         public SPUser User { get; private set; }   
 
         public WBUser(SPUser user)
@@ -66,32 +69,40 @@ namespace WorkBoxFramework
             return profile;
         }
 
-        public String AddToClipboard(WorkBox workBox, String[] itemIDs)
+        public String AddToClipboard(String action, WorkBox workBox, String[] itemIDs)
         {
-            return AddToClipboard(workBox, itemIDs, false);
+            return AddToClipboard(action, workBox, itemIDs, false);
         }
 
 
-        public String AddToClipboard(WorkBox workBox, String[] itemIDs, bool clearExistingItems)
+        public String AddToClipboard(String action, WorkBox workBox, String[] itemIDs, bool clearExistingItems)
         {
             String errorString = "";
 
             UserProfile userProfile = GetUserProfile(workBox.Site);
 
-            Dictionary<String, List<int>> clipboard = null;
+            Dictionary<String, List<int>> clipboardItems = new Dictionary<String, List<int>>();
+            String clipboardAction = "";
             if (clearExistingItems)
             {
-                clipboard = new Dictionary<String, List<int>>();
+                // If we are clearing the clipboard then we don't have to match the new action with the existing action:
+                clipboardAction = action;
             }
             else
             {
-                clipboard = GetClipboard(userProfile);
+                clipboardAction = GetClipboard(userProfile, clipboardItems);
+                if (String.IsNullOrEmpty(clipboardAction))
+                {
+                    clipboardAction = action;
+                }
             }
 
+            if (clipboardAction != action) return "You can't mix CUT and COPY actions!"; //"The action for the current items is: " + clipboardAction + " so you can't add items with the action: " + action + " without first clearing the clipboard";
+
             List<int> currentIDsForWorkBox = null;
-            if (clipboard.ContainsKey(workBox.Url))
+            if (clipboardItems.ContainsKey(workBox.Url))
             {
-                currentIDsForWorkBox = clipboard[workBox.Url];
+                currentIDsForWorkBox = clipboardItems[workBox.Url];
             }
             else
             {
@@ -113,26 +124,21 @@ namespace WorkBoxFramework
 
             if (String.IsNullOrEmpty(errorString))
             {
-                clipboard[workBox.Url] = currentIDsForWorkBox;
+                clipboardItems[workBox.Url] = currentIDsForWorkBox;
 
-                return SetClipboard(userProfile, clipboard);
+                return SetClipboard(userProfile, clipboardAction, clipboardItems);
             }
 
             return errorString;
         }
 
-        public Dictionary<String, List<int>> GetClipboard(WorkBox workBox)
-        {
-            return GetClipboard(workBox.Site);
-        }
-
-        public Dictionary<String, List<int>> GetClipboard(SPSite site)
+        public String GetClipboardAction(SPSite site)
         {
             UserProfile profile = GetUserProfile(site);
-            return GetClipboard(profile);
+            return GetClipboardAction(profile);
         }
 
-        private Dictionary<String, List<int>> GetClipboard(UserProfile userProfile)
+        public String GetClipboardAction(UserProfile userProfile)
         {
             UserProfileValueCollection clipboardPropertyValue = userProfile[WorkBox.USER_PROFILE_PROPERTY__MY_WORK_BOX_CLIPBOARD];
 
@@ -142,11 +148,82 @@ namespace WorkBoxFramework
                 clipboardString = clipboardPropertyValue.Value.WBxToString().Trim();
             }
 
-            Dictionary<String, List<int>> clipboard = new Dictionary<String, List<int>>();
+            if (String.IsNullOrEmpty(clipboardString)) return "";
 
-            if (String.IsNullOrEmpty(clipboardString)) return clipboard;
+            String actionString = ""; 
 
-            string[] valuesForEachWorkBox = clipboardString.Split(';');
+            string[] actionItemsSplit = clipboardString.Split('#');
+            if (actionItemsSplit.Length == 1)
+            {
+                actionString = CLIPBOARD_ACTION__COPY;
+            }
+            else if (actionItemsSplit.Length == 2)
+            {
+                actionString = actionItemsSplit[0];
+            }
+            else
+            {
+                throw new NotImplementedException("The clipboard string is badly formed: " + clipboardString);
+            }
+
+            return actionString;
+        }
+               
+        /// <summary>
+        /// This method returns the action of the clipboard while filling the 'clipboardItems' dictionary and
+        /// therefore returns the two key values from the clipboard in one go. The passed in clipboardItems dictionary
+        /// must be empty.
+        /// </summary>
+        /// <param name="site"></param>
+        /// <param name="clipboardItems">An empty dictionary object that will be filled with any clipboard items.</param>
+        /// <returns>The clipboard action of either 'COPY' or 'CUT'</returns>
+        public String GetClipboard(SPSite site, Dictionary<String, List<int>> clipboardItems)
+        {
+            UserProfile profile = GetUserProfile(site);
+            return GetClipboard(profile, clipboardItems);
+        }
+
+        /// <summary>
+        /// This method returns the action of the clipboard while filling the 'clipboardItems' dictionary and
+        /// therefore returns the two key values from the clipboard in one go. The passed in clipboardItems dictionary
+        /// must be empty.
+        /// </summary>
+        /// <param name="userProfile"></param>
+        /// <param name="clipboardItems">An empty dictionary object that will be filled with any clipboard items.</param>
+        /// <returns>The clipboard action of either 'COPY' or 'CUT'</returns>
+        public String GetClipboard(UserProfile userProfile, Dictionary<String, List<int>> clipboardItems)
+        {
+            if (clipboardItems.Count != 0) throw new NotImplementedException("You should only use this method with an empty clipboardItems dictionary object");
+
+            UserProfileValueCollection clipboardPropertyValue = userProfile[WorkBox.USER_PROFILE_PROPERTY__MY_WORK_BOX_CLIPBOARD];
+
+            String clipboardString = "";
+            if (clipboardPropertyValue != null)
+            {
+                clipboardString = clipboardPropertyValue.Value.WBxToString().Trim();
+            }
+
+            if (String.IsNullOrEmpty(clipboardString)) return "";
+
+            String clipboardItemsString = "";
+            String actionString = CLIPBOARD_ACTION__COPY;
+
+            string[] actionItemsSplit = clipboardString.Split('#');
+            if (actionItemsSplit.Length == 1)
+            {
+                clipboardItemsString = actionItemsSplit[0];
+            }
+            else if (actionItemsSplit.Length == 2)
+            {
+                actionString = actionItemsSplit[0];
+                clipboardItemsString = actionItemsSplit[1];
+            }
+            else
+            {
+                throw new NotImplementedException("The clipboard string is badly formed: " + clipboardString);
+            }
+
+            string[] valuesForEachWorkBox = clipboardItemsString.Split(';');
 
             foreach (string valueForAWorkBox in valuesForEachWorkBox)
             {
@@ -166,24 +243,29 @@ namespace WorkBoxFramework
                     listOfIDs.Add(Int32.Parse(idString));
                 }
 
-                clipboard.Add(workBoxURL, listOfIDs);
+                clipboardItems.Add(workBoxURL, listOfIDs);
             }
 
-            return clipboard;
+            return actionString;
         }
 
 
-        private String SetClipboard(UserProfile userProfile, Dictionary<String, List<int>> clipboard)
+        private String SetClipboard(UserProfile userProfile, String clipboardAction, Dictionary<String, List<int>> clipboardItems)
         {
+            if (String.IsNullOrEmpty(clipboardAction))
+            {
+                clipboardAction = CLIPBOARD_ACTION__COPY;
+            }
+
             UserProfileValueCollection clipboardPropertyValue = userProfile[WorkBox.USER_PROFILE_PROPERTY__MY_WORK_BOX_CLIPBOARD];
 
             String clipboardString = "";
 
             List<String> stringsForEachWorkBox = new List<String>();
 
-            foreach (String workBoxURL in clipboard.Keys)
+            foreach (String workBoxURL in clipboardItems.Keys)
             {
-                List<int> ids = clipboard[workBoxURL];
+                List<int> ids = clipboardItems[workBoxURL];
 
                 List<String> idStrings = new List<String>();
                 foreach (int id in ids)
@@ -195,7 +277,7 @@ namespace WorkBoxFramework
                 stringsForEachWorkBox.Add(stringForAWorkBox);
             }
 
-            clipboardString = String.Join(";", stringsForEachWorkBox.ToArray());
+            clipboardString = clipboardAction + "#" + String.Join(";", stringsForEachWorkBox.ToArray());
 
             clipboardPropertyValue.Value = clipboardString;
             userProfile.Commit();
@@ -204,10 +286,14 @@ namespace WorkBoxFramework
             return "";
         }
 
-
         public String ClearClipboard(SPSite site)
         {
             UserProfile userProfile = GetUserProfile(site);
+            return ClearClipboard(userProfile);
+        }
+
+        public String ClearClipboard(UserProfile userProfile)
+        {
             UserProfileValueCollection clipboardPropertyValue = userProfile[WorkBox.USER_PROFILE_PROPERTY__MY_WORK_BOX_CLIPBOARD];
 
             clipboardPropertyValue.Value = "";  
@@ -217,18 +303,98 @@ namespace WorkBoxFramework
             return "";
         }
 
-        public static String RenderClipboard(Dictionary<String, List<int>> clipboard)
+        public String PasteClipboard(WorkBox workBox, String folderPath)
         {
-            if (clipboard.Count == 0)
+            Dictionary<String, List<int>> clipboardItems = new Dictionary<String, List<int>>();
+            UserProfile userProfile = GetUserProfile(workBox.Site);
+
+            String clipboardAction = GetClipboard(userProfile, clipboardItems);
+
+            SPFolder folder = workBox.DocumentLibrary.RootFolder.WBxGetFolderPath(folderPath);
+
+            bool allowUnsafeUpdatesOriginalValue = workBox.Web.AllowUnsafeUpdates;
+            workBox.Web.AllowUnsafeUpdates = true;
+
+            foreach (String workBoxURL in clipboardItems.Keys)
             {
-                return "<div class='wbf-clipboard'><p>Clipboard is empty</p></div>";
+                List<int> ids = clipboardItems[workBoxURL];
+
+                using (WorkBox clipboardWorkBox = new WorkBox(workBoxURL))
+                {
+                    clipboardWorkBox.Web.AllowUnsafeUpdates = true;
+
+                    SPDocumentLibrary documents = clipboardWorkBox.DocumentLibrary;
+
+                    foreach (int id in ids)
+                    {
+                        SPListItem item = documents.GetItemById(id);
+
+                        bool cutOriginal = (clipboardAction == WBUser.CLIPBOARD_ACTION__CUT);
+                        folder.WBxCutOrCopyIntoFolder(item, cutOriginal);
+                    }
+
+                    clipboardWorkBox.Web.AllowUnsafeUpdates = false;
+                }
             }
 
-            String html = "<div class='wbf-clipboard'>";
-
-            foreach (String workBoxURL in clipboard.Keys)
+            if (clipboardAction == CLIPBOARD_ACTION__CUT)
             {
-                List<int> ids = clipboard[workBoxURL];
+                // You cannot paste more than once items that have been cut:
+                ClearClipboard(userProfile);
+            }
+
+            workBox.Web.AllowUnsafeUpdates = allowUnsafeUpdatesOriginalValue;
+
+            return clipboardAction;
+        }
+
+        public String RenderClipboardAction(SPSite site)
+        {
+            UserProfile profile = GetUserProfile(site);
+            String clipboardAction = GetClipboardAction(profile);
+
+            String html = "";
+
+            if (clipboardAction == CLIPBOARD_ACTION__CUT)
+            {
+                html += "<div class='wbf-clipboard-action'><p><img src='/_layouts/images/cuths.png' alt='Cut items' /> &nbsp; If you paste these items they will be <b>CUT</b> from their original location:</p></div>\n\n";
+            }
+
+            if (clipboardAction == CLIPBOARD_ACTION__COPY)
+            {
+                html += "<div class='wbf-clipboard-action'><p><img src='/_layouts/images/copy16.gif' alt='Copy items' /> &nbsp; If you paste these items they will be <b>COPIED</b> from their original location:</p></div>\n\n";
+            }
+
+            return html;
+        }
+
+        public String RenderClipboardItems(SPSite site)
+        {
+            UserProfile profile = GetUserProfile(site);
+            Dictionary<String, List<int>> clipboardItems = new Dictionary<String, List<int>>();
+            String clipboardAction = GetClipboard(profile, clipboardItems);
+
+            if (clipboardItems.Count == 0)
+            {
+                return "<div class='wbf-clipboard-items'><p>Clipboard is empty</p></div>";
+            }
+
+            String html = "<div class='wbf-clipboard-items'>";
+
+            String actionImageSrc = "";
+
+            if (clipboardAction == CLIPBOARD_ACTION__CUT)
+            {
+                actionImageSrc = "/_layouts/images/cuths.png";
+            }
+            else
+            {
+                actionImageSrc = "/_layouts/images/copy16.gif";
+            }
+
+            foreach (String workBoxURL in clipboardItems.Keys)
+            {
+                List<int> ids = clipboardItems[workBoxURL];
 
                 using (WorkBox clipboardWorkBox = new WorkBox(workBoxURL))
                 {
@@ -238,46 +404,39 @@ namespace WorkBoxFramework
 
                     if (ids.Count > 0)
                     {
-                        // OK we're first going to add the folder path to the parent folder 
-                        // As all items on the clipboard (currently) only come from one folder 
-                        // we can list this folder once at the start (and find it's details from
-                        // any of the items on the clipboard)
-                        SPListItem firstItem = documents.GetItemById(ids[0]);
-                        SPFolder fromFolder = null;                        
-                        if (firstItem.Folder == null)
-                        {
-                            fromFolder = firstItem.File.ParentFolder;
-                        }
-                        else
-                        {
-                            fromFolder = firstItem.Folder.ParentFolder;
-                        }
-
-                        // Now adding the folder's URL alongside the name of the work box.
-                        html += " /" + fromFolder.Url;
-
-
+                        Dictionary<String, String> htmlFragmentsToOrder = new Dictionary<string, string>();
 
                         foreach (int id in ids)
                         {
                             SPListItem item = documents.GetItemById(id);
 
-                            html += "<div class='wbf-clipboard-item'>";
-
+                            SPFolder fromFolder = null;
+                            String itemImageSrc = "";
                             if (item.Folder == null)
                             {
-                                html += "<img src=\"" + WBUtils.DocumentIcon16(item.Name) + "\"/> " + item.Name;
+                                fromFolder = item.File.ParentFolder;
+                                itemImageSrc = WBUtils.DocumentIcon16(item.Name);
                             }
                             else
                             {
-                                html += "<img src=\"/_layouts/images/folder.gif\"/> " + item.Name;
+                                fromFolder = item.Folder.ParentFolder;
+                                itemImageSrc = "/_layouts/images/folder.gif";
                             }
 
-                            html += "</div>\n";
+                            String htmlFragment = "<div class='wbf-clipboard-item'>";
+                            htmlFragment += "<img src=\"" + actionImageSrc + "\"/>  &nbsp; /" + fromFolder.Url + " &nbsp; <img src=\"" + itemImageSrc + "\"/> <b>" + item.Name + "</b>";
+                            htmlFragment += "</div>\n";
 
-
+                            htmlFragmentsToOrder.Add(fromFolder.Url + "/" + item.Name, htmlFragment);
                         }
 
+                        List<String> ordering = new List<String>(htmlFragmentsToOrder.Keys);
+                        ordering.Sort();
+
+                        foreach (String key in ordering)
+                        {
+                            html += htmlFragmentsToOrder[key];
+                        }
                     }
                     else
                     {

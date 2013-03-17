@@ -28,6 +28,13 @@ td.ms-authoringcontrols { border-left: 1px solid gray; }
 td.ms-authoringcontrols td { border: 0px; }
 </style>
 
+</asp:Content>
+
+<asp:Content ContentPlaceHolderId="PlaceHolderLeftNavBar" style="display:none" runat="server">
+</asp:Content>
+
+
+<asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
 <script type="text/javascript">
 
@@ -40,14 +47,6 @@ td.ms-authoringcontrols td { border: 0px; }
 
 </script>
 
-
-</asp:Content>
-
-<asp:Content ContentPlaceHolderId="PlaceHolderLeftNavBar" style="display:none" runat="server">
-</asp:Content>
-
-
-<asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
 <div class="wbf-application-page">
    		<table cellspacing="6">

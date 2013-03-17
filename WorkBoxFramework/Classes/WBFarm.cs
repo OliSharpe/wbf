@@ -56,7 +56,6 @@ namespace WorkBoxFramework
         private const string FARM_PROPERTY__TICKS_WHEN_LAST_UPDATED_RECENTLY_VISITED = "wbf__farm__ticks_when_last_updated_recently_visited";
 
 
-
         private const string FARM_PROPERTY__RECORDS_MANAGERS_GROUP_NAME = "wbf__farm__records_managers_group_name";
         private const string FARM_PROPERTY__RECORDS_SYSTEM_ADMIN_GROUP_NAME = "wbf__farm__records_system_admin_group_name";
 
@@ -64,6 +63,12 @@ namespace WorkBoxFramework
 //        private const string FARM_PROPERTY__TIMER_JOB_WEB_APPLICATION = "wbf__farm__timer_job_web_application";
         private const string FARM_PROPERTY__TIMER_JOBS_MANAGEMENT_SITE_URL = "wbf__farm__timer_jobs_management_url";
         private const string FARM_PROPERTY__TIMER_JOBS_SERVER_NAME = "wbf__farm__timer_jobs_server_name";
+
+
+
+        private const string FARM_PROPERTY__TERM_STORE_NAME = "wbf__farm__term_store_name";
+        private const string FARM_PROPERTY__TERM_STORE_GROUP_NAME = "wbf__farm__term_store_group_name";
+
 
 
         private const string FARM_PROPERTY__INVITE_INVOLVED_DEFAULT_EMAIL_SUBJECT = "wbf__farm__invite_involved_default_email_subject";
@@ -241,6 +246,25 @@ namespace WorkBoxFramework
         }
 
 
+        /// <summary>
+        /// The name of the managed metadata term store that will be used.
+        /// </summary>
+        public String TermStoreName
+        {
+            get { return _farm.WBxGetPropertyOrDefault(FARM_PROPERTY__TERM_STORE_NAME, WorkBox.TERM_STORE_NAME); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__TERM_STORE_NAME, value); }
+        }
+
+        /// <summary>
+        /// The name of the managed metadata term store group that will be used.
+        /// </summary>
+        public String TermStoreGroupName
+        {
+            get { return _farm.WBxGetPropertyOrDefault(FARM_PROPERTY__TERM_STORE_GROUP_NAME, WorkBox.TERM_STORE_GROUP_NAME); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__TERM_STORE_GROUP_NAME, value); }
+        }
+
+
         public String InviteInvolvedDefaultEmailSubject
         {
             get { return _farm.WBxGetPropertyOrDefault(FARM_PROPERTY__INVITE_INVOLVED_DEFAULT_EMAIL_SUBJECT,  "You have been invited to be involved with a work box"); }
@@ -307,8 +331,6 @@ namespace WorkBoxFramework
             get { return _farm.WBxGetProperty(FARM_PROPERTY__MIGRATION_SOURCE_SYSTEM); }
             set { _farm.WBxSetProperty(FARM_PROPERTY__MIGRATION_SOURCE_SYSTEM, value); }
         }
-
-
 
         public String MigrationControlListUrl
         {
@@ -468,8 +490,9 @@ namespace WorkBoxFramework
             WBLogging.Generic.Monitorable("Started term set initial setup.");
 
             TaxonomySession session = new TaxonomySession(site);
-            TermStore termStore = session.TermStores[WorkBox.TERM_STORE_NAME];
-            Group group = termStore.Groups[WorkBox.TERM_STORE_GROUP_NAME];
+            WBFarm farm = WBFarm.Local;
+            TermStore termStore = session.TermStores[farm.TermStoreName];
+            Group group = termStore.Groups[farm.TermStoreGroupName];
 
             bool needsCommitting = false;
 

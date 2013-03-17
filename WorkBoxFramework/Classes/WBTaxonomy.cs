@@ -74,9 +74,10 @@ namespace WorkBoxFramework
 
         public static WBTaxonomy GetTeams(SPSite site)
         {
+            WBFarm farm = WBFarm.Local;
             return new WBTaxonomy(site,
-                WorkBox.TERM_STORE_NAME,
-                WorkBox.TERM_STORE_GROUP_NAME,
+                farm.TermStoreName,
+                farm.TermStoreGroupName,
                 WorkBox.TERM_SET_NAME__TEAMS);
         }
 
@@ -89,9 +90,10 @@ namespace WorkBoxFramework
 
         public static WBTaxonomy GetRecordsTypes(SPSite site)
         {
+            WBFarm farm = WBFarm.Local;
             return new WBTaxonomy(site,
-                WorkBox.TERM_STORE_NAME,
-                WorkBox.TERM_STORE_GROUP_NAME,
+                farm.TermStoreName,
+                farm.TermStoreGroupName,
                 WorkBox.TERM_SET_NAME__RECORDS_TYPES);
         }
 
@@ -103,9 +105,10 @@ namespace WorkBoxFramework
 
         public static WBTaxonomy GetSeriesTags(SPSite site)
         {
+            WBFarm farm = WBFarm.Local;
             return new WBTaxonomy(site,
-                WorkBox.TERM_STORE_NAME,
-                WorkBox.TERM_STORE_GROUP_NAME,
+                farm.TermStoreName,
+                farm.TermStoreGroupName,
                 WorkBox.TERM_SET_NAME__SERIES_TAGS);
         }
 
@@ -117,9 +120,10 @@ namespace WorkBoxFramework
 
         public static WBTaxonomy GetSubjectTags(SPSite site)
         {
+            WBFarm farm = WBFarm.Local;
             return new WBTaxonomy(site,
-                WorkBox.TERM_STORE_NAME,
-                WorkBox.TERM_STORE_GROUP_NAME,
+                farm.TermStoreName,
+                farm.TermStoreGroupName,
                 WorkBox.TERM_SET_NAME__SUBJECT_TAGS);
         }
 
