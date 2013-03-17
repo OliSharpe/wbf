@@ -230,14 +230,18 @@ function WorkBoxFramework_PublishDoc_commandAction() {
     }
 }
 
-function WorkBoxFramework_PublishDoc_enable() {
+function WorkBoxFramework_PublishDoc_enabled() {
     var items = SP.ListOperation.Selection.getSelectedItems();
     var itemCount = CountDictionary(items);
     return (itemCount == 1) && WorkBoxFramework_actionIsEnabled('publish_document');
 }
 
+function WorkBoxFramework_AddToClipboard_commandAction(clipboardAction) {
 
-function WorkBoxFramework_AddToClipboard_commandAction() {
+    if (typeof wbf__clipboard_action !== 'undefined') {
+        wbf__clipboard_action = clipboardAction;
+    }
+    RefreshCommandUI();
 
     var ctx = SP.ClientContext.get_current();
     var selectedItemIDs = SP.ListOperation.Selection.getSelectedItems(ctx);
@@ -249,14 +253,17 @@ function WorkBoxFramework_AddToClipboard_commandAction() {
     }
 
     var allActionsDetails = JSON.parse(wbf_json__all_actions_details);
-    var action = allActionsDetails['add_to_clipboard'];
+    var action = allActionsDetails['copy_to_clipboard'];
+    if (clipboardAction == 'CUT') {
+        action = allActionsDetails['cut_to_clipboard'];
+    }
 
     if (action == null) {
         alert("There was no action for: " + actionKey + " This is an error. Please take a screenshot and email it to the SharePoint system administrators.");
         return;
     }
 
-    var urlValue = action.ActionUrl + '?selectedItemsIDsString=' + selectedItemsIDsString + '&selectedListGUID=' + selectedListGUID;
+    var urlValue = action.ActionUrl + '?clipboardAction=' + clipboardAction + '&selectedItemsIDsString=' + selectedItemsIDsString + '&selectedListGUID=' + selectedListGUID;
 
     if (action.IsModal) {
         var options = {
@@ -277,9 +284,27 @@ function WorkBoxFramework_AddToClipboard_commandAction() {
 }
 
 function WorkBoxFramework_AddToClipboard_enable() {
+    return WorkBoxFramework_AddToClipboard_enabled('COPY');
+}
+
+function WorkBoxFramework_AddToClipboard_enabled(clipboardAction) {
+
+    if (typeof wbf__clipboard_action !== 'undefined') {
+        if (wbf__clipboard_action != null && wbf__clipboard_action != "") {
+            if (wbf__clipboard_action != clipboardAction) return false;
+        }
+    } else {
+        return false;
+    }
+
+    var wbfAction = 'copy_to_clipboard';
+    if (clipboardAction == 'CUT') {
+        wbfAction = 'cut_to_clipboard';
+    }
+
     var items = SP.ListOperation.Selection.getSelectedItems();
     var itemCount = CountDictionary(items);
-    return (itemCount > 0) && WorkBoxFramework_actionIsEnabled('add_to_clipboard');
+    return (itemCount > 0) && WorkBoxFramework_actionIsEnabled(wbfAction);
 }
 
 function WorkBoxFramework_PasteFromClipboard_commandAction() {
@@ -312,6 +337,28 @@ function WorkBoxFramework_PasteFromClipboard_commandAction() {
     } else {
         window.location = action.ActionUrl;
     }
+}
+
+function WorkBoxFramework_PasteFromClipboard_enabled() {
+    if (typeof wbf__clipboard_action !== 'undefined') {
+        if (wbf__clipboard_action != null && wbf__clipboard_action != "") {
+            // So this means that there is something on the clipboard ... so we can view it if the function is enabled in this WBC:
+            return WorkBoxFramework_actionIsEnabled('paste_from_clipboard');
+        }
+    }
+
+    return false;
+}
+
+function WorkBoxFramework_ViewClipboard_enabled() {
+    if (typeof wbf__clipboard_action !== 'undefined') {
+        if (wbf__clipboard_action != null && wbf__clipboard_action != "") {
+            // So this means that there is something on the clipboard ... so we can view it if the function is enabled in this WBC:
+            return WorkBoxFramework_actionIsEnabled('view_clipboard');
+        }
+    }
+
+    return false;
 }
 
 

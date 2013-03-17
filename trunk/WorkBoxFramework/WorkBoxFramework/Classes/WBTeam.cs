@@ -68,7 +68,13 @@ namespace WorkBoxFramework
             return getFromTeamSite(teams, context.Web);
         }
 
+
         public static WBTeam getFromTeamSite(WBTaxonomy teams, SPWeb web)
+        {
+            return GetFromTeamSite(teams, web);
+        }
+
+        public static WBTeam GetFromTeamSite(WBTaxonomy teams, SPWeb web)
         {
             if (teams == null || web == null) return null;
 
@@ -702,42 +708,55 @@ namespace WorkBoxFramework
 
                         if (command == WBTimerTask.COMMAND__SYNCHRONISE_ALL_TEAMS)
                         {
-                            using (SPSite toSite = new SPSite(targetUrl))
-                            {                                            
-                                SPGroup toGroup = toSite.RootWeb.WBxGetGroupOrNull(groupName);
-
-                                toSite.AllowUnsafeUpdates = true;
-                                toSite.RootWeb.AllowUnsafeUpdates = true;
-
-                                if (toGroup == null)
+                            try
+                            {
+                                using (SPSite toSite = new SPSite(targetUrl))
                                 {
-                                    SPUser defaultUser = WBUtils.GetLocalUserFromGroupOrSystemAccount(toSite, fromGroup);
-                                    SPUser systemUser = toSite.SystemAccount;
+                                    SPGroup toGroup = toSite.RootWeb.WBxGetGroupOrNull(groupName);
 
-                                    WBLogging.Teams.Verbose("Found the user - about to create new group");
-                                    toSite.RootWeb.SiteGroups.Add(groupName, systemUser, defaultUser, fromGroup.Description);
+                                    toSite.AllowUnsafeUpdates = true;
+                                    toSite.RootWeb.AllowUnsafeUpdates = true;
 
-                                    WBLogging.Teams.Verbose("Created new group.");
-
-                                    toGroup = toSite.RootWeb.SiteGroups[groupName];
-                                }
-
-
-                                foreach (SPUser fromUser in newUsers)
-                                {
-                                    WBLogging.Teams.Verbose("Copying across a user: " + fromUser.LoginName);
-
-                                    SPUser toUser = toSite.RootWeb.WBxEnsureUserOrNull(fromUser.LoginName);
-
-                                    if (toUser != null)
+                                    if (toGroup == null)
                                     {
-                                        toGroup.AddUser(toUser);
+                                        SPUser defaultUser = WBUtils.GetLocalUserFromGroupOrSystemAccount(toSite, fromGroup);
+                                        SPUser systemUser = toSite.SystemAccount;
+
+                                        WBLogging.Teams.Verbose("Found the user - about to create new group");
+                                        toSite.RootWeb.SiteGroups.Add(groupName, systemUser, defaultUser, fromGroup.Description);
+
+                                        WBLogging.Teams.Verbose("Created new group.");
+
+                                        toGroup = toSite.RootWeb.SiteGroups[groupName];
                                     }
+
+                                    foreach (SPUser fromUser in newUsers)
+                                    {
+                                        WBLogging.Teams.Verbose("Copying across a user: " + fromUser.LoginName);
+
+                                        SPUser toUser = toSite.RootWeb.WBxEnsureUserOrNull(fromUser.LoginName);
+
+                                        if (toUser != null)
+                                        {
+                                            try
+                                            {
+                                                toGroup.AddUser(toUser);
+                                            }
+                                            catch (Exception exception)
+                                            {
+                                                WBLogging.Teams.Unexpected("Something went wrong when trying to add " + fromUser.LoginName + " to " + groupName + " on site collection " + targetUrl, exception);
+                                            }
+                                        }
+                                    }
+
+                                    toGroup.OnlyAllowMembersViewMembership = false;
+
+                                    toGroup.Update();
                                 }
-
-                                toGroup.OnlyAllowMembersViewMembership = false;
-
-                                toGroup.Update();
+                            }
+                            catch (Exception exception)
+                            {
+                                WBLogging.Teams.Unexpected("Something went wrong when trying to add a set of users to " + groupName + " on site collection " + targetUrl, exception);
                             }
                         }
 
@@ -782,10 +801,18 @@ namespace WorkBoxFramework
                                 {
                                     WBLogging.Teams.Verbose("Removing a user: " + userToRemove.LoginName);
 
-                                    toGroup.RemoveUser(userToRemove);
+                                    try
+                                    {
+                                        toGroup.RemoveUser(userToRemove);
+                                        toGroup.Update();
+                                    }
+                                    catch (Exception exception)
+                                    {
+                                        WBLogging.Teams.Unexpected("Something went wrong when trying to remove " + userToRemove.LoginName + " from " + groupName + " on site collection " + targetUrl, exception);
+                                    }
+
                                 }
 
-                                toGroup.Update();
                             }
                         }
 

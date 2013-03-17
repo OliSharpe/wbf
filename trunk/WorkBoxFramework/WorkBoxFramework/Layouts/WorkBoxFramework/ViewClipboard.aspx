@@ -15,13 +15,33 @@
 
 <style type="text/css">
 
-.wbf-clipboard { padding: 10px; }
+.wbf-clipboard h2 { padding: 0px; margin: 0px }
+
+.wbf-clipboard td { padding-left: 10px; }
+
+.wbf-clipboard-items { padding: 10px; }
 
 .wbf-clipboard-item { padding-top: 8px; margin-left: 20px; }
 
+.wbf-clipboard-from-work-box { padding-top: 15px; }
+
+.wbf-clipboard-header { padding-top: 10px; padding-left: 10px; }
+
 </style>
 
-<h2>Your Work Box Clipboard</h2>
+<div class="wbf-clipboard">
+
+<div class="wbf-clipboard-header">
+<table cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td rowspan="2"><img src="/_layouts/images/pastehh.png" /></td>
+<td><h2>Your Work Box Clipboard</h2></td>
+</tr>
+<tr>
+<td><asp:Label ID="CutOrCopiedText" runat="server" /></td>
+</tr>
+</table>
+</div>
 
 <asp:Literal ID="JustPastedText" runat="server" />
 <asp:HiddenField ID="NeedsRefreshOnReturn" runat="server" />
@@ -36,6 +56,7 @@
 
 </div>
 
+</div>
 
 </asp:Content>
 

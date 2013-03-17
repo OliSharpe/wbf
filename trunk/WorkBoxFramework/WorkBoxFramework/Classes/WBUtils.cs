@@ -1034,5 +1034,41 @@ namespace WorkBoxFramework
 
             return spUsers;
         }
+
+
+        public static String GenerateLinkToEmailGroup(String text, List<String> emails)
+        {
+            return GenerateLinkToEmailGroup(text, emails, null, null);
+        }
+
+        public static String GenerateLinkToEmailGroup(String text, List<String> emails, Dictionary<String,String> headers)
+        {
+            return GenerateLinkToEmailGroup(text, emails, headers, null);
+        }
+
+        public static String GenerateLinkToEmailGroup(String text, List<String> emails, Dictionary<String, String> headers, String cssClass)
+        {
+            String cssString = "";
+            if (!String.IsNullOrEmpty(cssClass))
+            {
+                cssString = " class='" + cssClass + "'";
+            }
+
+            String headersString = "";
+            if (headers != null)
+            {
+                headersString = "?";
+                List<String> parameters = new List<String>();
+                foreach (String key in headers.Keys)
+                {
+                    parameters.Add(key + "=" + headers[key]);
+                }
+
+                headersString += String.Join("&", parameters.ToArray());
+            }
+
+            return "<a href='mailto:" + String.Join(";", emails.ToArray()) + headersString + "'" + cssString + ">" + text + "</a>";
+        }
+
     }
 }

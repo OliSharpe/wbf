@@ -36,10 +36,37 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             if (!IsPostBack)
             {
+                String justReturnOK = Request.QueryString["justReturnOK"];
+                if (!String.IsNullOrEmpty(justReturnOK))
+                {
+                    returnFromDialogOK(justReturnOK);
+                    return;
+                }
+
+                String justReturnError = Request.QueryString["justReturnError"];
+                if (!String.IsNullOrEmpty(justReturnError))
+                {
+                    returnFromDialogError(justReturnError);
+                    return;
+                }
+
+
+                String refreshQueryString = Request.QueryString["refreshQueryString"];
+                if (String.IsNullOrEmpty(refreshQueryString)) refreshQueryString = String.Empty;
+
+                String justRefreshOK = Request.QueryString["justRefreshOK"];
+                if (!String.IsNullOrEmpty(justRefreshOK))
+                {
+                    this.returnFromDialogOKAndRefresh(refreshQueryString);
+                    return;
+                }
+
+
+                RefreshQueryString.Value = refreshQueryString;
+
                 pageTitle = Request.QueryString["pageTitle"];
                 pageText = Request.QueryString["pageText"];
 
-                RefreshQueryString.Value = Request.QueryString["refreshQueryString"];
             }
         }
 

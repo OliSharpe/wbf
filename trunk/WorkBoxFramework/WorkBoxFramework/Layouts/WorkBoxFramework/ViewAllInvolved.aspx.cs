@@ -21,6 +21,8 @@
 #endregion
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 
@@ -54,20 +56,33 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 currentUserCanRemoveTeams = true;
             }
 
+            Dictionary<String, String> headers = new Dictionary<String, String>();
+            headers.Add("body", "%0D%0A%0D%0A%0D%0AWork Box Title: " + WorkBox.Title + "%0D%0AWork Box URL: " + WorkBox.Url);
+
             string html = "<p>Users Involved with <b>" + WorkBox.Title + "</b></p>\n";
 
             html += "<table width=\"100%\" cellpadding=\"5\" cellspacing=\"0\">\n";
-
-            html += "<tr><td valign=\"top\"><b>Owning Team:</b></td><td class=\"ms-authoringcontrols\" valign=\"top\">\n";
-
+           
             if (WorkBox.OwningTeam != null)
             {
+
+                html += "<tr><td valign=\"top\"><b>Owning Team:</b><ul><li>";
+
+                html += WBUtils.GenerateLinkToEmailGroup("Email work box owners", WorkBox.GetAllOwners(SPContext.Current.Site).WBxToEmails(), headers);
+
+                html += "</li></ul></td><td class=\"ms-authoringcontrols\" valign=\"top\">\n";
+
                 html += renderTeamAsFieldSet(SPContext.Current.Site, WorkBox.OwningTeam);
+
+                html += "</td></tr>\n";
             }
 
-            html += "</td></tr>\n";
 
-            html += "<tr><td valign=\"top\"><b>Involved Teams:</b></td><td class=\"ms-authoringcontrols\" valign=\"top\">\n";
+            html += "<tr><td valign=\"top\"><b>Involved Teams:</b><ul><li>";
+
+            html += WBUtils.GenerateLinkToEmailGroup("Email all involved with work box", WorkBox.GetAllInvolved(SPContext.Current.Site).WBxToEmails(), headers);
+
+            html += "</li></ul></td><td class=\"ms-authoringcontrols\" valign=\"top\">\n";
 
             if (WorkBox.InvolvedTeams != null && WorkBox.OwningTeam != null)
             {
@@ -95,7 +110,11 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             html += "</td></tr>\n";
 
 
-            html += "<tr><td valign=\"top\"><b>Visiting Teams:</b></td><td class=\"ms-authoringcontrols\" valign=\"top\">\n";
+            html += "<tr><td valign=\"top\"><b>Visiting Teams:</b><ul><li>";
+
+            html += WBUtils.GenerateLinkToEmailGroup("Email everyone who can visit the work box", WorkBox.GetAllWhoCanVisit(SPContext.Current.Site).WBxToEmails(), headers);
+
+            html += "</li></ul></td><td class=\"ms-authoringcontrols\" valign=\"top\">\n";
 
             if (WorkBox.VisitingTeams != null)
             {

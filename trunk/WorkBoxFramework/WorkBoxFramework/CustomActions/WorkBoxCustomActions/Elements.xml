@@ -38,7 +38,7 @@
               <MaxSize Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.MaxSize"
                        GroupId="WorkBoxFramework.Ribbon.WorkBox.Clipboard"
                        Sequence="24"
-                       Size="ThreeLarge"/>
+                       Size="ThreeMediumOneLarge"/>
               <MaxSize Id="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup.MaxSize"
                        GroupId="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup"
                        Sequence="25"
@@ -62,7 +62,7 @@
               <Scale Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.CustomTabScaling"
                      GroupId="WorkBoxFramework.Ribbon.WorkBox.Clipboard"
                      Sequence="29"
-                     Size="ThreeMedium" />
+                     Size="ThreeMediumOneLarge" />
               <Scale Id="WorkBoxFramework.Ribbon.WorkBox.Status.Tasks.CustomTabScaling"
                      GroupId="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup"
                      Sequence="30"
@@ -230,28 +230,29 @@
                 Description="Manange your Work Box clipboard"
                 Title="Work Box Clipboard"
                 Sequence="35"
-                Template="WorkBoxFramework.Ribbon.Templates.ThreeLarge">
+                Template="WorkBoxFramework.Ribbon.Templates.ThreeMediumOneLarge">
                 <Controls Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.Controls">
                   <Button
-                    Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.Add"
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.Cut"
                     Sequence="10"
-                    Command="WorkBoxFramework.Command.Clipboard.Add"
-                    Image16by16="/_layouts/images/paste.gif"
-                    Image32by32="/_layouts/images/pastehh.png"
-                    Description="Copy the details of these documents to your work box clipboard."
-                    LabelText="Copy To Clipboard"
-                    ToolTipTitle="Copy To Details"
-                    ToolTipDescription="Copy the details of these documents to your work box clipboard."
+                    Command="WorkBoxFramework.Command.Clipboard.Cut"
+                    Image16by16="/_layouts/images/cuths.png"
+                    Image32by32="/_layouts/images/cut.gif"
+                    Description="Cut the details of these documents to your work box clipboard."
+                    LabelText="Cut"
+                    ToolTipTitle="Cut to Clipboard"
+                    ToolTipDescription="Cut the details of these documents to your work box clipboard."
                     TemplateAlias="control1"/>
                   <Button
-                    Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.View"
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.Copy"
                     Sequence="20"
-                    Command="WorkBoxFramework.Command.Clipboard.View"
-                    Image16by16="/_layouts/images/paste.gif"
-                    Image32by32="/_layouts/images/pastehh.png"
-                    LabelText="View Clipboard"
-                    ToolTipTitle="View Clipboard"
-                    ToolTipDescription="View the list of documents on your clipboard."
+                    Command="WorkBoxFramework.Command.Clipboard.Copy"
+                    Image16by16="/_layouts/images/copy16.gif"
+                    Image32by32="/_layouts/images/copy.gif"
+                    Description="Copy the details of these documents to your work box clipboard."
+                    LabelText="Copy"
+                    ToolTipTitle="Copy to Clipboard"
+                    ToolTipDescription="Copy the details of these documents to your work box clipboard."
                     TemplateAlias="control2"/>
                   <Button
                     Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.Paste"
@@ -259,10 +260,20 @@
                     Command="WorkBoxFramework.Command.Clipboard.Paste"
                     Image16by16="/_layouts/images/paste.gif"
                     Image32by32="/_layouts/images/pastehh.png"
-                    LabelText="Paste From Clipboard"
-                    ToolTipTitle="Paste Copy"
-                    ToolTipDescription="Paste copy of the documents on the clipboard."
+                    LabelText="Paste"
+                    ToolTipTitle="Paste"
+                    ToolTipDescription="Paste documents on the clipboard."
                     TemplateAlias="control3"/>
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.View"
+                    Sequence="40"
+                    Command="WorkBoxFramework.Command.Clipboard.View"
+                    Image16by16="/_layouts/images/paste.gif"
+                    Image32by32="/_layouts/images/pastehh.png"
+                    LabelText="View Clipboard"
+                    ToolTipTitle="View Clipboard"
+                    ToolTipDescription="View the list of documents on your clipboard."
+                    TemplateAlias="control4"/>
                 </Controls>
               </Group>
               <Group
@@ -393,6 +404,28 @@
             </Layout> 
           </GroupTemplate>
         </CommandUIDefinition>
+        <CommandUIDefinition Location="Ribbon.Templates._children">
+          <GroupTemplate Id="WorkBoxFramework.Ribbon.Templates.ThreeMediumOneLarge">
+            <Layout Title="ThreeMediumOneLarge" LayoutTitle="ThreeMediumOneLarge">
+              <Section Alignment="Top" Type="ThreeRow">
+                <Row>
+                  <ControlRef DisplayMode="Medium" TemplateAlias="control1" />
+                </Row>
+                <Row>
+                  <ControlRef DisplayMode="Medium" TemplateAlias="control2" />
+                </Row>
+                <Row>
+                  <ControlRef DisplayMode="Medium" TemplateAlias="control3" />
+                </Row>
+              </Section>
+              <Section Alignment="Top" Type="OneRow">
+                <Row>
+                  <ControlRef DisplayMode="Large" TemplateAlias="control4" />
+                </Row>
+              </Section>
+            </Layout>
+          </GroupTemplate>
+        </CommandUIDefinition>
       </CommandUIDefinitions>
       <CommandUIHandlers>
         <CommandUIHandler
@@ -440,17 +473,21 @@
             CommandAction="javascript: WorkBoxFramework_doAction('add_to_favourites');"
             EnabledScript="javascript: WorkBoxFramework_actionIsEnabled('add_to_favourites');"/>
         <CommandUIHandler
-            Command="WorkBoxFramework.Command.Clipboard.Add"
-            CommandAction="javascript: WorkBoxFramework_AddToClipboard_commandAction();"
-            EnabledScript="javascript: WorkBoxFramework_AddToClipboard_enable();" />
+            Command="WorkBoxFramework.Command.Clipboard.Cut"
+            CommandAction="javascript: WorkBoxFramework_AddToClipboard_commandAction('CUT');"
+            EnabledScript="javascript: WorkBoxFramework_AddToClipboard_enabled('CUT');" />
         <CommandUIHandler
-            Command="WorkBoxFramework.Command.Clipboard.View"
-            CommandAction="javascript: WorkBoxFramework_doAction('view_clipboard');"
-            EnabledScript="javascript: WorkBoxFramework_actionIsEnabled('view_clipboard');" />
+            Command="WorkBoxFramework.Command.Clipboard.Copy"
+            CommandAction="javascript: WorkBoxFramework_AddToClipboard_commandAction('COPY');"
+            EnabledScript="javascript: WorkBoxFramework_AddToClipboard_enabled('COPY');" />
         <CommandUIHandler
             Command="WorkBoxFramework.Command.Clipboard.Paste"
             CommandAction="javascript: WorkBoxFramework_PasteFromClipboard_commandAction();"
-            EnabledScript="javascript: WorkBoxFramework_actionIsEnabled('paste_from_clipboard');" />
+            EnabledScript="javascript: WorkBoxFramework_PasteFromClipboard_enabled();" />
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.Clipboard.View"
+            CommandAction="javascript: WorkBoxFramework_doAction('view_clipboard');"
+            EnabledScript="javascript: WorkBoxFramework_ViewClipboard_enabled();" />
         <CommandUIHandler
             Command="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup.Tasks.Command"
             CommandAction=""
@@ -508,7 +545,7 @@
         <CommandUIHandler
           Command="WorkBoxFramework.Command.PublishDoc"
           CommandAction="javascript: WorkBoxFramework_PublishDoc_commandAction();"
-          EnabledScript="javascript:WorkBoxFramework_PublishDoc_enable();" />
+          EnabledScript="javascript:WorkBoxFramework_PublishDoc_enabled();" />
       </CommandUIHandlers>
     </CommandUIExtension>
   </CustomAction>

@@ -1366,7 +1366,7 @@ namespace WorkBoxFramework
         }
 
 
-        public static bool WBxCopyIntoFolder(this SPFolder folder, SPListItem item)
+        public static bool WBxCutOrCopyIntoFolder(this SPFolder folder, SPListItem item, bool cutOriginal)
         {
             bool success = true;
 
@@ -1376,7 +1376,9 @@ namespace WorkBoxFramework
                 {
                     String filename = item.Name;
 
-                    filename = item.Web.WBxMakeFilenameUnique(folder, filename);
+                    // I'm fairly certain that this wont introduce a new 'SPWeb' object that isn't (in theory)
+                    // being handled somewhere in the calling code for this method.
+                    filename = folder.Item.Web.WBxMakeFilenameUnique(folder, filename);
 
                     SPFile copiedFile = null;
 
@@ -1396,15 +1398,26 @@ namespace WorkBoxFramework
 
                     foreach (SPFile file in item.Folder.Files)
                     {
-                        subFolder.WBxCopyIntoFolder(file.Item);
+                        subFolder.WBxCutOrCopyIntoFolder(file.Item, cutOriginal);
                     }
 
                     foreach (SPFolder child in item.Folder.SubFolders)
                     {
-                        subFolder.WBxCopyIntoFolder(child.Item);
+                        subFolder.WBxCutOrCopyIntoFolder(child.Item, cutOriginal);
                     }
                 }
 
+                if (cutOriginal)
+                {
+                    try
+                    {
+                        item.Recycle();
+                    }
+                    catch (Exception exception)
+                    {
+                        WBLogging.Generic.Unexpected("Was not able to recycle an item that should be cut from " + folder.ServerRelativeUrl + " with ID " + item.ID + " and name: " + item.Name, exception);
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -1738,8 +1751,8 @@ namespace WorkBoxFramework
             string fileNamePart = Path.GetFileNameWithoutExtension(suggestedName);
             string extension = Path.GetExtension(suggestedName);
 
-            WBUtils.logMessage(string.Format("Trying to make the name unique: {0}    {1}", fileNamePart, extension));
-            WBUtils.logMessage(string.Format("Suggested name: {0}    ", suggestedName));
+            WBLogging.Generic.Verbose(string.Format("Trying to make the name unique: {0}    {1}", fileNamePart, extension));
+            WBLogging.Generic.Verbose(string.Format("Suggested name: {0}    ", suggestedName));
 
             int count = 0;
             while (web.WBxFileExists(folder, suggestedName))
@@ -1747,7 +1760,7 @@ namespace WorkBoxFramework
                 count++;
                 suggestedName = fileNamePart + " (" + count + ")" + extension;
 
-                WBUtils.logMessage(string.Format("New suggested name: {0}    ", suggestedName));
+                WBLogging.Generic.Verbose(string.Format("New suggested name: {0}    ", suggestedName));
 
                 if (count > 1000) throw new Exception("You are trying to create more than 1000 files with the same name in the same folder!");
             }
@@ -1759,9 +1772,19 @@ namespace WorkBoxFramework
         {
             string fullPath = folder.Url + "/" + suggestedName;
 
-            WBUtils.logMessage("About to GetFile : " + fullPath);
+            WBLogging.Generic.Verbose("About to GetFile : " + fullPath + " in web: " + web.Url);
             SPFile file = web.GetFile(fullPath);
-            return file.Exists;
+
+            if (file.Exists)
+            {
+                WBLogging.Generic.Verbose("File already exists: " + fullPath);
+                return true;
+            }
+            else
+            {
+                WBLogging.Generic.Verbose("File does not exist: " + fullPath);
+                return false;
+            }
         }
 
 
@@ -1885,7 +1908,7 @@ namespace WorkBoxFramework
             web.AssociatedGroups.Add(group);
         }
 
-        public static void WBxAssignTeamWithRole(this SPWeb web, SPSite site, WBTeam team, String roleName)
+        public static void WBxAssignTeamMembersWithRole(this SPWeb web, SPSite site, WBTeam team, String roleName)
         {
             if (team == null) return;
             if (roleName == null || roleName == "") return;
@@ -2079,6 +2102,28 @@ namespace WorkBoxFramework
                 WBLogging.Generic.Unexpected("Could not safely set the value for the drop down list. Value = " + value);
             }
         }
+
+
+        public static List<String> WBxToEmails(this List<SPUser> users)
+        {
+            List<String> emails = new List<String>();
+
+            foreach (SPUser user in users)
+            {
+                String email = user.Email;
+
+                if (!String.IsNullOrEmpty(email))
+                {
+                    if (!emails.Contains(email))
+                    {
+                        emails.Add(email);
+                    }
+                }
+            }
+            return emails;
+        }
+
+
 
         /*
 public static DateTime? safeStringToNullableDateTime(String value)

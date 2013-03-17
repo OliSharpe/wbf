@@ -1118,6 +1118,91 @@ namespace WorkBoxFramework
             return allActions;
         }
 
+        public List<SPUser> GetAllOwners(SPSite site)
+        {
+            SPGroup ownersGroup = OwningTeam.MembersGroup(site);
+
+            List<SPUser> owners = new List<SPUser>();
+
+            if (ownersGroup != null)
+            {
+                foreach (SPUser user in ownersGroup.Users)
+                {
+                    owners.Add(user);
+                }
+            }
+
+            return owners;
+        }
+
+        public List<SPUser> GetAllInvolved(SPSite site)
+        {
+            List<SPUser> involvedUsers = new List<SPUser>();
+
+            involvedUsers.AddRange(GetAllOwners(site));
+
+            foreach (WBTeam invovledTeam in InvolvedTeams)
+            {
+                SPGroup group = invovledTeam.MembersGroup(site);
+
+                if (group != null)
+                {
+                    foreach (SPUser user in group.Users)
+                    {
+                        if (!involvedUsers.Contains(user))
+                        {
+                            involvedUsers.Add(user);
+                        }
+                    }
+                }   
+            }
+
+            foreach (SPUser user in InvolvedIndividuals)
+            {
+                if (!involvedUsers.Contains(user))
+                {
+                    involvedUsers.Add(user);
+                }
+            }
+
+            return involvedUsers;
+        }
+
+
+        public List<SPUser> GetAllWhoCanVisit(SPSite site)
+        {
+            List<SPUser> visitingUsers = new List<SPUser>();
+
+            visitingUsers.AddRange(GetAllInvolved(site));
+
+            foreach (WBTeam visitingTeam in VisitingTeams)
+            {
+                SPGroup group = visitingTeam.MembersGroup(site);
+
+                if (group != null)
+                {
+                    foreach (SPUser user in group.Users)
+                    {
+                        if (!visitingUsers.Contains(user))
+                        {
+                            visitingUsers.Add(user);
+                        }
+                    }
+                }
+            }
+
+            foreach (SPUser user in VisitingIndividuals)
+            {
+                if (!visitingUsers.Contains(user))
+                {
+                    visitingUsers.Add(user);
+                }
+            }
+
+            return visitingUsers;
+        }
+
+
 
         internal void JustUpdate()
         {
@@ -2038,19 +2123,19 @@ namespace WorkBoxFramework
 
                             foreach (WBTeam team in Collection.SystemAdminTeams)
                             {
-                                elevatedWeb.WBxAssignTeamWithRole(elevatedSite, team, Collection.OpenPermissionLevelForSystemAdmin);
+                                elevatedWeb.WBxAssignTeamMembersWithRole(elevatedSite, team, Collection.OpenPermissionLevelForSystemAdmin);
                             }
 
                             foreach (WBTeam team in Collection.BusinessAdminTeams)
                             {
-                                elevatedWeb.WBxAssignTeamWithRole(elevatedSite, team, Collection.OpenPermissionLevelForBusinessAdmin);
+                                elevatedWeb.WBxAssignTeamMembersWithRole(elevatedSite, team, Collection.OpenPermissionLevelForBusinessAdmin);
                             }
 
-                            elevatedWeb.WBxAssignTeamWithRole(elevatedSite, OwningTeam, Collection.OpenPermissionLevelForOwner);
+                            elevatedWeb.WBxAssignTeamMembersWithRole(elevatedSite, OwningTeam, Collection.OpenPermissionLevelForOwner);
 
                             foreach (WBTeam team in InvolvedTeams)
                             {
-                                elevatedWeb.WBxAssignTeamWithRole(elevatedSite, team, Collection.OpenPermissionLevelForInvolved);
+                                elevatedWeb.WBxAssignTeamMembersWithRole(elevatedSite, team, Collection.OpenPermissionLevelForInvolved);
                             }
 
                             foreach (SPUser user in InvolvedIndividuals)
@@ -2060,7 +2145,7 @@ namespace WorkBoxFramework
 
                             foreach (WBTeam team in VisitingTeams)
                             {
-                                elevatedWeb.WBxAssignTeamWithRole(elevatedSite, team, Collection.OpenPermissionLevelForVisitors);
+                                elevatedWeb.WBxAssignTeamMembersWithRole(elevatedSite, team, Collection.OpenPermissionLevelForVisitors);
                             }
 
                             foreach (SPUser user in VisitingIndividuals)
@@ -2261,19 +2346,19 @@ namespace WorkBoxFramework
 
                             foreach (WBTeam team in Collection.SystemAdminTeams)
                             {
-                                elevatedWeb.WBxAssignTeamWithRole(elevatedSite, team, Collection.ClosedPermissionLevelForSystemAdmin);
+                                elevatedWeb.WBxAssignTeamMembersWithRole(elevatedSite, team, Collection.ClosedPermissionLevelForSystemAdmin);
                             }
 
                             foreach (WBTeam team in Collection.BusinessAdminTeams)
                             {
-                                elevatedWeb.WBxAssignTeamWithRole(elevatedSite, team, Collection.ClosedPermissionLevelForBusinessAdmin);
+                                elevatedWeb.WBxAssignTeamMembersWithRole(elevatedSite, team, Collection.ClosedPermissionLevelForBusinessAdmin);
                             }
 
-                            elevatedWeb.WBxAssignTeamWithRole(elevatedSite, OwningTeam, Collection.ClosedPermissionLevelForOwner);
+                            elevatedWeb.WBxAssignTeamMembersWithRole(elevatedSite, OwningTeam, Collection.ClosedPermissionLevelForOwner);
 
                             foreach (WBTeam team in InvolvedTeams)
                             {
-                                elevatedWeb.WBxAssignTeamWithRole(elevatedSite, team, Collection.ClosedPermissionLevelForInvolved);
+                                elevatedWeb.WBxAssignTeamMembersWithRole(elevatedSite, team, Collection.ClosedPermissionLevelForInvolved);
                             }
 
                             foreach (SPUser user in InvolvedIndividuals)
@@ -2283,7 +2368,7 @@ namespace WorkBoxFramework
 
                             foreach (WBTeam team in VisitingTeams)
                             {
-                                elevatedWeb.WBxAssignTeamWithRole(elevatedSite, team, Collection.ClosedPermissionLevelForVisitors);
+                                elevatedWeb.WBxAssignTeamMembersWithRole(elevatedSite, team, Collection.ClosedPermissionLevelForVisitors);
                             }
 
                             foreach (SPUser user in VisitingIndividuals)

@@ -252,14 +252,58 @@
 
 
 
+<!-- Term Store Section -->
+<wssuc:InputFormSection
+	id="TermStoreNameSection"
+	title="Managed Metadata Term Store"
+	description="Edit the name of the term store and group in which the WBF term sets are held. <b>DO NOT EDIT</b> unless you know what you are doing!"
+	runat="server"
+	>
+	<Template_InputFormControls>
+		<wssuc:InputFormControl runat="server">
+			<Template_Control>
+				<table border="0" width="100%" cellspacing="0" cellpadding="2">
+					<tr>
+                        <td>
+                            <b><nobr>Term Store Name</nobr></b><br />
+                        </td>
+						<td class="ms-authoringcontrols" valign="top" align="left">
+                            <asp:TextBox ID="TermStoreName" runat="server" columns="50"/>
+                            <div>
+                                <asp:RequiredFieldValidator ID="TermStoreNameValidator" runat="server" ErrorMessage="The WBF requires a term store name to function."
+            ControlToValidate = "TermStoreName"></asp:RequiredFieldValidator>
+                            </div>
+                        </td>
+                    </tr>
+					<tr>
+                        <td>
+                            <b><nobr>Term Store Group Name</nobr></b><br />
+                        </td>
+						<td class="ms-authoringcontrols" valign="top" align="left">
+                            <asp:TextBox ID="TermStoreGroupName" runat="server" columns="50"/>
+                            <div>
+                                <asp:RequiredFieldValidator ID="TermStoreGroupNameValidator" runat="server" ErrorMessage="The WBF requires a term store group name to function."
+            ControlToValidate = "TermStoreGroupName"></asp:RequiredFieldValidator>
+                            </div>
+                        </td>
+                    </tr>
+
+				</table>
+			</Template_Control>
+		</wssuc:InputFormControl>
+	</Template_InputFormControls>
+</wssuc:InputFormSection>
+
+
+
+
 <!-- Buttons Section -->
 <wssuc:ButtonSection runat="server" ShowStandardCancelButton="false">
 	<Template_Buttons>
 		<asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="okButton_OnClick" Text="<%$Resources:wss,multipages_okbutton_text%>" id="okButton" accesskey="<%$Resources:wss,okbutton_accesskey%>"/>
-		<asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="cancelButton_OnClick" Text="<%$Resources:wss,multipages_cancelbutton_text%>" id="cancelButton" accesskey="<%$Resources:wss,cancelbutton_accesskey%>"/>
+		<asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" CausesValidation="False" OnClick="cancelButton_OnClick" Text="<%$Resources:wss,multipages_cancelbutton_text%>" id="cancelButton" accesskey="<%$Resources:wss,cancelbutton_accesskey%>"/>
 	</Template_Buttons>
 </wssuc:ButtonSection>
-
 
 	</table> 
 

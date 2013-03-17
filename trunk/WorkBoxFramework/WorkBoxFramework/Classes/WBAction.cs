@@ -58,9 +58,12 @@ namespace WorkBoxFramework
         public const string ACTION_KEY__CLOSE = "close";
         public const string ACTION_KEY__REOPEN = "reopen";
         public const string ACTION_KEY__ADD_TO_FAVOURITES = "add_to_favourites";
-        public const string ACTION_KEY__ADD_TO_CLIPBOARD = "add_to_clipboard";
-        public const string ACTION_KEY__VIEW_CLIPBOARD = "view_clipboard";
+//        public const string ACTION_KEY__ADD_TO_CLIPBOARD = "add_to_clipboard";
+
+        public const string ACTION_KEY__CUT_TO_CLIPBOARD = "cut_to_clipboard";
+        public const string ACTION_KEY__COPY_TO_CLIPBOARD = "copy_to_clipboard";
         public const string ACTION_KEY__PASTE_FROM_CLIPBOARD = "paste_from_clipboard";
+        public const string ACTION_KEY__VIEW_CLIPBOARD = "view_clipboard";
 
         private const string ACTION_KEY__PUBLISH_DOCUMENT = "publish_document";
 
@@ -499,10 +502,11 @@ namespace WorkBoxFramework
 
 
 
-                case ACTION_KEY__ADD_TO_CLIPBOARD:
+                case ACTION_KEY__CUT_TO_CLIPBOARD:
                     {
-                        Label = "Copy To Clipboard";
-                        Image32x32Url = "/_layouts/images/pastehh.png";
+                        Label = "Cut To Clipboard";
+                        
+                        Image32x32Url = "/_layouts/images/CUT.GIF";
 
                         IsEnabled = true;
                         AllowOwnersToUse = true;
@@ -514,15 +518,16 @@ namespace WorkBoxFramework
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/AddToClipboard.aspx";
                         Width = 600;
-                        Height = 300;
+                        Height = 250;
 
                         break;
                     }
 
-                case ACTION_KEY__VIEW_CLIPBOARD:
+                case ACTION_KEY__COPY_TO_CLIPBOARD:
                     {
-                        Label = "View Clipboard";
-                        Image32x32Url = "/_layouts/images/pastehh.png";
+                        Label = "Copy To Clipboard";
+
+                        Image32x32Url = "/_layouts/images/COPY.GIF";
 
                         IsEnabled = true;
                         AllowOwnersToUse = true;
@@ -532,9 +537,9 @@ namespace WorkBoxFramework
                         ShowClose = true;
                         AllowMaximise = false;
 
-                        ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/ViewClipboard.aspx";
+                        ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/AddToClipboard.aspx";
                         Width = 600;
-                        Height = 300;
+                        Height = 250;
 
                         break;
                     }
@@ -554,11 +559,30 @@ namespace WorkBoxFramework
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/PasteFromClipboard.aspx";
                         Width = 600;
-                        Height = 300;
+                        Height = 250;
 
                         break;
                     }
 
+                case ACTION_KEY__VIEW_CLIPBOARD:
+                    {
+                        Label = "View Clipboard";
+                        Image32x32Url = "/_layouts/images/pastehh.png";
+
+                        IsEnabled = true;
+                        AllowOwnersToUse = true;
+                        AllowInvolvedToUse = true;
+                        AllowVisitorsToUse = true;
+                        IsModal = true;
+                        ShowClose = true;
+                        AllowMaximise = false;
+
+                        ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/ViewClipboard.aspx";
+                        Width = 800;
+                        Height = 400;
+
+                        break;
+                    }
 
                 // Not really use this yet - maybe never will.
                 case ACTION_KEY__PUBLISH_DOCUMENT: 
@@ -818,9 +842,10 @@ namespace WorkBoxFramework
             editable.Add(ACTION_KEY__CLOSE);
             editable.Add(ACTION_KEY__REOPEN);
             editable.Add(ACTION_KEY__ADD_TO_FAVOURITES);
-            editable.Add(ACTION_KEY__ADD_TO_CLIPBOARD);
-            editable.Add(ACTION_KEY__VIEW_CLIPBOARD);
+            editable.Add(ACTION_KEY__CUT_TO_CLIPBOARD);
+            editable.Add(ACTION_KEY__COPY_TO_CLIPBOARD);
             editable.Add(ACTION_KEY__PASTE_FROM_CLIPBOARD);
+            editable.Add(ACTION_KEY__VIEW_CLIPBOARD);
             editable.Add(ACTION_KEY__PUBLISH_DOCUMENT);
 
             return editable;

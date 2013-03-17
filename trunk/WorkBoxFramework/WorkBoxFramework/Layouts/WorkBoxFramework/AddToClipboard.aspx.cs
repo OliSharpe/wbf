@@ -34,33 +34,61 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
             if (!IsPostBack)
             {
-
                 if (Request.QueryString["selectedItemsIDsString"] != null && Request.QueryString["selectedListGUID"] != null)
                 {
-                    string selectedListGUID = Request.QueryString["selectedListGUID"];
-                    string[] selectedItemsIDs = Request.QueryString["selectedItemsIDsString"].ToString().Split('|');
+                    String clipboardAction = Request.QueryString["clipboardAction"];
+                    if (String.IsNullOrEmpty(clipboardAction))
+                    {
+                        clipboardAction = WBUser.CLIPBOARD_ACTION__COPY;
+                    }
 
-                    WBUtils.logMessage("The list GUID was: " + selectedListGUID);
-                    selectedListGUID = selectedListGUID.Substring(1, selectedListGUID.Length - 2).ToLower();
+                    using (SPLongOperation longOperation = new SPLongOperation(this.Page))
+                    {                        
+                        string justReturnOK = "Copied to clipboard";
+                        longOperation.LeadingHTML = "Copying details to the clipboard";
 
-                    Guid sourceListGuid = new Guid(selectedListGUID);
+                        if (clipboardAction == WBUser.CLIPBOARD_ACTION__CUT)
+                        {
+                            justReturnOK = "Cut to clipboard";
+                            longOperation.LeadingHTML = "Cutting details to the clipboard";
+                        }
 
-                    //ListGUID.Value = sourceListGuid.ToString();
-                    //ItemID.Value = selectedItemsIDs[1].ToString();
+                        longOperation.TrailingHTML = "";
 
-                    //WBUtils.logMessage("The ListGUID was: " + ListGUID.Value);
-                    //WBUtils.logMessage("The ItemID was: " + ItemID.Value);
+                        longOperation.Begin();
 
-                    SPDocumentLibrary sourceDocLib = (SPDocumentLibrary)WorkBox.Web.Lists[sourceListGuid];
+                        string selectedListGUID = Request.QueryString["selectedListGUID"];
+                        string[] selectedItemsIDs = Request.QueryString["selectedItemsIDsString"].ToString().Split('|');
 
-                    WBUser user = new WBUser(WorkBox.Web.CurrentUser);
+                        WBUtils.logMessage("The list GUID was: " + selectedListGUID);
+                        selectedListGUID = selectedListGUID.Substring(1, selectedListGUID.Length - 2).ToLower();
 
-                    WorkBox.Web.AllowUnsafeUpdates = true;
-                    user.AddToClipboard(WorkBox, selectedItemsIDs, true);
-                    WorkBox.Web.AllowUnsafeUpdates = false;
+                        // Guid sourceListGuid = new Guid(selectedListGUID);
+                        //ListGUID.Value = sourceListGuid.ToString();
+                        //ItemID.Value = selectedItemsIDs[1].ToString();
+
+                        //WBUtils.logMessage("The ListGUID was: " + ListGUID.Value);
+                        //WBUtils.logMessage("The ItemID was: " + ItemID.Value);
+                        // SPDocumentLibrary sourceDocLib = (SPDocumentLibrary)WorkBox.Web.Lists[sourceListGuid];
+
+                        WBUser user = new WBUser(WorkBox.Web.CurrentUser);
+
+                        WorkBox.Web.AllowUnsafeUpdates = true;
+                        String error = user.AddToClipboard(clipboardAction, WorkBox, selectedItemsIDs, false);
+                        WorkBox.Web.AllowUnsafeUpdates = false;
+
+                        string okPageUrl = "WorkBoxFramework/GenericOKPage.aspx";
+                        string queryString = "justReturnOK=" + justReturnOK;
+
+                        if (!String.IsNullOrEmpty(error))
+                        {
+                            queryString = "justReturnError=" + error;
+                        }
+
+                        longOperation.End(okPageUrl, SPRedirectFlags.RelativeToLayoutsPage, Context, queryString);
+                    }
 
                     RenderClipboard();
                 }
@@ -82,9 +110,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         private void RenderClipboard()
         {
             WBUser user = new WBUser(WorkBox.Web.CurrentUser);
-            Dictionary<String, List<int>> clipboard = user.GetClipboard(WorkBox);
 
-            ItemsOnClipboard.Text = WBUser.RenderClipboard(clipboard); 
+            ItemsOnClipboard.Text = user.RenderClipboardItems(SPContext.Current.Site);
         }
 
 
