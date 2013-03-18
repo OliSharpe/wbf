@@ -418,36 +418,42 @@ namespace WorkBoxFramework
             if (teamSiteWeb != null) teamSiteWeb.Update();
         }
 
-        public void SyncSPGroup()
-        {
-            SyncSPGroup(SPContext.Current.Site);
-        }
-
         /// <summary>
         /// Synchronises the SharePoint SPGroup for this team from the Team Site site collection to the specified
         /// site colleciton.
         /// </summary>
         /// <param name="toSite"></param>
-        public void SyncSPGroup(SPSite toSite)
+        public SPGroup SyncMembersGroup(SPSite toSite)
+        {
+            WBFarm farm = WBFarm.Local;
+
+            using (SPSite teamsSite = new SPSite(farm.TeamSitesSiteCollectionUrl))
+            {
+                return SyncMembersGroup(teamsSite, toSite);
+            }
+        }
+
+        public SPGroup SyncMembersGroup(SPSite teamsSite, SPSite toSite)
         {
             // If no members group has been defined then there is nothing to do:
             if (MembersGroupName == "")
             {
                 WBLogging.Teams.Verbose("The team has no members group defined: " + Name);
-                return;
+                return null;
             }
 
-            WBFarm farm = WBFarm.Local;
-
-            using (SPSite teamsSite = new SPSite(farm.TeamSitesSiteCollectionUrl))
-            {
-                WBUtils.SyncSPGroup(teamsSite, toSite, MembersGroupName);
-            }
+            return WBUtils.SyncSPGroup(teamsSite, toSite, MembersGroupName);
         }
 
         public SPGroup MembersGroup(SPSite site)
         {
-            return site.RootWeb.WBxGetGroupOrNull(MembersGroupName);
+            SPGroup group = site.RootWeb.WBxGetGroupOrNull(MembersGroupName);
+
+            if (group == null)
+            {
+                group = SyncMembersGroup(site);
+            }
+            return group;
         }
 
         public SPGroup OwnersGroup(SPSite site)
@@ -536,17 +542,17 @@ namespace WorkBoxFramework
 
         #region Static Methods
 
-        private static void SyncAllSubTeams(WBTaxonomy teams, TermCollection terms, SPSite site)
+        private static void SyncAllSubTeams(WBTaxonomy teams, TermCollection terms, SPSite teamsSite, SPSite site)
         {
             foreach (Term term in terms)
             {
                 WBLogging.Teams.Verbose("Trying to sync the team with term name: " + term.Name);
 
                 WBTeam team = new WBTeam(teams, term);
-                team.SyncSPGroup(site);
+                team.SyncMembersGroup(teamsSite, site);
 
                 WBLogging.Teams.Verbose("Next syncing all sub-teams of team: " + team.Name);
-                SyncAllSubTeams(teams, term.Terms, site);
+                SyncAllSubTeams(teams, term.Terms, teamsSite, site);
             }
         }
 
@@ -555,7 +561,13 @@ namespace WorkBoxFramework
             WBTaxonomy teams = WBTaxonomy.GetTeams(site);
 
             WBLogging.Teams.Verbose("Syncing all teams within the TermSet: " + teams.TermSet.Name);
-            SyncAllSubTeams(teams, teams.TermSet.Terms, site);
+                        
+            WBFarm farm = WBFarm.Local;
+
+            using (SPSite teamsSite = new SPSite(farm.TeamSitesSiteCollectionUrl))                        
+            {
+                SyncAllSubTeams(teams, teams.TermSet.Terms, teamsSite, site);
+            }
         }
 
         #endregion

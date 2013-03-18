@@ -1366,7 +1366,7 @@ namespace WorkBoxFramework
         }
 
 
-        public static bool WBxCutOrCopyIntoFolder(this SPFolder folder, SPListItem item, bool cutOriginal)
+        public static bool WBxCutOrCopyIntoFolder(this SPFolder folder, SPWeb web, SPListItem item, bool cutOriginal)
         {
             bool success = true;
 
@@ -1378,7 +1378,7 @@ namespace WorkBoxFramework
 
                     // I'm fairly certain that this wont introduce a new 'SPWeb' object that isn't (in theory)
                     // being handled somewhere in the calling code for this method.
-                    filename = folder.Item.Web.WBxMakeFilenameUnique(folder, filename);
+                    filename = web.WBxMakeFilenameUnique(folder, filename);
 
                     SPFile copiedFile = null;
 
@@ -1398,12 +1398,12 @@ namespace WorkBoxFramework
 
                     foreach (SPFile file in item.Folder.Files)
                     {
-                        subFolder.WBxCutOrCopyIntoFolder(file.Item, cutOriginal);
+                        subFolder.WBxCutOrCopyIntoFolder(web, file.Item, cutOriginal);
                     }
 
                     foreach (SPFolder child in item.Folder.SubFolders)
                     {
-                        subFolder.WBxCutOrCopyIntoFolder(child.Item, cutOriginal);
+                        subFolder.WBxCutOrCopyIntoFolder(web, child.Item, cutOriginal);
                     }
                 }
 
@@ -1891,14 +1891,19 @@ namespace WorkBoxFramework
             web.RoleAssignments.Add(roleAssignment);
         }
 
-
-
-        public static void WBxAssignGroupWithRole(this SPWeb web, String groupName, String roleName) 
+        public static void WBxAssignGroupWithRole(this SPWeb web, String groupName, String roleName)
         {
             if (groupName == null || groupName == "") return;
-            if (roleName == null || roleName == "") return;
 
             SPGroup group = web.SiteGroups[groupName];
+            web.WBxAssignGroupWithRole(group, roleName);
+        }
+
+        public static void WBxAssignGroupWithRole(this SPWeb web, SPGroup group, String roleName) 
+        {
+            if (group == null) return;
+            if (roleName == null || roleName == "") return;
+
             SPRoleDefinition roleDefinition = web.RoleDefinitions[roleName];
 
             SPRoleAssignment roleAssignment = new SPRoleAssignment(group);
@@ -1913,17 +1918,33 @@ namespace WorkBoxFramework
             if (team == null) return;
             if (roleName == null || roleName == "") return;
 
-            team.SyncSPGroup(site);
-            String groupName = team.MembersGroupName;
-            if (groupName == "")
+            SPGroup group = team.MembersGroup(site);
+            if (group == null)
             {
-                WBUtils.shouldThrowError("There was no associated group name to define this team");
+                WBLogging.Teams.Unexpected("There was no associated members group for this team: " + team.Name + " on: " + site.Url);
                 return;
             }
 
-            WBUtils.logMessage("Just about to add team | to have role: " + team.Name + " | " + roleName);
-            web.WBxAssignGroupWithRole(groupName, roleName);
+            WBLogging.Teams.Verbose("Just about to add team members | to have role: " + team.Name + " | " + roleName);
+            web.WBxAssignGroupWithRole(group, roleName);
         }
+
+        public static void WBxAssignTeamOwnersWithRole(this SPWeb web, SPSite site, WBTeam team, String roleName)
+        {
+            if (team == null) return;
+            if (roleName == null || roleName == "") return;
+
+            SPGroup group = team.OwnersGroup(site);
+            if (group == null)
+            {
+                WBLogging.Teams.Unexpected("There was no associated owners group for this team: " + team.Name + " on: " + site.Url);
+                return;
+            }
+
+            WBLogging.Teams.Verbose("Just about to add team owners | to have role: " + team.Name + " | " + roleName);
+            web.WBxAssignGroupWithRole(group, roleName);
+        }
+
 
         public static void WBxRemoveGroupAssignment(this SPWeb web, String groupName)
         {

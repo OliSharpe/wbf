@@ -95,7 +95,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                     owningTeam = teams.GetTeam(new Guid(owningTeamGuidString));
 
-                    OwningTeamField.Text = owningTeam.UIControlValue;
+                    OwningTeamField.Text = owningTeam.Name; //  UIControlValue;
+                    OwningTeamUIControlValue.Value = owningTeam.UIControlValue;
 
                     InvolvedTeamsField.Text = owningTeam.UIControlValue;
                 }
@@ -116,7 +117,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     }
 
                     owningTeam = relatedWorkBox.OwningTeam;
-                    OwningTeamField.Text = owningTeam.UIControlValue;
+                    OwningTeamField.Text = owningTeam.Name; //  UIControlValue;
+                    OwningTeamUIControlValue.Value = owningTeam.UIControlValue;
                     InvolvedTeamsField.Text = relatedWorkBox.InvolvedTeams.UIControlValue;
                 }
 
@@ -236,7 +238,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
 
 
-            teams.InitialiseTaxonomyControl(OwningTeamField, WorkBox.COLUMN_NAME__OWNING_TEAM, false);
+            // teams.InitialiseTaxonomyControl(OwningTeamField, WorkBox.COLUMN_NAME__OWNING_TEAM, false);
 
             teams.InitialiseTaxonomyControl(InvolvedTeamsField, WorkBox.COLUMN_NAME__INVOLVED_TEAMS, true);
 
@@ -335,7 +337,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             Hashtable metadataProblems = new Hashtable();
 
-            if (OwningTeamField.Text.Equals("")) metadataProblems.Add(WorkBox.COLUMN_NAME__OWNING_TEAM, "You must enter the owning team.");
+            // if (OwningTeamField.Text.Equals("")) metadataProblems.Add(WorkBox.COLUMN_NAME__OWNING_TEAM, "You must enter the owning team.");
 
             if (InvolvedTeamsField.Text.Equals("")) metadataProblems.Add(WorkBox.COLUMN_NAME__INVOLVED_TEAMS, "You must enter at least one involved team.");
 
@@ -446,7 +448,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 WBTemplate template = collection.GetTypeByID(templateID);
 
 
-                WBTeam owningTeam = new WBTeam(teams, OwningTeamField.Text);
+                WBTeam owningTeam = new WBTeam(teams, OwningTeamUIControlValue.Value);
                 WBTermCollection<WBTeam> involvedTeams = new WBTermCollection<WBTeam>(teams, InvolvedTeamsField.Text);
 
                 Hashtable extraValues = null;

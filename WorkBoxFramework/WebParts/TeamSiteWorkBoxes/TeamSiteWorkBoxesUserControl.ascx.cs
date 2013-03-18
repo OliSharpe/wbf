@@ -71,9 +71,6 @@ namespace WorkBoxFramework.TeamSiteWorkBoxes
                     ViewState["SortExpression"] = "";
                 }
 
-                
-
-
                 WBLogging.Debug("Not in post back so setting guid value to be: " + SelectedRecordsTypeGUID);
                 RefreshBoundData();
             }
@@ -169,6 +166,7 @@ namespace WorkBoxFramework.TeamSiteWorkBoxes
             {
                 SelectedRecordsTypeGUID = guidString;
                 SelectedWorkBoxView = VIEW__SELECTED_RECORDS_TYPE;
+                SetSortColumn(WBColumn.ReferenceDate);
 
                 RefreshBoundData();
             }
@@ -259,6 +257,8 @@ namespace WorkBoxFramework.TeamSiteWorkBoxes
                 FilterOpenStatus.Enabled = false;
                 FilterClosedStatus.Enabled = false;
                 FilterAllStatus.Enabled = false;
+
+                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ClearHighlightedRecordsTypes", "$('a.ms-navitem').css('font-weight', 'normal');", true);
             }
 
             WBTaxonomy recordsTypes = WBTaxonomy.GetRecordsTypes(SPContext.Current.Site);
@@ -282,7 +282,7 @@ namespace WorkBoxFramework.TeamSiteWorkBoxes
 
             SelectedWorkBoxes.Columns.Clear();
             SelectedWorkBoxes.Columns.Add(WBUtils.FixedIconTemplateField(WorkBox.ICON_16_IMAGE_URL, WBColumn.WorkBoxURL));
-            SelectedWorkBoxes.Columns.Add(WBUtils.HyperLinkField(WBColumn.Title, WBColumn.WorkBoxURL, sortColumn, ascending));
+            SelectedWorkBoxes.Columns.Add(WBUtils.HyperLinkField(WBColumn.Title, WBColumn.WorkBoxURL, sortColumn, ascending, ""));
             //                    SelectedWorkBoxes.Columns.Add(WBUtils.BoundField(WBColumn.OwningTeam, sortColumn, ascending));
             //                        ShowResults.Columns.Add(WBUtils.BoundField(WBColumn.FunctionalArea, sortColumn, ascending));
             // SelectedWorkBoxes.Columns.Add(WBUtils.BoundField(WBColumn.ReferenceDate, HorizontalAlign.Center, sortColumn, ascending));

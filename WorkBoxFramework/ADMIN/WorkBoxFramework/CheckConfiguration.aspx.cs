@@ -33,6 +33,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!IsPostBack)
+            {
+                WBFarm farm = WBFarm.Local;
+
+                TermStoreName.Text = farm.TermStoreName;
+                TermStoreGroupName.Text = farm.TermStoreGroupName;
+            }
         }
 
         protected void DoInitialSetup_OnClick(object sender, EventArgs e)
@@ -40,6 +47,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             WBLogging.Debug("AdminTeamSiteURL: " + AdminTeamSiteURL.Text);
             WBLogging.Debug("TimerJobsServerName: " + TimerJobsServerName.Text);
             WBLogging.Debug("TimerJobsServerName to upper: " + TimerJobsServerName.Text.ToUpper());
+
+            WBFarm farm = WBFarm.Local;
+
+            farm.TermStoreName = TermStoreName.Text;
+            farm.TermStoreGroupName = TermStoreGroupName.Text;
+
+            farm.Update();
 
             WBFarm.Local.InitialFarmSetup(SPContext.Current.Site, AdminTeamSiteURL.Text, TimerJobsServerName.Text.ToUpper());
 

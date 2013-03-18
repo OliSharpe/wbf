@@ -53,12 +53,12 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                     String docLibraryFolderPath = WorkBox.Web.ServerRelativeUrl + "/" + WorkBox.DocumentLibrary.RootFolder.Url;
 
-//                    WBLogging.Debug("Root folder was: " + folderPath + "     in : " + WorkBox.DocumentLibrary.RootFolder.Url);
-  //                  WBLogging.Debug("docLibraryFolderPath =  " + docLibraryFolderPath);
+                    WBLogging.Generic.Unexpected("Root folder was: " + folderPath + "     in : " + WorkBox.DocumentLibrary.RootFolder.Url);
+                    WBLogging.Generic.Unexpected("docLibraryFolderPath =  " + docLibraryFolderPath);
 
                     folderPath = folderPath.Replace(docLibraryFolderPath, "");
 
-//                    WBLogging.Debug("Now using folder path: " + folderPath);
+                    WBLogging.Generic.Unexpected("Now using folder path: " + folderPath);
 
 
                     WBUser user = new WBUser(WorkBox.Web.CurrentUser);
