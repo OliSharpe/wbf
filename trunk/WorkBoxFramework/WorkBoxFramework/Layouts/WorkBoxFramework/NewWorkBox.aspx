@@ -206,12 +206,16 @@ You must enter the following metadata details for your new Work Box.
 <td class="wbf-metadata-title-panel">
         <div class="wbf-metadata-title">Owning Team</div>
 <div class="wbf-metadata-description">
-A record of the team who owned this document when it was created.
+The team who will own this work box.
 </div>
 </td>
 <td class="wbf-metadata-value-panel" valign="top">
 
-<Taxonomy:TaxonomyWebTaggingControl ID="OwningTeamField" ControlMode="display" runat="server" />
+<div class="wbf-metadata-read-only-value">
+<asp:Label ID="OwningTeamField" ControlMode="display" runat="server" />
+</div>
+
+<asp:HiddenField ID="OwningTeamUIControlValue" runat="server" />
 <div class="wbf-metadata-error">
 <asp:Label ID="OwningTeamFieldMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
@@ -222,7 +226,7 @@ A record of the team who owned this document when it was created.
 <td class="wbf-metadata-title-panel">
         <div class="wbf-metadata-title">Involved Teams</div>
 <div class="wbf-metadata-description">
-A record of the teams that were involved with the creation of this document.
+The teams who can collaborate in this work box.
 </div>
 </td>
 <td class="wbf-metadata-value-panel" valign="top">

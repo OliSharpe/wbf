@@ -137,23 +137,22 @@ namespace WorkBoxFramework
             return user;
         }
 
-        public static void SyncSPGroup(SPSite fromSite, SPSite toSite, String groupName)
+        public static SPGroup SyncSPGroup(SPSite fromSite, SPSite toSite, String groupName)
         {
-            // If these happen to be the same site collection then there is nothing to do:
-            if (fromSite.ID.Equals(toSite.ID)) return;
-
             WBLogging.Teams.Verbose("Syncing SPGroup | from | to : " + groupName + " | " + fromSite.Url + " | " + toSite.Url);
 
             SPGroup fromGroup = fromSite.RootWeb.WBxGetGroupOrNull(groupName);
 
+            // If these happen to be the same site collection then there is nothing to do:
+            if (fromSite.ID.Equals(toSite.ID)) return fromGroup;
+
             if (fromGroup == null)
             {
                 WBUtils.shouldThrowError("Couldn't find the group that was being synced. Group Name: " + groupName);
-                return;
+                return null;
             }
 
             WBLogging.Teams.Verbose("Found group in the 'from' site collection. ");
-
 
             SPGroup toGroup = toSite.RootWeb.WBxGetGroupOrNull(groupName);
 
@@ -173,36 +172,51 @@ namespace WorkBoxFramework
                 WBLogging.Teams.Verbose("Created new group.");
 
                 toGroup = toSite.RootWeb.SiteGroups[groupName];
-
             }
             else
             {
                 WBLogging.Teams.Verbose("FOUND!! group in the 'to' site collection. ");                
             }
 
-            // First we're going to empty the destination group of all users:
+            // First we're going to remove the extra users in the toGroup that need to be removed:
             foreach (SPUser toUser in toGroup.Users)
             {
-                toGroup.RemoveUser(toUser);
+                if (!fromGroup.WBxContainsUser(toUser))
+                {
+                    WBLogging.Teams.Verbose("On site removing from group an un-needed user: " + toSite.Url + " | " + toGroup.Name + " | " + toUser.LoginName);
+
+                    toGroup.RemoveUser(toUser);
+                }
             }
 
-            // And now we'll add into the group all of the users from the source:
+            // And now we'll add into the group all of missing users from the fromGroup that need to be added:
             foreach (SPUser fromUser in fromGroup.Users)
             {
-                WBLogging.Teams.Verbose("Copying across a user: " + fromUser.LoginName);
-
                 SPUser toUser = toSite.RootWeb.WBxEnsureUserOrNull(fromUser.LoginName);
 
-                if (toUser != null)
+                if (toUser != null && !toGroup.WBxContainsUser(toUser))
                 {
-                    toGroup.Users.Add(toUser.LoginName, toUser.Email, toUser.Name, toUser.Notes);
+                    WBLogging.Teams.Verbose("On site adding to group a missing user: " + toSite.Url + " | " + toGroup.Name + " | " + toUser.LoginName);
+
+                    toGroup.AddUser(toUser);
                 }
+            }
+
+            if (toGroup.Users.Count != fromGroup.Users.Count)
+            {
+                WBLogging.Teams.Unexpected("Synced groups have different number of users: toSite | fromGroup | toGroup : " + toSite.Url + " | " + fromGroup.Users.Count + " | " + toGroup.Users.Count);
+            }
+            else
+            {
+                WBLogging.Teams.Verbose("Synced groups now have same number of users: toSite | fromGroup | toGroup : " + toSite.Url + " | " + fromGroup.Users.Count + " | " + toGroup.Users.Count);
             }
 
             // Finally we'll make sure that everyone can see the membership of this group:
             toGroup.OnlyAllowMembersViewMembership = false;
 
             toGroup.Update();
+
+            return toGroup;
         }
 
 
@@ -351,13 +365,33 @@ namespace WorkBoxFramework
             linkField.DataNavigateUrlFormatString = "{0}";
 
             linkField.SortExpression = textColumn.InternalName;
-            
             if (sortColumn == textColumn)
             {
                 if (ascending) linkField.HeaderText += " ^";
                 else linkField.HeaderText += " v";
             }
             
+            return linkField;
+        }
+
+        public static HyperLinkField HyperLinkField(WBColumn textColumn, WBColumn urlLinkColumn, WBColumn sortColumn, bool ascending, String target)
+        {
+            HyperLinkField linkField = new HyperLinkField();
+            linkField.HeaderText = textColumn.PrettyName;
+            linkField.DataTextField = textColumn.InternalName;
+            linkField.Target = target;
+
+            string[] urlFields = { urlLinkColumn.InternalName };
+            linkField.DataNavigateUrlFields = urlFields;
+            linkField.DataNavigateUrlFormatString = "{0}";
+
+            linkField.SortExpression = textColumn.InternalName;
+            if (sortColumn == textColumn)
+            {
+                if (ascending) linkField.HeaderText += " ^";
+                else linkField.HeaderText += " v";
+            }
+
             return linkField;
         }
 

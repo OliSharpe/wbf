@@ -102,6 +102,50 @@ Give the name of the server on which you want the WBF timer jobs to be run.
 
 
 <tr>
+<td class="wbf-metadata-title-panel">
+<div class="wbf-metadata-title">Managed Metadata Term Store</div>
+<div>
+<p>
+Edit the name of the term store and group in which the WBF term sets are held if these are going to be different from the default.
+</p>
+</div>
+</td>
+<td class="wbf-metadata-value-panel">
+
+				<table border="0" width="100%" cellspacing="0" cellpadding="2">
+					<tr>
+                        <td>
+                            <b><nobr>Term Store Name</nobr></b><br />
+                        </td>
+						<td class="ms-authoringcontrols" valign="top" align="left">
+                            <asp:TextBox ID="TermStoreName" runat="server" columns="50"/>
+                            <div>
+                                <asp:RequiredFieldValidator ID="TermStoreNameValidator" runat="server" ErrorMessage="The WBF requires a term store name to function."
+            ControlToValidate = "TermStoreName"></asp:RequiredFieldValidator>
+                            </div>
+                        </td>
+                    </tr>
+					<tr>
+                        <td>
+                            <b><nobr>Term Store Group Name</nobr></b><br />
+                        </td>
+						<td class="ms-authoringcontrols" valign="top" align="left">
+                            <asp:TextBox ID="TermStoreGroupName" runat="server" columns="50"/>
+                            <div>
+                                <asp:RequiredFieldValidator ID="TermStoreGroupNameValidator" runat="server" ErrorMessage="The WBF requires a term store group name to function."
+            ControlToValidate = "TermStoreGroupName"></asp:RequiredFieldValidator>
+                            </div>
+                        </td>
+                    </tr>
+
+				</table>
+
+</td>
+</tr>
+
+
+
+<tr>
 <td colspan="2" align="center" valign="top">
     <asp:Button ID="DoInitialSetup" runat="server" Text="Do Initial Setup"  OnClick="DoInitialSetup_OnClick"/>
 &nbsp;

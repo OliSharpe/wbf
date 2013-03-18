@@ -2071,19 +2071,19 @@ namespace WorkBoxFramework
 
                             foreach (WBTeam team in Collection.SystemAdminTeams)
                             {
-                                team.SyncSPGroup(elevatedSite);
+                                team.SyncMembersGroup(elevatedSite);
                             }
 
                             foreach (WBTeam team in Collection.BusinessAdminTeams)
                             {
-                                team.SyncSPGroup(elevatedSite);
+                                team.SyncMembersGroup(elevatedSite);
                             }
 
-                            OwningTeam.SyncSPGroup(elevatedSite);
+                            OwningTeam.SyncMembersGroup(elevatedSite);
 
                             foreach (WBTeam team in InvolvedTeams)
                             {
-                                team.SyncSPGroup(elevatedSite);
+                                team.SyncMembersGroup(elevatedSite);
                             }
    //                     }
                     }

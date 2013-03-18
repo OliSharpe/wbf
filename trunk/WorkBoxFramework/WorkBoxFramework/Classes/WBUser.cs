@@ -310,7 +310,18 @@ namespace WorkBoxFramework
 
             String clipboardAction = GetClipboard(userProfile, clipboardItems);
 
-            SPFolder folder = workBox.DocumentLibrary.RootFolder.WBxGetFolderPath(folderPath);
+            SPFolder folder = workBox.DocumentLibrary.RootFolder;
+            WBLogging.Generic.Unexpected("Folder path: ##" + folderPath + "##");
+            if (folder == null)
+            {
+                WBLogging.Generic.Unexpected("folder is null !!!");
+            }
+
+            folderPath = folderPath.WBxTrim();
+            if (!String.IsNullOrEmpty(folderPath))
+            {
+                folder = folder.WBxGetFolderPath(folderPath);
+            }
 
             bool allowUnsafeUpdatesOriginalValue = workBox.Web.AllowUnsafeUpdates;
             workBox.Web.AllowUnsafeUpdates = true;
@@ -330,7 +341,7 @@ namespace WorkBoxFramework
                         SPListItem item = documents.GetItemById(id);
 
                         bool cutOriginal = (clipboardAction == WBUser.CLIPBOARD_ACTION__CUT);
-                        folder.WBxCutOrCopyIntoFolder(item, cutOriginal);
+                        folder.WBxCutOrCopyIntoFolder(workBox.Web, item, cutOriginal);
                     }
 
                     clipboardWorkBox.Web.AllowUnsafeUpdates = false;
