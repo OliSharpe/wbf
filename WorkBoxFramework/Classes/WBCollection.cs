@@ -80,16 +80,6 @@ namespace WorkBoxFramework
         private const string COLLECTION_PROPERTY__CREATE_NEW_WORK_BOX_TEXT = "wbf__collection__create_new_work_box_text";
         private const string COLLECTION_PROPERTY__DEFAULT_OWNING_TEAM = "wbf__collection__default_owning_team";
 
-        private const string COLLECTION_PROPERTY__URL_FOR_VIEW_PROPERTIES_DIALOG = "wbf__collection__url_for_view_properties_dialog";
-        private const string COLLECTION_PROPERTY__URL_FOR_EDIT_PROPERTIES_DIALOG = "wbf__collection__url_for_edit_properties_dialog";
-        private const string COLLECTION_PROPERTY__URL_FOR_VIEW_ALL_INVOLVED_DIALOG = "wbf__collection__url_for_view_all_involved_dialog";
-        private const string COLLECTION_PROPERTY__URL_FOR_INVITE_TEAM_DIALOG = "wbf__collection__url_for_invite_team_dialog";
-        private const string COLLECTION_PROPERTY__URL_FOR_INVITE_INDIVIDUAL_DIALOG = "wbf__collection__url_for_invite_individual_dialog";
-        private const string COLLECTION_PROPERTY__URL_FOR_CHANGE_OWNER_DIALOG = "wbf__collection__url_for_change_owner_dialog";
-        private const string COLLECTION_PROPERTY__URL_FOR_CLOSE_DIALOG = "wbf__collection__url_for_close_dialog";
-        private const string COLLECTION_PROPERTY__URL_FOR_REOPEN_DIALOG = "wbf__collection__url_for_reopen_dialog";
-
-
         private const string COLLECTION_PROPERTY__DIALOG_DETAILS_FORMAT = "wbf__collection__dialog__{0}";
 
 
@@ -606,7 +596,7 @@ namespace WorkBoxFramework
 
 
 
-
+        /*
         public String UrlForViewPropertiesDialog
         {
             get { return Web.WBxGetPropertyOrDefault(COLLECTION_PROPERTY__URL_FOR_VIEW_PROPERTIES_DIALOG, DEFAULT_URL__VIEW_PROPERTIES_DIALOG); }
@@ -654,7 +644,7 @@ namespace WorkBoxFramework
             get { return Web.WBxGetPropertyOrDefault(COLLECTION_PROPERTY__URL_FOR_REOPEN_DIALOG, DEFAULT_URL__REOPEN_DIALOG); }
             set { Web.WBxSetProperty(COLLECTION_PROPERTY__URL_FOR_REOPEN_DIALOG, value); }
         }
-
+        */
 
         
 
@@ -912,6 +902,21 @@ namespace WorkBoxFramework
 
 
 
+        public WorkBox RequestNewEventWorkBox(String calendarURL, Guid calendarGuid, int eventID, String shortTitle, String description, DateTime eventDate, DateTime endDate, WBTeam owningTeam, WBTermCollection<WBTeam> involvedTeams, String templateName)
+        {
+            WBLogging.WorkBoxCollections.Unexpected("In: RequestNewEventWorkBox()");
+
+            WBTemplate template = new WBTemplate(this, 10);
+            
+            Hashtable extraBits = new Hashtable();
+            extraBits["EventDate"] = eventDate;
+            extraBits["ReferenceDate"] = eventDate;
+            extraBits["EndDate"] = endDate;
+            extraBits["WorkBoxLinkedCalendars"] = calendarURL + "|" + calendarGuid + "|" + eventID;
+
+            return RequestNewWorkBox(shortTitle, "", template, owningTeam, involvedTeams, extraBits);
+        }
+
 
         public WorkBox RequestNewWorkBox()
         {
@@ -935,6 +940,8 @@ namespace WorkBoxFramework
 
         public WorkBox RequestNewWorkBox(String shortTitle, String localID, WBTemplate template, WBTeam owningTeam, WBTermCollection<WBTeam> involvedTeams, Hashtable extraRequiredColumnValues)
         {
+            WBLogging.WorkBoxCollections.Unexpected("In: RequestNewWorkBox()");
+
             using (EventsFiringDisabledScope noevents = new EventsFiringDisabledScope())
             {
                 SPListItem newItem = List.AddItem();
@@ -943,7 +950,9 @@ namespace WorkBoxFramework
                 /* First we set the required items: */
                 if (template == null) template = DefaultTemplate();
                 newWorkBox.Template = template;
-                newItem[WorkBox.COLUMN_NAME__RECORDS_TYPE] = template.Item[WorkBox.COLUMN_NAME__RECORDS_TYPE];
+
+                newWorkBox.RecordsType = template.RecordsType(newWorkBox.RecordsTypes);
+                //newItem[WorkBox.COLUMN_NAME__RECORDS_TYPE] = template.Item[WorkBox.COLUMN_NAME__RECORDS_TYPE];
 
                 if (extraRequiredColumnValues != null)
                 {
@@ -965,6 +974,8 @@ namespace WorkBoxFramework
 
                             default: 
                                 {
+                                    WBLogging.WorkBoxCollections.Unexpected("Setting extra bit: " + entry.Key.WBxToString());
+                                    WBLogging.WorkBoxCollections.Unexpected("To have value: " + entry.Value.WBxToString());
                                     newItem[entry.Key.WBxToString()] = entry.Value;
                                     break;
                                 }

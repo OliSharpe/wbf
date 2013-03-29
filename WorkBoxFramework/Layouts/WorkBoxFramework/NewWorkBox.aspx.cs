@@ -275,6 +275,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             showReferenceDate = workBoxRecordsType.WorkBoxReferenceDateRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
             if (showReferenceDate)
             {
+                // Setting the local to a value that should make the date format DD/MM/YYYY
+                // ReferenceDate.LocaleId = 2057;
+
                 if (workBoxRecordsType.IsWorkBoxReferenceDateRequired)
                 {
                     ReferenceDateTitle.Text = "Reference Date";

@@ -17,6 +17,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <AssemblyDeploymentTarget>GlobalAssemblyCache</AssemblyDeploymentTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -73,6 +74,12 @@
     <Compile Include="Classes\WBConstant.cs" />
     <Compile Include="Classes\WBIconItemTemplateField.cs" />
     <Compile Include="Classes\WBQueryClause.cs" />
+    <Compile Include="Features\LinkedCalendars\LinkedCalendars.EventReceiver.cs">
+      <DependentUpon>LinkedCalendars.feature</DependentUpon>
+    </Compile>
+    <Compile Include="Features\TeamSiteCalendarUpdates\TeamSiteCalendarUpdates.EventReceiver.cs">
+      <DependentUpon>TeamSiteCalendarUpdates.feature</DependentUpon>
+    </Compile>
     <Compile Include="Features\WorkBoxCollections\WorkBoxCollections.EventReceiver.cs">
       <DependentUpon>WorkBoxCollections.feature</DependentUpon>
     </Compile>
@@ -104,6 +111,15 @@
     <Compile Include="Layouts\WorkBoxFramework\ChangeTeamManager.aspx.designer.cs">
       <DependentUpon>ChangeTeamManager.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Classes\WBTeamSiteCalendarChangeEventReceiver.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\ConfigureLinkedCalendar.aspx.cs">
+      <DependentUpon>ConfigureLinkedCalendar.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ConfigureLinkedCalendar.aspx.designer.cs">
+      <DependentUpon>ConfigureLinkedCalendar.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\WBLinkedCalendarUpdatesEventReceiver.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
@@ -656,6 +672,12 @@
     <None Include="1033\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{ad111b85-98d1-4df8-8f5f-ef3141011c5c}</SharePointProjectItemId>
     </None>
+    <None Include="Features\LinkedCalendars\LinkedCalendars.feature">
+      <FeatureId>{c7babbed-affc-4dc1-bb7c-584343bfb6ff}</FeatureId>
+    </None>
+    <None Include="Features\TeamSiteCalendarUpdates\TeamSiteCalendarUpdates.feature">
+      <FeatureId>{f813dd17-fc0c-4c52-a710-d371b201a2cb}</FeatureId>
+    </None>
     <None Include="WebParts\ConfigurationStatus\ConfigurationStatus.webpart" />
     <None Include="WebParts\ConfigurationStatus\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{15e0ce8c-93d9-4277-8d9e-649b36a80214}</SharePointProjectItemId>
@@ -836,6 +858,12 @@
     <Content Include="ADMIN\WorkBoxFramework\CheckConfiguration.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
+    <Content Include="Features\LinkedCalendars\LinkedCalendars.Template.xml">
+      <DependentUpon>LinkedCalendars.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\TeamSiteCalendarUpdates\TeamSiteCalendarUpdates.Template.xml">
+      <DependentUpon>TeamSiteCalendarUpdates.feature</DependentUpon>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\AddAllManagersReports.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -843,6 +871,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\ChangeTeamManager.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ConfigureLinkedCalendar.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx">
@@ -1112,9 +1143,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\InviteTeams.aspx" />
-    <Content Include="Layouts\WorkBoxFramework\NewWorkBox.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="Layouts\WorkBoxFramework\NewWorkBox.aspx" />
     <Content Include="Layouts\WorkBoxFramework\RemoveWorkBoxFromFavourites.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
