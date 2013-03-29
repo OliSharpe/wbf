@@ -1238,6 +1238,7 @@ namespace WorkBoxFramework
                 //calEvent["RecurrenceData"] = recurrenceRule;
                 //calEvent["Recurrence"] = 1;
                 //calendarEvent["UID"] = System.Guid.NewGuid();
+
                 calendarEvent["EventType"] = 1;
 
                 WBLogging.WorkBoxes.Unexpected("The reference date is: " + ReferenceDate);
