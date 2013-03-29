@@ -1249,6 +1249,7 @@ namespace WorkBoxFramework
                 {
                     calendarEvent["EndDate"] = ReferenceDate.AddHours(1);                
                 }
+
                 //calendarEvent["Workspace"] = Url;
                 //calendarEvent["WorkspaceLink"] = 1;
 
