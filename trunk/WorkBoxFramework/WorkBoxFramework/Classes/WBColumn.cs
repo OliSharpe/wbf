@@ -664,7 +664,6 @@ namespace WorkBoxFramework
 
         public static readonly WBColumn WorkBoxCachedListItemID = WBColumn.IntegerColumn(WorkBox.COLUMN_NAME__WORK_BOX_CACHED_LIST_ITEM_ID);
 
-
         public static readonly WBColumn WorkBoxDateLastModified = WBColumn.DateTimeColumn(WorkBox.COLUMN_NAME__WORK_BOX_DATE_LAST_MODIFIED, false, "Modified (approx)");
         public static readonly WBColumn WorkBoxDateLastVisited = WBColumn.DateTimeColumn(WorkBox.COLUMN_NAME__WORK_BOX_DATE_LAST_VISITED, false, "Visited (approx)");
         public static readonly WBColumn WorkBoxDateCreated = WBColumn.DateTimeColumn(WorkBox.COLUMN_NAME__WORK_BOX_DATE_CREATED, false, "Created");
@@ -672,6 +671,9 @@ namespace WorkBoxFramework
         public static readonly WBColumn WorkBoxDateLastClosed = WBColumn.DateTimeColumn(WorkBox.COLUMN_NAME__WORK_BOX_DATE_LAST_CLOSED, false, "Closed");
         public static readonly WBColumn WorkBoxDateLastOpened = WBColumn.DateTimeColumn(WorkBox.COLUMN_NAME__WORK_BOX_DATE_LAST_OPENED, false, "Opened");
         public static readonly WBColumn WorkBoxRetentionEndDate = WBColumn.DateTimeColumn(WorkBox.COLUMN_NAME__WORK_BOX_RETENTION_END_DATE, false, "Retention End Date");
+
+        //public static readonly WBColumn WorkBoxLinkedCalendars = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_LINKED_CALENDARS);
+
 
         public static readonly WBColumn FunctionalArea = WBColumn.ManagedMedataColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, WorkBox.TERM_SET_NAME__FUNCTIONAL_AREAS, true);
         public static readonly WBColumn RecordsType = WBColumn.ManagedMedataColumn(WorkBox.COLUMN_NAME__RECORDS_TYPE, INTERNAL_NAME_USES_SPACE_CHARACTERS, WorkBox.TERM_SET_NAME__RECORDS_TYPES, false);

@@ -28,6 +28,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Taxonomy;
+using Microsoft.SharePoint.Meetings;
 
 namespace WorkBoxFramework
 {
@@ -39,32 +40,6 @@ namespace WorkBoxFramework
     {
 
         #region Constants
-
-        public const string JAVASCRIPT_VAR__URL_FOR_NEW_DIALOG                  = "wbf__javascript_var__url_for_new_dialog";
-
-        public const string JAVASCRIPT_VAR__URL_FOR_VIEW_PROPERTIES_DIALOG      = "wbf__javascript_var__url_for_view_properties_dialog";
-        public const string JAVASCRIPT_VAR__URL_FOR_EDIT_PROPERTIES_DIALOG      = "wbf__javascript_var__url_for_edit_properties_dialog";
-
-        public const string JAVASCRIPT_VAR__URL_FOR_VIEW_ALL_INVOLVED_DIALOG    = "wbf__javascript_var__url_for_view_all_involved_dialog";
-        public const string JAVASCRIPT_VAR__URL_FOR_INVITE_TEAM_DIALOG          = "wbf__javascript_var__url_for_invite_team_dialog";
-        public const string JAVASCRIPT_VAR__URL_FOR_INVITE_INDIVIDUAL_DIALOG    = "wbf__javascript_var__url_for_invite_individual_dialog";
-        public const string JAVASCRIPT_VAR__URL_FOR_CHANGE_OWNER_DIALOG         = "wbf__javascript_var__url_for_change_owner_dialog";
-
-        public const string JAVASCRIPT_VAR__URL_FOR_CLOSE_DIALOG                = "wbf__javascript_var__url_for_close_dialog";
-        public const string JAVASCRIPT_VAR__URL_FOR_REOPEN_DIALOG               = "wbf__javascript_var__url_for_reopen_dialog";
-
-
-        public const string JAVASCRIPT_VAR__ENABLE_VIEW_PROPERTIES_BUTTON       = "wbf__javascript_var__enable_view_properties_button";
-        public const string JAVASCRIPT_VAR__ENABLE_EDIT_PROPERTIES_BUTTON       = "wbf__javascript_var__enable_edit_properties_button";
-
-        public const string JAVASCRIPT_VAR__ENABLE_VIEW_ALL_INVOLVED_BUTTON     = "wbf__javascript_var__enable_view_all_involved_button";
-        public const string JAVASCRIPT_VAR__ENABLE_INVITE_TEAM_BUTTON           = "wbf__javascript_var__enable_invite_team_button";
-        public const string JAVASCRIPT_VAR__ENABLE_INVITE_INDIVIDUAL_BUTTON     = "wbf__javascript_var__enable_invite_individual_button";
-        public const string JAVASCRIPT_VAR__ENABLE_CHANGE_OWNER_BUTTON          = "wbf__javascript_var__enable_change_owner_button";
-
-        public const string JAVASCRIPT_VAR__ENABLE_CLOSE_BUTTON                 = "wbf__javascript_var__enable_close_button";
-        public const string JAVASCRIPT_VAR__ENABLE_REOPEN_BUTTON                = "wbf__javascript_var__enable_reopen_button";
-
  
         public const string WORK_BOXES_LIST_EVENT_RECEIVER__ITEM_ADDED          = "wbf__work_box_list_event_receiver__ItemAdded";
         public const string WORK_BOXES_LIST_EVENT_RECEIVER__ITEM_UPDATED        = "wbf__work_box_list_event_receiver__ItemUpdated";
@@ -75,6 +50,10 @@ namespace WorkBoxFramework
         public const string WORK_BOX_PROPERTY__COLLECTION_LIST_GUID     = "wbf__work_box__collection_list_guid";
         public const string WORK_BOX_PROPERTY__METADATA_ITEM_ID         = "wbf__work_box__metadata_item_id";
         public const string WORK_BOX_PROPERTY__DOCUMENT_LIBRARY_GUID    = "wbf__work_box__document_library_guid";
+
+
+        public const string LINKED_CALENDAR_PROPERTY__WORK_BOX_COLLECTION = "wbf__linked_calendar__work_box_collection";
+        public const string LINKED_CALENDAR_PROPERTY__DEFAULT_TEMPLATE_TITLE = "wbf__linked_calendar__default_template_title";
 
 
         public const string COLUMN_NAME__WORK_BOX_STATUS = "WorkBoxStatus";
@@ -251,7 +230,7 @@ namespace WorkBoxFramework
         /// <returns>A WorkBox object if the SPWeb of the given SPContext is a work box or null otherwise.</returns>
         public static WorkBox GetIfWorkBox(SPContext context)
         {
-            if (isWebAWorkBox(context.Web))
+            if (IsWebAWorkBox(context.Web))
             {
                 return new WorkBox(context);
             }
@@ -316,7 +295,7 @@ namespace WorkBoxFramework
             _web = _site.OpenWeb();
             _webNeedsDisposing = true;
 
-            if (!isWebAWorkBox(_web)) throw new Exception("You can only use the WorkBox(String workBoxURL) constructor when you know you are using a genuine work box URL");
+            if (!IsWebAWorkBox(_web)) throw new Exception("You can only use the WorkBox(String workBoxURL) constructor when you know you are using a genuine work box URL");
 
             _useable = true;
         }
@@ -835,241 +814,8 @@ namespace WorkBoxFramework
 
         #endregion
 
-        #region Properties for Work Box Buttons and Dialogs
-        private string _urlForViewPropertiesDialog = null;
-        public String UrlForViewPropertiesDialog
-        {
-            get
-            {
-                if (!EnableViewPropertiesButton) return "";
-                if (_urlForViewPropertiesDialog == null)
-                {
-                    _urlForViewPropertiesDialog = processDialogUrl(Collection.UrlForViewPropertiesDialog);
-                }
-                return _urlForViewPropertiesDialog;
-            }
-        }
-
-        public bool EnableViewPropertiesButton
-        {
-            get { return true; }
-        }
-
-        private string _urlForEditPropertiesDialog = null;
-        public String UrlForEditPropertiesDialog
-        {
-            get
-            {
-                if (!EnableEditPropertiesButton) return "";
-                if (_urlForEditPropertiesDialog == null)
-                {
-                    _urlForEditPropertiesDialog = processDialogUrl(Collection.UrlForEditPropertiesDialog);
-                }
-                return _urlForEditPropertiesDialog;
-            }
-        }
-
-        public bool EnableEditPropertiesButton
-        {
-            get
-            {
-                if (!IsOpen) return false;
-
-                SPUser currentUser = Web.CurrentUser;
-
-                if (currentUser == null) return false;
-
-                if (CurrentUserIsBusinessAdmin() || CurrentUserIsSystemAdmin()) return true;
-
-                if (CurrentUserIsOwner() && Collection.CanOwnerEditProperties) return true;
-
-                return false;
-            }
-        }
-
-
-
-        private string _urlForViewAllInvolvedDialog = null;
-        public String UrlForViewAllInvolvedDialog
-        {
-            get
-            {
-                if (!EnableViewAllInvolvedButton) return "";
-                if (_urlForViewAllInvolvedDialog == null)
-                {
-                    _urlForViewAllInvolvedDialog = processDialogUrl(Collection.UrlForViewAllInvolvedDialog);
-                }
-                return _urlForViewAllInvolvedDialog;
-            }
-        }
-
-        public bool EnableViewAllInvolvedButton
-        {
-            get { return true; }
-        }
-
-        private string _urlForInviteTeamDialog = null;
-        public String UrlForInviteTeamDialog
-        {
-            get
-            {
-                if (!EnableInviteTeamButton) return "";
-                if (_urlForInviteTeamDialog == null)
-                {
-                    _urlForInviteTeamDialog = processDialogUrl(Collection.UrlForInviteTeamDialog);
-                }
-                return _urlForInviteTeamDialog;
-            }
-        }
-
-        public bool EnableInviteTeamButton
-        {
-            get
-            {
-                if (!IsOpen) return false;
-
-                SPUser currentUser = Web.CurrentUser;
-
-                if (currentUser == null) return false;
-
-                if (CurrentUserIsBusinessAdmin() || CurrentUserIsSystemAdmin() || CurrentUserIsOwner()) return true;
-
-                return false;
-            }
-        }
-
-        private string _urlForInviteIndividualDialog = null;
-        public String UrlForInviteIndividualDialog
-        {
-            get
-            {
-                if (!EnableInviteIndividualButton) return "";
-                if (_urlForInviteIndividualDialog == null)
-                {
-                    _urlForInviteIndividualDialog = processDialogUrl(Collection.UrlForInviteIndividualDialog);
-                }
-                return _urlForInviteIndividualDialog;
-            }
-        }
-
-        public bool EnableInviteIndividualButton
-        {
-            get 
-            {
-                if (!IsOpen) return false;
-
-                SPUser currentUser = Web.CurrentUser;
-
-                if (currentUser == null) return false;
-
-                if (CurrentUserIsBusinessAdmin() || CurrentUserIsSystemAdmin() || CurrentUserIsOwner()) return true;
-
-                return false;
-            }
-        }
-
-        private string _urlForChangeOwnerDialog = null;
-        public String UrlForChangeOwnerDialog
-        {
-            get
-            {
-                if (!EnableChangeOwnerButton) return "";
-                if (_urlForChangeOwnerDialog == null)
-                {
-                    _urlForChangeOwnerDialog = processDialogUrl(Collection.UrlForChangeOwnerDialog);
-                }
-                return _urlForChangeOwnerDialog;
-            }
-        }
-
-        public bool EnableChangeOwnerButton
-        {
-            get 
-            {
-                if (!IsOpen) return false;
-
-                SPUser currentUser = Web.CurrentUser;
-
-                if (currentUser == null) return false;
-
-                if (CurrentUserIsBusinessAdmin() || CurrentUserIsSystemAdmin()) return true;
-
-                if (CurrentUserIsOwner() && Collection.CanOwnerChangeOwner) return true;
-
-                return false;
-            }
-        }
-
-        private string _urlForCloseDialog = null;
-        public String UrlForCloseDialog
-        {
-            get
-            {
-                if (_urlForCloseDialog == null)
-                {
-                    _urlForCloseDialog = processDialogUrl(Collection.UrlForCloseDialog);
-                }
-                return _urlForCloseDialog;
-            }
-        }
-
-        public bool EnableCloseButton
-        {
-            get {
-                if (UrlForCloseDialog == "") return false;
-
-                if (!IsOpen) return false;
-
-                SPUser currentUser = Web.CurrentUser;
-
-                if (currentUser == null) return false;
-
-                if (CurrentUserIsBusinessAdmin() || CurrentUserIsSystemAdmin()) return true;
-
-                if (CurrentUserIsOwner() && Collection.CanOwnerClose) return true; 
-
-                return false; 
-            }
-        }
-
-        private string _urlForReOpenDialog = null;
-        public String UrlForReOpenDialog
-        {
-            get
-            {
-                if (_urlForReOpenDialog == null)
-                {
-                    _urlForReOpenDialog = processDialogUrl(Collection.UrlForReOpenDialog);
-                }
-                return _urlForReOpenDialog;
-            }
-        }
-
-        public bool EnableReOpenButton
-        {
-            get
-            {
-                if (UrlForReOpenDialog == "") return false;
-
-                if (Status != WORK_BOX_STATUS__CLOSED) return false;
-
-                SPUser currentUser = Web.CurrentUser;
-
-                if (currentUser == null) return false;
-
-                if (CurrentUserIsBusinessAdmin() || CurrentUserIsSystemAdmin()) return true;
-
-                if (CurrentUserIsOwner() && Collection.CanOwnerReOpen) return true;
-
-                return false;
-            }
-        }
-
-
-        #endregion
-
         #region Static Methods
-        public static bool isWebAWorkBox(SPWeb web)
+        public static bool IsWebAWorkBox(SPWeb web)
         {
             return (web.AllProperties.ContainsKey(WorkBox.WORK_BOX_PROPERTY__METADATA_ITEM_ID)
                 && !web.AllProperties[WorkBox.WORK_BOX_PROPERTY__METADATA_ITEM_ID].Equals(""));
@@ -1262,7 +1008,6 @@ namespace WorkBoxFramework
                 cachedItem = cachedDetailsList.AddItem();
             }
 
-
             WBColumn[] columnsToSet = { 
                                         WBColumn.Title,
                                         WBColumn.WorkBoxStatus,
@@ -1390,6 +1135,10 @@ namespace WorkBoxFramework
             {
                 WBLogging.WorkBoxes.Verbose("In WorkBox.Update() _web was null");
             }
+
+
+            // Note that this method will only really do anything if at least one linked calendar is found:
+            UpdateLinkedCalendars();
         }
 
         public void Dispose()
@@ -1404,6 +1153,116 @@ namespace WorkBoxFramework
             _site = null;
 
             _useable = false;
+        }
+
+        public void UpdateLinkedCalendars()
+        {
+            WBLogging.WorkBoxes.Unexpected("In UpdateLinkedCalendars()");
+
+            if (OwningTeam == null)
+            {
+                WBLogging.WorkBoxes.Unexpected("Owning team has not been set yet ... it's null");
+                return;
+            }
+
+            if (String.IsNullOrEmpty(OwningTeam.TeamSiteUrl))
+            {
+                WBLogging.WorkBoxes.Unexpected("Owning team's team site URL has not been set yet ... it's null or empty");
+                return;
+            }
+            else
+            {
+                WBLogging.WorkBoxes.Unexpected("Owning team's team site URL is: " + OwningTeam.TeamSiteUrl);
+            }
+
+            if (Web == null)
+            {
+                WBLogging.WorkBoxes.Unexpected("The SPWeb doesn't apppear to have been created yet as it's null");
+                return;
+            }
+
+            using (SPSite teamSPSite = new SPSite(OwningTeam.TeamSiteUrl))
+            using (SPWeb teamSPWeb = teamSPSite.OpenWeb())
+            using (EventsFiringDisabledScope noevents = new EventsFiringDisabledScope())
+            {
+                SPList calendar = teamSPWeb.Lists["Calendar"];
+
+                WBLogging.WorkBoxes.Unexpected("Got the calendar list");
+
+                foreach (SPListItem item in calendar.Items)
+                {
+                    WBLogging.WorkBoxes.Unexpected("Found item: " + item.ID + " | " + item.Title + " | " + item.WBxGetColumnAsString("WorkBoxURL"));
+                }
+
+
+                WBColumn workBoxEventIDColumn = WBColumn.TextColumn("WorkBoxEventId");
+
+                SPListItem calendarEvent = null;
+                if (Item.WBxColumnHasValue("WorkBoxEventId"))
+                {
+                    int eventId = Item.WBxGetColumnAsInt("WorkBoxEventId", -1);
+
+                    WBLogging.WorkBoxes.Unexpected("Found the WorkBoxEventId = " + eventId);
+
+                    if (eventId != -1)
+                    {
+                        try
+                        {
+                            calendarEvent = calendar.GetItemById(eventId);
+                        }
+                        catch (Exception exception)
+                        {
+                            WBLogging.WorkBoxes.Unexpected("Coulnd't find the item by event  id: " + eventId, exception); 
+                        }
+
+                    }
+                }
+
+                if (calendarEvent == null)
+                {
+                    calendarEvent = WBUtils.FindItemByColumn(teamSPSite, calendar, WBColumn.WorkBoxURL, Url);
+                }
+
+                if (calendarEvent == null)
+                {
+                    WBLogging.WorkBoxes.Unexpected("Adding new calendar date");
+                    calendarEvent = calendar.Items.Add();
+                }
+
+                calendarEvent["Title"] = Title;
+
+                calendarEvent["Description"] = "\n\nMeeting work box: " + Url;
+
+                //calEvent["RecurrenceData"] = recurrenceRule;
+                //calEvent["Recurrence"] = 1;
+                //calendarEvent["UID"] = System.Guid.NewGuid();
+                calendarEvent["EventType"] = 1;
+
+                WBLogging.WorkBoxes.Unexpected("The reference date is: " + ReferenceDate);
+
+                calendarEvent["EventDate"] = ReferenceDate;
+                if (Item.WBxColumnHasValue("EndDate"))
+                {
+                    calendarEvent["EndDate"] = Item["EndDate"];
+                }
+                else
+                {
+                    calendarEvent["EndDate"] = ReferenceDate.AddHours(1);                
+                }
+                //calendarEvent["Workspace"] = Url;
+                //calendarEvent["WorkspaceLink"] = 1;
+
+                //SPMeeting meetingInfo = SPMeeting.GetMeetingInformation(Web);                              
+                //string meetingURL = meetingInfo.LinkWithEvent(web, calendar.ID.ToString(), calendarEvent.ID, "WorkspaceLink", "Workspace");
+                //WBLogging.WorkBoxes.Unexpected("The meeting URL: " + meetingURL);
+
+                calendarEvent.WBxSetColumnAsString(WBColumn.WorkBoxURL, Url);
+
+                calendarEvent.Update();
+            }
+
+            WBLogging.WorkBoxes.Unexpected("Leaving UpdateLinkedCalendars()");
+
         }
 
 
@@ -1560,7 +1419,7 @@ namespace WorkBoxFramework
             Web.AllowUnsafeUpdates = true;
             if (IsOpen) ApplyPermissionsForOpenStatus();
             else ApplyPermissionsForClosedStatus();
-            _updateMustRedoPermissions = false;
+            _updateMustRedoPermissions = false;            
         }
 
         // This method actually creates the sub-site for the work box
@@ -2629,7 +2488,7 @@ namespace WorkBoxFramework
                 }
                 else
                 {
-                    WBUtils.shouldThrowError("Couldn't find a current users!");
+                    WBUtils.shouldThrowError("Couldn't find a current user");
 
                 }
 

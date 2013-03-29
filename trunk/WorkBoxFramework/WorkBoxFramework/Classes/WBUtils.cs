@@ -699,6 +699,70 @@ namespace WorkBoxFramework
         #endregion
 
 
+        public static bool CutOrCopyIntoFolder(SPWeb web, SPFolder folder, SPListItem item, bool cutOriginal)
+        {
+            bool success = true;
+
+            try
+            {
+                if (item.Folder == null)
+                {
+                    String filename = item.Name;
+
+                    // I'm fairly certain that this wont introduce a new 'SPWeb' object that isn't (in theory)
+                    // being handled somewhere in the calling code for this method.
+                    filename = web.WBxMakeFilenameUnique(folder, filename);
+
+                    SPFile copiedFile = null;
+
+                    using (Stream stream = item.File.OpenBinaryStream())
+                    {
+                        copiedFile = folder.Files.Add(filename, stream);
+                        stream.Close();
+                    }
+                }
+                else
+                {
+                    String folderName = item.Name;
+
+                    folderName = folder.WBxMakeSubFolderNameUnique(folderName);
+
+                    SPFolder subFolder = folder.SubFolders.Add(folderName);
+
+                    foreach (SPFile file in item.Folder.Files)
+                    {
+                        CutOrCopyIntoFolder(web, subFolder, file.Item, cutOriginal);
+                    }
+
+                    foreach (SPFolder child in item.Folder.SubFolders)
+                    {
+                        CutOrCopyIntoFolder(web, subFolder, child.Item, cutOriginal);
+                    }
+                }
+
+                if (cutOriginal)
+                {
+                    try
+                    {
+                        item.Recycle();
+                    }
+                    catch (Exception exception)
+                    {
+                        WBLogging.Generic.Unexpected("Was not able to recycle an item that should be cut from " + folder.ServerRelativeUrl + " with ID " + item.ID + " and name: " + item.Name, exception);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                WBLogging.Generic.Unexpected(e);
+                success = false;
+            }
+
+            return success;
+        }
+
+
+
         internal static void RecursivelyDeleteSPWeb(SPWeb web)
         {
             if (web.Exists)

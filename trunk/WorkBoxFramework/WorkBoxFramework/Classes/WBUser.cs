@@ -341,7 +341,7 @@ namespace WorkBoxFramework
                         SPListItem item = documents.GetItemById(id);
 
                         bool cutOriginal = (clipboardAction == WBUser.CLIPBOARD_ACTION__CUT);
-                        folder.WBxCutOrCopyIntoFolder(workBox.Web, item, cutOriginal);
+                        WBUtils.CutOrCopyIntoFolder(workBox.Web, folder, item, cutOriginal);
                     }
 
                     clipboardWorkBox.Web.AllowUnsafeUpdates = false;
