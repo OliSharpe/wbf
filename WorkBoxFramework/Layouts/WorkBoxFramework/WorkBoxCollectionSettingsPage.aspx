@@ -61,8 +61,8 @@
 <!-- Name Of All Work Boxes List Section -->
 <wssuc:InputFormSection
 	id="NameOfAllWorkBoxesListSection"
-	title="Name of the 'All Work Boxes' list"
-	Description="Enter the name of the list that contains the definitive list of all the work boxes of this type."
+	title="Name of the 'Work Boxes in Collection' list" 
+	Description="Enter the name of the list that contains the definitive list of all the work boxes in the collection."
 	runat="server"
 	>
 	<Template_InputFormControls>

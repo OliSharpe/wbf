@@ -146,6 +146,51 @@ Edit the name of the term store and group in which the WBF term sets are held if
 
 
 <tr>
+<td class="wbf-metadata-title-panel">
+<div class="wbf-metadata-title">Work Box Content Types</div>
+<div>
+<p>
+Edit the names for the key document content types used in work boxes and in the central records library.
+</p>
+</div>
+</td>
+<td class="wbf-metadata-value-panel">
+
+				<table border="0" width="100%" cellspacing="0" cellpadding="2">
+					<tr>
+                        <td>
+                            <b><nobr>Document Content Type Name</nobr></b><br />
+                        </td>
+						<td class="ms-authoringcontrols" valign="top" align="left">
+                            <asp:TextBox ID="DocumentContentTypeName" runat="server" columns="50"/>
+                            <div>
+                                <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ErrorMessage="The WBF requires a document content type name to function."
+            ControlToValidate = "DocumentContentTypeName"></asp:RequiredFieldValidator>
+                            </div>
+                        </td>
+                    </tr>
+					<tr>
+                        <td>
+                            <b><nobr>Record Content Type Name</nobr></b><br />
+                        </td>
+						<td class="ms-authoringcontrols" valign="top" align="left">
+                            <asp:TextBox ID="RecordContentTypeName" runat="server" columns="50"/>
+                            <div>
+                                <asp:RequiredFieldValidator ID="RequiredFieldValidator4" runat="server" ErrorMessage="The WBF requires a record content type name to function."
+            ControlToValidate = "RecordContentTypeName"></asp:RequiredFieldValidator>
+                            </div>
+                        </td>
+                    </tr>
+
+				</table>
+
+</td>
+</tr>
+
+
+
+
+<tr>
 <td colspan="2" align="center" valign="top">
     <asp:Button ID="DoInitialSetup" runat="server" Text="Do Initial Setup"  OnClick="DoInitialSetup_OnClick"/>
 &nbsp;

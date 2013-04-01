@@ -222,24 +222,25 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             FilingRuleLevel4.DataBind();
             FilingRuleLevel4.WBxSafeSetSelectedValue(recordsType.FilingRuleLevel4);
 
-
             WBFarm farm = WBFarm.Local;
 
-            using (SPSite recordsSite = new SPSite(farm.ProtectedRecordsLibraryUrl))
-            using (SPWeb recordsWeb = recordsSite.OpenWeb())
+            if (!String.IsNullOrEmpty(farm.ProtectedRecordsLibraryUrl))
             {
-                string link = farm.ProtectedRecordsLibraryUrl + "/_layouts/expirationconfig.aspx?RootFolder=";
+                using (SPSite recordsSite = new SPSite(farm.ProtectedRecordsLibraryUrl))
+                using (SPWeb recordsWeb = recordsSite.OpenWeb())
+                {
+                    string link = farm.ProtectedRecordsLibraryUrl + "/_layouts/expirationconfig.aspx?RootFolder=";
 
-                SPList library = recordsWeb.GetList(farm.ProtectedRecordsLibraryUrl);
+                    SPList library = recordsWeb.GetList(farm.ProtectedRecordsLibraryUrl);
 
 
-                string rootFolder = library.RootFolder.ServerRelativeUrl + recordsType.FullPath;
-                link += Uri.EscapeDataString(rootFolder);
-                link += "&List=" + library.ID.WBxToString();
+                    string rootFolder = library.RootFolder.ServerRelativeUrl + recordsType.FullPath;
+                    link += Uri.EscapeDataString(rootFolder);
+                    link += "&List=" + library.ID.WBxToString();
 
-                LinkToRecordsCenterConfig.Text = "<a href=\"" + link + "\">Configure document retention</a>";                
+                    LinkToRecordsCenterConfig.Text = "<a href=\"" + link + "\">Configure document retention</a>";
+                }
             }
-
         }
 
         private void resetPanelToSelectedTermValues()

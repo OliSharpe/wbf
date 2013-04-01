@@ -39,6 +39,10 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                 TermStoreName.Text = farm.TermStoreName;
                 TermStoreGroupName.Text = farm.TermStoreGroupName;
+
+                DocumentContentTypeName.Text = farm.WorkBoxDocumentContentTypeName;
+                RecordContentTypeName.Text = farm.WorkBoxRecordContentTypeName;
+
             }
         }
 
@@ -52,6 +56,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             farm.TermStoreName = TermStoreName.Text;
             farm.TermStoreGroupName = TermStoreGroupName.Text;
+
+            farm.WorkBoxDocumentContentTypeName = DocumentContentTypeName.Text;
+            farm.WorkBoxRecordContentTypeName = RecordContentTypeName.Text;
 
             farm.Update();
 

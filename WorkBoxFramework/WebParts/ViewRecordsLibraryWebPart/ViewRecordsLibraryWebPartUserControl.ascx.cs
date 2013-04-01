@@ -456,7 +456,7 @@ namespace WorkBoxFramework.ViewRecordsLibraryWebPart
                                 }
                             }
 
-                            query.AddClause(new WBQueryClause(WBColumn.ContentType, WBQueryClause.Comparators.Equals, WorkBox.WORK_BOX_RECORD_CONTENT_TYPE));
+                            query.AddClause(new WBQueryClause(WBColumn.ContentType, WBQueryClause.Comparators.Equals, WorkBox.WORK_BOX_RECORD_CONTENT_TYPE_NAME));
 
 
                             if (subjectTag != null)
