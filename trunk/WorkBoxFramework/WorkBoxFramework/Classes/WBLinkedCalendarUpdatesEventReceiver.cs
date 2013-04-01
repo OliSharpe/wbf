@@ -102,6 +102,7 @@ namespace WorkBoxFramework
 
                 WorkBox workBox = collection.RequestNewEventWorkBox(
                     properties.List.DefaultViewUrl,
+                    properties.List.ID,
                     properties.ListItemId,
                     title,
                     description,

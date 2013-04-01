@@ -7,7 +7,7 @@
             Sequence="4000"
             Title="Team Management"
             RequireSiteAdministrator="TRUE">
-    <UrlAction Url="http://sp.izzi/teams/admin/_layouts/WorkBoxFramework/TeamManagement.aspx"/>
+    <UrlAction Url="_layouts/WorkBoxFramework/GoToTeamManagement.aspx"/>
   </CustomAction>
 
   <CustomAction Id="RecordsTypeManagementLink"

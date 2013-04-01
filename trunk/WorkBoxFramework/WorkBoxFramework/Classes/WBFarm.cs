@@ -69,7 +69,8 @@ namespace WorkBoxFramework
         private const string FARM_PROPERTY__TERM_STORE_NAME = "wbf__farm__term_store_name";
         private const string FARM_PROPERTY__TERM_STORE_GROUP_NAME = "wbf__farm__term_store_group_name";
 
-
+        private const string FARM_PROPERTY__WORK_BOX_DOCUMENT_CONTENT_TYPE_NAME = "wbf__farm__work_box_document_content_type_name";
+        private const string FARM_PROPERTY__WORK_BOX_RECORD_CONTENT_TYPE_NAME = "wbf__farm__work_box_record_content_type_name";
 
         private const string FARM_PROPERTY__INVITE_INVOLVED_DEFAULT_EMAIL_SUBJECT = "wbf__farm__invite_involved_default_email_subject";
         private const string FARM_PROPERTY__INVITE_INVOLVED_DEFAULT_EMAIL_BODY = "wbf__farm__invite_involved_default_email_body";
@@ -264,6 +265,17 @@ namespace WorkBoxFramework
             set { _farm.WBxSetProperty(FARM_PROPERTY__TERM_STORE_GROUP_NAME, value); }
         }
 
+        public String WorkBoxDocumentContentTypeName
+        {
+            get { return _farm.WBxGetPropertyOrDefault(FARM_PROPERTY__WORK_BOX_DOCUMENT_CONTENT_TYPE_NAME, WorkBox.WORK_BOX_DOCUMENT_CONTENT_TYPE_NAME); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__WORK_BOX_DOCUMENT_CONTENT_TYPE_NAME, value); }
+        }
+
+        public String WorkBoxRecordContentTypeName
+        {
+            get { return _farm.WBxGetPropertyOrDefault(FARM_PROPERTY__WORK_BOX_RECORD_CONTENT_TYPE_NAME, WorkBox.WORK_BOX_RECORD_CONTENT_TYPE_NAME); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__WORK_BOX_RECORD_CONTENT_TYPE_NAME, value); }
+        }
 
         public String InviteInvolvedDefaultEmailSubject
         {
@@ -446,7 +458,6 @@ namespace WorkBoxFramework
 
                 CreateOrCheckTimerTasksLists(rootTeamSiteWeb, adminWeb);
 
-
                 this.TeamSitesSiteCollectionUrl = adminSite.Url;
                 this.TimerJobsManagementSiteUrl = adminTeamSiteURL;
                 this.OpenWorkBoxesCachedDetailsListUrl = adminSite.Url + "/Lists/CachedWorkBoxDetails";
@@ -491,10 +502,50 @@ namespace WorkBoxFramework
 
             TaxonomySession session = new TaxonomySession(site);
             WBFarm farm = WBFarm.Local;
-            TermStore termStore = session.TermStores[farm.TermStoreName];
-            Group group = termStore.Groups[farm.TermStoreGroupName];
+            TermStore termStore = null;
+
+            try
+            {
+                termStore = session.TermStores[farm.TermStoreName];
+            }
+            catch (Exception exception)
+            {
+                WBLogging.Generic.Unexpected("Couldn't find the term store with name: " + farm.TermStoreName, exception);
+                return;
+            }
+            WBLogging.Generic.Unexpected("Found term store: " + termStore.Name);
+
+            Group group = null;
+
+            try
+            {
+                group = termStore.Groups[farm.TermStoreGroupName];
+            }
+            catch (Exception exception)
+            {
+                WBLogging.Generic.Unexpected("Couldn't find the term store group with name: " + farm.TermStoreGroupName, exception);
+            }
 
             bool needsCommitting = false;
+
+            if (group == null)
+            {
+                WBLogging.Generic.Unexpected("Trying to create term store group with name: " + farm.TermStoreGroupName);
+
+                try
+                {
+                    group = termStore.CreateGroup(farm.TermStoreGroupName);
+                    needsCommitting = true;
+                }
+                catch (Exception exception)
+                {
+                    WBLogging.Generic.Unexpected("Couldn't create a term store group with name: " + farm.TermStoreGroupName, exception);
+                    return;
+                }
+            }
+
+            WBLogging.Generic.Unexpected("Created the term store group with name: " + farm.TermStoreGroupName);
+
 
             TermSet recordsTypes = null;
             try
@@ -863,7 +914,7 @@ namespace WorkBoxFramework
                 WBColumn.LiveOrArchived
             };
 
-            CreateOrCheckContentType(web, WorkBox.WORK_BOX_DOCUMENT_CONTENT_TYPE, "Document", requiredFields, optionalFields);
+            CreateOrCheckContentType(web, WBFarm.Local.WorkBoxDocumentContentTypeName, "Document", requiredFields, optionalFields);
         }
 
         private void CreateOrCheckWorkBoxRecordContentType(SPWeb web)
@@ -879,7 +930,7 @@ namespace WorkBoxFramework
             };
 
 
-            SPContentType recordContentType = CreateOrCheckContentType(web, WorkBox.WORK_BOX_RECORD_CONTENT_TYPE, WorkBox.WORK_BOX_DOCUMENT_CONTENT_TYPE, requiredFields, optionalFields);
+            SPContentType recordContentType = CreateOrCheckContentType(web, WBFarm.Local.WorkBoxRecordContentTypeName, WBFarm.Local.WorkBoxDocumentContentTypeName, requiredFields, optionalFields);
 
             // Really need to make some of the optional fields required:
 

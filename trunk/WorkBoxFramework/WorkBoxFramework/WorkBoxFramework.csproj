@@ -120,6 +120,13 @@
       <DependentUpon>ConfigureLinkedCalendar.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\WBLinkedCalendarUpdatesEventReceiver.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx.cs">
+      <DependentUpon>GoToTeamManagement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx.designer.cs">
+      <DependentUpon>GoToTeamManagement.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
@@ -874,6 +881,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\ConfigureLinkedCalendar.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx">

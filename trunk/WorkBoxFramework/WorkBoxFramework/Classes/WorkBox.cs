@@ -178,8 +178,10 @@ namespace WorkBoxFramework
         public const string RELATION_TYPE__MANUAL_LINK = "Manual Link";
 
 
-        public const string WORK_BOX_DOCUMENT_CONTENT_TYPE = "Islington Document";
-        public const string WORK_BOX_RECORD_CONTENT_TYPE = "Islington Record";
+//        public const string WORK_BOX_DOCUMENT_CONTENT_TYPE_NAME = "Islington Document";
+  //      public const string WORK_BOX_RECORD_CONTENT_TYPE_NAME = "Islington Record";
+        public const string WORK_BOX_DOCUMENT_CONTENT_TYPE_NAME = "Work Box Document";
+        public const string WORK_BOX_RECORD_CONTENT_TYPE_NAME = "Work Box Record";
 
 
         #endregion
@@ -2559,7 +2561,7 @@ namespace WorkBoxFramework
             if (true) // RecordsType.UseDefaultsWhenPublishingOut)
             {
                 // First we'll double check that this item is the correct content type:
-                SPContentType workBoxDocumentType = sourceDocAsItem.ParentList.ContentTypes[WORK_BOX_DOCUMENT_CONTENT_TYPE];
+                SPContentType workBoxDocumentType = sourceDocAsItem.ParentList.ContentTypes[WORK_BOX_DOCUMENT_CONTENT_TYPE_NAME];
                 sourceDocAsItem["ContentTypeId"] = workBoxDocumentType.Id;
                 sourceDocAsItem.Update();
 

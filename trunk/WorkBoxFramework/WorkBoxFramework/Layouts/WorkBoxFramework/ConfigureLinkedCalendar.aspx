@@ -21,7 +21,7 @@ border-top:solid 1px grey;
 
 <h2>Configure Linked Calendar</h2>
 
-<asp:Hidden ID="CalendarListGUID" runat="server"></asp:Hidden>
+<asp:HiddenField ID="CalendarListGUID" runat="server" />
 <asp:Label ID="ErrorMessage" runat="server"></asp:Label>
 
 
