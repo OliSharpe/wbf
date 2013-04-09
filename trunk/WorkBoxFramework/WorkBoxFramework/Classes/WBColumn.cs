@@ -50,7 +50,7 @@ namespace WorkBoxFramework
             MultiLineText,
             User,
             Integer,
-            Count,
+            Counter,
             DateTime,
             ManagedMetadata,
             Lookup,
@@ -221,21 +221,21 @@ namespace WorkBoxFramework
             return integerColumn;
         }
 
-        public static WBColumn CountColumn(String displayName, bool internalNameHasSpaceCharacters)
+        public static WBColumn CounterColumn(String displayName, bool internalNameHasSpaceCharacters)
         {
-            return new WBColumn(displayName, internalNameHasSpaceCharacters, DataTypes.Count);
+            return new WBColumn(displayName, internalNameHasSpaceCharacters, DataTypes.Counter);
         }
 
-        public static WBColumn CountColumn(String displayName)
+        public static WBColumn CounterColumn(String displayName)
         {
-            return new WBColumn(displayName, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, DataTypes.Count);
+            return new WBColumn(displayName, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, DataTypes.Counter);
         }
 
-        public static WBColumn CountColumn(String displayName, String prettyName)
+        public static WBColumn CounterColumn(String displayName, String prettyName)
         {
-            WBColumn integerColumn = new WBColumn(displayName, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, DataTypes.Count);
-            integerColumn.PrettyName = prettyName;
-            return integerColumn;
+            WBColumn counterColumn = new WBColumn(displayName, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, DataTypes.Counter);
+            counterColumn.PrettyName = prettyName;
+            return counterColumn;
         }
 
 
@@ -408,6 +408,13 @@ namespace WorkBoxFramework
             }        
         }
 
+
+        public bool CreateOrCheck(SPSite site, SPWeb web)
+        {
+            return CreateOrCheck(site, web, WorkBox.SITE_COLUMNS_GROUP_NAME);
+        }
+
+        
         /// <summary>
         /// The idea is that this method will allow the simple ability to either create this column as a field on the given
         /// SPWeb if it does not already exist, or to check that the existing field conforms to the definition of the column.
@@ -420,7 +427,7 @@ namespace WorkBoxFramework
         /// <param name="site"></param>
         /// <param name="web"></param>
         /// <returns></returns>
-        public bool CreateOrCheck(SPSite site, SPWeb web)
+        public bool CreateOrCheck(SPSite site, SPWeb web, String SiteColumnsGroupName)
         {
             if (String.IsNullOrEmpty(InternalName)) throw new NotImplementedException("Cannot create a column that doesn't have an internal name set!");
             if (String.IsNullOrEmpty(DisplayName)) throw new NotImplementedException("Cannot create a column that doesn't have a display name set!");
@@ -439,7 +446,7 @@ namespace WorkBoxFramework
                 case DataTypes.Text:
                     {
                         SPFieldText textField = web.Fields.CreateNewField(SPFieldType.Text.ToString(), DisplayName) as SPFieldText;
-                        textField.Group = "Work Box Framework";
+                        textField.Group = SiteColumnsGroupName;
                         textField.StaticName = InternalName;
                         textField.Title = DisplayName;
 
@@ -464,7 +471,7 @@ namespace WorkBoxFramework
                         break;
                     }
 
-                case DataTypes.Count:
+                case DataTypes.Counter:
                     {
                         SPFieldNumber numberField = web.Fields.CreateNewField(SPFieldType.Number.ToString(), DisplayName) as SPFieldNumber;
                         numberField.Title = DisplayName;
@@ -630,8 +637,10 @@ namespace WorkBoxFramework
 
         public static readonly WBColumn Name = new WBColumn("Name", "BaseName", DataTypes.Text);
         public static readonly WBColumn Title = WBColumn.TextColumn("Title");
+        public static readonly WBColumn LinkTitle = WBColumn.TextColumn("LinkTitle");
         public static readonly WBColumn Modified = WBColumn.DateTimeColumn("Modified");
         public static readonly WBColumn ContentType = WBColumn.TextColumn("Content Type");
+        public static readonly WBColumn ID = WBColumn.CounterColumn("ID");
 
         public static readonly WBColumn ServerURL = WBColumn.TextColumn("ServerUrl", "Server URL");
         public static readonly WBColumn EncodedAbsoluteURL = WBColumn.TextColumn("EncodedAbsUrl", "Absolute URL");
@@ -699,7 +708,7 @@ namespace WorkBoxFramework
         public static readonly WBColumn OriginalFilename = WBColumn.TextColumn(WorkBox.COLUMN_NAME__ORIGINAL_FILENAME);
         public static readonly WBColumn SourceSystem = WBColumn.TextColumn("Source System");
         public static readonly WBColumn SourceID = WBColumn.TextColumn("Source ID");
-        public static readonly WBColumn RecordID = WBColumn.CountColumn("Record ID");
+        public static readonly WBColumn RecordID = WBColumn.CounterColumn("Record ID");
 
 
         public static readonly WBColumn WorkBoxTemplateTitle = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE_TITLE);
@@ -818,7 +827,7 @@ namespace WorkBoxFramework
             {
                 case DataTypes.Text: return "Text";
                 case DataTypes.MultiLineText: return "MultiLineText";
-                case DataTypes.Count: return "Count";
+                case DataTypes.Counter: return "Count";
                 case DataTypes.Integer: return "Integer";
                 case DataTypes.DateTime: return "DateTime";
                 case DataTypes.ManagedMetadata: return "ManagedMetadata";

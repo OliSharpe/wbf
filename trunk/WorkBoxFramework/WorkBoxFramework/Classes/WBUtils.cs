@@ -1168,5 +1168,162 @@ namespace WorkBoxFramework
             return "<a href='mailto:" + String.Join(";", emails.ToArray()) + headersString + "'" + cssString + ">" + text + "</a>";
         }
 
+
+        public static SPList CreateOrCheckListUsingContentType(SPWeb rootWeb, SPWeb web, String listName, String itemContentTypeName)
+        {
+            WBLogging.Generic.Monitorable("Starting CreateOrCheckCustomList with custom content type for: " + listName);
+
+            SPList list = web.Lists.TryGetList(listName);
+            if (list != null)
+            {
+                WBLogging.Generic.Monitorable("Found existig list - not updating yet so: Finished CreateOrCheckCustomList for: " + listName);
+
+                return list;
+            }
+
+            WBLogging.Generic.Monitorable("Here: " + listName);
+
+            SPContentType itemContentType = rootWeb.ContentTypes.Cast<SPContentType>()
+                .FirstOrDefault(c => c.Name == itemContentTypeName);
+
+            WBLogging.Generic.Monitorable("Here now: " + listName);
+
+            if (itemContentType == null)
+            {
+                throw new NotImplementedException("Not yet handling the situation where the list item content type for a new list has not yet been created as a site content type: " + itemContentTypeName);
+            }
+
+            WBLogging.Generic.Monitorable("Next: " + listName);
+
+            Guid newListGuid = web.Lists.Add(listName, "", SPListTemplateType.GenericList);
+
+            WBLogging.Generic.Monitorable("One more: " + listName);
+
+            list = web.Lists[newListGuid];
+
+            list.ContentTypesEnabled = true;
+
+            list.ContentTypes.Add(itemContentType);
+            list.Update();
+
+
+            List<SPContentType> contentTypesToRemove = new List<SPContentType>();
+            foreach (SPContentType contentType in list.ContentTypes)
+            {
+                WBLogging.Generic.Monitorable("List has content type: " + contentType.Name);
+                if (contentType.Name != itemContentType.Name)
+                {
+                    WBLogging.Generic.Monitorable("Added to list to remove content type: " + contentType.Name);
+                    contentTypesToRemove.Add(contentType);
+                }
+
+            }
+
+            foreach (SPContentType contentType in contentTypesToRemove)
+            {
+                WBLogging.Generic.Monitorable("Trying to remove content type: " + contentType.Name);
+                list.ContentTypes.Delete(contentType.Id);
+            }
+
+            list.Update();
+
+            WBLogging.Generic.Monitorable("Finished CreateOrCheckCustomList for: " + listName);
+
+            return list;
+        }
+
+        public static SPList CreateOrCheckCustomList(SPWeb rootWeb, SPWeb web, String listName, IEnumerable<WBColumn> columns)
+        {
+            WBLogging.Generic.Monitorable("Starting CreateOrCheckCustomList with custom columns for: " + listName);
+
+            SPList list = web.Lists.TryGetList(listName);
+
+            bool listNeedsUpdating = false;
+            if (list == null)
+            {
+                Guid listGuid = web.Lists.Add(listName, "A WBF configuration list", SPListTemplateType.GenericList);
+
+                list = web.Lists[listGuid];
+                listNeedsUpdating = true;
+            }
+
+
+            foreach (WBColumn column in columns)
+            {
+                if (!list.Fields.ContainsField(column.DisplayName))
+                {
+                    SPField field = rootWeb.Fields[column.DisplayName];
+
+                    list.Fields.Add(field);
+                    listNeedsUpdating = true;
+                }
+            }
+
+            if (listNeedsUpdating)
+            {
+                list.Update();
+                web.Update();
+            }
+
+            WBLogging.Generic.Monitorable("Finished CreateOrCheckCustomList for: " + listName);
+
+            return list;
+        }
+
+
+
+        public static SPContentType CreateOrCheckContentType(
+            SPWeb web,
+            String contentTypeName,
+            String parentContentTypeName,
+            String groupName,
+            IEnumerable<WBColumn> requiredFields,
+            IEnumerable<WBColumn> optionalFields)
+        {
+
+            // We're only going to create this content type if it doesn't already exist:
+            SPContentType existingContentType = web.ContentTypes.Cast<SPContentType>()
+                .FirstOrDefault(c => c.Name == contentTypeName);
+
+            if (existingContentType != null)
+            {
+                WBLogging.Generic.Monitorable("The content type " + contentTypeName + " already exists - so not trying to re-create it.");
+                WBLogging.Generic.Unexpected("Not yet checking existing content types have the right columns!!");
+                return existingContentType;
+            }
+
+            // OK so now we can create the content type:
+            WBLogging.Generic.Monitorable("Creating content type: " + contentTypeName);
+
+            SPContentType newContentType = new SPContentType(
+                web.ContentTypes[parentContentTypeName],
+                web.ContentTypes,
+                contentTypeName);
+
+            newContentType.Group = groupName;
+
+            foreach (WBColumn column in requiredFields)
+            {
+                SPFieldLink fieldLink = new SPFieldLink(web.Fields[column.DisplayName]);
+                newContentType.FieldLinks.Add(fieldLink);
+                fieldLink.Required = true;
+            }
+
+            foreach (WBColumn column in optionalFields)
+            {
+                SPFieldLink fieldLink = new SPFieldLink(web.Fields[column.DisplayName]);
+                newContentType.FieldLinks.Add(fieldLink);
+                fieldLink.Required = false;
+            }
+
+            // And finally add this content type to the web (should be a root web):
+            web.ContentTypes.Add(newContentType);
+            newContentType.Update();
+
+            return newContentType;
+        }
+
+
+
     }
 }

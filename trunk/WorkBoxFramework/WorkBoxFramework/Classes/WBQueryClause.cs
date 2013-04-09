@@ -39,7 +39,9 @@ namespace WorkBoxFramework
             LessThan,
             LessThanEquals,
             GreaterThan,
-            GreaterThanEquals
+            GreaterThanEquals,
+            IsNull,
+            IsNotNull
         }
 
         public enum Modifiers
@@ -62,6 +64,8 @@ namespace WorkBoxFramework
                 case Comparators.LessThanEquals: { break; }
                 case Comparators.GreaterThan: { break; }
                 case Comparators.GreaterThanEquals: { break; }
+                case Comparators.IsNull: { break; }
+                case Comparators.IsNotNull: { break; }
                 default: throw new NotImplementedException("The selected comparator has not been implemented yet.");
             }
 
@@ -77,8 +81,26 @@ namespace WorkBoxFramework
         public bool UseDescendants { get; set; }
 
 
+        private bool _renderForView = false;
+        public bool RenderForView
+        {
+            get;
+            set; 
+        }
+
         public StringBuilder AppendCAMLClauseTo(StringBuilder builder, SPSite site)
-        {            
+        {
+            if (RenderForView)
+            {
+                if (Column.DataType == WBColumn.DataTypes.ManagedMetadata)
+                {
+                    return AppendCAMLClause(builder, Column.InternalName, "Text", ((WBTerm)Value).Name);
+                }
+                else
+                {
+                    return AppendCAMLClause(builder, Column.InternalName, "Text", Value.WBxToString());
+                }
+            }
 
             switch (Column.DataType)
             {
@@ -94,13 +116,13 @@ namespace WorkBoxFramework
                     {
                         return AppendCAMLClause(builder, Column.InternalName, "Integer", Value.ToString());
                     }
-                case WBColumn.DataTypes.Count:
+                case WBColumn.DataTypes.Counter:
                     {
-                        return AppendCAMLClause(builder, Column.InternalName, "Count", Value.ToString());
+                        return AppendCAMLClause(builder, Column.InternalName, "Counter", Value.ToString());
                     }
                 case WBColumn.DataTypes.Choice:
                     {
-                        return AppendCAMLClause(builder, Column.InternalName, "Text", (String)Value);
+                        return AppendCAMLClause(builder, Column.InternalName, "Choice", (String)Value);
                     }
                 case WBColumn.DataTypes.DateTime:
                     {
@@ -124,7 +146,9 @@ namespace WorkBoxFramework
                 case Comparators.LessThan: { builder.Append("<Lt>"); break; } 
                 case Comparators.LessThanEquals: { builder.Append("<Leq>"); break; } 
                 case Comparators.GreaterThan: { builder.Append("<Gt>"); break; }
-                case Comparators.GreaterThanEquals: { builder.Append("<Geq>"); break; } 
+                case Comparators.GreaterThanEquals: { builder.Append("<Geq>"); break; }
+                case Comparators.IsNull: { builder.Append("<IsNull>"); break; }
+                case Comparators.IsNotNull: { builder.Append("<IsNotNull>"); break; }
                 default: throw new NotImplementedException("The selected comparator has not been implemented yet.");
             }
         }
@@ -138,7 +162,9 @@ namespace WorkBoxFramework
                 case Comparators.LessThan: { builder.Append("</Lt>"); break; } 
                 case Comparators.LessThanEquals: { builder.Append("</Leq>"); break; } 
                 case Comparators.GreaterThan: { builder.Append("</Gt>"); break; }
-                case Comparators.GreaterThanEquals: { builder.Append("</Geq>"); break; } 
+                case Comparators.GreaterThanEquals: { builder.Append("</Geq>"); break; }
+                case Comparators.IsNull: { builder.Append("</IsNull>"); break; }
+                case Comparators.IsNotNull: { builder.Append("</IsNotNull>"); break; }
                 default: throw new NotImplementedException("The selected comparator has not been implemented yet.");
             }
         }
@@ -153,6 +179,7 @@ namespace WorkBoxFramework
         {
 
             if (term == null) return builder;
+            if (Comparator != Comparators.Equals) return builder;
 
             WBLogging.Queries.Verbose("Looking for term: " + term.Name + " in site: " + site.HostName + site.ServerRelativeUrl + " for field: " + fieldName);
 
@@ -197,7 +224,10 @@ namespace WorkBoxFramework
         {
             AppendComparatorStartTag(builder);
             builder.Append("<FieldRef Name='").Append(fieldName).Append("'/>\n");
-            builder.Append("<Value Type='").Append(valueType).Append("'>").Append(value).Append("</Value>");
+            if (Comparator != Comparators.IsNull && Comparator != Comparators.IsNotNull)
+            {
+                builder.Append("<Value Type='").Append(valueType).Append("'>").Append(value).Append("</Value>");
+            }
             AppendComparatorEndTag(builder);
 
             return builder;

@@ -25,8 +25,8 @@ namespace WorkBoxFramework.Features.TeamSiteCalendarUpdates
         public override void FeatureActivated(SPFeatureReceiverProperties properties)
         {
 
-            RemoveEventReceivers(properties);
-            AddEventReceivers(properties);
+            //RemoveEventReceivers(properties);
+            //AddEventReceivers(properties);
 
         }
 
