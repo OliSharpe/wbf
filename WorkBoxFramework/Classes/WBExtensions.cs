@@ -524,7 +524,7 @@ namespace WorkBoxFramework
                     {
                         return item[column.DisplayName];
                     }
-                case WBColumn.DataTypes.Count:
+                case WBColumn.DataTypes.Counter:
                     {
                         return item[column.DisplayName];
                     }
@@ -667,7 +667,7 @@ namespace WorkBoxFramework
                         item[column.DisplayName] = value;
                         break;
                     }
-                case WBColumn.DataTypes.Count:
+                case WBColumn.DataTypes.Counter:
                     {
                         item[column.DisplayName] = value;
                         break;
@@ -1011,7 +1011,36 @@ namespace WorkBoxFramework
         {
             return (list.BaseType == SPBaseType.DocumentLibrary);
         }
-      
+
+        public static SPView WBxCreateViewIfMissing(this SPList list, SPSite site, String viewName, WBQuery query)
+        {
+            return list.WBxCreateViewIfMissing(site, viewName, query, 50, true, false);
+        }
+
+        public static SPView WBxCreateViewIfMissing(this SPList list, SPSite site, String viewName, WBQuery query, uint itemsPerPage, bool paginate, bool setAsDefault)
+        {
+            SPView view = null;
+
+            try
+            {
+                view = list.Views[viewName];
+            }
+            catch (Exception exception)
+            {
+            }
+
+            if (view == null)
+            {
+                return list.Views.Add(viewName, query.JustViewFields(), query.JustCAMLQuery(site), itemsPerPage, paginate, setAsDefault);
+            }
+            else
+            {
+                return view;
+            }
+
+        }
+        
+        
 
         #endregion
 
@@ -1723,7 +1752,6 @@ namespace WorkBoxFramework
                 return false;
             }
         }
-
 
         #endregion
 

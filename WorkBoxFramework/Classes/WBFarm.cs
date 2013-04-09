@@ -635,7 +635,7 @@ namespace WorkBoxFramework
                 WBColumn.VisitingTeams
             };
 
-            CreateOrCheckCustomList(rootWeb, rootWeb, "CachedWorkBoxDetails", columns);
+            WBUtils.CreateOrCheckCustomList(rootWeb, rootWeb, "CachedWorkBoxDetails", columns);
 
         }
 
@@ -649,7 +649,7 @@ namespace WorkBoxFramework
                 WBColumn.Argument1
             };
 
-            SPList dailyList = CreateOrCheckCustomList(rootweb, web, WBTimerTasksJob.DAILY_TIMER_TASKS__LIST_NAME, columns);
+            SPList dailyList = WBUtils.CreateOrCheckCustomList(rootweb, web, WBTimerTasksJob.DAILY_TIMER_TASKS__LIST_NAME, columns);
 
             SPViewCollection dailyViews = dailyList.Views;
 
@@ -667,7 +667,7 @@ namespace WorkBoxFramework
             dailyList.Update();
             web.Update();
 
-            SPList frequentList = CreateOrCheckCustomList(rootweb, web, WBTimerTasksJob.FREQUENT_TIMER_TASKS__LIST_NAME, columns);
+            SPList frequentList = WBUtils.CreateOrCheckCustomList(rootweb, web, WBTimerTasksJob.FREQUENT_TIMER_TASKS__LIST_NAME, columns);
 
             SPViewCollection frequentViews = frequentList.Views;
 
@@ -677,45 +677,6 @@ namespace WorkBoxFramework
 
         }
 
-
-
-        internal SPList CreateOrCheckCustomList(SPWeb rootWeb, SPWeb web, String listName, IEnumerable<WBColumn> columns)
-        {
-            WBLogging.Generic.Monitorable("Starting CreateOrCheckCustomList for: " + listName);
-
-            SPList list = web.Lists.TryGetList(listName);
-
-            bool listNeedsUpdating = false;
-            if (list == null)
-            {
-                Guid listGuid = web.Lists.Add(listName, "A WBF configuration list", SPListTemplateType.GenericList);
-
-                list = web.Lists[listGuid];
-                listNeedsUpdating = true;
-            }
-
-
-            foreach (WBColumn column in columns)
-            {
-                if (!list.Fields.ContainsField(column.DisplayName))
-                {
-                    SPField field = rootWeb.Fields[column.DisplayName];
-
-                    list.Fields.Add(field);
-                    listNeedsUpdating = true;
-                }
-            }
-
-            if (listNeedsUpdating)
-            {
-                list.Update();
-                web.Update();
-            }
-
-            WBLogging.Generic.Monitorable("Finished CreateOrCheckCustomList for: " + listName);
-
-            return list;
-        }
 
         internal void CreateOrCheckWBFSiteColumns(SPSite site, SPWeb rootWeb)
         {
@@ -856,7 +817,7 @@ namespace WorkBoxFramework
                 WBColumn.VisitingIndividuals
             };
 
-            CreateOrCheckContentType(web, "Work Box Metadata Item", "Item", requiredFields, optionalFields);
+            WBUtils.CreateOrCheckContentType(web, WorkBox.CONTENT_TYPE__WORK_BOX_METADATA_ITEM, "Item", WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, optionalFields);
         }
 
         private void CreateOrCheckWorkBoxTemplatesItemContentType(SPWeb web)
@@ -883,7 +844,7 @@ namespace WorkBoxFramework
                 WBColumn.WorkBoxTemplateName
             };
 
-            CreateOrCheckContentType(web, "Work Box Templates Item", "Item", requiredFields, optionalFields);
+            WBUtils.CreateOrCheckContentType(web, WorkBox.CONTENT_TYPE__WORK_BOX_TEMPLATES_ITEM, "Item", WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, optionalFields);
         }
 
         private void CreateOrCheckWorkBoxDocumentContentType(SPWeb web)
@@ -914,7 +875,7 @@ namespace WorkBoxFramework
                 WBColumn.LiveOrArchived
             };
 
-            CreateOrCheckContentType(web, WBFarm.Local.WorkBoxDocumentContentTypeName, "Document", requiredFields, optionalFields);
+            WBUtils.CreateOrCheckContentType(web, WBFarm.Local.WorkBoxDocumentContentTypeName, "Document", WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, optionalFields);
         }
 
         private void CreateOrCheckWorkBoxRecordContentType(SPWeb web)
@@ -930,62 +891,10 @@ namespace WorkBoxFramework
             };
 
 
-            SPContentType recordContentType = CreateOrCheckContentType(web, WBFarm.Local.WorkBoxRecordContentTypeName, WBFarm.Local.WorkBoxDocumentContentTypeName, requiredFields, optionalFields);
-
-            // Really need to make some of the optional fields required:
+            SPContentType recordContentType = WBUtils.CreateOrCheckContentType(web, WBFarm.Local.WorkBoxRecordContentTypeName, WBFarm.Local.WorkBoxDocumentContentTypeName, WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, optionalFields);
 
         }
 
-
-        private SPContentType CreateOrCheckContentType(
-            SPWeb web,
-            String contentTypeName,
-            String parentContentTypeName,
-            IEnumerable<WBColumn> requiredFields,
-            IEnumerable<WBColumn> optionalFields)
-        {
-
-            // We're only going to create this content type if it doesn't already exist:
-            SPContentType existingContentType = web.ContentTypes.Cast<SPContentType>()
-                .FirstOrDefault(c => c.Name == contentTypeName);
-
-            if (existingContentType != null)
-            {
-                WBLogging.Generic.Monitorable("The content type " + contentTypeName + " already exists - so not trying to re-create it.");
-                WBLogging.Generic.Unexpected("Not yet checking existing content types have the right columns!!");
-                return null;
-            } 
-
-            // OK so now we can create the content type:
-            WBLogging.Generic.Monitorable("Creating content type: " + contentTypeName);
-
-            SPContentType newContentType = new SPContentType(
-                web.ContentTypes[parentContentTypeName],                    
-                web.ContentTypes, 
-                contentTypeName);
-
-            newContentType.Group = "Work Box Framework";
-
-            foreach (WBColumn column in requiredFields)
-            {
-                SPFieldLink fieldLink = new SPFieldLink(web.Fields[column.DisplayName]);
-                newContentType.FieldLinks.Add(fieldLink);
-                fieldLink.Required = true;
-            }
-
-            foreach (WBColumn column in optionalFields)
-            {
-                SPFieldLink fieldLink = new SPFieldLink(web.Fields[column.DisplayName]);
-                newContentType.FieldLinks.Add(fieldLink);
-                fieldLink.Required = false;
-            }
-
-            // And finally add this content type to the web (should be a root web):
-            web.ContentTypes.Add(newContentType);
-            newContentType.Update();
-
-            return newContentType;
-        }
 
 
 

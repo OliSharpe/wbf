@@ -70,8 +70,6 @@ namespace WorkBoxFramework
             _termSetName = termSetName;
         }
 
-        #endregion
-
         public static WBTaxonomy GetTeams(SPSite site)
         {
             WBFarm farm = WBFarm.Local;
@@ -139,6 +137,45 @@ namespace WorkBoxFramework
                 WorkBox.TERM_SET_NAME__FUNCTIONAL_AREAS);
         }
 
+        public static WBTaxonomy Get(SPSite site, String termSetName)
+        {
+            WBFarm farm = WBFarm.Local;
+            WBTaxonomy taxonomy = new WBTaxonomy(site,
+                farm.TermStoreName,
+                farm.TermStoreGroupName,
+                termSetName);
+
+            return taxonomy;
+        }
+
+        public static WBTaxonomy GetOrCreate(SPSite site, String termSetName)
+        {
+            WBFarm farm = WBFarm.Local;
+            WBTaxonomy taxonomy = new WBTaxonomy(site,
+                farm.TermStoreName,
+                farm.TermStoreGroupName,
+                termSetName);
+
+            TermSet termSet = null;
+
+            try
+            {
+                termSet = taxonomy.Group.TermSets[termSetName];
+            }
+            catch (Exception exception)
+            {
+                WBLogging.Generic.Verbose("Couldn't find a termset of the name so creating one: " + termSetName);
+
+                termSet = taxonomy.Group.CreateTermSet(termSetName);
+                taxonomy.CommitAll();
+            }
+
+            taxonomy._termSet = termSet;
+
+            return taxonomy;
+        }
+
+        #endregion
 
         #region Properties
 
@@ -187,6 +224,41 @@ namespace WorkBoxFramework
                 return _termSet;
             }
         }
+
+        private bool _autocommit = true;
+        /// <summary>
+        /// This property is used in order that the creation of multiple terms within a term set can be grouped into 
+        /// one larger commit by first setting AutoCommit = false and then later testing if NeedsCommitting is true.
+        /// </summary>
+        public bool AutoCommit
+        {
+            get
+            {
+                return _autocommit;
+            }
+            set
+            {
+                _autocommit = value;
+            }
+        }
+
+        private bool _needsCommitting = false;
+        /// <summary>
+        /// This property is used in order that the creation of multiple terms within a term set can be grouped into 
+        /// one larger commit by first setting AutoCommit = false and then later testing if NeedsCommitting is true.
+        /// </summary>
+        public bool NeedsCommitting
+        {
+            get
+            {
+                return _needsCommitting;
+            }
+            private set
+            {
+                _needsCommitting = value;
+            }
+        }
+    
 
         #endregion
 
@@ -263,6 +335,7 @@ namespace WorkBoxFramework
         {
 //            WBUtils.logMessage("WBTaxonomy committing changes to term store | group | term set: " + TermStore.Name + " | " + Group.Name + " | " + TermSet.Name);
             TermStore.CommitAll();
+            NeedsCommitting = false;
         }
 
         public WBTeam GetTeam(Guid id)
@@ -361,7 +434,12 @@ namespace WorkBoxFramework
             }
 
             if (taxonomyNeedsSaving)
-                CommitAll();
+            {
+                if (AutoCommit)
+                    CommitAll();
+                else
+                    NeedsCommitting = true;
+            }
 
             return nextTerm;
         }
@@ -380,6 +458,27 @@ namespace WorkBoxFramework
             Term selectedTerm = GetSelectedTermByPath(path);
             if (selectedTerm == null) return null;
             return new WBTeam(this, selectedTerm);
+        }
+
+        // http://www.codeproject.com/Articles/193663/SharePoint-2010-Taxonomy-Import
+        private static int CreateWssId(SPSite site, Term term)
+        {
+            site.RootWeb.AllowUnsafeUpdates = true;
+
+            int result = -1;
+
+            MethodInfo mi = typeof(TaxonomyField).GetMethod("AddTaxonomyGuidToWss",
+                    BindingFlags.NonPublic | BindingFlags.Static, null,
+                    new Type[3] { typeof(SPSite), typeof(Term), typeof(bool) },
+                    null);
+            if (mi != null)
+            {
+                result = (int)mi.Invoke(null, new object[3] { site, term, false });
+            }
+
+            site.RootWeb.AllowUnsafeUpdates = false;
+
+            return result;
         }
 
 

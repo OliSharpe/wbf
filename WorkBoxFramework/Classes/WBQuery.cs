@@ -23,6 +23,7 @@
 using System;
 using System.Data;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using Microsoft.SharePoint;
@@ -71,6 +72,10 @@ namespace WorkBoxFramework
             _viewColumns.Add(column);
         }
 
+        public void AddViewColumns(IEnumerable<WBColumn> columns)
+        {
+            _viewColumns.AddRange(columns);
+        }
 
         public void AddClause(WBQueryClause clause)
         {
@@ -85,6 +90,16 @@ namespace WorkBoxFramework
         public void AddEqualsFilter(WBColumn column, Object value)
         {
             _clauses.Add(new WBQueryClause(column, WBQueryClause.Comparators.Equals, value));
+        }
+
+        public void AddIsNullFilter(WBColumn column)
+        {
+            _clauses.Add(new WBQueryClause(column, WBQueryClause.Comparators.IsNull, ""));
+        }
+
+        public void AddIsNotNullFilter(WBColumn column)
+        {
+            _clauses.Add(new WBQueryClause(column, WBQueryClause.Comparators.IsNotNull, ""));
         }
 
         public void OrderBy(WBColumn column, bool ascending)
@@ -103,6 +118,79 @@ namespace WorkBoxFramework
             OrderBy(column, false);
         }
 
+
+        public String JustCAMLQueryForView(SPSite site)
+        {
+            foreach (WBQueryClause clause in _clauses)
+            {
+                clause.RenderForView = true;
+            }
+
+            return JustCAMLQuery(site);
+        }
+
+        /// <summary>
+        /// This method returns just the CAML that can be used for the Query property of an SPQuery or of an SPView object. So this will contain the Where clause and any OrderBy clause 
+        /// but will not contain any definition about the view fields.
+        /// </summary>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public String JustCAMLQuery(SPSite site)
+        {
+            StringBuilder queryBuilder = new StringBuilder("");
+            if (_logicallyCannotHaveResults)
+            {
+                queryBuilder.Append("<Where>");
+                WBQueryClause.AppendNoResultsClause(queryBuilder);
+                queryBuilder.Append("</Where>");
+            }
+            else if (_clauses.Count > 0)
+            {
+                queryBuilder.Append("<Where>");
+                buildNestedAndClauses(queryBuilder, site, _clauses, 0);
+                queryBuilder.Append("</Where>");
+            }
+
+
+            if (_orderByColumn != null)
+            {
+                queryBuilder.Append("<OrderBy>");
+
+
+                if (_orderByColumn.InternalName == WBColumn.TitleOrName.InternalName)
+                {
+                    queryBuilder.Append("<FieldRef Name=\"").Append(WBColumn.Title.InternalName).Append("\" Ascending=\"").Append(_ascending.ToString().ToUpper()).Append("\" />");
+                    queryBuilder.Append("<FieldRef Name=\"").Append(WBColumn.Name.InternalName).Append("\" Ascending=\"").Append(_ascending.ToString().ToUpper()).Append("\" />");
+                }
+                else if (_orderByColumn.InternalName == WBColumn.DisplayFileSize.InternalName)
+                {
+                    queryBuilder.Append("<FieldRef Name=\"").Append(WBColumn.FileSize.InternalName).Append("\" Ascending=\"").Append(_ascending.ToString().ToUpper()).Append("\" />");
+                }
+                else
+                {
+                    queryBuilder.Append("<FieldRef Name=\"").Append(_orderByColumn.InternalName).Append("\" Ascending=\"").Append(_ascending.ToString().ToUpper()).Append("\" />");
+                }
+
+                queryBuilder.Append("</OrderBy>");
+            }
+
+            String query = queryBuilder.ToString();
+            WBLogging.Queries.Monitorable("The query XML is: " + query);
+
+            return query;
+        }
+
+        public StringCollection JustViewFields()
+        {
+            StringCollection viewFields = new StringCollection();
+
+            foreach (WBColumn viewColumn in ViewColumns)
+            {
+                viewFields.Add(viewColumn.InternalName);
+            }
+
+            return viewFields;
+        }
 
         public SPQuery AsSPQuery(SPSite site, SPList list)
         {
@@ -141,46 +229,7 @@ namespace WorkBoxFramework
                 query.ViewFieldsOnly = true;
             }
 
-            StringBuilder queryBuilder = new StringBuilder("");
-            if (_logicallyCannotHaveResults)
-            {
-                queryBuilder.Append("<Where>");
-                WBQueryClause.AppendNoResultsClause(queryBuilder);
-                queryBuilder.Append("</Where>");
-            }
-            else if (_clauses.Count > 0)
-            {
-                queryBuilder.Append("<Where>");
-                buildNestedAndClauses(queryBuilder, site, _clauses, 0);
-                queryBuilder.Append("</Where>");
-            }
-
-            
-            if (_orderByColumn != null)
-            {
-                queryBuilder.Append("<OrderBy>");
-
-
-                if (_orderByColumn.InternalName == WBColumn.TitleOrName.InternalName)
-                {
-                    queryBuilder.Append("<FieldRef Name=\"").Append(WBColumn.Title.InternalName).Append("\" Ascending=\"").Append(_ascending.ToString().ToUpper()).Append("\" />");
-                    queryBuilder.Append("<FieldRef Name=\"").Append(WBColumn.Name.InternalName).Append("\" Ascending=\"").Append(_ascending.ToString().ToUpper()).Append("\" />");
-                }
-                else if (_orderByColumn.InternalName == WBColumn.DisplayFileSize.InternalName)
-                {
-                    queryBuilder.Append("<FieldRef Name=\"").Append(WBColumn.FileSize.InternalName).Append("\" Ascending=\"").Append(_ascending.ToString().ToUpper()).Append("\" />");
-                }
-                else
-                {
-                    queryBuilder.Append("<FieldRef Name=\"").Append(_orderByColumn.InternalName).Append("\" Ascending=\"").Append(_ascending.ToString().ToUpper()).Append("\" />");
-                }
-
-                queryBuilder.Append("</OrderBy>");
-            }
-
-            WBLogging.Queries.Monitorable("The query XML is: " + queryBuilder.ToString());
-
-            query.Query = queryBuilder.ToString();
+            query.Query = JustCAMLQuery(site);
 
             if (_recursiveAll)
             {

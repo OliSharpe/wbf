@@ -78,7 +78,13 @@ namespace WorkBoxFramework
 
         public const string COLUMN_NAME__WORK_BOX_CACHED_LIST_ITEM_ID = "WorkBoxCachedListItemID";
         public const string COLUMN_NAME__WORK_BOX_DATE_LAST_VISITED = "WorkBoxDateLastVisited";
-        
+
+
+        public const string CONTENT_TYPE__WORK_BOX_METADATA_ITEM = "Work Box Metadata Item";
+        public const string CONTENT_TYPE__WORK_BOX_TEMPLATES_ITEM = "Work Box Templates Item";
+        public const string SITE_COLUMNS_GROUP_NAME = "Work Box Framework";
+        public const string SITE_CONTENT_TYPES_GROUP_NAME = "Work Box Framework";
+
         public const string LIST_NAME__WORK_BOX_TEMPLATES = "Work Box Templates";
         public const string COLUMN_NAME__WORK_BOX_TEMPLATE_NAME = "WorkBoxTemplateName";
         public const string COLUMN_NAME__WORK_BOX_TEMPLATE_TITLE = "WorkBoxTemplateTitle";
@@ -89,6 +95,7 @@ namespace WorkBoxFramework
         public const string COLUMN_NAME__WORK_BOX_INVITE_VISITING_EMAIL_SUBJECT = "WorkBoxInviteVisitingEmailSubject";
         public const string COLUMN_NAME__WORK_BOX_INVITE_VISITING_EMAIL_BODY = "WorkBoxInviteVisitingEmailBody";
         public const string COLUMN_NAME__WORK_BOX_TEMPLATE_USE_FOLDER_PATTERN = "WorkBoxTemplateUseFolderPattern";
+
 
         public const string WORK_BOX_TEMPLATE_STATUS__ACTIVE = "Active";
         public const string WORK_BOX_TEMPLATE_STATUS__ACTIVE_DEFAULT = "Active (default)";
