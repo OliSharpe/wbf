@@ -741,11 +741,11 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 if (errorMessage == "")
                 {
                     //returnFromDialogOKAndRefresh();
-                    goToGenericOKPage("Publishing Out Success", successMessage);
+                    GoToGenericOKPage("Publishing Out Success", successMessage);
                 }
                 else
                 {
-                    goToGenericOKPage("Publishing Out Error", errorMessage);
+                    GoToGenericOKPage("Publishing Out Error", errorMessage);
 
                     //returnFromDialogOK("An error occurred during publishing: " + errorMessage);
                 }

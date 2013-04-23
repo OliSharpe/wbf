@@ -1149,7 +1149,7 @@ namespace WorkBoxFramework
 
 
             // Note that this method will only really do anything if at least one linked calendar is found:
-            UpdateLinkedCalendars();
+            //UpdateLinkedCalendars();
         }
 
         public void Dispose()

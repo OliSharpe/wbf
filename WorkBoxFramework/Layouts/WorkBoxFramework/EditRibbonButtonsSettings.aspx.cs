@@ -95,7 +95,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 {
                     action.CaptureControlValues();
 
-                    collection.Web.WBxSetProperty(action.PropertyKey, action.PropertyValue);
+                    collection.SetAction(action);
+                    // collection.Web.WBxSetProperty(action.PropertyKey, action.PropertyValue);
                 }
 
                 collection.Update();

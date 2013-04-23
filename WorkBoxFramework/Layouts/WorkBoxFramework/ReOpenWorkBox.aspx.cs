@@ -39,7 +39,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             DisposeWorkBox();
 
-            returnFromDialogOKAndRefresh();
+            CloseDialogAndRefresh();
         }
 
 
@@ -47,7 +47,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             DisposeWorkBox();
 
-            returnFromDialogCancel("Closing of the Work Box was cancelled");
+            CloseDialogWithCancel("Closing of the Work Box was cancelled");
         }
 
     }

@@ -62,11 +62,11 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             if (NeedsRefreshOnReturn.Value == "True")
             {
-                returnFromDialogOKAndRefresh();
+                CloseDialogAndRefresh();
             }
             else
             {
-                returnFromDialogOK(" ");
+                CloseDialogWithOK(" ");
             }
         }
 
@@ -81,7 +81,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             JustPastedText.Text = "";
 //            RenderClipboard();
 
-            returnFromDialogOKAndRefresh();
+            CloseDialogAndRefresh();
         }
 
 

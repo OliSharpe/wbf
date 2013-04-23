@@ -76,7 +76,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                 DisposeWorkBox();
 
-                returnFromDialogOKAndRefresh();
+                CloseDialogAndRefresh();
             }
         }
 
@@ -84,7 +84,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             DisposeWorkBox();
 
-            returnFromDialogCancel("Inviting of teams was cancelled");
+            CloseDialogWithCancel("Inviting of teams was cancelled");
         }
 
     }

@@ -57,7 +57,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 String justRefreshOK = Request.QueryString["justRefreshOK"];
                 if (!String.IsNullOrEmpty(justRefreshOK))
                 {
-                    this.returnFromDialogOKAndRefresh(refreshQueryString);
+                    CloseDialogAndRefresh(refreshQueryString);
                     return;
                 }
 
@@ -74,11 +74,11 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             if (String.IsNullOrEmpty(RefreshQueryString.Value)) 
             {
-                returnFromDialogOKAndRefresh();
+                CloseDialogAndRefresh();
             }
             else
             {
-                returnFromDialogOKAndRefresh(RefreshQueryString.Value);
+                CloseDialogAndRefresh(RefreshQueryString.Value);
             }
         }
 

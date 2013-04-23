@@ -93,13 +93,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 team.RemoveMember(SPContext.Current.Site, userToRemove);
             }
 
-            returnFromDialogOKAndRefresh();
+            CloseDialogAndRefresh();
         }
 
 
         protected void cancelButton_OnClick(object sender, EventArgs e)
         {
-            returnFromDialogCancel("Inviting of teams was cancelled");
+            CloseDialogWithCancel("Inviting of teams was cancelled");
         }
 
     }

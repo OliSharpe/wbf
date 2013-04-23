@@ -37,7 +37,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             team.AddAllManagersReports();
 
-            returnFromDialogOKAndRefresh();
+            CloseDialogAndRefresh();
         }
 
 

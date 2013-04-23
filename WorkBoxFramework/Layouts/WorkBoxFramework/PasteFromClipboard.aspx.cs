@@ -87,7 +87,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void closeButton_OnClick(object sender, EventArgs e)
         {
-            this.returnFromDialogOKAndRefresh();
+            CloseDialogAndRefresh();
         }
 
 

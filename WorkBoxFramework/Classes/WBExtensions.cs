@@ -161,7 +161,21 @@ namespace WorkBoxFramework
 
         #endregion
 
+        #region WebControl extensions
 
+        public static void WBxSetSelectedDate(this DateTimeControl dateTimeControl, SPListItem item, WBColumn column)
+        {
+            if (item.WBxHasValue(column))
+            {
+                dateTimeControl.SelectedDate = (DateTime)item.WBxGet(column);
+            }
+            else
+            {
+                dateTimeControl.ClearSelection();
+            }
+        }
+
+        #endregion
 
         #region SPFarm SPWeb and Term Property Set and Get Extensions
 
@@ -466,11 +480,20 @@ namespace WorkBoxFramework
             return (item.Fields.ContainsField(columnName));
         }
 
+        public static bool WBxColumnExists(this SPListItem item, WBColumn column)
+        {
+            return item.WBxExists(column);
+        }
+
         public static bool WBxExists(this SPListItem item, WBColumn column)
         {
             return (item.Fields.ContainsField(column.DisplayName));
         }
 
+        public static bool WBxColumnHasValue(this SPListItem item, WBColumn column)
+        {
+            return item.WBxHasValue(column);
+        }
 
         public static bool WBxColumnHasValue(this SPListItem item, String columnName)
         {
@@ -550,6 +573,17 @@ namespace WorkBoxFramework
                     {
                         return item[column.DisplayName];
                     }
+                case WBColumn.DataTypes.User:
+                    {
+                        if (column.AllowMultipleValues)
+                        {
+                            return item.WBxGetMultiUserColumn(column);
+                        }
+                        else
+                        {
+                            return item.WBxGetSingleUserColumn(column);
+                        }
+                    }
 
 
                 default: throw new Exception("There is no WBxGet implementation (yet) for WBColumn of type : " + column.DataType);
@@ -575,10 +609,68 @@ namespace WorkBoxFramework
             return value;
         }
 
+        public static String WBxGetAsPrettyString(this SPListItem item, WBColumn column)
+        {
+            if (item.WBxColumnHasValue(column))
+            {
+                switch (column.DataType)
+                {
+                    case WBColumn.DataTypes.DateTime:
+                        {
+                            DateTime date = (DateTime)item.WBxGet(column);
+                            return date.ToShortDateString();
+                        }
+                    case WBColumn.DataTypes.User:
+                        {
+                            SPUser user = item.WBxGetSingleUserColumn(column);
+                            if (user != null)
+                            {
+                                return user.Name;
+                            }
+                            return "<i>(couldn't find: " + item.WBxGetAsString(column) + ")</i>";
+                        }
+
+                    case WBColumn.DataTypes.ManagedMetadata:
+                        {
+                            WBTerm term = item.WBxGetSingleTermColumn<WBTerm>(null, column);
+                            if (term != null)
+                            {
+                                return term.Name;
+                            }
+                            else
+                            {
+                                return "";
+                            }
+                        }
+
+                    case WBColumn.DataTypes.Lookup:
+                        {
+                            SPFieldLookup fieldLookup = (SPFieldLookup)item.Fields.GetField(column.DisplayName);
+                            SPFieldLookupValue fieldLookupValue = (SPFieldLookupValue)fieldLookup.GetFieldValue(item[column.DisplayName].ToString());
+
+                            return fieldLookupValue.LookupValue;
+                        }
+
+                    default: return item.WBxGetAsString(column);
+                }
+            }
+            else
+            {
+                return "";
+            }
+
+        }
+
+
 
         public static bool WBxGetColumnAsBool(this SPListItem item, String columnName)
         {
             return (item.WBxGetColumnAsString(columnName) == "True");
+        }
+
+        public static int WBxGetColumnAsInt(this SPListItem item, WBColumn column, int defaultValue)
+        {
+            return item.WBxGetColumnAsInt(column.DisplayName, defaultValue);
         }
 
         public static int WBxGetColumnAsInt(this SPListItem item, String columnName, int defaultValue)
@@ -662,6 +754,11 @@ namespace WorkBoxFramework
                         item[column.DisplayName] = value.WBxToString();
                         break;
                     }
+                case WBColumn.DataTypes.MultiLineText:
+                    {
+                        item[column.DisplayName] = value.WBxToString();
+                        break;
+                    }
                 case WBColumn.DataTypes.Integer:
                     {
                         item[column.DisplayName] = value;
@@ -677,6 +774,18 @@ namespace WorkBoxFramework
                         if (value == null || value is DateTime)
                         {
                             item[column.DisplayName] = value;
+                        }
+                        else if (value is DateTimeControl)
+                        {
+                            DateTimeControl dateTimeControl = (DateTimeControl)value;
+                            if (dateTimeControl.IsDateEmpty)
+                            {
+                                item[column.DisplayName] = null;
+                            }
+                            else
+                            {
+                                item[column.DisplayName] = dateTimeControl.SelectedDate;
+                            }
                         }
                         else
                         {
@@ -759,6 +868,29 @@ namespace WorkBoxFramework
                         break; 
                     }
 
+                case WBColumn.DataTypes.User:
+                    {
+                        if (column.AllowMultipleValues == false)
+                        {
+                            if (value is SPUser)
+                            {
+                                item[column.DisplayName] = value;
+                            }
+                            else if (String.IsNullOrEmpty(value.WBxToString()))
+                            {
+                                item[column.DisplayName] = null;
+                            }
+                            else
+                            {
+                                throw new Exception("In WBxSet() for User column type: The value being saved was not an SPUser object or null: " + value);
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("In WBxSet() for User column type: Either the column is a multi-User column");
+                        }
+                        break;
+                    }
 
                 default: throw new Exception("There is no WBxSet implementation (yet) for WBColumn of type : " + column.DataType);
             }
@@ -857,6 +989,28 @@ namespace WorkBoxFramework
             WBxSetMultiTermColumn(item, columnName, terms.UIControlValue);
         }
 
+        public static SPUser WBxGetSingleUserColumn(this SPListItem item, WBColumn column)
+        {
+            if (!item.WBxHasValue(column)) return null;
+
+            Object value = item[column.DisplayName];
+
+            SPFieldUser fieldUser = (SPFieldUser)item.Fields.GetField(column.DisplayName);
+            SPFieldUserValue fieldUserValue = (SPFieldUserValue)fieldUser.GetFieldValue(item[column.DisplayName].ToString());
+
+            if (fieldUserValue.User == null)
+            {
+                WBLogging.Generic.Unexpected("Debug: found that fieldUserValue.User was null but LoginName: " + fieldUserValue.LookupValue);
+            }
+
+            return fieldUserValue.User;
+        }
+
+        public static List<SPUser> WBxGetMultiUserColumn(this SPListItem item, WBColumn column)
+        {
+            return item.WBxGetMultiUserColumn(column.DisplayName);
+        }
+
         public static List<SPUser> WBxGetMultiUserColumn(this SPListItem item, String columnName)
         {
             SPFieldUserValueCollection userValueCollection = item[columnName] as SPFieldUserValueCollection;
@@ -871,6 +1025,11 @@ namespace WorkBoxFramework
             }
 
             return users;
+        }
+
+        public static void WBxSetMultiUserColumn(this SPListItem item, SPWeb web, WBColumn column, List<SPUser> users)
+        {
+            item.WBxSetMultiUserColumn(web, column.DisplayName, users);
         }
 
         public static void WBxSetMultiUserColumn(this SPListItem item, SPWeb web, String columnName, List<SPUser> users)
@@ -1031,16 +1190,61 @@ namespace WorkBoxFramework
 
             if (view == null)
             {
-                return list.Views.Add(viewName, query.JustViewFields(), query.JustCAMLQuery(site), itemsPerPage, paginate, setAsDefault);
+                return list.Views.Add(viewName, query.JustViewFields(), query.JustCAMLQueryForView(site), itemsPerPage, paginate, setAsDefault);
             }
             else
             {
                 return view;
             }
-
         }
-        
-        
+
+        public static SPView WBxCreateOrUpdateView(this SPList list, SPSite site, String viewName, WBQuery query)
+        {
+            return list.WBxCreateOrUpdateView(site, viewName, query, 50, true, false);
+        }
+
+        public static SPView WBxCreateOrUpdateView(this SPList list, SPSite site, String viewName, WBQuery query, uint itemsPerPage, bool paginate, bool setAsDefault)
+        {
+            SPView view = null;
+
+            try
+            {
+                view = list.Views[viewName];
+
+                // First update the fields:
+                view.ViewFields.DeleteAll();
+                foreach (String fieldName in query.JustViewFields())
+                {
+                    view.ViewFields.Add(fieldName);
+                }
+                view.Update();
+
+                // Then udpate the query:
+                view.Query = query.JustCAMLQueryForView(site);
+                view.Update();
+
+                // Finally update the pagination:
+                view.RowLimit = itemsPerPage;
+                view.Paged = paginate;
+                view.DefaultView = setAsDefault;
+                view.Update();
+
+            }
+            catch (Exception exception)
+            {
+            }
+
+            if (view == null)
+            {
+                return list.Views.Add(viewName, query.JustViewFields(), query.JustCAMLQueryForView(site), itemsPerPage, paginate, setAsDefault);
+            }
+            else
+            {
+                return view;
+            }
+        }
+
+
 
         #endregion
 

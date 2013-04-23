@@ -89,6 +89,7 @@ namespace WorkBoxFramework
 
             AllowMultipleValues = false;
 
+
             _knownColumnsByInternalName[InternalName] = this;
         }
 
@@ -288,6 +289,17 @@ namespace WorkBoxFramework
             return ChoiceColumn(displayName, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, choices);
         }
 
+
+        public static WBColumn ChoiceColumn(String displayName, IEnumerable<String> choices, bool valueIsRequired, String defaultValue)
+        {
+            WBColumn choiceColumn = ChoiceColumn(displayName, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, choices);
+
+            choiceColumn.ValueIsRequired = valueIsRequired;
+            choiceColumn.DefaultValue = defaultValue;
+            return choiceColumn;
+        }
+
+
         public static WBColumn ChoiceColumn(String displayName, String prettyName, IEnumerable<String> choices)
         {
             WBColumn column = ChoiceColumn(displayName, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, choices);
@@ -295,6 +307,7 @@ namespace WorkBoxFramework
 
             return column;
         }
+
 
 
         public static WBColumn ManagedMedataColumn(String displayName, bool internalNameHasSpaceCharacters, String termSetName, bool allowMultipleValues)
@@ -358,7 +371,71 @@ namespace WorkBoxFramework
 
         public List<WBColumn> FormatStringPlaceHolders { get; set; }
 
-        public bool AllowMultipleValues { get; set; }
+        private bool _allowMultipleValues = false;
+        public bool AllowMultipleValues 
+        { 
+            get 
+            { 
+                return _allowMultipleValues; 
+            } 
+            set 
+            { 
+                _allowMultipleValues = value; 
+            } 
+        }
+
+        private bool _allowFillInValues = false;
+        public bool AllowFillInValues 
+        {
+            get
+            {
+                return _allowFillInValues;
+            }
+            set
+            {
+                _allowFillInValues = value;
+            }
+        }
+
+        private bool _valueIsRequired = false;
+        public bool ValueIsRequired 
+        {
+            get
+            {
+                return _valueIsRequired;
+            }
+            set
+            {
+                _valueIsRequired = value;
+            }
+        }
+
+        private bool _enforceUniqueValues = false;
+        public bool EnforceUniqueValues
+        {
+            get
+            {
+                return _enforceUniqueValues;
+            }
+            set
+            {
+                _enforceUniqueValues = value;
+            }
+        }
+
+        private String _defaultValue = "";
+        public String DefaultValue 
+        {
+            get
+            {
+                return _defaultValue;
+            }
+            set
+            {
+                _defaultValue = value;
+            }
+        }
+
 
         // This is clearly starting to get ugly!! Should be done with subclasses really!!
         public String TestColumnInternalName { get; set; }
@@ -427,7 +504,7 @@ namespace WorkBoxFramework
         /// <param name="site"></param>
         /// <param name="web"></param>
         /// <returns></returns>
-        public bool CreateOrCheck(SPSite site, SPWeb web, String SiteColumnsGroupName)
+        public bool CreateOrCheck(SPSite site, SPWeb web, String siteColumnsGroupName)
         {
             if (String.IsNullOrEmpty(InternalName)) throw new NotImplementedException("Cannot create a column that doesn't have an internal name set!");
             if (String.IsNullOrEmpty(DisplayName)) throw new NotImplementedException("Cannot create a column that doesn't have a display name set!");
@@ -445,10 +522,10 @@ namespace WorkBoxFramework
             {
                 case DataTypes.Text:
                     {
-                        SPFieldText textField = web.Fields.CreateNewField(SPFieldType.Text.ToString(), DisplayName) as SPFieldText;
-                        textField.Group = SiteColumnsGroupName;
-                        textField.StaticName = InternalName;
+                        SPFieldText textField = web.Fields.CreateNewField(SPFieldType.Text.ToString(), InternalName) as SPFieldText;
                         textField.Title = DisplayName;
+                        textField.StaticName = InternalName;
+                        textField.Group = siteColumnsGroupName;
 
                         web.Fields.Add(textField);
                         web.Update();
@@ -458,11 +535,11 @@ namespace WorkBoxFramework
 
                 case DataTypes.MultiLineText:
                     {
-                        SPFieldMultiLineText multiLineTextField = web.Fields.CreateNewField(SPFieldType.Note.ToString(), DisplayName) as SPFieldMultiLineText;
+                        SPFieldMultiLineText multiLineTextField = web.Fields.CreateNewField(SPFieldType.Note.ToString(), InternalName) as SPFieldMultiLineText;
 
                         multiLineTextField.Title = DisplayName;
                         multiLineTextField.StaticName = InternalName;
-                        multiLineTextField.Group = "Work Box Framework";
+                        multiLineTextField.Group = siteColumnsGroupName;
                         multiLineTextField.RichText = false;
 
                         web.Fields.Add(multiLineTextField);
@@ -473,10 +550,10 @@ namespace WorkBoxFramework
 
                 case DataTypes.Counter:
                     {
-                        SPFieldNumber numberField = web.Fields.CreateNewField(SPFieldType.Number.ToString(), DisplayName) as SPFieldNumber;
+                        SPFieldNumber numberField = web.Fields.CreateNewField(SPFieldType.Number.ToString(), InternalName) as SPFieldNumber;
                         numberField.Title = DisplayName;
                         numberField.StaticName = InternalName;
-                        numberField.Group = "Work Box Framework";
+                        numberField.Group = siteColumnsGroupName;
 
                         numberField.EnforceUniqueValues = true;
                         numberField.Indexed = true;
@@ -490,10 +567,10 @@ namespace WorkBoxFramework
 
                 case DataTypes.Integer:
                     {
-                        SPFieldNumber numberField = web.Fields.CreateNewField(SPFieldType.Number.ToString(), DisplayName) as SPFieldNumber;
+                        SPFieldNumber numberField = web.Fields.CreateNewField(SPFieldType.Number.ToString(), InternalName) as SPFieldNumber;
                         numberField.Title = DisplayName;
                         numberField.StaticName = InternalName;
-                        numberField.Group = "Work Box Framework";
+                        numberField.Group = siteColumnsGroupName;
 
                         numberField.DisplayFormat = SPNumberFormatTypes.NoDecimal;
 
@@ -505,10 +582,10 @@ namespace WorkBoxFramework
 
                 case DataTypes.DateTime:
                     {
-                        SPFieldDateTime dateTimeField = web.Fields.CreateNewField(SPFieldType.DateTime.ToString(), DisplayName) as SPFieldDateTime;
+                        SPFieldDateTime dateTimeField = web.Fields.CreateNewField(SPFieldType.DateTime.ToString(), InternalName) as SPFieldDateTime;
                         dateTimeField.Title = DisplayName;
                         dateTimeField.StaticName = InternalName;
-                        dateTimeField.Group = "Work Box Framework";
+                        dateTimeField.Group = siteColumnsGroupName;
 
                         dateTimeField.DisplayFormat = SPDateTimeFieldFormatType.DateTime;
 
@@ -527,10 +604,10 @@ namespace WorkBoxFramework
                         Group group = termStore.Groups[farm.TermStoreGroupName];
                         TermSet termSet = group.TermSets[TermSetName];
 
-                        TaxonomyField taxonomyField = web.Fields.CreateNewField("TaxonomyFieldType", DisplayName) as TaxonomyField;
+                        TaxonomyField taxonomyField = web.Fields.CreateNewField("TaxonomyFieldType", InternalName) as TaxonomyField;
                         taxonomyField.Title = DisplayName;
                         taxonomyField.StaticName = InternalName;
-                        taxonomyField.Group = "Work Box Framework";
+                        taxonomyField.Group = siteColumnsGroupName;
 
                         taxonomyField.SspId = termStore.Id;
                         taxonomyField.TermSetId = termSet.Id;
@@ -552,10 +629,10 @@ namespace WorkBoxFramework
 
                 case DataTypes.Boolean:
                     {
-                        SPFieldBoolean booleanField = web.Fields.CreateNewField(SPFieldType.Boolean.ToString(), DisplayName) as SPFieldBoolean;
+                        SPFieldBoolean booleanField = web.Fields.CreateNewField(SPFieldType.Boolean.ToString(), InternalName) as SPFieldBoolean;
                         booleanField.Title = DisplayName;
                         booleanField.StaticName = InternalName;
-                        booleanField.Group = "Work Box Framework";
+                        booleanField.Group = siteColumnsGroupName;
                         booleanField.DefaultValue = "0";
 
                         web.Fields.Add(booleanField);
@@ -566,10 +643,11 @@ namespace WorkBoxFramework
 
                 case DataTypes.Choice:
                     {
-                        SPFieldChoice choiceField = web.Fields.CreateNewField(SPFieldType.Choice.ToString(), DisplayName) as SPFieldChoice;
-                        choiceField.Title = DisplayName;
-                        choiceField.StaticName = InternalName;
-                        choiceField.Group = "Work Box Framework";
+                        SPFieldChoice choiceField = web.Fields.CreateNewField(SPFieldType.Choice.ToString(), InternalName) as SPFieldChoice;
+
+                        SetStandardFieldSettings(choiceField, siteColumnsGroupName);
+
+                        choiceField.FillInChoice = AllowFillInValues;
 
                         web.Fields.Add(choiceField);
                         web.Update();
@@ -592,10 +670,10 @@ namespace WorkBoxFramework
 
                 case DataTypes.URL:
                     {
-                        SPFieldUrl urlField = web.Fields.CreateNewField(SPFieldType.URL.ToString(), DisplayName) as SPFieldUrl;
+                        SPFieldUrl urlField = web.Fields.CreateNewField(SPFieldType.URL.ToString(), InternalName) as SPFieldUrl;
                         urlField.Title = DisplayName;
                         urlField.StaticName = InternalName;
-                        urlField.Group = "Work Box Framework";
+                        urlField.Group = siteColumnsGroupName;
 
                         web.Fields.Add(urlField);
                         web.Update();
@@ -605,10 +683,10 @@ namespace WorkBoxFramework
 
                 case DataTypes.User:
                     {
-                        SPFieldUser userField = web.Fields.CreateNewField(SPFieldType.User.ToString(), DisplayName) as SPFieldUser;
+                        SPFieldUser userField = web.Fields.CreateNewField(SPFieldType.User.ToString(), InternalName) as SPFieldUser;
                         userField.Title = DisplayName;
                         userField.StaticName = InternalName;
-                        userField.Group = "Work Box Framework";
+                        userField.Group = siteColumnsGroupName;
 
                         userField.AllowMultipleValues = AllowMultipleValues;
                         userField.SelectionMode = SPFieldUserSelectionMode.PeopleOnly;
@@ -627,6 +705,17 @@ namespace WorkBoxFramework
             }
 
             return true;
+        }
+
+        private void SetStandardFieldSettings(SPField field, String siteColumnsGroupName)
+        {
+            field.Title = DisplayName;
+            field.StaticName = InternalName;
+            field.Group = siteColumnsGroupName;
+
+            field.Required = ValueIsRequired;
+            field.EnforceUniqueValues = EnforceUniqueValues;
+            field.DefaultValue = DefaultValue;
         }
 
         #endregion
