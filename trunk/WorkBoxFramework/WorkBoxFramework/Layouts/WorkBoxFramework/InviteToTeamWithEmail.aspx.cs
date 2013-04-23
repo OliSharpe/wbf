@@ -167,13 +167,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             }
 
-            this.returnFromDialogOKAndRefresh();
+            CloseDialogAndRefresh();
         }
 
 
         protected void cancelButton_OnClick(object sender, EventArgs e)
         {
-            returnFromDialogCancel("Inviting of individuals to the team.");
+            CloseDialogWithCancel("Inviting of individuals to the team.");
         }
     }
 }

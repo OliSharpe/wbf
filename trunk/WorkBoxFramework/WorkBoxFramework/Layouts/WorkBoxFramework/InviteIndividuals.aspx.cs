@@ -49,14 +49,14 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             DisposeWorkBox();
 
-            returnFromDialogOKAndRefresh();
+            CloseDialogAndRefresh();
         }
 
         protected void cancelButton_OnClick(object sender, EventArgs e)
         {
             DisposeWorkBox();
 
-            returnFromDialogCancel("Inviting of individual was cancelled");
+            CloseDialogWithCancel("Inviting of individual was cancelled");
         }
 
     }

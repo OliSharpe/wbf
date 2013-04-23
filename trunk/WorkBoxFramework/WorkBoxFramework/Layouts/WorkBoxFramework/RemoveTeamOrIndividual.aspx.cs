@@ -145,7 +145,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     WorkBox.Update();
                 }
 
-                returnFromDialogOKAndRefresh();
+                CloseDialogAndRefresh();
             }
 
             if (TeamOrIndividual.Value == "Individual" && user != null)
@@ -169,7 +169,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     WorkBox.Update();
                 }
 
-                returnFromDialogOKAndRefresh();
+                CloseDialogAndRefresh();
             }
 
             DisposeWorkBox();
@@ -180,7 +180,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             DisposeWorkBox();
 
-            returnFromDialogCancel("Inviting of teams was cancelled");
+            CloseDialogWithCancel("Inviting of teams was cancelled");
         }
 
     }

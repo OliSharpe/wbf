@@ -157,6 +157,15 @@ namespace WorkBoxFramework
             _webNeedsDisposing = false;
         }
 
+        public WBCollection(SPSite site, SPWeb web)
+        {
+            _site = site;
+            _siteNeedsDisposing = false;
+
+            _web = web;
+            _webNeedsDisposing = false;
+        }
+
         public WBCollection(SPListItem item)
         {
             _web = item.ParentList.ParentWeb;
@@ -660,6 +669,12 @@ namespace WorkBoxFramework
             action.SetFromPropertyValue(Web.WBxGetProperty(action.PropertyKey));
             return action;
         }
+
+        public void SetAction(WBAction action)
+        {
+            Web.WBxSetProperty(action.PropertyKey, action.PropertyValue);
+        }
+
 
         public WBTemplate GetTypeByID(int id)
         {

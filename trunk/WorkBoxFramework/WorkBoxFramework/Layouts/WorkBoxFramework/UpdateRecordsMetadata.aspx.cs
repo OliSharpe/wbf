@@ -228,7 +228,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 }
 
 
-                returnFromDialogOKAndRefresh();                
+                CloseDialogAndRefresh();                
             }
             else
             {

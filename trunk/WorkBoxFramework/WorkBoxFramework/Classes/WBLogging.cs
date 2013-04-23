@@ -102,7 +102,15 @@ namespace WorkBoxFramework
 
         public static void Debug(String message)
         {
-            WriteTrace(CATEGORY__GENERIC, TraceSeverity.Verbose, "DEBUG: " + message);
+            if (WBFarm.Local.FarmInstance == WBFarm.FARM_INSTANCE__DEVELOPMENT_FARM)
+            {
+                WriteTrace(CATEGORY__GENERIC, TraceSeverity.High, "DEBUG: " + message);
+            }
+            else
+            {
+                WriteTrace(CATEGORY__GENERIC, TraceSeverity.Verbose, "DEBUG: " + message);
+            }
+
         }
 
 

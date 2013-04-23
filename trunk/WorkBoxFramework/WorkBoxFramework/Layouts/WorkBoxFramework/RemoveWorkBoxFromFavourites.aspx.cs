@@ -84,13 +84,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             profile.Commit();
             site.AllowUnsafeUpdates = false;
 
-            returnFromDialogOKAndRefresh();
+            CloseDialogAndRefresh();
         }
 
 
         protected void cancelButton_OnClick(object sender, EventArgs e)
         {
-            returnFromDialogCancel("Removal from favourites was cancelled.");
+            CloseDialogWithCancel("Removal from favourites was cancelled.");
         }
 
 

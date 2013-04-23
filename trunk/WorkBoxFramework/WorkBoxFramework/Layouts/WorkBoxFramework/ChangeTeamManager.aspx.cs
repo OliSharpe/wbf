@@ -39,13 +39,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             team.Update();
 
-            returnFromDialogOKAndRefresh();
+            CloseDialogAndRefresh();
         }
 
 
         protected void cancelButton_OnClick(object sender, EventArgs e)
         {
-            returnFromDialogCancel("Adding was cancelled");
+            CloseDialogWithCancel("Adding was cancelled");
         }
 
     }

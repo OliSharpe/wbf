@@ -70,21 +70,67 @@ namespace WorkBoxFramework
             }
         }
 
-        protected void returnFromDialogOKAndRefresh()
+        #region Close methods
+        protected void CloseDialogAndRefresh()
         {
             returnFromDialog(OK_REFRESH, "");
         }
 
-        protected void returnFromDialogOKAndRefresh(String refreshQueryString)
+        [Obsolete("returnFromDialogOKAndRefresh is deprecated, please use CloseDialogAndRefresh instead.", true)]
+        protected void returnFromDialogOKAndRefresh()
+        {
+            CloseDialogAndRefresh();
+        }
+
+        protected void CloseDialogAndRefresh(String refreshQueryString)
         {
             returnFromDialog(OK_REFRESH, refreshQueryString);
         }
 
-        protected void returnFromDialogOKAndRedirect(String redirectURL)
+        [Obsolete("returnFromDialogOKAndRefresh is deprecated, please use CloseDialogAndRefresh instead.", true)]
+        protected void returnFromDialogOKAndRefresh(String refreshQueryString)
+        {
+            CloseDialogAndRefresh(refreshQueryString);
+        }
+
+        protected void CloseDialogAndRedirect(String redirectURL)
         {
             returnFromDialog(OK_REDIRECT, redirectURL);
         }
 
+        [Obsolete("returnFromDialogOKAndRedirect is deprecated, please use CloseDialogAndRedirect instead.", true)]
+        protected void returnFromDialogOKAndRedirect(String redirectURL)
+        {
+            CloseDialogAndRedirect(redirectURL);
+        }
+
+        protected void CloseDialogWithOK()
+        {
+            returnFromDialogOK("");
+        }
+
+        protected void CloseDialogWithOK(String message)
+        {
+            returnFromDialogOK(message);
+        }
+
+        protected void CloseDialogWithCancel()
+        {
+            returnFromDialogCancel("");
+        }
+
+        protected void CloseDialogWithCancel(String message)
+        {
+            returnFromDialogCancel(message);
+        }
+
+        protected void CloseDialogWithError(String message)
+        {
+            returnFromDialogError(message);
+        }
+        #endregion
+
+        #region return value methods
         protected void returnFromDialogOK(string returnValue)
         {
             returnFromDialog(OK_RESULT, returnValue);
@@ -112,8 +158,10 @@ namespace WorkBoxFramework
             Page.Response.Write(String.Format(CultureInfo.InvariantCulture, "<script type=\"text/javascript\">window.frameElement.commonModalDialogClose({0}, {1});</script>", new object[] { resultValue, String.IsNullOrEmpty(returnValue) ? "null" : String.Format("\"{0}\"", returnValue) }));
             Page.Response.End(); 
         }
+        #endregion
 
-        protected void goToGenericOKPage(String pageTitle, String pageText)
+        #region Go To methods
+        protected void GoToGenericOKPage(String pageTitle, String pageText)
         {
             pageTitle = Uri.EscapeDataString(pageTitle);
             pageText = Uri.EscapeDataString(pageText);
@@ -123,7 +171,7 @@ namespace WorkBoxFramework
 
             SPUtility.Redirect(redirectUrl, SPRedirectFlags.RelativeToLayoutsPage, Context, queryString);
         }
-
+        #endregion
 
     }
 }

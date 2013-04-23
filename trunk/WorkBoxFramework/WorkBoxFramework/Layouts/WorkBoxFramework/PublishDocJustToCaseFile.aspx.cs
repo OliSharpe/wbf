@@ -96,7 +96,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
             else
             {
-                goToGenericOKPage("Counldn't find case file work box", "It was not possible to find the case file work box with local ID = " + LocalID.Text);
+                GoToGenericOKPage("Counldn't find case file work box", "It was not possible to find the case file work box with local ID = " + LocalID.Text);
             }
         }
 

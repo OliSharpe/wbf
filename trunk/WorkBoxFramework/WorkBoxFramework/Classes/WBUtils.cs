@@ -972,6 +972,21 @@ namespace WorkBoxFramework
             return text;
         }
 
+        internal static String ProcessColumnTokensTemplate(String templateText, SPListItem item)
+        {
+            StringDictionary textForToken = new StringDictionary();
+
+            Regex expression = new Regex(@"\[(?<Token>.*)\]");
+
+            MatchCollection matches = expression.Matches(templateText);
+            foreach (Match match in matches)
+            {
+                Console.WriteLine(match.Groups["Token"].Value);
+            }
+
+            return ProcessTemplate(templateText, textForToken);
+        }
+
         internal static String ProcessTemplate(String templateText, StringDictionary textForToken)
         {
             String processedText = templateText;
