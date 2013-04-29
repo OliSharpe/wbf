@@ -618,7 +618,15 @@ namespace WorkBoxFramework
                     case WBColumn.DataTypes.DateTime:
                         {
                             DateTime date = (DateTime)item.WBxGet(column);
-                            return date.ToShortDateString();
+
+                            if (column.UseDateAndTime)
+                            {
+                                return date.ToShortDateString() + " " + date.ToShortTimeString();
+                            }
+                            else
+                            {
+                                return date.ToShortDateString();
+                            }
                         }
                     case WBColumn.DataTypes.User:
                         {
@@ -662,7 +670,6 @@ namespace WorkBoxFramework
         }
 
 
-
         public static bool WBxGetColumnAsBool(this SPListItem item, String columnName)
         {
             return (item.WBxGetColumnAsString(columnName) == "True");
@@ -679,6 +686,10 @@ namespace WorkBoxFramework
             return (Convert.ToInt32(item.WBxGetColumnAsString(columnName)));
         }
 
+        public static void WBxSetFrom(this SPListItem destination, SPListItem source, WBColumn column)
+        {
+            destination.WBxSet(column, source.WBxGet(column));
+        }
 
         public static void WBxSetFrom(this SPListItem destination, WBItem source)
         {
@@ -2112,6 +2123,52 @@ namespace WorkBoxFramework
 
             WBLogging.Teams.Verbose("Just about to add team owners | to have role: " + team.Name + " | " + roleName);
             web.WBxAssignGroupWithRole(group, roleName);
+        }
+
+
+        public static void WBxAssignGroupWithRole(this SPListItem item, SPWeb web, SPGroup group, String roleName)
+        {
+            if (group == null) return;
+            if (roleName == null || roleName == "") return;
+
+            SPRoleDefinition roleDefinition = web.RoleDefinitions[roleName];
+
+            SPRoleAssignment roleAssignment = new SPRoleAssignment(group);
+            roleAssignment.RoleDefinitionBindings.Add(roleDefinition);
+
+            item.RoleAssignments.Add(roleAssignment);
+        }
+
+        public static void WBxAssignTeamMembersWithRole(this SPListItem item, SPSite site, SPWeb web, WBTeam team, String roleName)
+        {
+            if (team == null) return;
+            if (roleName == null || roleName == "") return;
+
+            SPGroup group = team.MembersGroup(site);
+            if (group == null)
+            {
+                WBLogging.Teams.Unexpected("There was no associated members group for this team: " + team.Name + " on: " + site.Url);
+                return;
+            }
+
+            WBLogging.Teams.Verbose("Just about to add team members | to have role: " + team.Name + " | " + roleName);
+            item.WBxAssignGroupWithRole(web, group, roleName);
+        }
+
+        public static void WBxAssignTeamOwnersWithRole(this SPListItem item, SPSite site, SPWeb web, WBTeam team, String roleName)
+        {
+            if (team == null) return;
+            if (roleName == null || roleName == "") return;
+
+            SPGroup group = team.OwnersGroup(site);
+            if (group == null)
+            {
+                WBLogging.Teams.Unexpected("There was no associated members group for this team: " + team.Name + " on: " + site.Url);
+                return;
+            }
+
+            WBLogging.Teams.Verbose("Just about to add team members | to have role | to item: " + team.Name + " | " + roleName + " | " + item.Name);
+            item.WBxAssignGroupWithRole(web, group, roleName);
         }
 
 

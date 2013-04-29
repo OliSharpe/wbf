@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <CustomAction
+		Id="WorkBoxFramework.EditLinkedCalendarSettings"
+		Sequence="999"
+		GroupId="GeneralSettings"
+		Location="Microsoft.SharePoint.ListEdit"
+    RegistrationType="List"
+    RegistrationId="106"
+		Title="Edit calendar link to work boxes"
+		Description="Edit the settings for how this calendar links to work boxes"
+		Rights="ManageWeb">
+    <UrlAction
+			Url="~site/_layouts/WorkBoxFramework/EditLinkedCalendarSettings.aspx?List={ListId}"/>
+  </CustomAction>
+</Elements>

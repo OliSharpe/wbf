@@ -1064,6 +1064,28 @@ namespace WorkBoxFramework
         }
 
 
+        public static void AddEmailAddresses(IEnumerable users, List<String> emailAddresses)
+        {
+            foreach (SPUser user in users)
+            {
+                if (!String.IsNullOrEmpty(user.Email))
+                {
+                    if (!emailAddresses.Contains(user.Email))
+                    {
+                        emailAddresses.Add(user.Email);
+                    }
+                }
+            }
+        }
+
+        public static void SendEmais(SPWeb spWeb, List<String> emails, String subject, String body, bool isBodyHtml)
+        {
+            foreach (String email in emails)
+            {
+                SendEmail(spWeb, email, subject, body, isBodyHtml);
+            }
+        }
+
         public static bool SendEmail(SPWeb spWeb, String to, String subject, String body, bool isBodyHtml)
         {
             StringDictionary messageHeaders = new StringDictionary();
@@ -1105,6 +1127,14 @@ namespace WorkBoxFramework
             {
                 return SPUtility.SendEmail(web, headers, body);
             }
+        }
+
+        public static void SendErrorReport(SPWeb spWeb, String subject, String body)
+        {
+            WBLogging.Generic.Unexpected("SENDING ERROR REPORT: " + subject);
+
+            // This obviously a very very early implementation of this method!!
+            WBUtils.SendEmail(spWeb, "oli@gometa.co.uk", subject, body, false);
         }
 
         internal static List<SPUser> RemoveUser(List<SPUser> users, SPUser userToRemove)

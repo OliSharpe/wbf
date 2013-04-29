@@ -240,6 +240,13 @@ namespace WorkBoxFramework
         }
 
 
+        public static WBColumn DateColumn(String displayName)
+        {
+            WBColumn dateColumn = new WBColumn(displayName, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, DataTypes.DateTime);
+            dateColumn.UseDateAndTime = false;
+            return dateColumn;
+        }
+
 
         public static WBColumn DateTimeColumn(String displayName, bool internalNameHasSpaceCharacters)
         {
@@ -436,6 +443,20 @@ namespace WorkBoxFramework
             }
         }
 
+        private bool _useDateAndTime = true;
+        public bool UseDateAndTime
+        {
+            get
+            {
+                return _useDateAndTime;
+            }
+            set
+            {
+                _useDateAndTime = value;
+            }
+        }
+
+
 
         // This is clearly starting to get ugly!! Should be done with subclasses really!!
         public String TestColumnInternalName { get; set; }
@@ -587,7 +608,14 @@ namespace WorkBoxFramework
                         dateTimeField.StaticName = InternalName;
                         dateTimeField.Group = siteColumnsGroupName;
 
-                        dateTimeField.DisplayFormat = SPDateTimeFieldFormatType.DateTime;
+                        if (UseDateAndTime)
+                        {
+                            dateTimeField.DisplayFormat = SPDateTimeFieldFormatType.DateTime;
+                        }
+                        else
+                        {
+                            dateTimeField.DisplayFormat = SPDateTimeFieldFormatType.DateOnly;
+                        }
 
                         web.Fields.Add(dateTimeField);
                         web.Update();
@@ -770,8 +798,10 @@ namespace WorkBoxFramework
         public static readonly WBColumn WorkBoxDateLastOpened = WBColumn.DateTimeColumn(WorkBox.COLUMN_NAME__WORK_BOX_DATE_LAST_OPENED, false, "Opened");
         public static readonly WBColumn WorkBoxRetentionEndDate = WBColumn.DateTimeColumn(WorkBox.COLUMN_NAME__WORK_BOX_RETENTION_END_DATE, false, "Retention End Date");
 
-        //public static readonly WBColumn WorkBoxLinkedCalendars = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_LINKED_CALENDARS);
-
+        public static readonly WBColumn WorkBoxLinkedCalendars = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_LINKED_CALENDARS);
+        public static readonly WBColumn StartTime = WBColumn.DateTimeColumn("Start Time", "EventDate");   // These are the standard calendar columns
+        public static readonly WBColumn EndTime = WBColumn.DateTimeColumn("End Time", "EndDate");         // These are the standard calendar columns
+        public static readonly WBColumn DateCompleted = WBColumn.DateTimeColumn("Date Completed");         // This is  standard SharePoint column.
 
         public static readonly WBColumn FunctionalArea = WBColumn.ManagedMedataColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, WorkBox.TERM_SET_NAME__FUNCTIONAL_AREAS, true);
         public static readonly WBColumn RecordsType = WBColumn.ManagedMedataColumn(WorkBox.COLUMN_NAME__RECORDS_TYPE, INTERNAL_NAME_USES_SPACE_CHARACTERS, WorkBox.TERM_SET_NAME__RECORDS_TYPES, false);

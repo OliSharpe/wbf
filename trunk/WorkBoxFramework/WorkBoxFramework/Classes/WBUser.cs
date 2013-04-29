@@ -308,53 +308,74 @@ namespace WorkBoxFramework
             Dictionary<String, List<int>> clipboardItems = new Dictionary<String, List<int>>();
             UserProfile userProfile = GetUserProfile(workBox.Site);
 
-            String clipboardAction = GetClipboard(userProfile, clipboardItems);
+            String clipboardAction = "";
 
-            SPFolder folder = workBox.DocumentLibrary.RootFolder;
-            WBLogging.Generic.Unexpected("Folder path: ##" + folderPath + "##");
-            if (folder == null)
+            try
             {
-                WBLogging.Generic.Unexpected("folder is null !!!");
-            }
+                clipboardAction = GetClipboard(userProfile, clipboardItems);
 
-            folderPath = folderPath.WBxTrim();
-            if (!String.IsNullOrEmpty(folderPath))
-            {
-                folder = folder.WBxGetFolderPath(folderPath);
-            }
-
-            bool allowUnsafeUpdatesOriginalValue = workBox.Web.AllowUnsafeUpdates;
-            workBox.Web.AllowUnsafeUpdates = true;
-
-            foreach (String workBoxURL in clipboardItems.Keys)
-            {
-                List<int> ids = clipboardItems[workBoxURL];
-
-                using (WorkBox clipboardWorkBox = new WorkBox(workBoxURL))
+                SPFolder folder = workBox.DocumentLibrary.RootFolder;
+                WBLogging.Generic.Unexpected("Folder path: ##" + folderPath + "##");
+                if (folder == null)
                 {
-                    clipboardWorkBox.Web.AllowUnsafeUpdates = true;
-
-                    SPDocumentLibrary documents = clipboardWorkBox.DocumentLibrary;
-
-                    foreach (int id in ids)
-                    {
-                        SPListItem item = documents.GetItemById(id);
-
-                        bool cutOriginal = (clipboardAction == WBUser.CLIPBOARD_ACTION__CUT);
-                        WBUtils.CutOrCopyIntoFolder(workBox.Web, folder, item, cutOriginal);
-                    }
-
-                    clipboardWorkBox.Web.AllowUnsafeUpdates = false;
+                    WBLogging.Generic.Unexpected("folder is null !!!");
                 }
-            }
 
-            if (clipboardAction == CLIPBOARD_ACTION__CUT)
+                folderPath = folderPath.WBxTrim();
+                if (!String.IsNullOrEmpty(folderPath))
+                {
+                    folder = folder.WBxGetFolderPath(folderPath);
+                }
+
+                bool allowUnsafeUpdatesOriginalValue = workBox.Web.AllowUnsafeUpdates;
+                workBox.Web.AllowUnsafeUpdates = true;
+
+                foreach (String workBoxURL in clipboardItems.Keys)
+                {
+                    List<int> ids = clipboardItems[workBoxURL];
+
+                    using (WorkBox clipboardWorkBox = new WorkBox(workBoxURL))
+                    {
+                        clipboardWorkBox.Web.AllowUnsafeUpdates = true;
+
+                        SPDocumentLibrary documents = clipboardWorkBox.DocumentLibrary;
+
+                        foreach (int id in ids)
+                        {
+                            SPListItem item = documents.GetItemById(id);
+
+                            bool cutOriginal = (clipboardAction == WBUser.CLIPBOARD_ACTION__CUT);
+
+                            try
+                            {
+                                WBUtils.CutOrCopyIntoFolder(workBox.Web, folder, item, cutOriginal);
+                            } 
+                            catch (Exception docLevelException) 
+                            {
+                                WBUtils.SendErrorReport(workBox.Web, "Error pasting a particular document in PasteClipboard", "Exception : " + docLevelException + " \n\n " + docLevelException.StackTrace);
+                            }
+                        }
+
+                        clipboardWorkBox.Web.AllowUnsafeUpdates = false;
+                    }
+                }
+
+                if (clipboardAction == CLIPBOARD_ACTION__CUT)
+                {
+                    // You cannot paste more than once items that have been cut:
+                    ClearClipboard(userProfile);
+                }
+
+                workBox.Web.AllowUnsafeUpdates = allowUnsafeUpdatesOriginalValue;
+
+            }
+            catch (Exception exception)
             {
-                // You cannot paste more than once items that have been cut:
+                WBUtils.SendErrorReport(workBox.Web, "Error in PasteClipboard", "Exception : " + exception + " \n\n " + exception.StackTrace);
+                WBLogging.Generic.Unexpected("Clearing the user's clipboard in the hope that that will fix the error they are having.");
                 ClearClipboard(userProfile);
             }
 
-            workBox.Web.AllowUnsafeUpdates = allowUnsafeUpdatesOriginalValue;
 
             return clipboardAction;
         }
@@ -419,26 +440,39 @@ namespace WorkBoxFramework
 
                         foreach (int id in ids)
                         {
-                            SPListItem item = documents.GetItemById(id);
+                            String htmlFragment = "<div class='wbf-clipboard-item'><i>(could not find an item)</i></div>";
 
-                            SPFolder fromFolder = null;
-                            String itemImageSrc = "";
-                            if (item.Folder == null)
+                            try
                             {
-                                fromFolder = item.File.ParentFolder;
-                                itemImageSrc = WBUtils.DocumentIcon16(item.Name);
+                                SPListItem item = documents.GetItemById(id);
+
+                                SPFolder fromFolder = null;
+                                String itemImageSrc = "";
+                                if (item.Folder == null)
+                                {
+                                    fromFolder = item.File.ParentFolder;
+                                    itemImageSrc = WBUtils.DocumentIcon16(item.Name);
+                                }
+                                else
+                                {
+                                    fromFolder = item.Folder.ParentFolder;
+                                    itemImageSrc = "/_layouts/images/folder.gif";
+                                }
+
+                                htmlFragment = "<div class='wbf-clipboard-item'>";
+                                htmlFragment += "<img src=\"" + actionImageSrc + "\"/>  &nbsp; /" + fromFolder.Url + " &nbsp; <img src=\"" + itemImageSrc + "\"/> <b>" + item.Name + "</b>";
+                                htmlFragment += "</div>\n";
+
+                                htmlFragmentsToOrder.Add(fromFolder.Url + "/" + item.Name, htmlFragment);
                             }
-                            else
+                            catch (Exception itemException)
                             {
-                                fromFolder = item.Folder.ParentFolder;
-                                itemImageSrc = "/_layouts/images/folder.gif";
+                                // Trying to add this to the end of the list of items found:
+                                htmlFragmentsToOrder.Add("zzzzzzz", htmlFragment);
+
+                                WBUtils.SendErrorReport(clipboardWorkBox.Web, "Error in RenderClipboardItems", "Exception : " + itemException + " \n\n " + itemException.StackTrace);
                             }
 
-                            String htmlFragment = "<div class='wbf-clipboard-item'>";
-                            htmlFragment += "<img src=\"" + actionImageSrc + "\"/>  &nbsp; /" + fromFolder.Url + " &nbsp; <img src=\"" + itemImageSrc + "\"/> <b>" + item.Name + "</b>";
-                            htmlFragment += "</div>\n";
-
-                            htmlFragmentsToOrder.Add(fromFolder.Url + "/" + item.Name, htmlFragment);
                         }
 
                         List<String> ordering = new List<String>(htmlFragmentsToOrder.Keys);

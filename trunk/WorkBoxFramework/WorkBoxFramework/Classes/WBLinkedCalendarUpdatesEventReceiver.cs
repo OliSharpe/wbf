@@ -30,8 +30,8 @@ namespace WorkBoxFramework
                 WBLogging.Teams.Unexpected("Calendar item added to list: " + properties.List.DefaultViewUrl);
             }
 
-            String workBoxCollectionURL = properties.List.WBxGetProperty(WorkBox.LINKED_CALENDAR_PROPERTY__WORK_BOX_COLLECTION);
-            String defaultTemplateTitle = properties.List.WBxGetProperty(WorkBox.LINKED_CALENDAR_PROPERTY__DEFAULT_TEMPLATE_TITLE);
+            String workBoxCollectionURL = properties.List.WBxGetProperty(WorkBox.LIST_PROPERTY__LINKED_CALENDAR__WORK_BOX_COLLECTION);
+            String defaultTemplateTitle = properties.List.WBxGetProperty(WorkBox.LIST_PROPERTY__LINKED_CALENDAR__DEFAULT_TEMPLATE_TITLE);
 
             if (String.IsNullOrEmpty(workBoxCollectionURL) || String.IsNullOrEmpty(defaultTemplateTitle))
             {
@@ -40,11 +40,11 @@ namespace WorkBoxFramework
             }
 
             using (WBCollection collection = new WBCollection(workBoxCollectionURL))
-            using (SPSite teamsSite = new SPSite(properties.WebUrl))
-            using (SPWeb teamsWeb = teamsSite.OpenWeb())
+            using (SPSite calendarSite = new SPSite(properties.WebUrl))
+            using (SPWeb calendarWeb = calendarSite.OpenWeb())
             {
                 WBTaxonomy teams = WBTaxonomy.GetTeams(collection.Site);
-                WBTeam team = WBTeam.GetFromTeamSite(teams, teamsWeb);
+                WBTeam team = WBTeam.GetFromTeamSite(teams, calendarWeb);
 
                 if (team == null)
                 {
@@ -100,8 +100,10 @@ namespace WorkBoxFramework
 
                 WBLogging.Teams.Unexpected(" description is: " + description);
 
+                String calendarURL = calendarSite.Url + properties.List.DefaultViewUrl;
+
                 WorkBox workBox = collection.RequestNewEventWorkBox(
-                    properties.List.DefaultViewUrl,
+                    calendarURL,
                     properties.List.ID,
                     properties.ListItemId,
                     title,
