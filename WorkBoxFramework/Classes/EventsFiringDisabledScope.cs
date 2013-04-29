@@ -28,9 +28,8 @@ using Microsoft.SharePoint;
 
 namespace WorkBoxFramework
 {
-    internal class EventsFiringDisabledScope : SPEventReceiverBase, IDisposable
+    public class EventsFiringDisabledScope : SPEventReceiverBase, IDisposable
     {
-
         bool _previouslyEnabled = true;
         public EventsFiringDisabledScope()
         {

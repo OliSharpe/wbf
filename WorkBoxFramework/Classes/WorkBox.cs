@@ -54,9 +54,11 @@ namespace WorkBoxFramework
         public const string WORK_BOX_PROPERTY__DOCUMENT_LIBRARY_GUID    = "wbf__work_box__document_library_guid";
 
 
-        public const string LINKED_CALENDAR_PROPERTY__WORK_BOX_COLLECTION = "wbf__linked_calendar__work_box_collection";
-        public const string LINKED_CALENDAR_PROPERTY__DEFAULT_TEMPLATE_TITLE = "wbf__linked_calendar__default_template_title";
-
+        public const string LIST_PROPERTY__LINKED_CALENDAR__WORK_BOX_COLLECTION = "wbf__linked_calendar__work_box_collection";
+        public const string LIST_PROPERTY__LINKED_CALENDAR__DEFAULT_TEMPLATE_TITLE = "wbf__linked_calendar__default_template_title";
+        public const string LINKED_CALENDAR_EVENT_RECEIVER__ITEM_ADDED = "wbf__linked_calendar_event_receiver__ItemAdded";
+        public const string LINKED_CALENDAR_EVENT_RECEIVER__ITEM_UPDATED = "wbf__linked_calendar_event_receiver__ItemUpdated";
+        public const string LINKED_CALENDAR_EVENT_RECEIVER__ITEM_DELETING = "wbf__linked_calendar_event_receiver__ItemDeleting";
 
         public const string COLUMN_NAME__WORK_BOX_STATUS = "WorkBoxStatus";
         public const string COLUMN_NAME__WORK_BOX_STATUS_CHANGE_REQUEST = "WorkBoxStatusChangeRequest";
@@ -95,6 +97,9 @@ namespace WorkBoxFramework
         public const string COLUMN_NAME__WORK_BOX_INVITE_VISITING_EMAIL_SUBJECT = "WorkBoxInviteVisitingEmailSubject";
         public const string COLUMN_NAME__WORK_BOX_INVITE_VISITING_EMAIL_BODY = "WorkBoxInviteVisitingEmailBody";
         public const string COLUMN_NAME__WORK_BOX_TEMPLATE_USE_FOLDER_PATTERN = "WorkBoxTemplateUseFolderPattern";
+
+
+        public const string COLUMN_NAME__WORK_BOX_LINKED_CALENDARS = "WorkBoxLinkedCalendars";
 
 
         public const string WORK_BOX_TEMPLATE_STATUS__ACTIVE = "Active";
@@ -191,6 +196,8 @@ namespace WorkBoxFramework
         public const string WORK_BOX_RECORD_CONTENT_TYPE_NAME = "Work Box Record";
 
 
+
+
         #endregion
 
 
@@ -251,6 +258,18 @@ namespace WorkBoxFramework
             }
         }
 
+        public static WorkBox GetIfWorkBox(SPSite site, SPWeb web)
+        {
+            if (IsWebAWorkBox(web))
+            {
+                return new WorkBox(site, web);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public WorkBox(SPContext context)
         {
             _item = null;
@@ -260,6 +279,20 @@ namespace WorkBoxFramework
             _webNeedsDisposing = false;
 
             _site = context.Site;
+            _siteNeedsDisposing = false;
+
+            _useable = true;
+        }
+
+        public WorkBox(SPSite site, SPWeb web)
+        {
+            _item = null;
+            _collection = null;
+
+            _web = web;
+            _webNeedsDisposing = false;
+
+            _site = site;
             _siteNeedsDisposing = false;
 
             _useable = true;
@@ -1120,6 +1153,11 @@ namespace WorkBoxFramework
 
                 CachedListItemID = UpdateCachedDetails();
 
+                if (Collection.UsesLinkedCalendars)
+                {
+                    UpdateLinkedCalendars();
+                }
+
                 _item.Update();
 
                 WBLogging.WorkBoxes.Verbose("In WorkBox.Update() done the item update");
@@ -1148,8 +1186,6 @@ namespace WorkBoxFramework
             }
 
 
-            // Note that this method will only really do anything if at least one linked calendar is found:
-            //UpdateLinkedCalendars();
         }
 
         public void Dispose()
@@ -1170,6 +1206,7 @@ namespace WorkBoxFramework
         {
             WBLogging.WorkBoxes.Unexpected("In UpdateLinkedCalendars()");
 
+            /*
             if (OwningTeam == null)
             {
                 WBLogging.WorkBoxes.Unexpected("Owning team has not been set yet ... it's null");
@@ -1191,89 +1228,134 @@ namespace WorkBoxFramework
                 WBLogging.WorkBoxes.Unexpected("The SPWeb doesn't apppear to have been created yet as it's null");
                 return;
             }
+            */
 
-            using (SPSite teamSPSite = new SPSite(OwningTeam.TeamSiteUrl))
-            using (SPWeb teamSPWeb = teamSPSite.OpenWeb())
-            using (EventsFiringDisabledScope noevents = new EventsFiringDisabledScope())
+            if (!this.WebExists)
             {
-                SPList calendar = teamSPWeb.Lists["Calendar"];
+                WBLogging.WorkBoxes.HighLevel("The work box for this event work box item hasn't been created yet - so not running UpdateLinkedCalendar()");
+                return;
+            }
 
-                WBLogging.WorkBoxes.Unexpected("Got the calendar list");
+            // Just setting the start time 'EventDate' column if it exists to keep it in line with the reference date column:
+            Item.WBxSet(WBColumn.StartTime, ReferenceDate);
 
-                foreach (SPListItem item in calendar.Items)
+            if (!Item.WBxHasValue(WBColumn.WorkBoxLinkedCalendars))
+            {
+                WBLogging.WorkBoxes.HighLevel("The work box item does not have any linked calendar details.");
+                return;
+            }
+            else
+            {
+                WBLogging.WorkBoxes.HighLevel("The linked calenders have the following details: " + Item.WBxGetAsString(WBColumn.WorkBoxLinkedCalendars));
+            }
+
+            String[] linkedCalendarsDetails = Item.WBxGetAsString(WBColumn.WorkBoxLinkedCalendars).Split(';');
+
+            foreach (String linkedCalendarDetails in linkedCalendarsDetails)
+            {
+                String[] details = linkedCalendarDetails.Split('|');
+                if (details.Length < 3)
                 {
-                    WBLogging.WorkBoxes.Unexpected("Found item: " + item.ID + " | " + item.Title + " | " + item.WBxGetColumnAsString("WorkBoxURL"));
+                    WBLogging.WorkBoxes.Unexpected("The linked calendar details did not have the right number of components: " + linkedCalendarDetails);
+                    continue; 
                 }
 
+                String calendarURL = details[0];
+                String calendarGUID = details[1];
+                String eventIDString = details[2];
 
-                WBColumn workBoxEventIDColumn = WBColumn.TextColumn("WorkBoxEventId");
-
-                SPListItem calendarEvent = null;
-                if (Item.WBxColumnHasValue("WorkBoxEventId"))
+                if (String.IsNullOrEmpty(eventIDString))
                 {
-                    int eventId = Item.WBxGetColumnAsInt("WorkBoxEventId", -1);
+                    WBLogging.WorkBoxes.Unexpected("The linked calendar event ID did not exist: " + eventIDString);
+                    continue;
+                }
 
-                    WBLogging.WorkBoxes.Unexpected("Found the WorkBoxEventId = " + eventId);
+                WBLogging.WorkBoxes.Unexpected("The calendarURL = " + calendarURL);
+                WBLogging.WorkBoxes.Unexpected("The calendarGUID = " + calendarGUID);
+                WBLogging.WorkBoxes.Unexpected("The eventIDString = " + eventIDString);
 
-                    if (eventId != -1)
+                int eventID = Convert.ToInt32(eventIDString);
+
+                using (SPSite calendarSite = new SPSite(calendarURL))
+                using (SPWeb calendarWeb = calendarSite.OpenWeb())
+                using (EventsFiringDisabledScope noevents = new EventsFiringDisabledScope())
+                {
+                    WBLogging.WorkBoxes.Unexpected("Opened calendarSite = " + calendarSite.Url);
+                    WBLogging.WorkBoxes.Unexpected("Opened calendarWeb = " + calendarWeb.Url);
+
+
+                    SPList calendarList = calendarWeb.Lists[new Guid(calendarGUID)];
+
+                    WBLogging.WorkBoxes.Unexpected("Got the calendar list: " + calendarList.DefaultDisplayFormUrl);
+
+                    foreach (SPListItem item in calendarList.Items)
+                    {
+                        WBLogging.WorkBoxes.Unexpected("Found item: " + item.ID + " | " + item.Title + " | " + item.WBxGetColumnAsString("WorkBoxURL"));
+                    }
+
+
+                    SPListItem calendarEvent = null;
+                    if (eventID != -1)
                     {
                         try
                         {
-                            calendarEvent = calendar.GetItemById(eventId);
+                            calendarEvent = calendarList.GetItemById(eventID);
                         }
                         catch (Exception exception)
                         {
-                            WBLogging.WorkBoxes.Unexpected("Coulnd't find the item by event  id: " + eventId, exception); 
+                            WBLogging.WorkBoxes.Unexpected("Coulnd't find the item by event  id: " + eventID, exception);
                         }
 
                     }
+
+                    if (calendarEvent == null)
+                    {
+                        calendarEvent = WBUtils.FindItemByColumn(calendarSite, calendarList, WBColumn.WorkBoxURL, Url);
+                    }
+
+                    if (calendarEvent == null)
+                    {
+                        WBLogging.WorkBoxes.Unexpected("Adding new calendar date");
+                        calendarEvent = calendarList.Items.Add();
+                    }
+
+                    calendarEvent["Title"] = Title;
+
+                    calendarEvent["Description"] = "\n\nMeeting work box: " + Url;
+
+                    //calEvent["RecurrenceData"] = recurrenceRule;
+                    //calEvent["Recurrence"] = 1;
+                    //calendarEvent["UID"] = System.Guid.NewGuid();
+
+                    calendarEvent["EventType"] = 1;
+
+                    WBLogging.WorkBoxes.Unexpected("The reference date is: " + ReferenceDate);
+
+                    calendarEvent.WBxSet(WBColumn.StartTime, ReferenceDate);
+                    if (Item.WBxHasValue(WBColumn.EndTime))
+                    {
+                        calendarEvent.WBxSet(WBColumn.EndTime, Item.WBxGet(WBColumn.EndTime));
+                    }
+                    else
+                    {
+                        calendarEvent.WBxSet(WBColumn.EndTime, ReferenceDate.AddHours(1));
+                    }
+
+                    //calendarEvent["Workspace"] = Url;
+                    //calendarEvent["WorkspaceLink"] = 1;
+
+                    //SPMeeting meetingInfo = SPMeeting.GetMeetingInformation(Web);                              
+                    //string meetingURL = meetingInfo.LinkWithEvent(web, calendar.ID.ToString(), calendarEvent.ID, "WorkspaceLink", "Workspace");
+                    //WBLogging.WorkBoxes.Unexpected("The meeting URL: " + meetingURL);
+
+                    calendarEvent.WBxSetColumnAsString(WBColumn.WorkBoxURL, Url);
+
+                    calendarEvent.Update();
                 }
 
-                if (calendarEvent == null)
-                {
-                    calendarEvent = WBUtils.FindItemByColumn(teamSPSite, calendar, WBColumn.WorkBoxURL, Url);
-                }
-
-                if (calendarEvent == null)
-                {
-                    WBLogging.WorkBoxes.Unexpected("Adding new calendar date");
-                    calendarEvent = calendar.Items.Add();
-                }
-
-                calendarEvent["Title"] = Title;
-
-                calendarEvent["Description"] = "\n\nMeeting work box: " + Url;
-
-                //calEvent["RecurrenceData"] = recurrenceRule;
-                //calEvent["Recurrence"] = 1;
-                //calendarEvent["UID"] = System.Guid.NewGuid();
-
-                calendarEvent["EventType"] = 1;
-
-                WBLogging.WorkBoxes.Unexpected("The reference date is: " + ReferenceDate);
-
-                calendarEvent["EventDate"] = ReferenceDate;
-                if (Item.WBxColumnHasValue("EndDate"))
-                {
-                    calendarEvent["EndDate"] = Item["EndDate"];
-                }
-                else
-                {
-                    calendarEvent["EndDate"] = ReferenceDate.AddHours(1);                
-                }
-
-                //calendarEvent["Workspace"] = Url;
-                //calendarEvent["WorkspaceLink"] = 1;
-
-                //SPMeeting meetingInfo = SPMeeting.GetMeetingInformation(Web);                              
-                //string meetingURL = meetingInfo.LinkWithEvent(web, calendar.ID.ToString(), calendarEvent.ID, "WorkspaceLink", "Workspace");
-                //WBLogging.WorkBoxes.Unexpected("The meeting URL: " + meetingURL);
-
-                calendarEvent.WBxSetColumnAsString(WBColumn.WorkBoxURL, Url);
-
-                calendarEvent.Update();
             }
 
+              
             WBLogging.WorkBoxes.Unexpected("Leaving UpdateLinkedCalendars()");
 
         }

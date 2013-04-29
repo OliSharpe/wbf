@@ -120,6 +120,13 @@
       <DependentUpon>ConfigureLinkedCalendar.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\WBLinkedCalendarUpdatesEventReceiver.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\EditLinkedCalendarSettings.aspx.cs">
+      <DependentUpon>EditLinkedCalendarSettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\EditLinkedCalendarSettings.aspx.designer.cs">
+      <DependentUpon>EditLinkedCalendarSettings.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx.cs">
       <DependentUpon>GoToTeamManagement.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -685,6 +692,9 @@
     <None Include="Features\TeamSiteCalendarUpdates\TeamSiteCalendarUpdates.feature">
       <FeatureId>{f813dd17-fc0c-4c52-a710-d371b201a2cb}</FeatureId>
     </None>
+    <None Include="CustomActions\LinkedCalendarSettingsCustomAction\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{1e23a6c4-0355-4468-ae40-72b4eceaa13f}</SharePointProjectItemId>
+    </None>
     <None Include="WebParts\ConfigurationStatus\ConfigurationStatus.webpart" />
     <None Include="WebParts\ConfigurationStatus\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{15e0ce8c-93d9-4277-8d9e-649b36a80214}</SharePointProjectItemId>
@@ -883,9 +893,13 @@
     <Content Include="Layouts\WorkBoxFramework\ConfigureLinkedCalendar.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
+    <Content Include="Layouts\WorkBoxFramework\EditLinkedCalendarSettings.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
+    <Content Include="CustomActions\LinkedCalendarSettingsCustomAction\Elements.xml" />
     <Content Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

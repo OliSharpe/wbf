@@ -83,6 +83,9 @@ namespace WorkBoxFramework
         private const string COLLECTION_PROPERTY__DIALOG_DETAILS_FORMAT = "wbf__collection__dialog__{0}";
 
 
+        private const string COLLECTION_PROPERTY__USES_LINKED_CALENDARS = "wbf__collection__uses_linked_calendars";
+
+
         private const bool DEFAULT__CAN_ANYONE_CREATE = true;
         private const bool DEFAULT__CAN_OWNER_EDIT_PROPERTIES = true;
         private const bool DEFAULT__CAN_OWNER_CHANGE_OWNER = true;
@@ -604,59 +607,11 @@ namespace WorkBoxFramework
         }
 
 
-
-        /*
-        public String UrlForViewPropertiesDialog
+        public bool UsesLinkedCalendars
         {
-            get { return Web.WBxGetPropertyOrDefault(COLLECTION_PROPERTY__URL_FOR_VIEW_PROPERTIES_DIALOG, DEFAULT_URL__VIEW_PROPERTIES_DIALOG); }
-            set { Web.WBxSetProperty(COLLECTION_PROPERTY__URL_FOR_VIEW_PROPERTIES_DIALOG, value); }
+            get { return Web.WBxGetBoolProperty(COLLECTION_PROPERTY__USES_LINKED_CALENDARS); }
+            set { Web.WBxSetProperty(COLLECTION_PROPERTY__USES_LINKED_CALENDARS, value); }
         }
-
-        public String UrlForEditPropertiesDialog
-        {
-            get { return Web.WBxGetPropertyOrDefault(COLLECTION_PROPERTY__URL_FOR_EDIT_PROPERTIES_DIALOG, DEFAULT_URL__EDIT_PROPERTIES_DIALOG); }
-            set { Web.WBxSetProperty(COLLECTION_PROPERTY__URL_FOR_EDIT_PROPERTIES_DIALOG, value); }
-        }
-
-        public String UrlForViewAllInvolvedDialog
-        {
-            get { return Web.WBxGetPropertyOrDefault(COLLECTION_PROPERTY__URL_FOR_VIEW_ALL_INVOLVED_DIALOG, DEFAULT_URL__VIEW_ALL_INVOLVED_DIALOG); }
-            set { Web.WBxSetProperty(COLLECTION_PROPERTY__URL_FOR_VIEW_ALL_INVOLVED_DIALOG, value); }
-        }
-
-        public String UrlForInviteTeamDialog
-        {
-            get { return Web.WBxGetPropertyOrDefault(COLLECTION_PROPERTY__URL_FOR_INVITE_TEAM_DIALOG, DEFAULT_URL__INVITE_TEAM_DIALOG); }
-            set { Web.WBxSetProperty(COLLECTION_PROPERTY__URL_FOR_INVITE_TEAM_DIALOG, value); }
-        }
-
-        public String UrlForInviteIndividualDialog
-        {
-            get { return Web.WBxGetPropertyOrDefault(COLLECTION_PROPERTY__URL_FOR_INVITE_INDIVIDUAL_DIALOG, DEFAULT_URL__INVITE_INDIVIDUAL_DIALOG); }
-            set { Web.WBxSetProperty(COLLECTION_PROPERTY__URL_FOR_INVITE_INDIVIDUAL_DIALOG, value); }
-        }
-
-        public String UrlForChangeOwnerDialog
-        {
-            get { return Web.WBxGetPropertyOrDefault(COLLECTION_PROPERTY__URL_FOR_CHANGE_OWNER_DIALOG, DEFAULT_URL__CHANGE_OWNER_DIALOG); }
-            set { Web.WBxSetProperty(COLLECTION_PROPERTY__URL_FOR_CHANGE_OWNER_DIALOG, value); }
-        }
-
-        public String UrlForCloseDialog
-        {
-            get { return Web.WBxGetPropertyOrDefault(COLLECTION_PROPERTY__URL_FOR_CLOSE_DIALOG, DEFAULT_URL__CLOSE_DIALOG); }
-            set { Web.WBxSetProperty(COLLECTION_PROPERTY__URL_FOR_CLOSE_DIALOG, value); }
-        }
-
-        public String UrlForReOpenDialog
-        {
-            get { return Web.WBxGetPropertyOrDefault(COLLECTION_PROPERTY__URL_FOR_REOPEN_DIALOG, DEFAULT_URL__REOPEN_DIALOG); }
-            set { Web.WBxSetProperty(COLLECTION_PROPERTY__URL_FOR_REOPEN_DIALOG, value); }
-        }
-        */
-
-        
-
 
 
         #endregion
@@ -917,11 +872,21 @@ namespace WorkBoxFramework
 
 
 
-        public WorkBox RequestNewEventWorkBox(String calendarURL, Guid calendarGuid, int eventID, String shortTitle, String description, DateTime eventDate, DateTime endDate, WBTeam owningTeam, WBTermCollection<WBTeam> involvedTeams, String templateName)
+        public WorkBox RequestNewEventWorkBox(String calendarURL, Guid calendarGuid, int eventID, String shortTitle, String description, DateTime eventDate, DateTime endDate, WBTeam owningTeam, WBTermCollection<WBTeam> involvedTeams, String templateTitle)
         {
             WBLogging.WorkBoxCollections.Unexpected("In: RequestNewEventWorkBox()");
 
-            WBTemplate template = new WBTemplate(this, 10);
+            SPListItem foundTemplateItem = WBUtils.FindItemByColumn(this.Site, this.TemplatesList, WBColumn.Title, templateTitle);
+
+            WBTemplate template = this.DefaultTemplate();
+            if (foundTemplateItem == null)
+            {
+                WBLogging.WorkBoxCollections.Unexpected("Could not find a template with the title: " + templateTitle + " so just using the default template!!");
+            }
+            else
+            {
+                template = new WBTemplate(this, foundTemplateItem);
+            }
             
             Hashtable extraBits = new Hashtable();
             extraBits["EventDate"] = eventDate;

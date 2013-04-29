@@ -30,8 +30,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             if (!IsPostBack)
             {
                 CalendarURL.Text = calendar.DefaultViewUrl;
-                LinkedCalendarWorkBoxCollection.Text = calendar.WBxGetProperty(WorkBox.LINKED_CALENDAR_PROPERTY__WORK_BOX_COLLECTION);
-                LinkedCalendarDefaultWorkBoxTemplate.Text = calendar.WBxGetProperty(WorkBox.LINKED_CALENDAR_PROPERTY__DEFAULT_TEMPLATE_TITLE);
+                LinkedCalendarWorkBoxCollection.Text = calendar.WBxGetProperty(WorkBox.LIST_PROPERTY__LINKED_CALENDAR__WORK_BOX_COLLECTION);
+                LinkedCalendarDefaultWorkBoxTemplate.Text = calendar.WBxGetProperty(WorkBox.LIST_PROPERTY__LINKED_CALENDAR__DEFAULT_TEMPLATE_TITLE);
             }
         }
 
@@ -39,8 +39,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             if (calendar != null)
             {
-                calendar.WBxSetProperty(WorkBox.LINKED_CALENDAR_PROPERTY__WORK_BOX_COLLECTION, LinkedCalendarWorkBoxCollection.Text);
-                calendar.WBxSetProperty(WorkBox.LINKED_CALENDAR_PROPERTY__DEFAULT_TEMPLATE_TITLE, LinkedCalendarDefaultWorkBoxTemplate.Text);
+                calendar.WBxSetProperty(WorkBox.LIST_PROPERTY__LINKED_CALENDAR__WORK_BOX_COLLECTION, LinkedCalendarWorkBoxCollection.Text);
+                calendar.WBxSetProperty(WorkBox.LIST_PROPERTY__LINKED_CALENDAR__DEFAULT_TEMPLATE_TITLE, LinkedCalendarDefaultWorkBoxTemplate.Text);
                 calendar.Update();
             }
 
@@ -51,8 +51,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             if (calendar != null)
             {
-                calendar.WBxSetProperty(WorkBox.LINKED_CALENDAR_PROPERTY__WORK_BOX_COLLECTION, "");
-                calendar.WBxSetProperty(WorkBox.LINKED_CALENDAR_PROPERTY__DEFAULT_TEMPLATE_TITLE, "");
+                calendar.WBxSetProperty(WorkBox.LIST_PROPERTY__LINKED_CALENDAR__WORK_BOX_COLLECTION, "");
+                calendar.WBxSetProperty(WorkBox.LIST_PROPERTY__LINKED_CALENDAR__DEFAULT_TEMPLATE_TITLE, "");
                 calendar.Update();
             }
 

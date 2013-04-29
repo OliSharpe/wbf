@@ -94,6 +94,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 teams.InitialiseTaxonomyControl(DefaultOwningTeam, "Select the Default Owning Team", false);
                 DefaultOwningTeam.Text = collection.DefaultOwningTeamUIControlValue;
 
+                UsesLinkedCalendars.Checked = collection.UsesLinkedCalendars;
             }
         }
 
@@ -149,7 +150,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 collection.CreateNewWorkBoxText = CreateNewWorkBoxText.Text;
 
                 collection.DefaultOwningTeamUIControlValue = DefaultOwningTeam.Text;
-                
+
+                collection.UsesLinkedCalendars = UsesLinkedCalendars.Checked;
+
                 collection.Update();
 
             }

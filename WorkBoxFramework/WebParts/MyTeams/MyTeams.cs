@@ -140,8 +140,7 @@ namespace WorkBoxFramework.MyTeams
                         displayingAnyTeams = true;
 
                         teamTreeNode.NavigateUrl = team.TeamSiteUrl;
-                        teamTreeNode.ImageUrl = "http://sp.izzi/Style%20Library/team-16.png";                    
-                        //teamTreeNode.ImageUrl = "/_layouts/Images/WorkBoxFramework/team-16.png";
+                        teamTreeNode.ImageUrl = "/_layouts/images/WorkBoxFramework/team-16.png";                    
                     }
 
                     if (AlwaysProvideLink)

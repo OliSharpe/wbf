@@ -337,6 +337,24 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::Microsoft.SharePoint.Taxonomy.TaxonomyWebTaggingControl DefaultOwningTeam;
         
         /// <summary>
+        /// UsesLinkedCalendarsSection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl UsesLinkedCalendarsSection;
+        
+        /// <summary>
+        /// UsesLinkedCalendars control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox UsesLinkedCalendars;
+        
+        /// <summary>
         /// okButton control.
         /// </summary>
         /// <remarks>

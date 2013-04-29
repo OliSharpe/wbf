@@ -705,6 +705,8 @@ namespace WorkBoxFramework
                 WBColumn.WorkBoxDateLastOpened,
                 WBColumn.WorkBoxRetentionEndDate,
 
+                WBColumn.WorkBoxLinkedCalendars,
+
                 WBColumn.FunctionalArea,
                 WBColumn.RecordsType,
                 WBColumn.SubjectTags,

@@ -417,6 +417,39 @@
 </wssuc:InputFormSection>
 
 
+<!-- Work Box Collection Uses Linked Calendars Section -->
+<wssuc:InputFormSection
+	id="UsesLinkedCalendarsSection"
+	title="Uses Linked Calendars"
+	Description="Does this work box collection use linked calendars?"
+	runat="server"
+	>
+	<Template_InputFormControls>
+		<wssuc:InputFormControl runat="server">
+			<Template_Control>
+				<table border="0" width="100%" cellspacing="0" cellpadding="2">
+					<tr>
+						<td class="ms-authoringcontrols" valign="top" align="center" width="50">
+                            <asp:CheckBox ID="UsesLinkedCalendars" runat="server"></asp:CheckBox>
+						</td>
+						<td class="ms-authoringcontrols" width="10"></td>
+						<td nowrap="nowrap" class="ms-authoringcontrols" width="100%">
+							Uses Linked Calendars?
+						</td>
+					</tr>
+				</table>
+			</Template_Control>
+		</wssuc:InputFormControl>
+	</Template_InputFormControls>
+</wssuc:InputFormSection>
+
+
+
+
+
+
+
+
 <!-- Buttons Section -->
 <wssuc:ButtonSection runat="server" ShowStandardCancelButton="false">
 	<Template_Buttons>
