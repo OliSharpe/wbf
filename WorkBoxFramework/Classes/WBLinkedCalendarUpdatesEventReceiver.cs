@@ -43,16 +43,23 @@ namespace WorkBoxFramework
             using (SPSite calendarSite = new SPSite(properties.WebUrl))
             using (SPWeb calendarWeb = calendarSite.OpenWeb())
             {
-                WBTaxonomy teams = WBTaxonomy.GetTeams(collection.Site);
-                WBTeam team = WBTeam.GetFromTeamSite(teams, calendarWeb);
+                WorkBox onWorkBox = WorkBox.GetIfWorkBox(calendarSite, calendarWeb);
 
-                if (team == null)
+                WBTaxonomy teams = WBTaxonomy.GetTeams(collection.Site);
+                WBTeam eventOwningTeam = WBTeam.GetFromTeamSite(teams, calendarWeb);
+
+                if (eventOwningTeam == null && onWorkBox != null)
                 {
-                    WBLogging.Teams.Unexpected("Didn't find a team for this calender creation event!!!");
+                    eventOwningTeam = onWorkBox.OwningTeam;
+                }
+
+                if (eventOwningTeam == null)
+                {
+                    WBLogging.Teams.Unexpected("Didn't find an eventOwningTeam for this calender creation event!!!");
                 }
                 else
                 {
-                    WBLogging.Teams.Unexpected("Found team: " + team.Name + " | " + team.TeamSiteUrl);
+                    WBLogging.Teams.Unexpected("Found team: " + eventOwningTeam.Name + " | " + eventOwningTeam.TeamSiteUrl);
                 }
 
 
@@ -110,7 +117,7 @@ namespace WorkBoxFramework
                     description,
                     eventDate,
                     endDate,
-                    team,
+                    eventOwningTeam,
                     null,
                     defaultTemplateTitle);
 
@@ -145,6 +152,8 @@ namespace WorkBoxFramework
                         workBox.Item["EndDate"] = properties.ListItem["EndDate"];
                     }
 
+                    workBox.GenerateTitle();
+                    workBox.Web.Title = workBox.GenerateWorkBoxWebSiteTitle();
                     workBox.JustUpdate();
                     workBox.UpdateCachedDetails();
                 }

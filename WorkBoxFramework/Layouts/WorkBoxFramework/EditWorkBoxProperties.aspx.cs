@@ -74,24 +74,49 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void saveButton_OnClick(object sender, EventArgs e)
         {
-            WorkBox.ShortTitle = WorkBoxShortTitle.Text;            
-            WorkBox.Web.Title = WorkBoxPrettyTitle.Text;
-            WorkBox.GenerateTitle();
-
-            if (showReferenceID)
+            try
             {
-                WorkBox.ReferenceID = ReferenceID.Text;
-            }
+                bool digestOK = WorkBox.Web.ValidateFormDigest();
 
-            if (showReferenceDate)
-            {
-                if (!ReferenceDate.IsDateEmpty)
+                if (digestOK)
                 {
-                    WorkBox.ReferenceDate = ReferenceDate.SelectedDate;
-                }
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        using (SPSite elevatedSite = new SPSite(WorkBox.Site.ID))
+                        using (SPWeb elevatedWorkBoxWeb = elevatedSite.OpenWeb(WorkBox.Web.ID))
+                        {
+                            elevatedSite.AllowUnsafeUpdates = true;
+                            elevatedWorkBoxWeb.AllowUnsafeUpdates = true;
+
+                            WorkBox elevatedWorkBox = new WorkBox(elevatedSite, elevatedWorkBoxWeb);
+                            elevatedWorkBox.ShortTitle = WorkBoxShortTitle.Text;
+                            elevatedWorkBox.Web.Title = WorkBoxPrettyTitle.Text;
+                            elevatedWorkBox.GenerateTitle();
+
+                            if (showReferenceID)
+                            {
+                                elevatedWorkBox.ReferenceID = ReferenceID.Text;
+                            }
+
+                            if (showReferenceDate)
+                            {
+                                if (!ReferenceDate.IsDateEmpty)
+                                {
+                                    elevatedWorkBox.ReferenceDate = ReferenceDate.SelectedDate;
+                                }
+                            }
+
+                            elevatedWorkBox.Update();
+                        }
+                    });
+                }            
+            }
+            catch (Exception exception)
+            {
+                WBUtils.SendErrorReport(SPContext.Current.Web, "Exception in EditWorkBoxPropertise.saveButton_OnClick()", "Something went wrong when saving: " + exception.Message + " ... " + exception.StackTrace);
+                throw new NotImplementedException("Something went wrong when saving the properties changes");
             }
 
-            WorkBox.Update();
             returnFromDialogOK("");
         }
 

@@ -61,6 +61,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             string relatedWorkBoxUrl = "";
             string recordsTypeGUIDString = "";
+
+            // Set the reference date control to match the locally set locale:
+            ReferenceDate.LocaleId = SPContext.Current.Web.Locale.LCID;
             
             recordsTypes = WBTaxonomy.GetRecordsTypes(SPContext.Current.Site);
             teams = WBTaxonomy.GetTeams(recordsTypes);
