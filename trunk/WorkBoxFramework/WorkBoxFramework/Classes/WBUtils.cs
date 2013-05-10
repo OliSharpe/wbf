@@ -1134,7 +1134,7 @@ namespace WorkBoxFramework
             WBLogging.Generic.Unexpected("SENDING ERROR REPORT: " + subject);
 
             // This obviously a very very early implementation of this method!!
-            WBUtils.SendEmail(spWeb, "oli@gometa.co.uk", subject, body, false);
+            WBUtils.SendEmail(spWeb, "oli.sharpe@islington.gov.uk", subject, body, false);
         }
 
         internal static List<SPUser> RemoveUser(List<SPUser> users, SPUser userToRemove)

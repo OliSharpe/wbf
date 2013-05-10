@@ -849,6 +849,11 @@ namespace WorkBoxFramework
         public static readonly WBColumn WorkBoxTemplateUseFolderPattern = WBColumn.BooleanColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE_USE_FOLDER_PATTERN);
         public static readonly WBColumn WorkBoxTemplateName = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE_NAME);
 
+        public static readonly WBColumn PrecreateWorkBoxes = WBColumn.IntegerColumn(WorkBox.COLUMN_NAME__PRECREATE_WORK_BOXES);
+        public static readonly WBColumn PrecreatedWorkBoxesList = WBColumn.TextColumn(WorkBox.COLUMN_NAME__PRECREATED_WORK_BOXES_LIST);
+        public static readonly WBColumn RequestPrecreatedWorkBoxList = WBColumn.TextColumn(WorkBox.COLUMN_NAME__REQUEST_PRECREATED_WORK_BOX_LIST);
+        public static readonly WBColumn WorkBoxListID = WBColumn.IntegerColumn(WorkBox.COLUMN_NAME__WORK_BOX_LIST_ID);
+
         private static string[] commands = 
         {
             WBTimerTask.COMMAND__COMPOSITE_TEAMS,
@@ -856,7 +861,8 @@ namespace WorkBoxFramework
             WBTimerTask.COMMAND__FOLDER_GROUPS_MAPPING,
             WBTimerTask.COMMAND__WORK_BOX_STATUS_UPDATES,
             WBTimerTask.COMMAND__CACHE_WORK_BOX_DETAILS,
-            WBTimerTask.COMMAND__UPDATE_RECENTLY_VISITED_WORK_BOXES
+            WBTimerTask.COMMAND__UPDATE_RECENTLY_VISITED_WORK_BOXES,
+            WBTimerTask.COMMAND__PRECREATE_WORK_BOXES
         };
 
         public static readonly WBColumn Command = WBColumn.ChoiceColumn(WBTimerTask.COLUMN_NAME__COMMAND, commands);

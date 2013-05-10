@@ -735,7 +735,11 @@ namespace WorkBoxFramework
                 WBColumn.WorkBoxInviteVisitingEmailBody,
                 WBColumn.WorkBoxTemplateUseFolderPattern,
                 WBColumn.WorkBoxTemplateName,
-           
+                WBColumn.PrecreateWorkBoxes,
+                WBColumn.PrecreatedWorkBoxesList,
+                WBColumn.RequestPrecreatedWorkBoxList,
+                WBColumn.WorkBoxListID, 
+
                 WBColumn.ExecutionOrder,
                 WBColumn.Command,
                 WBColumn.TargetURL,

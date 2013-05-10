@@ -97,7 +97,10 @@ namespace WorkBoxFramework
         public const string COLUMN_NAME__WORK_BOX_INVITE_VISITING_EMAIL_SUBJECT = "WorkBoxInviteVisitingEmailSubject";
         public const string COLUMN_NAME__WORK_BOX_INVITE_VISITING_EMAIL_BODY = "WorkBoxInviteVisitingEmailBody";
         public const string COLUMN_NAME__WORK_BOX_TEMPLATE_USE_FOLDER_PATTERN = "WorkBoxTemplateUseFolderPattern";
-
+        public const string COLUMN_NAME__PRECREATE_WORK_BOXES = "PrecreateWorkBoxes";
+        public const string COLUMN_NAME__REQUEST_PRECREATED_WORK_BOX_LIST = "RequestPrecreatedWorkBoxList";
+        public const string COLUMN_NAME__PRECREATED_WORK_BOXES_LIST = "PrecreatedWorkBoxesList";
+        public const string COLUMN_NAME__WORK_BOX_LIST_ID = "WorkBoxListID";
 
         public const string COLUMN_NAME__WORK_BOX_LINKED_CALENDARS = "WorkBoxLinkedCalendars";
 
@@ -347,6 +350,8 @@ namespace WorkBoxFramework
         #endregion
 
         #region Properties
+
+        internal bool FirstUseOfWorkBox = false;
 
         private bool _useable = false;
         public bool Usable { get { return _useable; } }
@@ -787,7 +792,7 @@ namespace WorkBoxFramework
         public DateTime DateLastModified
         {
             get { return (DateTime)Item[COLUMN_NAME__WORK_BOX_DATE_LAST_MODIFIED]; }
-            set { Item[COLUMN_NAME__WORK_BOX_DATE_LAST_MODIFIED] = value; }
+            // set { Item[COLUMN_NAME__WORK_BOX_DATE_LAST_MODIFIED] = value; }
         }
 
 
@@ -1125,11 +1130,9 @@ namespace WorkBoxFramework
             if (ticksWhenVisited > currentLastVisitedTicks)
             {
                 Item.WBxSet(WBColumn.WorkBoxDateLastVisited, new DateTime(ticksWhenVisited));
-                if (_web != null)
-                {
-                    // We're going to update this value as often as we can - but it wont always be up to date.
-                    Item[COLUMN_NAME__WORK_BOX_DATE_LAST_MODIFIED] = _web.LastItemModifiedDate;
-                }
+
+                // We're going to update this value as often as we can - but it wont always be up to date.
+                UpdateDateLastModified();
 
                 CachedListItemID = UpdateCachedDetails(cachedDetailsList);
 
@@ -1139,17 +1142,13 @@ namespace WorkBoxFramework
 
         public void Update()
         {
+            UpdateDateLastModified();
+            
             if (_item != null)
             {
                 checkOwnersAreAlsoInvolved();
 
                 WBLogging.WorkBoxes.Verbose("In WorkBox.Update(): Checked that owners are involved - now about to do the update:");
-
-                if (_web != null)
-                {
-                    // We're going to update this value as often as we can - but it wont always be up to date.
-                    Item[COLUMN_NAME__WORK_BOX_DATE_LAST_MODIFIED] = _web.LastItemModifiedDate;
-                }
 
                 CachedListItemID = UpdateCachedDetails();
 
@@ -1188,6 +1187,33 @@ namespace WorkBoxFramework
 
         }
 
+        private void UpdateDateLastModified()
+        {
+            if (_item == null) return;
+
+            if (FirstUseOfWorkBox)
+            {
+                _item[COLUMN_NAME__WORK_BOX_DATE_LAST_MODIFIED] = DateTime.Now;
+                FirstUseOfWorkBox = false;
+            }
+            else
+            {
+                if (_web == null) return;
+
+                if (!_item.WBxColumnHasValue(COLUMN_NAME__WORK_BOX_DATE_LAST_MODIFIED))
+                {
+                    _item[COLUMN_NAME__WORK_BOX_DATE_LAST_MODIFIED] = _web.LastItemModifiedDate;
+                }
+                else
+                {
+                    if (((DateTime)_item[COLUMN_NAME__WORK_BOX_DATE_LAST_MODIFIED]) < _web.LastItemModifiedDate)
+                    {
+                        _item[COLUMN_NAME__WORK_BOX_DATE_LAST_MODIFIED] = _web.LastItemModifiedDate;
+                    }
+                }
+            }
+        }
+
         public void Dispose()
         {
             if (_web != null && _webNeedsDisposing) _web.Dispose();
@@ -1207,22 +1233,6 @@ namespace WorkBoxFramework
             WBLogging.WorkBoxes.Unexpected("In UpdateLinkedCalendars()");
 
             /*
-            if (OwningTeam == null)
-            {
-                WBLogging.WorkBoxes.Unexpected("Owning team has not been set yet ... it's null");
-                return;
-            }
-
-            if (String.IsNullOrEmpty(OwningTeam.TeamSiteUrl))
-            {
-                WBLogging.WorkBoxes.Unexpected("Owning team's team site URL has not been set yet ... it's null or empty");
-                return;
-            }
-            else
-            {
-                WBLogging.WorkBoxes.Unexpected("Owning team's team site URL is: " + OwningTeam.TeamSiteUrl);
-            }
-
             if (Web == null)
             {
                 WBLogging.WorkBoxes.Unexpected("The SPWeb doesn't apppear to have been created yet as it's null");
@@ -1239,19 +1249,54 @@ namespace WorkBoxFramework
             // Just setting the start time 'EventDate' column if it exists to keep it in line with the reference date column:
             Item.WBxSet(WBColumn.StartTime, ReferenceDate);
 
-            if (!Item.WBxHasValue(WBColumn.WorkBoxLinkedCalendars))
+            String linkedCalendarsDetailsString = Item.WBxGetAsString(WBColumn.WorkBoxLinkedCalendars);
+
+            if (String.IsNullOrEmpty(linkedCalendarsDetailsString))
             {
-                WBLogging.WorkBoxes.HighLevel("The work box item does not have any linked calendar details.");
-                return;
+                WBLogging.WorkBoxes.HighLevel("The work box item does not have any linked calendar details: possibly going to set based on OwningTeam");
+
+                if (OwningTeam == null)
+                {
+                    WBLogging.WorkBoxes.Unexpected("Owning team has not been set yet ... it's null");
+                    return;
+                }
+
+                if (String.IsNullOrEmpty(OwningTeam.TeamSiteUrl))
+                {
+                    WBLogging.WorkBoxes.Unexpected("Owning team's team site URL has not been set yet ... it's null or empty");
+                    return;
+                }
+                else
+                {
+                    WBLogging.WorkBoxes.Unexpected("Owning team's team site URL is: " + OwningTeam.TeamSiteUrl);
+                }
+
+                using (SPSite calendarSite = new SPSite(OwningTeam.TeamSiteUrl))
+                using (SPWeb calendarWeb = calendarSite.OpenWeb())
+                {
+                    // This is just an initial implementation of this 'finding' process. Really it should look through all calendars to 
+                    // find the one that has the the settings for this template title!!
+                    try
+                    {
+                        SPList calendar = calendarWeb.Lists["Calendar"];
+                        linkedCalendarsDetailsString = calendarWeb.Url + calendar.DefaultViewUrl + "|" + calendar.ID + "|-1";
+                    }
+                    catch (Exception exception)
+                    {
+                        WBLogging.WorkBoxes.Unexpected("could not find a calendar on the team site called 'Calendar' to link to");                        
+                    }                    
+                }
+
+                if (String.IsNullOrEmpty(linkedCalendarsDetailsString)) return;
             }
             else
             {
                 WBLogging.WorkBoxes.HighLevel("The linked calenders have the following details: " + Item.WBxGetAsString(WBColumn.WorkBoxLinkedCalendars));
             }
 
-            String[] linkedCalendarsDetails = Item.WBxGetAsString(WBColumn.WorkBoxLinkedCalendars).Split(';');
+            String[] linkedCalendarsDetailsArray = linkedCalendarsDetailsString.Split(';');
 
-            foreach (String linkedCalendarDetails in linkedCalendarsDetails)
+            foreach (String linkedCalendarDetails in linkedCalendarsDetailsArray)
             {
                 String[] details = linkedCalendarDetails.Split('|');
                 if (details.Length < 3)
@@ -1288,10 +1333,13 @@ namespace WorkBoxFramework
 
                     WBLogging.WorkBoxes.Unexpected("Got the calendar list: " + calendarList.DefaultDisplayFormUrl);
 
+                    /*
+                     * This was just to help debugging in the first place:
                     foreach (SPListItem item in calendarList.Items)
                     {
                         WBLogging.WorkBoxes.Unexpected("Found item: " + item.ID + " | " + item.Title + " | " + item.WBxGetColumnAsString("WorkBoxURL"));
                     }
+                     */
 
 
                     SPListItem calendarEvent = null;
@@ -1315,7 +1363,7 @@ namespace WorkBoxFramework
 
                     if (calendarEvent == null)
                     {
-                        WBLogging.WorkBoxes.Unexpected("Adding new calendar date");
+                        WBLogging.WorkBoxes.Unexpected("Adding new calendar event");
                         calendarEvent = calendarList.Items.Add();
                     }
 
@@ -1396,10 +1444,8 @@ namespace WorkBoxFramework
 
             if (Status == WorkBox.WORK_BOX_STATUS__OPEN)
             {
-                if (WebExists)
-                {
-                    Item[COLUMN_NAME__WORK_BOX_DATE_LAST_MODIFIED] = Web.LastItemModifiedDate;
-                }
+                // We're going to update this value as often as we can - but it wont always be up to date.
+                UpdateDateLastModified();
 
                 int unmodifiedTimeScalar = this.RecordsType.AutoCloseTimeScalar;
 
@@ -1525,9 +1571,11 @@ namespace WorkBoxFramework
 
         public bool Create(String auditComment)
         {
+            bool previousWebAllowUnsafeUpdates = Collection.Web.AllowUnsafeUpdates;
+            Collection.Web.AllowUnsafeUpdates = true;
+
             using (EventsFiringDisabledScope noevents = new EventsFiringDisabledScope())
             {
-                Collection.Web.AllowUnsafeUpdates = true;
 
                 // Make sure that any update events fired don't re-trigger the create event:
                 StatusChangeRequest = "";
@@ -1570,34 +1618,7 @@ namespace WorkBoxFramework
 
                 WBLogging.WorkBoxes.Verbose("Generated title is: " + Title);
 
-                String workBoxWebSiteTitle = Title;
-
-                WBRecordsType recordsTypeForName = Template.Item.WBxGetSingleTermColumn<WBRecordsType>(null, WBColumn.RecordsType.DisplayName);
-                if (recordsTypeForName != null && recordsTypeForName.Name.Contains("Team meetings"))
-                {
-                    string referenceDateString = string.Format("({0}-{1}-{2})",
-                            ReferenceDate.Year.ToString("D4"),
-                            ReferenceDate.Month.ToString("D2"),
-                            ReferenceDate.Day.ToString("D2"));
-
-                    String teamName = "";
-                            if (this.OwningTeam != null && !String.IsNullOrEmpty(this.OwningTeam.Name))
-                            {
-                                teamName = this.OwningTeam.Name + " ";
-                            }
-
-                    string seriesTag = "";
-
-                    if (this.SeriesTag(null) != null)
-                    {
-                        seriesTag = SeriesTag(null).Name + " ";
-                    }
-
-                    workBoxWebSiteTitle = teamName + GetUniqueIDPrefix() + " " + seriesTag + referenceDateString;
-
-                    WBLogging.WorkBoxes.Verbose("Creating a different site name for a team meeting:" + workBoxWebSiteTitle);
-                }
-
+                String workBoxWebSiteTitle = GenerateWorkBoxWebSiteTitle();
 
                 int prefixLength = Collection.UniqueIDPrefix.Length;
                 int idLength = UniqueID.Length;
@@ -1661,12 +1682,31 @@ namespace WorkBoxFramework
 
                                     WBLogging.WorkBoxes.Verbose("Set all of the info to link work box web back to metadata item");
 
-                                    SPDocumentLibrary documentLibrary = (SPDocumentLibrary)Web.Lists["Documents"];
+                                    SPDocumentLibrary documentLibrary = null;
 
-                                    DocumentLibraryGUIDString = documentLibrary.ID.WBxToString();
+                                    try
+                                    {
+                                        documentLibrary = (SPDocumentLibrary)Web.Lists["Documents"];
+                                    }
+                                    catch (Exception e) { }
 
-                                    documentLibrary.BrowserFileHandling = SPBrowserFileHandling.Permissive;
-                                    documentLibrary.Update();
+                                    if (documentLibrary == null)
+                                    {
+                                        try
+                                        {
+                                            documentLibrary = (SPDocumentLibrary)Web.Lists["Shared Documents"];
+                                        }
+                                        catch (Exception e) { }
+                                    }
+
+                                    if (documentLibrary != null)
+                                    {
+                                        DocumentLibraryGUIDString = documentLibrary.ID.WBxToString();
+
+                                        documentLibrary.BrowserFileHandling = SPBrowserFileHandling.Permissive;
+                                        documentLibrary.Update();
+                                    }
+
 
                                     /* The documents library is now going to remain being called 'Documents'
                                     string documentsRootFolderName = Title + " - Documents";
@@ -1718,7 +1758,7 @@ namespace WorkBoxFramework
 
             Update();
 
-            Collection.Web.AllowUnsafeUpdates = false;
+            Collection.Web.AllowUnsafeUpdates = previousWebAllowUnsafeUpdates;
 
             return IsInErrorStatus;
         }
@@ -1926,6 +1966,39 @@ namespace WorkBoxFramework
             WBLogging.WorkBoxes.Verbose("The work box generated title is: " + generatedTitle);
         }
 
+        internal String GenerateWorkBoxWebSiteTitle()
+        {
+            String workBoxWebSiteTitle = Title;
+
+            WBRecordsType recordsTypeForName = Template.Item.WBxGetSingleTermColumn<WBRecordsType>(null, WBColumn.RecordsType.DisplayName);
+            if (recordsTypeForName != null && recordsTypeForName.Name.Contains("Team meetings"))
+            {
+                string referenceDateString = string.Format("({0}-{1}-{2})",
+                        ReferenceDate.Year.ToString("D4"),
+                        ReferenceDate.Month.ToString("D2"),
+                        ReferenceDate.Day.ToString("D2"));
+
+                String teamName = "";
+                if (this.OwningTeam != null && !String.IsNullOrEmpty(this.OwningTeam.Name))
+                {
+                    teamName = this.OwningTeam.Name + " ";
+                }
+
+                string seriesTag = "";
+
+                if (this.SeriesTag(null) != null)
+                {
+                    seriesTag = SeriesTag(null).Name + " ";
+                }
+
+                workBoxWebSiteTitle = teamName + GetUniqueIDPrefix() + " " + seriesTag + referenceDateString;
+
+                WBLogging.WorkBoxes.Verbose("Creating a different site name for a team meeting:" + workBoxWebSiteTitle);
+            }
+
+            return workBoxWebSiteTitle;
+        }
+
         public void SetLocalID(string localID)
         {
             if (LocalIDAsString == "")
@@ -1962,6 +2035,8 @@ namespace WorkBoxFramework
                 // Make sure that any later update events fired don't re-trigger the open event:
                 StatusChangeRequest = "";
 
+                bool firstTimeBeingOpened = !HasBeenOpened;
+
                 if (HasBeenDeleted)
                 {
                     AddToErrorMessage("You cannot open again a work box that has been deleted.");
@@ -1990,6 +2065,21 @@ namespace WorkBoxFramework
 
                     ApplyPermissionsForOpenStatus();
                 }
+
+                // Now finally we'll just check if we need to update the spweb title. Currently this only applies to team meetings:
+                if (firstTimeBeingOpened)
+                {
+                    WBLogging.Debug("First time being opened so we're going to update the spweb title: " + Web.Title);
+
+                    Web.Title = GenerateWorkBoxWebSiteTitle();
+                    
+                    WBLogging.Debug("The new spweb title: " + Web.Title);
+                }
+                else
+                {
+                    WBLogging.Debug("Not the first time this work box has been opened");
+                }
+
             }
 
             // This last set of changes we will do outside of the 'no-events' scope in order

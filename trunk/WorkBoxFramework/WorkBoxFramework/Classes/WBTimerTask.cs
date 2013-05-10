@@ -45,6 +45,7 @@ namespace WorkBoxFramework
         internal const string COMMAND__WORK_BOX_STATUS_UPDATES = "Work Box Status Updates (Work Box Collection | [Current Status])";
         internal const string COMMAND__CACHE_WORK_BOX_DETAILS = "Cache Work Box Details (Work Box Collection | [Current Status])";
         internal const string COMMAND__UPDATE_RECENTLY_VISITED_WORK_BOXES = "Update Recently Visited Work Boxes ([] | [All])";
+        internal const string COMMAND__PRECREATE_WORK_BOXES = "Precreate Work Boxes (Work Box Collection)";
 
         private const string DEFAULT_LIST_NAME__COMPOSITE_TEAMS = "Composite Teams";
         private const string DEFAULT_LIST_NAME__FOLDER_GROUPS_MAPPING = "Folder Groups Mapping";
@@ -100,6 +101,13 @@ namespace WorkBoxFramework
                     {
                         doUpdateRecentlyVisitedWorkBoxes(targetUrl, argument1);
                         break;
+                    }
+
+                case COMMAND__PRECREATE_WORK_BOXES:
+                    {
+                        doPrecreateWorkBoxes(targetUrl, argument1);
+                        break;
+
                     }
 
 
@@ -495,6 +503,38 @@ namespace WorkBoxFramework
 
 
         }
+
+
+        private static void doPrecreateWorkBoxes(String workBoxCollectionURL, String flag)
+        {
+            WBLogging.TimerTasks.Monitorable("Running doPrecreateWorkBoxes command");
+
+            using (WBCollection collection = new WBCollection(workBoxCollectionURL))
+            {
+                try 
+                {
+                    SPList templates = collection.TemplatesList;
+
+                    foreach (SPListItem item in templates.Items)
+                    {
+                        WBTemplate template = new WBTemplate(collection, item);
+
+                        template.PrecreateWorkBoxes();
+                    }
+
+                }
+                catch (Exception exception)
+                {
+                    WBLogging.TimerTasks.Unexpected("Exception happened when doing PrecreateWorkBoxes: " + workBoxCollectionURL, exception);
+                }
+
+            }
+
+            WBLogging.TimerTasks.Monitorable("Finished doPrecreateWorkBoxes command");
+        }
+
+        
+        
         #endregion
 
     }

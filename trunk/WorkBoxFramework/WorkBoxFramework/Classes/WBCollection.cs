@@ -922,13 +922,27 @@ namespace WorkBoxFramework
         {
             WBLogging.WorkBoxCollections.Unexpected("In: RequestNewWorkBox()");
 
+            // First let's make sure that we have a template to be using:
+            if (template == null) template = DefaultTemplate();
+
+            WorkBox newWorkBox = template.GetPrecreatedWorkBoxIfAny(shortTitle);
+            SPListItem newItem = null;
+            bool usingPrecreatedWorkBox = false;
+            if (newWorkBox != null)
+            {
+                usingPrecreatedWorkBox = true;
+                newItem = newWorkBox.Item;
+            }
+
             using (EventsFiringDisabledScope noevents = new EventsFiringDisabledScope())
             {
-                SPListItem newItem = List.AddItem();
-                WorkBox newWorkBox = new WorkBox(this, newItem);
+                if (newItem == null)
+                {
+                    newItem = List.AddItem();
+                    newWorkBox = new WorkBox(this, newItem);
+                }
 
                 /* First we set the required items: */
-                if (template == null) template = DefaultTemplate();
                 newWorkBox.Template = template;
 
                 newWorkBox.RecordsType = template.RecordsType(newWorkBox.RecordsTypes);
@@ -963,24 +977,37 @@ namespace WorkBoxFramework
                     }
                 }
 
+                newWorkBox.FirstUseOfWorkBox = true;
+
                 /* Then do an initial update to ensure that the item is assigned an ID: */
                 newWorkBox.Update();
 
-
                 newWorkBox.ShortTitle = shortTitle.WBxTrim(); // This WBxTrim is as much to check for null as to trim the title passed in.
 
-                if (localID == null || localID == "") newWorkBox.GenerateLocalID();
-                else newWorkBox.SetLocalID(localID);
-                newWorkBox.GenerateUniqueID();
+
+                if (!usingPrecreatedWorkBox) 
+                {
+                    if (localID == null || localID == "")
+                    {
+                        newWorkBox.GenerateLocalID();
+                    }
+                    else 
+                    { 
+                        newWorkBox.SetLocalID(localID); 
+                    }
+                    newWorkBox.GenerateUniqueID();
+                }
 
                 if (owningTeam == null) owningTeam = DefaultOwningTeam;
                 newWorkBox.OwningTeam = owningTeam;
 
                 if (involvedTeams != null) newWorkBox.InvolvedTeams = involvedTeams;
 
-                newWorkBox.Status = WorkBox.WORK_BOX_STATUS__REQUESTED;
+                if (String.IsNullOrEmpty(newWorkBox.Status))
+                {
+                    newWorkBox.Status = WorkBox.WORK_BOX_STATUS__REQUESTED;
+                }
                 newWorkBox.GenerateTitle();
-
                 newWorkBox.Update();
 
                 return newWorkBox;
