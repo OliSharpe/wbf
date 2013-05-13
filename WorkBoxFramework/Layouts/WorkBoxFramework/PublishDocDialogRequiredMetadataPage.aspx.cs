@@ -45,8 +45,6 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         WBTaxonomy subjectTagsTaxonomy = null;
         WBTaxonomy functionalAreasTaxonomy = null;
 
-
-
         WBRecordsType documentRecordsType = null;
         SPListItem sourceDocAsItem = null;
         SPFile sourceFile = null;

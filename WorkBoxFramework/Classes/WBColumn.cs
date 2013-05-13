@@ -827,7 +827,7 @@ namespace WorkBoxFramework
         public static readonly WBColumn OriginalFilename = WBColumn.TextColumn(WorkBox.COLUMN_NAME__ORIGINAL_FILENAME);
         public static readonly WBColumn SourceSystem = WBColumn.TextColumn("Source System");
         public static readonly WBColumn SourceID = WBColumn.TextColumn("Source ID");
-        public static readonly WBColumn RecordID = WBColumn.CounterColumn("Record ID");
+        public static readonly WBColumn RecordID = WBColumn.IntegerColumn("Record ID");
 
 
         public static readonly WBColumn WorkBoxTemplateTitle = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE_TITLE);
