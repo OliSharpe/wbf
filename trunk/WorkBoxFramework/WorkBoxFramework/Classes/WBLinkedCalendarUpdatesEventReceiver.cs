@@ -153,9 +153,18 @@ namespace WorkBoxFramework
                     }
 
                     workBox.GenerateTitle();
-                    workBox.Web.Title = workBox.GenerateWorkBoxWebSiteTitle();
-                    workBox.JustUpdate();
+                    workBox.Item.Update();
                     workBox.UpdateCachedDetails();
+
+                    workBox.UpdateWorkBoxWebSiteTitle();
+
+                    // Finally we're going to update the title of the calendar event as it may have changed 
+                    // in light of the update to the title of the associated work box.
+                    using (EventsFiringDisabledScope noevents = new EventsFiringDisabledScope())
+                    {
+                        properties.ListItem["Title"] = workBox.Title;
+                        properties.ListItem.Update();
+                    }
                 }
             }
 

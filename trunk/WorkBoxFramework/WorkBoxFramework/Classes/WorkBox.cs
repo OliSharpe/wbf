@@ -1025,6 +1025,7 @@ namespace WorkBoxFramework
 
         internal int UpdateCachedDetails(SPList cachedDetailsList)
         {
+            WBLogging.WorkBoxes.Verbose("UpdateCachedDetails(SPList): Starting");
             int cachedListItemID = CachedListItemID;
 
             SPListItem cachedItem = null;                
@@ -1080,11 +1081,15 @@ namespace WorkBoxFramework
 
             cachedItem.Update();
 
+            WBLogging.WorkBoxes.Verbose("UpdateCachedDetails(SPList): Ending");
+
             return cachedItem.ID;
         }
 
         internal int UpdateCachedDetails()
         {
+            WBLogging.WorkBoxes.Verbose("UpdateCachedDetails(): Starting");
+
             String cachedListUrl = WBFarm.Local.OpenWorkBoxesCachedDetailsListUrl;
 
             if (String.IsNullOrEmpty(cachedListUrl)) return -1;
@@ -1102,6 +1107,8 @@ namespace WorkBoxFramework
                     using (SPSite elevatedCacheSite = new SPSite(cachedListUrl))
                     using (SPWeb elevatedCacheWeb = elevatedCacheSite.OpenWeb())
                     {
+                        WBLogging.WorkBoxes.Verbose("UpdateCachedDetails(): Got the elevated cache site and web objects");
+
                         elevatedCacheWeb.AllowUnsafeUpdates = true;
                         SPList cachedDetailsList = elevatedCacheWeb.GetList(cachedListUrl);
 
@@ -1111,6 +1118,8 @@ namespace WorkBoxFramework
                     }
                 });
             }
+
+            WBLogging.WorkBoxes.Verbose("UpdateCachedDetails(): Ending");
 
             return cachedListItemID;
         }
@@ -1230,7 +1239,7 @@ namespace WorkBoxFramework
 
         public void UpdateLinkedCalendars()
         {
-            WBLogging.WorkBoxes.Unexpected("In UpdateLinkedCalendars()");
+            WBLogging.WorkBoxes.Verbose("UpdateLinkedCalendars(): Starting");
 
             /*
             if (Web == null)
@@ -1242,7 +1251,7 @@ namespace WorkBoxFramework
 
             if (!this.WebExists)
             {
-                WBLogging.WorkBoxes.HighLevel("The work box for this event work box item hasn't been created yet - so not running UpdateLinkedCalendar()");
+                WBLogging.WorkBoxes.Verbose("The work box for this event work box item hasn't been created yet - so not running UpdateLinkedCalendar()");
                 return;
             }
 
@@ -1253,22 +1262,22 @@ namespace WorkBoxFramework
 
             if (String.IsNullOrEmpty(linkedCalendarsDetailsString))
             {
-                WBLogging.WorkBoxes.HighLevel("The work box item does not have any linked calendar details: possibly going to set based on OwningTeam");
+                WBLogging.WorkBoxes.Verbose("The work box item does not have any linked calendar details: possibly going to set based on OwningTeam");
 
                 if (OwningTeam == null)
                 {
-                    WBLogging.WorkBoxes.Unexpected("Owning team has not been set yet ... it's null");
+                    WBLogging.Debug("Owning team has not been set yet ... it's null");
                     return;
                 }
 
                 if (String.IsNullOrEmpty(OwningTeam.TeamSiteUrl))
                 {
-                    WBLogging.WorkBoxes.Unexpected("Owning team's team site URL has not been set yet ... it's null or empty");
+                    WBLogging.WorkBoxes.Verbose("Owning team's team site URL has not been set yet ... it's null or empty");
                     return;
                 }
                 else
                 {
-                    WBLogging.WorkBoxes.Unexpected("Owning team's team site URL is: " + OwningTeam.TeamSiteUrl);
+                    WBLogging.WorkBoxes.Verbose("Owning team's team site URL is: " + OwningTeam.TeamSiteUrl);
                 }
 
                 using (SPSite calendarSite = new SPSite(OwningTeam.TeamSiteUrl))
@@ -1291,7 +1300,7 @@ namespace WorkBoxFramework
             }
             else
             {
-                WBLogging.WorkBoxes.HighLevel("The linked calenders have the following details: " + Item.WBxGetAsString(WBColumn.WorkBoxLinkedCalendars));
+                WBLogging.WorkBoxes.Verbose("The linked calenders have the following details: " + Item.WBxGetAsString(WBColumn.WorkBoxLinkedCalendars));
             }
 
             String[] linkedCalendarsDetailsArray = linkedCalendarsDetailsString.Split(';');
@@ -1315,9 +1324,9 @@ namespace WorkBoxFramework
                     continue;
                 }
 
-                WBLogging.WorkBoxes.Unexpected("The calendarURL = " + calendarURL);
-                WBLogging.WorkBoxes.Unexpected("The calendarGUID = " + calendarGUID);
-                WBLogging.WorkBoxes.Unexpected("The eventIDString = " + eventIDString);
+                WBLogging.WorkBoxes.Verbose("The calendarURL = " + calendarURL);
+                WBLogging.WorkBoxes.Verbose("The calendarGUID = " + calendarGUID);
+                WBLogging.WorkBoxes.Verbose("The eventIDString = " + eventIDString);
 
                 int eventID = Convert.ToInt32(eventIDString);
 
@@ -1325,13 +1334,13 @@ namespace WorkBoxFramework
                 using (SPWeb calendarWeb = calendarSite.OpenWeb())
                 using (EventsFiringDisabledScope noevents = new EventsFiringDisabledScope())
                 {
-                    WBLogging.WorkBoxes.Unexpected("Opened calendarSite = " + calendarSite.Url);
-                    WBLogging.WorkBoxes.Unexpected("Opened calendarWeb = " + calendarWeb.Url);
+                    WBLogging.WorkBoxes.Verbose("Opened calendarSite = " + calendarSite.Url);
+                    WBLogging.WorkBoxes.Verbose("Opened calendarWeb = " + calendarWeb.Url);
 
 
                     SPList calendarList = calendarWeb.Lists[new Guid(calendarGUID)];
 
-                    WBLogging.WorkBoxes.Unexpected("Got the calendar list: " + calendarList.DefaultDisplayFormUrl);
+                    WBLogging.WorkBoxes.Verbose("Got the calendar list: " + calendarList.DefaultDisplayFormUrl);
 
                     /*
                      * This was just to help debugging in the first place:
@@ -1351,7 +1360,7 @@ namespace WorkBoxFramework
                         }
                         catch (Exception exception)
                         {
-                            WBLogging.WorkBoxes.Unexpected("Coulnd't find the item by event  id: " + eventID, exception);
+                            WBLogging.WorkBoxes.Verbose("Coulnd't find the item by event id: " + eventID);
                         }
 
                     }
@@ -1363,7 +1372,7 @@ namespace WorkBoxFramework
 
                     if (calendarEvent == null)
                     {
-                        WBLogging.WorkBoxes.Unexpected("Adding new calendar event");
+                        WBLogging.WorkBoxes.Verbose("Adding new calendar event");
                         calendarEvent = calendarList.Items.Add();
                     }
 
@@ -1377,7 +1386,7 @@ namespace WorkBoxFramework
 
                     calendarEvent["EventType"] = 1;
 
-                    WBLogging.WorkBoxes.Unexpected("The reference date is: " + ReferenceDate);
+                    WBLogging.WorkBoxes.Verbose("The reference date is: " + ReferenceDate);
 
                     calendarEvent.WBxSet(WBColumn.StartTime, ReferenceDate);
                     if (Item.WBxHasValue(WBColumn.EndTime))
@@ -1401,11 +1410,8 @@ namespace WorkBoxFramework
                     calendarEvent.Update();
                 }
 
-            }
-
-              
-            WBLogging.WorkBoxes.Unexpected("Leaving UpdateLinkedCalendars()");
-
+            }              
+            WBLogging.WorkBoxes.Verbose("UpdateLinkedCalendars(): Ending");
         }
 
 
@@ -1958,16 +1964,35 @@ namespace WorkBoxFramework
 
             }
 
-            
-
-
             Title = generatedTitle;
             WBLogging.WorkBoxes.Verbose("The work box naming convention used was: " + RecordsType.WorkBoxNamingConvention);
             WBLogging.WorkBoxes.Verbose("The work box generated title is: " + generatedTitle);
         }
 
+        internal void UpdateWorkBoxWebSiteTitle()
+        {
+            WBLogging.WorkBoxes.Verbose("UpdateWorkBoxWebSiteTitle(): Starting");
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                using (SPSite elevatedWorkBoxSite = new SPSite(Site.ID))
+                using (SPWeb elevatedWorkBoxWeb = elevatedWorkBoxSite.OpenWeb(Web.ID))
+                {
+                    elevatedWorkBoxWeb.AllowUnsafeUpdates = true;
+                    elevatedWorkBoxWeb.Title = GenerateWorkBoxWebSiteTitle();
+                    elevatedWorkBoxWeb.Update();
+
+                    elevatedWorkBoxWeb.AllowUnsafeUpdates = false;
+                }
+            });
+
+            WBLogging.WorkBoxes.Verbose("UpdateWorkBoxWebSiteTitle(): Ending");
+        }
+
         internal String GenerateWorkBoxWebSiteTitle()
         {
+            WBLogging.WorkBoxes.Verbose("GenerateWorkBoxWebSiteTitle(): Starting");
+
             String workBoxWebSiteTitle = Title;
 
             WBRecordsType recordsTypeForName = Template.Item.WBxGetSingleTermColumn<WBRecordsType>(null, WBColumn.RecordsType.DisplayName);
@@ -1996,6 +2021,7 @@ namespace WorkBoxFramework
                 WBLogging.WorkBoxes.Verbose("Creating a different site name for a team meeting:" + workBoxWebSiteTitle);
             }
 
+            WBLogging.WorkBoxes.Verbose("GenerateWorkBoxWebSiteTitle(): Ending");
             return workBoxWebSiteTitle;
         }
 
@@ -2035,8 +2061,6 @@ namespace WorkBoxFramework
                 // Make sure that any later update events fired don't re-trigger the open event:
                 StatusChangeRequest = "";
 
-                bool firstTimeBeingOpened = !HasBeenOpened;
-
                 if (HasBeenDeleted)
                 {
                     AddToErrorMessage("You cannot open again a work box that has been deleted.");
@@ -2065,22 +2089,22 @@ namespace WorkBoxFramework
 
                     ApplyPermissionsForOpenStatus();
                 }
-
-                // Now finally we'll just check if we need to update the spweb title. Currently this only applies to team meetings:
-                if (firstTimeBeingOpened)
-                {
-                    WBLogging.Debug("First time being opened so we're going to update the spweb title: " + Web.Title);
-
-                    Web.Title = GenerateWorkBoxWebSiteTitle();
-                    
-                    WBLogging.Debug("The new spweb title: " + Web.Title);
-                }
-                else
-                {
-                    WBLogging.Debug("Not the first time this work box has been opened");
-                }
-
             }
+
+            // Now finally we'll just check if we need to update the spweb title. Currently this only applies to team meetings:
+            if (!HasBeenOpened)
+            {
+                WBLogging.Debug("First time being opened so we're going to update the spweb title: " + Web.Title);
+
+                UpdateWorkBoxWebSiteTitle();
+
+                WBLogging.Debug("The new spweb title: " + Web.Title);
+            }
+            else
+            {
+                WBLogging.Debug("Not the first time this work box has been opened");
+            }
+
 
             // This last set of changes we will do outside of the 'no-events' scope in order
             // to fire a update change event that can be used by workflows etc.
@@ -2739,8 +2763,8 @@ namespace WorkBoxFramework
 
             if (true) // RecordsType.UseDefaultsWhenPublishingOut)
             {
-                // First we'll double check that this item is the correct content type:
-                SPContentType workBoxDocumentType = sourceDocAsItem.ParentList.ContentTypes[WORK_BOX_DOCUMENT_CONTENT_TYPE_NAME];
+                // First we'll double check that this item is the correct content type:                
+                SPContentType workBoxDocumentType = sourceDocAsItem.ParentList.ContentTypes[WBFarm.Local.WorkBoxDocumentContentTypeName];
                 sourceDocAsItem["ContentTypeId"] = workBoxDocumentType.Id;
                 sourceDocAsItem.Update();
 

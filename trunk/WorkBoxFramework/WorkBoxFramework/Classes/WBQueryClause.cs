@@ -114,7 +114,7 @@ namespace WorkBoxFramework
                     }
                 case WBColumn.DataTypes.Integer:
                     {
-                        return AppendCAMLClause(builder, Column.InternalName, "Integer", Value.ToString());
+                        return AppendCAMLClause(builder, Column.InternalName, "Number", Value.ToString());
                     }
                 case WBColumn.DataTypes.Counter:
                     {

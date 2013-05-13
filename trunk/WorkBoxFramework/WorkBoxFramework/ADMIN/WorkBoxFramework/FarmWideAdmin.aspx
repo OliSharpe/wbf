@@ -295,6 +295,48 @@
 </wssuc:InputFormSection>
 
 
+<!-- Content Types Section -->
+<wssuc:InputFormSection
+	id="ContentTypesNameSection"
+	title="Key Content Types"
+	description="Edit the name of the key content types used by the framework for documents and records. <b>DO NOT EDIT</b> unless you know what you are doing!"
+	runat="server"
+	>
+	<Template_InputFormControls>
+		<wssuc:InputFormControl runat="server">
+			<Template_Control>
+				<table border="0" width="100%" cellspacing="0" cellpadding="2">
+					<tr>
+                        <td>
+                            <b><nobr>Document Content Type Name</nobr></b><br />
+                        </td>
+						<td class="ms-authoringcontrols" valign="top" align="left">
+                            <asp:TextBox ID="DocumentContentTypeName" runat="server" columns="50"/>
+                            <div>
+                                <asp:RequiredFieldValidator ID="DocumentContentTypeNameValidator" runat="server" ErrorMessage="The WBF requires a document content type name to function."
+            ControlToValidate = "DocumentContentTypeName"></asp:RequiredFieldValidator>
+                            </div>
+                        </td>
+                    </tr>
+					<tr>
+                        <td>
+                            <b><nobr>Record Content Type Name</nobr></b><br />
+                        </td>
+						<td class="ms-authoringcontrols" valign="top" align="left">
+                            <asp:TextBox ID="RecordContentTypeName" runat="server" columns="50"/>
+                            <div>
+                                <asp:RequiredFieldValidator ID="RecordContentTypeNameValidator" runat="server" ErrorMessage="The WBF requires a record content type name to function."
+            ControlToValidate = "RecordContentTypeName"></asp:RequiredFieldValidator>
+                            </div>
+                        </td>
+                    </tr>
+
+				</table>
+			</Template_Control>
+		</wssuc:InputFormControl>
+	</Template_InputFormControls>
+</wssuc:InputFormSection>
+
 
 
 <!-- Buttons Section -->

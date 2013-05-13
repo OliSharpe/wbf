@@ -220,6 +220,51 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.RequiredFieldValidator TermStoreGroupNameValidator;
         
         /// <summary>
+        /// ContentTypesNameSection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl ContentTypesNameSection;
+        
+        /// <summary>
+        /// DocumentContentTypeName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox DocumentContentTypeName;
+        
+        /// <summary>
+        /// DocumentContentTypeNameValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator DocumentContentTypeNameValidator;
+        
+        /// <summary>
+        /// RecordContentTypeName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox RecordContentTypeName;
+        
+        /// <summary>
+        /// RecordContentTypeNameValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RecordContentTypeNameValidator;
+        
+        /// <summary>
         /// okButton control.
         /// </summary>
         /// <remarks>
