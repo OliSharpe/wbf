@@ -138,7 +138,7 @@ namespace WBFWebParts.PickedDocumentsGroup
                 return;
             }
 
-            String extranetRecordsLibraryURL = WBFWebPartsUtils.GetExtranetLibraryURL(SPContext.Current);
+            String extranetRecordsLibraryURL = WBFWebPartsUtils.GetPublicExtranetLibraryURL(SPContext.Current);
 
             SPSite extranetRecordsSite = null;
             SPWeb extranetRecordsWeb = null;

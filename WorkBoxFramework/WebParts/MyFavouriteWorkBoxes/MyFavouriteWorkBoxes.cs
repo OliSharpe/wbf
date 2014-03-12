@@ -39,11 +39,18 @@ namespace WorkBoxFramework.MyFavouriteWorkBoxes
     [ToolboxItemAttribute(false)]
     public class MyFavouriteWorkBoxes : WebPart
     {
+        [WebBrowsable(true)]
+        [Personalizable(PersonalizationScope.Shared)]
+        [WebDisplayName("Number To Show")]
+        [WebDescription("How many favourite work boxes should be listed?")]
+        [System.ComponentModel.Category("Configuration")]
+        public int NumberToShow { get; set; }
+
         protected override void CreateChildControls()
         {
 
             Literal literal = new Literal();
-            string html = getScriptCode();
+            string html = "<style type=\"text/css\">\n tr.wbf-extra-favourites-items {display:none;}\n</style>\n\n" + getScriptCode();
 
             SPSite _site = SPContext.Current.Site;
             SPServiceContext _serviceContext = SPServiceContext.GetContext(_site);
@@ -52,6 +59,9 @@ namespace WorkBoxFramework.MyFavouriteWorkBoxes
 
             UserProfileValueCollection myFavouriteWorkBoxesPropertyValue = profile[WorkBox.USER_PROFILE_PROPERTY__MY_FAVOURITE_WORK_BOXES];
 
+            // If the NumberToShow value isn't set or is set zero or negative then fix the web part to show 5 items:
+            if (NumberToShow <= 0) NumberToShow = 5;
+
             if (myFavouriteWorkBoxesPropertyValue.Value != null)
             {
                 string[] myFavouriteWorkBoxes = myFavouriteWorkBoxesPropertyValue.Value.ToString().Split(';');
@@ -59,20 +69,40 @@ namespace WorkBoxFramework.MyFavouriteWorkBoxes
                 if (myFavouriteWorkBoxes.Length > 0)
                 {
                     html += "<table cellpadding='5'>";
+                    int count = 0;
+                    bool hasExtraItems = false;
+                    String cssClass = "";
+
                     foreach (string recentWorkBox in myFavouriteWorkBoxes)
                     {
+                        count++;
+
+                        if (count > NumberToShow)
+                        {
+                            cssClass = " class='wbf-extra-favourites-items'";
+                            hasExtraItems = true;
+                        }
+
                         string[] details = recentWorkBox.Split('|');
 
                         string guidString = details[2];
                         if (details.Length == 4)
                             guidString = details[3];
 
-                        html += "<tr><td><img src='/_layouts/images/WorkBoxFramework/work-box-16.png'/></td><td><a href='";
+                        html += "<tr" + cssClass + "><td><img src='/_layouts/images/WorkBoxFramework/work-box-16.png'/></td><td><a href='";
                         html += details[1];
                         html += "'>" + details[0] + "</a></td>";
                         html += "<td><a href='#' onclick='javascript: RemoveFavourite_commandAction(\"" + details[0] + "\", \"" + guidString + "\");'>remove</a></td>";
-                            html += "</tr>";
+                        html += "</tr>";
+
                     }
+
+                    if (hasExtraItems)
+                    {
+                        html += "<tr class=\"wbf-show-more-favourites-link\"><td colspan='3' align='right'><a href='#' onclick='javascript: $(\".wbf-extra-favourites-items\").show(); $(\".wbf-show-more-favourites-link\").hide(); '>More favourite work boxes ...</a></td></tr>";
+                        html += "<tr class=\"wbf-extra-favourites-items\"><td colspan='3' align='right'><a href='#' onclick='javascript: $(\".wbf-extra-favourites-items\").hide(); $(\".wbf-show-more-favourites-link\").show(); '>Fewer favourite work boxes</a></td></tr>";
+                    }
+
                     html += "</table>";
                 }
                 else

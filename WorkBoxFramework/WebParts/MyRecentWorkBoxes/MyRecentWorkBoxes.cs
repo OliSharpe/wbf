@@ -46,11 +46,18 @@ namespace WorkBoxFramework.MyRecentWorkBoxes
         [System.ComponentModel.Category("Configuration")]
         public int NumberToShow { get; set; }
 
+        [WebBrowsable(true)]
+        [Personalizable(PersonalizationScope.Shared)]
+        [WebDisplayName("Unique Prefix to Filter")]
+        [WebDescription("Which unique prefix should be filtered from results?")]
+        [System.ComponentModel.Category("Configuration")]
+        public String UniquePrefixToFilter { get; set; }
+
         protected override void CreateChildControls()
         {
             
             Literal literal = new Literal();
-            string html = "";
+            string html = "<style type=\"text/css\">\n tr.wbf-extra-recent-items {display:none;}\n</style>\n\n";
 
             // Now let's check or set the last visited Guid:
             SPSite _site = SPContext.Current.Site;
@@ -60,11 +67,8 @@ namespace WorkBoxFramework.MyRecentWorkBoxes
 
             UserProfileValueCollection workBoxesRecentlyVisited = profile[WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES];
 
-//            int numberToShow = 1;
- //           if (NumberToShow != null && NumberToShow != "")
-  //          {
-   //             numberToShow = Convert.ToInt32(NumberToShow);
-     //       }
+            // If the NumberToShow value isn't set or is set zero or negative then fix the web part to show 5 items:
+            if (NumberToShow <= 0) NumberToShow = 5;
 
             if (workBoxesRecentlyVisited.Value != null)
             {
@@ -74,16 +78,37 @@ namespace WorkBoxFramework.MyRecentWorkBoxes
                 {
                     html += "<table cellpadding='5'>";
                     int count = 0;
+                    bool hasExtraItems = false;
+                    String cssClass = "";
                     foreach (string recentWorkBox in recentWorkBoxes)
                     {
                         string[] details = recentWorkBox.Split('|');
-                        html += "<tr><td><img src='/_layouts/images/WorkBoxFramework/work-box-16.png'/></td><td><a href='";
+
+                        // We're going to skip any work box whose title matches the unique prefix being filtered:
+                        if (!String.IsNullOrEmpty(UniquePrefixToFilter))
+                        {
+                            if (details[0].StartsWith(UniquePrefixToFilter)) continue;
+                        }
+                        
+                        count++;
+                        if (count > NumberToShow)
+                        {
+                            cssClass = " class='wbf-extra-recent-items'";
+                            hasExtraItems = true;
+                        }
+
+                        html += "<tr" + cssClass + "><td><img src='/_layouts/images/WorkBoxFramework/work-box-16.png'/></td><td><a href='";
                         html += details[1];
                         html += "'>" + details[0] + "</a></td></tr>";
 
-                        count++;
-                        if (count >= NumberToShow) break;
                     }
+
+                    if (hasExtraItems)
+                    {
+                        html += "<tr class=\"wbf-show-more-recent-link\"><td colspan='2' align='right'><a href='#' onclick='javascript: $(\".wbf-extra-recent-items\").show(); $(\".wbf-show-more-recent-link\").hide(); '>More recent work boxes ...</a></td></tr>";
+                        html += "<tr class=\"wbf-extra-recent-items\"><td colspan='2' align='right'><a href='#' onclick='javascript: $(\".wbf-extra-recent-items\").hide(); $(\".wbf-show-more-recent-link\").show(); '>Fewer recent work boxes</a></td></tr>";
+                    }
+
                     html += "</table>";
                 }
                 else
