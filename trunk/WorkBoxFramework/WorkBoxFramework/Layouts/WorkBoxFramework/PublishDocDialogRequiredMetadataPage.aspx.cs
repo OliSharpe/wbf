@@ -256,27 +256,48 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 ReadOnlyFunctionalAreaField.Text = functionalAreas.Names();
             }
 
-            ProtectiveZone.DataSource = WBRecordsType.getProtectiveZones();
-            ProtectiveZone.DataBind();
-
-            if (destinationType.Equals(WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__PUBLIC_WEB_SITE))
+            bool userCanPublishToPublic = false;
+            SPGroup publishersGroup = WorkBox.OwningTeam.PublishersGroup(SPContext.Current.Site);
+            if (publishersGroup != null)
             {
-                WBLogging.Generic.Verbose("In PUBLIC: The destination type was: " + destinationType);                
-                ProtectiveZone.SelectedValue = WBRecordsType.PROTECTIVE_ZONE__PUBLIC;
+                if (publishersGroup.ContainsCurrentUser)
+                {
+                    userCanPublishToPublic = true;
+                }
             }
-            else if (destinationType.Equals(WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__PUBLIC_EXTRANET))
+
+            String selectedZone = WBRecordsType.PROTECTIVE_ZONE__PROTECTED;
+            if (userCanPublishToPublic)
             {
-                WBLogging.Generic.Verbose("In PUBLIC EXTRANET: The destination type was: " + destinationType);                
-                ProtectiveZone.SelectedValue = WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET;
+                if (destinationType.Equals(WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__PUBLIC_WEB_SITE))
+                {
+                    WBLogging.Generic.Verbose("In PUBLIC: The destination type was: " + destinationType);
+                    selectedZone = WBRecordsType.PROTECTIVE_ZONE__PUBLIC;
+                }
+                else if (destinationType.Equals(WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__PUBLIC_EXTRANET))
+                {
+                    WBLogging.Generic.Verbose("In PUBLIC EXTRANET: The destination type was: " + destinationType);
+                    selectedZone = WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET;
+                }
+                else
+                {
+                    WBLogging.Generic.Verbose("The destination type was: " + destinationType);
+                    selectedZone = WBRecordsType.PROTECTIVE_ZONE__PROTECTED;
+                }
             }
             else
             {
-                WBLogging.Generic.Verbose("The destination type was: " + destinationType);                
-                string currentZone = sourceDocAsItem.WBxGetColumnAsString(WorkBox.COLUMN_NAME__PROTECTIVE_ZONE);
-
-                if (currentZone == "") currentZone = WBRecordsType.PROTECTIVE_ZONE__PROTECTED;
-                ProtectiveZone.SelectedValue = currentZone;
+                selectedZone = WBRecordsType.PROTECTIVE_ZONE__PROTECTED;
             }
+
+            List<String> protectiveZoneList = new List<String>();
+            protectiveZoneList.Add(selectedZone);
+
+            ProtectiveZone.DataSource = protectiveZoneList;
+            ProtectiveZone.DataBind();
+
+            ProtectiveZone.SelectedValue = selectedZone;
+
 
             if (showSubjectTags)
             {
@@ -414,15 +435,35 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                         }
                     }
 
-                    if (!documentRecordsType.IsZoneAtLeastMinimum(ProtectiveZone.Text))
+                    bool userCanPublishToPublic = false;
+                    SPGroup publishersGroup = WorkBox.OwningTeam.PublishersGroup(SPContext.Current.Site);
+                    if (publishersGroup != null)
                     {
-                        if (ProtectiveZone.Text == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
+                        if (publishersGroup.ContainsCurrentUser)
                         {
-                            metadataProblems.Add(WorkBox.COLUMN_NAME__PROTECTIVE_ZONE, "You can only publish to the public extranet zone if the records type has that zone explicitly set. This records type has the minimum zone set as: " + documentRecordsType.DocumentMinimumProtectiveZone);
+                            userCanPublishToPublic = true;
                         }
-                        else
+                    }
+
+                    if (userCanPublishToPublic)
+                    {
+                        if (!documentRecordsType.IsZoneAtLeastMinimum(ProtectiveZone.Text))
                         {
-                            metadataProblems.Add(WorkBox.COLUMN_NAME__PROTECTIVE_ZONE, "The selected protective zone does not meet the minimum requirement for this records type of: " + documentRecordsType.DocumentMinimumProtectiveZone);
+                            if (ProtectiveZone.Text == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
+                            {
+                                metadataProblems.Add(WorkBox.COLUMN_NAME__PROTECTIVE_ZONE, "You can only publish to the public extranet zone if the records type has that zone explicitly set. This records type has the minimum zone set as: " + documentRecordsType.DocumentMinimumProtectiveZone);
+                            }
+                            else
+                            {
+                                metadataProblems.Add(WorkBox.COLUMN_NAME__PROTECTIVE_ZONE, "The selected protective zone does not meet the minimum requirement for this records type of: " + documentRecordsType.DocumentMinimumProtectiveZone);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (ProtectiveZone.Text != WBRecordsType.PROTECTIVE_ZONE__PROTECTED)
+                        {
+                            metadataProblems.Add(WorkBox.COLUMN_NAME__PROTECTIVE_ZONE, "In this work box you only have permissions to publish to the internal records library.");
                         }
                     }
 

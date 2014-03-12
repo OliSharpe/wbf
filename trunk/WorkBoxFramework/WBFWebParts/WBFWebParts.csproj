@@ -44,6 +44,7 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.SharePoint.Publishing, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.SharePoint.Taxonomy, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -63,6 +64,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControlTemplates\WBFWebParts\FindWhereRecordIsBeingUsed.ascx.cs">
+      <DependentUpon>FindWhereRecordIsBeingUsed.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ControlTemplates\WBFWebParts\FindWhereRecordIsBeingUsed.ascx.designer.cs">
+      <DependentUpon>FindWhereRecordIsBeingUsed.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WBFWebParts\WhereIsRecordBeingUsed.aspx.cs">
+      <DependentUpon>WhereIsRecordBeingUsed.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WBFWebParts\WhereIsRecordBeingUsed.aspx.designer.cs">
+      <DependentUpon>WhereIsRecordBeingUsed.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="WebParts\CentralListOfLinks\CentralListOfLinks.cs" />
     <Compile Include="WebParts\CentralListOfLinks\CentralListOfLinksUserControl.ascx.cs">
       <DependentUpon>CentralListOfLinksUserControl.ascx</DependentUpon>
@@ -120,6 +135,15 @@
     <Compile Include="Classes\WBFWebPartsUtils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ControlTemplates\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{51d75317-6203-4bd4-9b34-ded752d680bb}</SharePointProjectItemId>
+    </None>
+    <None Include="CustomActions\FindWhereIsThisRecordBeingUsed\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{94c18d16-5677-428d-9dbb-f76a77a8231a}</SharePointProjectItemId>
+    </None>
+    <None Include="Features\FindWhereRecordIsUsed\FindWhereRecordIsUsed.feature">
+      <FeatureId>{2cc6f326-8b92-41ee-b29d-d7c0dc4a51f4}</FeatureId>
+    </None>
     <None Include="WebParts\CentralListOfLinks\CentralListOfLinks.webpart" />
     <None Include="WebParts\CentralListOfLinks\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{9f40976c-f218-45c0-9a9e-51527a65eaa5}</SharePointProjectItemId>
@@ -160,6 +184,16 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="ControlTemplates\WBFWebParts\FindWhereRecordIsBeingUsed.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="CustomActions\FindWhereIsThisRecordBeingUsed\Elements.xml" />
+    <Content Include="Features\FindWhereRecordIsUsed\FindWhereRecordIsUsed.Template.xml">
+      <DependentUpon>FindWhereRecordIsUsed.feature</DependentUpon>
+    </Content>
+    <Content Include="Layouts\WBFWebParts\WhereIsRecordBeingUsed.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="WebParts\CentralListOfLinks\CentralListOfLinksUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

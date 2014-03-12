@@ -88,7 +88,7 @@ namespace WBFWebParts
         }
 
 
-        internal static String GetExtranetLibraryURL(SPContext context)
+        internal static String GetPublicExtranetLibraryURL(SPContext context)
         {
             WBFarm farm = WBFarm.Local;
 

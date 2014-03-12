@@ -2249,7 +2249,14 @@ namespace WorkBoxFramework
             SPUserCollection allUsers = group.Users;
             foreach (SPUser user in allUsers)
             {
-                intoGroup.AddUser(user);
+                try
+                {
+                    intoGroup.AddUser(user);
+                }
+                catch (Exception e)
+                {
+                    WBLogging.Teams.Monitorable("Failed to copy a user: " + user.LoginName + " into group: " + intoGroup.Name);
+                }
             }
 
             intoGroup.Update();

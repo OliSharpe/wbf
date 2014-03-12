@@ -9,6 +9,7 @@
       <properties>
         <property name="Title" type="string">My Favourite Work Boxes</property>
         <property name="Description" type="string">This web part lists the work boxes that the current user has selected to be a favourite.</property>
+        <property name="NumberToShow" type="int">10</property>
       </properties>
     </data>
   </webPart>

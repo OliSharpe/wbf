@@ -241,6 +241,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         private void RemoveCopyFromLibrary(SPListItem recordItem, string copyLibraryUrl)
         {
+            // If no valid library URL is passed in then just return:
+            if (String.IsNullOrEmpty(copyLibraryUrl)) return;
+
             using (SPSite copyLibrarySite = new SPSite(copyLibraryUrl))
             using (SPWeb copyLibraryWeb = copyLibrarySite.OpenWeb(copyLibraryUrl))
             {
@@ -267,6 +270,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         private void UpdateCopyInLibrary(SPListItem recordItem, string copyLibraryUrl)
         {
             //WBLogging.RecordsTypes.Unexpected("UpdateCopyInLibrary(): looking at libraryURL: " + copyLibraryUrl);
+
+            // If no valid library URL is passed in then just return:
+            if (String.IsNullOrEmpty(copyLibraryUrl)) return;
 
             using (SPSite copyLibrarySite = new SPSite(copyLibraryUrl))
             using (SPWeb copyLibraryWeb = copyLibrarySite.OpenWeb(copyLibraryUrl))

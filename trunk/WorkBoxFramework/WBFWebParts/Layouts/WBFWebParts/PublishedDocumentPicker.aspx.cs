@@ -386,7 +386,7 @@ namespace WBFWebParts.Layouts.WBFWebParts
 
                 if (Request.QueryString["Library"] == "Extranet")
                 {
-                    recordsLibraryURL = WBFWebPartsUtils.GetExtranetLibraryURL(SPContext.Current);
+                    recordsLibraryURL = WBFWebPartsUtils.GetPublicExtranetLibraryURL(SPContext.Current);
                 }
 
                 using (SPSite site = new SPSite(recordsLibraryURL))

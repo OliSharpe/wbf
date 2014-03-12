@@ -181,11 +181,18 @@ namespace WorkBoxFramework
             // First we're going to remove the extra users in the toGroup that need to be removed:
             foreach (SPUser toUser in toGroup.Users)
             {
-                if (!fromGroup.WBxContainsUser(toUser))
+                try
                 {
-                    WBLogging.Teams.Verbose("On site removing from group an un-needed user: " + toSite.Url + " | " + toGroup.Name + " | " + toUser.LoginName);
+                    if (!fromGroup.WBxContainsUser(toUser))
+                    {
+                        WBLogging.Teams.Verbose("On site removing from group an un-needed user: " + toSite.Url + " | " + toGroup.Name + " | " + toUser.LoginName);
 
-                    toGroup.RemoveUser(toUser);
+                        toGroup.RemoveUser(toUser);
+                    }
+                }
+                catch (Exception e)
+                {
+                    WBLogging.Teams.Monitorable("There was a exception when trying to remove user: " + toUser.LoginName + " from group: " + toGroup.Name + " on site: " + toSite.Url);
                 }
             }
 
@@ -194,12 +201,20 @@ namespace WorkBoxFramework
             {
                 SPUser toUser = toSite.RootWeb.WBxEnsureUserOrNull(fromUser.LoginName);
 
-                if (toUser != null && !toGroup.WBxContainsUser(toUser))
+                try
                 {
-                    WBLogging.Teams.Verbose("On site adding to group a missing user: " + toSite.Url + " | " + toGroup.Name + " | " + toUser.LoginName);
+                    if (toUser != null && !toGroup.WBxContainsUser(toUser))
+                    {
+                        WBLogging.Teams.Verbose("On site adding to group a missing user: " + toSite.Url + " | " + toGroup.Name + " | " + toUser.LoginName);
 
-                    toGroup.AddUser(toUser);
+                        toGroup.AddUser(toUser);
+                    }
                 }
+                catch (Exception e)
+                {
+                    WBLogging.Teams.Monitorable("There was a exception when trying to add user: " + fromUser.LoginName + " to group: " + fromGroup.Name + " on site: " + toSite.Url);
+                }
+
             }
 
             if (toGroup.Users.Count != fromGroup.Users.Count)

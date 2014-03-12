@@ -2949,9 +2949,11 @@ namespace WorkBoxFramework
             }
 
             if (InvolvedIndividuals == null) return false;
+            if (String.IsNullOrEmpty(Web.CurrentUser.LoginName)) return false;
+            String currentUsersLoginNameToLower = Web.CurrentUser.LoginName.ToLower();
             foreach (SPUser user in InvolvedIndividuals) 
             {
-                if (Web.CurrentUser.Equals(user)) return true;
+                if (currentUsersLoginNameToLower.Equals(user.LoginName.ToLower())) return true;
             }
 
             return false;

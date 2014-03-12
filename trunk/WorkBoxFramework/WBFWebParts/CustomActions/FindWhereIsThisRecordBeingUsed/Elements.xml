@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+
+  <CustomAction Id="WBFWebParts.FindWhereThisRecordIsBeingUsed"
+                RegistrationType="List"
+                RegistrationId="101"
+                Location="EditControlBlock"
+                Sequence="10105"
+                Title="Where is this record being used?"
+                Description="Helps find where a given record is being referenced on a publishing page." >
+    <UrlAction Url="/_layouts/WBFWebParts/WhereIsRecordBeingUsed.aspx?ListID={ListId}&amp;ItemID={ItemId}" />
+  </CustomAction>
+
+
+</Elements>

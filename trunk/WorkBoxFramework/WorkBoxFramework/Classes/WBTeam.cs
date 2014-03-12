@@ -549,7 +549,14 @@ namespace WorkBoxFramework
                 WBLogging.Teams.Verbose("Trying to sync the team with term name: " + term.Name);
 
                 WBTeam team = new WBTeam(teams, term);
-                team.SyncMembersGroup(teamsSite, site);
+                try
+                {
+                    team.SyncMembersGroup(teamsSite, site);
+                }
+                catch (Exception e)
+                {
+                    WBLogging.Teams.Unexpected("Syncing failed for team: " + team.Name + " to site: " + site.Url);
+                }
 
                 WBLogging.Teams.Verbose("Next syncing all sub-teams of team: " + team.Name);
                 SyncAllSubTeams(teams, term.Terms, teamsSite, site);

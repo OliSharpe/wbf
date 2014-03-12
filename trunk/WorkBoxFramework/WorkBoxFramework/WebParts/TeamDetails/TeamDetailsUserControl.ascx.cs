@@ -74,7 +74,7 @@ namespace WorkBoxFramework.TeamDetails
 
                         if (userIsTeamOwnerOrSystemAdmin)
                         {
-                            teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('InviteToTeamWithEmail.aspx', 660, 500); \">Invite user to team</a></li>";
+                            teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('InviteToTeamWithEmail.aspx', 660, 600); \">Invite user to team</a></li>";
 
                             if (team.IsCurrentUserTeamManagerOrSystemAdmin())
                             {
