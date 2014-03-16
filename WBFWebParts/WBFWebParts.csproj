@@ -144,6 +144,8 @@
     <None Include="Features\FindWhereRecordIsUsed\FindWhereRecordIsUsed.feature">
       <FeatureId>{2cc6f326-8b92-41ee-b29d-d7c0dc4a51f4}</FeatureId>
     </None>
+    <None Include="Releases\v0.9.5i-final-2014.03.11\WBFWebParts v0.9.5i.wsp" />
+    <None Include="Releases\v0.9.5i-final-2014.03.11\WBFWebParts v0.9.5i - Public.wsp" />
     <None Include="WebParts\CentralListOfLinks\CentralListOfLinks.webpart" />
     <None Include="WebParts\CentralListOfLinks\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{9f40976c-f218-45c0-9a9e-51527a65eaa5}</SharePointProjectItemId>
