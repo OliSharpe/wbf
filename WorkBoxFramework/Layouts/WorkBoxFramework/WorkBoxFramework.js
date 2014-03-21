@@ -171,10 +171,15 @@ function WorkBoxFramework_doAction(actionKey) {
             tite: 'Work Box Action',
             allowMaximize: action.AllowMaximise,
             showClose: action.ShowClose,
-            width: action.Width,
-            height: action.Height,
             dialogReturnValueCallback: WorkBoxFramework_callback
         };
+
+        // We're only going to add the width and height if both are set. Otherwise we'll let the modal
+        // dialog API automatically size the modal dialog window:
+        if (action.Width > 0 && action.Height > 0) {
+            options.width = action.Width;
+            options.height = action.Height;
+        }
 
         SP.UI.ModalDialog.showModalDialog(options);
 
@@ -529,8 +534,15 @@ function WorkBoxFramework_clearPeopleEditors() {
             arr[i].value = '';
         }
     }
-} 
+}
 
+function WorkBoxFramework__setDialogFocus() {
+    ///<summary> If the current page is a SharePoint dialog (IsDlg=1), this will set the focus on the first (visible) input element in the page </summary>
+    // Thanks to Steve Clements from Perspicuity for this function.
+    if (document.URL.indexOf('IsDlg=1') > -1) {
+        $('form').find('input,select,a').filter(':visible:first').focus();
+    }
+}
 
 // There's probably a nicer way to do this ....
 var wbf__user_presence_sips = new Object();
@@ -568,7 +580,11 @@ function WorkBoxFramework__add_do_user_presence_function() {
     _spBodyOnLoadFunctionNames.push("WorkBoxFramework__do_user_presence");
 }
 
-// We want to run this function when the page has finished loading:
+// We want to run these functions when the page has finished loading:
 if (typeof (_spBodyOnLoadFunctionNames) != 'undefined') {
+//    _spBodyOnLoadFunctionNames.push("WorkBoxFramework__setDialogFocus");
     _spBodyOnLoadFunctionNames.push("WorkBoxFramework__add_do_user_presence_function");
 }
+
+
+

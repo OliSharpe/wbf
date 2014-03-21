@@ -250,7 +250,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 if (workBoxRecordsType.IsWorkBoxShortTitleRequired)
                 {
-                    ShortTitleTitle.Text = "Short Title";
+                    ShortTitleTitle.Text = "Short Title" + WBConstant.REQUIRED_ASTERISK;
                 }
                 else
                 {
@@ -265,7 +265,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 if (workBoxRecordsType.IsWorkBoxReferenceIDRequired)
                 {
-                    ReferenceIDTitle.Text = "Reference ID";
+                    ReferenceIDTitle.Text = "Reference ID" + WBConstant.REQUIRED_ASTERISK;
                 }
                 else
                 {
@@ -283,7 +283,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                 if (workBoxRecordsType.IsWorkBoxReferenceDateRequired)
                 {
-                    ReferenceDateTitle.Text = "Reference Date";
+                    ReferenceDateTitle.Text = "Reference Date" + WBConstant.REQUIRED_ASTERISK;
                 }
                 else
                 {
@@ -306,7 +306,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 if (workBoxRecordsType.IsWorkBoxSeriesTagRequired)
                 {
-                    SeriesTagTitle.Text = "Series Tag";
+                    SeriesTagTitle.Text = "Series Tag" + WBConstant.REQUIRED_ASTERISK;
                 }
                 else
                 {
@@ -331,6 +331,31 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
 
             ErrorMessageLabel.Text = errorMessage;
+
+            if (functionalAreaFieldIsEditable)
+            {
+                FunctionalAreaField.Focus();
+            }
+            else
+            {
+                if (!onlyOneWorkBoxTemplate)
+                {
+                    WorkBoxTemplates.Focus();
+                }
+                else
+                {
+                    if (showShortTitle)
+                    {
+                        WorkBoxShortTitle.Focus();
+                    }
+                    else
+                    {
+                        // Just to have the focus somewhere:
+                        InvolvedTeamsField.Focus();
+                    }
+                }
+            }
+
 
             if (relatedWorkBox != null) relatedWorkBox.Dispose();
 

@@ -46,7 +46,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (pageRenderingRequired)
             {
-
+                OwningTeamField.Focus();
                 WorkBoxTitle.Text = WorkBox.Title;
 
                 WorkBox.Teams.InitialiseTaxonomyControl(OwningTeamField, "Select New Owning Team", false);

@@ -62,7 +62,7 @@ namespace WorkBoxFramework.OurTeamsWorkBoxes
         protected override void CreateChildControls()
         {
             WBTaxonomy teams = WBTaxonomy.GetTeams(SPContext.Current.Site);
-            team = WBTeam.getFromTeamSite(teams, SPContext.Current);
+            team = WBTeam.GetFromTeamSite(teams, SPContext.Current);
 
             Literal literal = new Literal();
             string html = "";

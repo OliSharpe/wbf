@@ -199,8 +199,6 @@ namespace WorkBoxFramework
         public const string WORK_BOX_RECORD_CONTENT_TYPE_NAME = "Work Box Record";
 
 
-
-
         #endregion
 
 

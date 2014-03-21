@@ -13,6 +13,24 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
     public partial class PublishDocDialogRequiredMetadataPage {
         
         /// <summary>
+        /// WBFCssRegistration control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.CssRegistration WBFCssRegistration;
+        
+        /// <summary>
+        /// WBFScriptRegistration control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.ScriptLink WBFScriptRegistration;
+        
+        /// <summary>
         /// ErrorMessageLabel control.
         /// </summary>
         /// <remarks>
@@ -157,13 +175,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.TextBox TitleField;
         
         /// <summary>
-        /// RequiredFieldValidator2 control.
+        /// TitleFieldValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator2;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator TitleFieldValidator;
         
         /// <summary>
         /// ProtectiveZone control.

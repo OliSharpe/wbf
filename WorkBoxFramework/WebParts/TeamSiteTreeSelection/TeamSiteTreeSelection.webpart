@@ -7,8 +7,8 @@
     </metaData>
     <data>
       <properties>
-        <property name="Title" type="string">TeamSiteTreeSelection</property>
-        <property name="Description" type="string">My Visual WebPart</property>
+        <property name="Title" type="string">TeamSiteTreeSelection (deprecated)</property>
+        <property name="Description" type="string">This web part is deprecated, please instead use 'Team Site Work Boxes' web part</property>
       </properties>
     </data>
   </webPart>

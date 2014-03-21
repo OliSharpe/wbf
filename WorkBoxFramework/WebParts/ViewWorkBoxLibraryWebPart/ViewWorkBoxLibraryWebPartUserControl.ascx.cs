@@ -107,7 +107,7 @@ namespace WorkBoxFramework.ViewWorkBoxLibraryWebPart
 
 
 
-                WBTeam team = WBTeam.getFromTeamSite(teams, SPContext.Current.Web);
+                WBTeam team = WBTeam.GetFromTeamSite(teams, SPContext.Current.Web);
 
                 WBFarm farm = WBFarm.Local;
 

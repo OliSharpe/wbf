@@ -7,7 +7,7 @@
               Sequence="5000"
               Title="Work Box Collection Settings"
               RequireSiteAdministrator="TRUE">
-    <UrlAction Url="_layouts/WorkBoxFramework/WorkBoxCollectionSettingsPage.aspx"/>
+    <UrlAction Url="_layouts/WorkBoxFramework/GoToWBCollectionSettings.aspx"/>
   </CustomAction>
 
   <CustomAction Id="EditRibbonButtonsSettingsLink"
@@ -16,7 +16,7 @@
               Sequence="5010"
               Title="Edit Ribbon Buttons Settings"
               RequireSiteAdministrator="TRUE">
-    <UrlAction Url="_layouts/WorkBoxFramework/EditRibbonButtonsSettings.aspx"/>
+    <UrlAction Url="_layouts/WorkBoxFramework/GoToWBCollectionSettings.aspx?SettingsPage=EditRibbonButtonsSettings.aspx"/>
   </CustomAction>
 
   

@@ -65,6 +65,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                 teamsTaxonomy.InitialiseTaxonomyControl(TeamsToInviteControl, "Teams to invite", true);
 
+                TeamsToInviteControl.Focus();
+
                 DisposeWorkBox();
             }
         }

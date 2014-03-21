@@ -134,6 +134,13 @@
     <Compile Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx.designer.cs">
       <DependentUpon>GoToTeamManagement.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx.cs">
+      <DependentUpon>GoToWBCollectionSettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx.designer.cs">
+      <DependentUpon>GoToWBCollectionSettings.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
@@ -371,6 +378,14 @@
     </Compile>
     <Compile Include="WebParts\RedirectToMyWorkBox\RedirectToMyWorkBoxUserControl.ascx.designer.cs">
       <DependentUpon>RedirectToMyWorkBoxUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPart.cs" />
+    <Compile Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPartUserControl.ascx.cs">
+      <DependentUpon>TeamSiteTreeNavWebPartUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPartUserControl.ascx.designer.cs">
+      <DependentUpon>TeamSiteTreeNavWebPartUserControl.ascx.cs</DependentUpon>
     </Compile>
     <Compile Include="WebParts\TeamSiteWorkBoxes\TeamSiteWorkBoxes.cs" />
     <Compile Include="WebParts\TeamSiteWorkBoxes\TeamSiteWorkBoxesUserControl.ascx.cs">
@@ -695,6 +710,9 @@
     <None Include="CustomActions\LinkedCalendarSettingsCustomAction\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{1e23a6c4-0355-4468-ae40-72b4eceaa13f}</SharePointProjectItemId>
     </None>
+    <None Include="STYLES\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{8d4eacdb-7abc-472f-af7b-35b4091fbc88}</SharePointProjectItemId>
+    </None>
     <None Include="WebParts\ConfigurationStatus\ConfigurationStatus.webpart" />
     <None Include="WebParts\ConfigurationStatus\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{15e0ce8c-93d9-4277-8d9e-649b36a80214}</SharePointProjectItemId>
@@ -730,6 +748,10 @@
     <None Include="WebParts\RedirectToMyWorkBox\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{cadbbcc3-f14b-4c9f-bbdf-dcf52ef24a9c}</SharePointProjectItemId>
     </None>
+    <None Include="WebParts\TeamSiteTreeNavWebPart\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{86182df6-3a5d-4847-87cf-640153037e82}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPart.webpart" />
     <None Include="WebParts\TeamSiteWorkBoxes\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{b03744bc-efc3-4f64-aa30-7743074db1a9}</SharePointProjectItemId>
     </None>
@@ -900,6 +922,10 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="CustomActions\LinkedCalendarSettingsCustomAction\Elements.xml" />
+    <Content Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="STYLES\WorkBoxFramework\css\WBF.css" />
     <Content Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1014,7 +1040,9 @@
     <Content Include="Layouts\WorkBoxFramework\PublishDocPickWorkBoxFolder.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\WorkBoxFramework\PublishedDocumentPicker.aspx" />
+    <Content Include="Layouts\WorkBoxFramework\PublishedDocumentPicker.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\RemoveFromTeam.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1051,6 +1079,12 @@
     </Content>
     <Content Include="WebParts\RedirectToMyWorkBox\Elements.xml" />
     <Content Include="WebParts\RedirectToMyWorkBox\RedirectToMyWorkBoxUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\TeamSiteTreeNavWebPart\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPartUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="WebParts\TeamSiteWorkBoxes\Elements.xml" />
@@ -1092,7 +1126,9 @@
     <Content Include="WebParts\ShowWorkBoxesFromSeries\Elements.xml" />
     <Content Include="WebParts\ShowPublishedDocumentsFromSeries\Elements.xml" />
     <Content Include="WebParts\TeamSiteTreeSelection\Elements.xml" />
-    <Content Include="WebParts\TeamSiteTreeSelection\TeamSiteTreeSelectionUserControl.ascx" />
+    <Content Include="WebParts\TeamSiteTreeSelection\TeamSiteTreeSelectionUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="WebParts\ShowTimeToAutoClose\Elements.xml" />
     <Content Include="WebParts\RelatedWorkBoxes\Elements.xml" />
     <Content Include="WebParts\RelatedWorkBoxes\RelatedWorkBoxesUserControl.ascx">
@@ -1103,7 +1139,9 @@
     <Content Include="WebParts\FindWorkBoxByLocalID\FindWorkBoxByLocalIDUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\WorkBoxFramework\ChangeWorkBoxOwner.aspx" />
+    <Content Include="Layouts\WorkBoxFramework\ChangeWorkBoxOwner.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\InviteIndividuals.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1122,8 +1160,12 @@
     <Content Include="Layouts\WorkBoxFramework\ViewAllInvolved.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\WorkBoxFramework\ViewAllProperties.aspx" />
-    <Content Include="Layouts\WorkBoxFramework\ViewAuditLog.aspx" />
+    <Content Include="Layouts\WorkBoxFramework\ViewAllProperties.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ViewAuditLog.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\WorkBoxPicker.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1159,15 +1201,21 @@
     <Content Include="Layouts\WorkBoxFramework\CloseWorkBox.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\WorkBoxFramework\DisplayUserProfileInfo.aspx" />
+    <Content Include="Layouts\WorkBoxFramework\DisplayUserProfileInfo.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="ADMIN\WorkBoxFramework\FarmWideAdmin.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\GenericOKPage.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\WorkBoxFramework\InviteTeams.aspx" />
-    <Content Include="Layouts\WorkBoxFramework\NewWorkBox.aspx" />
+    <Content Include="Layouts\WorkBoxFramework\InviteTeams.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\NewWorkBox.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\RemoveWorkBoxFromFavourites.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

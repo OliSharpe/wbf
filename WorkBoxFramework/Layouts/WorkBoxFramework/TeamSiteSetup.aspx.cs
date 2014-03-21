@@ -46,7 +46,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                 TeamName.Text = web.Title;
 
-                WBTeam team = WBTeam.getFromTeamSite(teams, web);
+                WBTeam team = WBTeam.GetFromTeamSite(teams, web);
                 if (team != null)
                 {
                     TeamTerm.Text = team.UIControlValue;
@@ -81,7 +81,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     TeamTerm.Text = "";
 
                     SPWeb parentWeb = web.ParentWeb;
-                    WBTeam parentTeam = WBTeam.getFromTeamSite(teams, parentWeb);
+                    WBTeam parentTeam = WBTeam.GetFromTeamSite(teams, parentWeb);
 
                     if (parentTeam != null)
                     {
@@ -145,7 +145,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
             else
             {
-                team = WBTeam.getFromTeamSite(teams, web);
+                team = WBTeam.GetFromTeamSite(teams, web);
             }
 
             if (team == null)

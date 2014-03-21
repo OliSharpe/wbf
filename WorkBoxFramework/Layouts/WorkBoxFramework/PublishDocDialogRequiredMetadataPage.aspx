@@ -10,6 +10,19 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <SharePoint:CssRegistration ID="WBFCssRegistration"
+      name="WorkBoxFramework/css/WBF.css" 
+      After="corev4.css"
+      runat="server"
+    />
+
+    <SharePoint:ScriptLink ID="WBFScriptRegistration"
+        name="WorkBoxFramework/WorkBoxFramework.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
 
 <script type="text/javascript">
     function WorkBoxFramework_PublishDoc_pickedANewRecordsType(dialogResult, returnValue) {
@@ -30,20 +43,10 @@
 
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
+<div class="wbf-dialog">
+<div class="wbf-dialog-error">
 <asp:Label ID="ErrorMessageLabel" runat="server" Text="" ForeColor="Red"></asp:Label>
-<style type="text/css">
- 
-td.wbf-records-type { border: 0px; }
-td.wbf-metadata-title-panel { width: 300px; padding: 8px; border-top:solid 1px grey; vertical-align: top; }
-td.wbf-metadata-value-panel { width: 405px; padding: 8px; border-top:solid 1px grey; vertical-align: top; background-color: #f1f1f2;  }
-td.wbf-buttons-panel { border-top:solid 1px grey; text-align: center; vertical-align: top; }
-.wbf-metadata-title { font-weight: bold; padding-bottom: 2px; }
-.wbf-metadata-description { font-weight: normal; padding: 2px; }
-.wbf-metadata-read-only-value { font-weight: bold; padding: 2px; }
-.wbf-metadata-error { font-weight: normal; padding: 0px; color: Red; }
-div.wbf-publish-out-title { font-weight: bold; font-size: 16px; vertical-align: top; padding-bottom:4px; }
-table.wbf-title-table { padding: 6px 0px 12px 10px; }
-</style>
+</div>
 
 <table cellpadding="8" cellspacing="0" class="wbf-title-table">
 <tr>
@@ -65,17 +68,19 @@ You must enter the following metadata for the document
 <asp:HiddenField ID="RecordsTypeUIControlValue" runat="server"/>
 <asp:HiddenField ID="NewRecordsTypeUIControlValue" runat="server" Value="" />
 
-<table width="100%" cellpadding="5" cellspacing="0">
+<table class="wbf-dialog-form">
 
 <tr>
-<td class="wbf-metadata-title-panel">
-<div class="wbf-metadata-title">Functional Area</div>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Functional Area<span class="wbf-required-asterisk">*</span></div>
 </td>
-<td class="wbf-metadata-value-panel">
+<td class="wbf-field-value-panel">
 
 <% if (functionalAreaFieldIsEditable)
    { %>
+<div class="wbf-field-value">
 <Taxonomy:TaxonomyWebTaggingControl ID="FunctionalAreaField" ControlMode="display" runat="server" />
+</div>
 <% }
    else
    { %>
@@ -84,7 +89,7 @@ You must enter the following metadata for the document
 </div>
 <% } %>
 
-<div class="wbf-metadata-error">
+<div class="wbf-field-error">
 <asp:Label ID="FunctionalAreaFieldMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 
@@ -93,14 +98,14 @@ You must enter the following metadata for the document
 
 
 <tr>
-<td class="wbf-metadata-title-panel">
-<div class="wbf-metadata-title">Records Type</div>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Records Type<span class="wbf-required-asterisk">*</span></div>
 </td>
-<td class="wbf-metadata-value-panel">
+<td class="wbf-field-value-panel">
 <table width="100%" cellpadding="0" cellspacing="0">
 <tr>
 <td align="left" class="wbf-records-type">
-<div class="wbf-metadata-read-only-value">
+<div class="wbf-field-read-only-value">
 <asp:Label ID="RecordsType" runat="server" />
 </div>
 </td>
@@ -110,7 +115,7 @@ You must enter the following metadata for the document
 </tr>
 </table>
 
-<div class="wbf-metadata-error">
+<div class="wbf-field-error">
 <asp:Label ID="RecordsTypeFieldMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 
@@ -121,36 +126,38 @@ You must enter the following metadata for the document
 <% if (generatingFilename)
    { %>
 <tr>
-    <td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title">Published File Name</div>
-        <div class="wbf-metadata-description">Generated with file naming convention</div>
+    <td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Published File Name</div>
+        <div class="wbf-field-description">Generated with file naming convention</div>
     </td>
-    <td class="wbf-metadata-value-panel">
-        <div class="wbf-metadata-read-only-value">
+    <td class="wbf-field-value-panel">
+        <div class="wbf-field-read-only-value">
             <asp:Label ID="ReadOnlyNameField" runat="server"></asp:Label>
         </div>
-        <div class="wbf-metadata-description">
+        <div class="wbf-field-description">
             <asp:Label ID="DocumentFileNamingConvention" runat="server"></asp:Label>
         </div>
     </td>
 </tr>
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title">Original File Name</div>
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Original File Name</div>
 </td>
-<td class="wbf-metadata-value-panel">
-<div class="wbf-metadata-read-only-value">    <asp:Label ID="OriginalFileName" runat="server"></asp:Label></div>
+<td class="wbf-field-value-panel">
+<div class="wbf-field-read-only-value">    <asp:Label ID="OriginalFileName" runat="server"></asp:Label></div>
 </td>
 </tr>
 <% }
    else
    { %>
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title">File Name</div>
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">File Name</div>
 </td>
-<td class="wbf-metadata-value-panel">
+<td class="wbf-field-value-panel">
+<div class="wbf-field-value">
     <asp:TextBox ID="NameField" runat="server"></asp:TextBox>
+</div>
 </td>
 </tr>
 <% } %>
@@ -158,16 +165,18 @@ You must enter the following metadata for the document
 
 
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title">Short Title</div>
-<div class="wbf-metadata-description">Give a short, meaningful title.</div>
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Short Title<span class="wbf-required-asterisk">*</span></div>
+<div class="wbf-field-description">Give a short, meaningful title.</div>
 </td>
-<td class="wbf-metadata-value-panel">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-value">
     <asp:TextBox ID="TitleField" runat="server"></asp:TextBox>
-    <div class="wbf-metadata-error">
+</div>
+    <div class="wbf-field-error">
     <asp:RequiredFieldValidator
-        ID="RequiredFieldValidator2" runat="server" 
+        ID="TitleFieldValidator" runat="server" 
         ErrorMessage="You must enter a value for the Title"
         ControlToValidate="TitleField">        
     </asp:RequiredFieldValidator>
@@ -176,14 +185,16 @@ You must enter the following metadata for the document
 </tr>
 
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title">Protective Zone</div>
-<div class="wbf-metadata-description">What is the most permissive zone that this document could be held in?</div>
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Protective Zone<span class="wbf-required-asterisk">*</span></div>
+<div class="wbf-field-description">What is the most permissive zone that this document could be held in?</div>
 </td>
-<td class="wbf-metadata-value-panel">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-value">
     <asp:DropDownList ID="ProtectiveZone" runat="server"></asp:DropDownList>
-<div class="wbf-metadata-error">
+</div>
+<div class="wbf-field-error">
 <asp:Label ID="ProtectiveZoneMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 
@@ -194,15 +205,17 @@ You must enter the following metadata for the document
 <% if (showSubjectTags)
    { %>
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title"><asp:Label ID="SubjectTagsTitle" runat="server"/></div>
-<div class="wbf-metadata-description">
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name"><asp:Label ID="SubjectTagsTitle" runat="server"/></div>
+<div class="wbf-field-description">
 <asp:Label ID="SubjectTagsDescription" runat="server"/>
 </div>
 </td>
-<td class="wbf-metadata-value-panel" valign="top">
+<td class="wbf-field-value-panel" valign="top">
+<div class="wbf-field-value">
 <Taxonomy:TaxonomyWebTaggingControl ID="SubjectTagsField" ControlMode="display" runat="server" />
-<div class="wbf-metadata-error">
+</div>
+<div class="wbf-field-error">
 <asp:Label ID="SubjectTagsError" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
@@ -214,15 +227,17 @@ You must enter the following metadata for the document
 <% if (showReferenceID)
    { %>
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title"><asp:Label ID="ReferenceIDTitle" runat="server"/></div>
-<div class="wbf-metadata-description">
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name"><asp:Label ID="ReferenceIDTitle" runat="server"/></div>
+<div class="wbf-field-description">
 <asp:Label ID="ReferenceIDDescription" runat="server"/>
 </div>
 </td>
-<td class="wbf-metadata-value-panel" valign="top">
+<td class="wbf-field-value-panel" valign="top">
+<div class="wbf-field-value">
     <asp:TextBox ID="ReferenceID" runat="server" />
-<div class="wbf-metadata-error">
+</div>
+<div class="wbf-field-error">
 <asp:Label ID="ReferenceIDMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
@@ -232,15 +247,17 @@ You must enter the following metadata for the document
 <% if (showReferenceDate)
    { %>
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title"><asp:Label ID="ReferenceDateTitle" runat="server"/></div>
-<div class="wbf-metadata-description">
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name"><asp:Label ID="ReferenceDateTitle" runat="server"/></div>
+<div class="wbf-field-description">
 <asp:Label ID="ReferenceDateDescription" runat="server"/>
 </div>
 </td>
-<td class="wbf-metadata-value-panel" valign="top">
+<td class="wbf-field-value-panel" valign="top">
+<div class="wbf-field-value">
     <SharePoint:DateTimeControl ID="ReferenceDate" runat="server" />
-<div class="wbf-metadata-error">
+</div>
+<div class="wbf-field-error">
 <asp:Label ID="ReferenceDateMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
@@ -250,16 +267,18 @@ You must enter the following metadata for the document
 <% if (showSeriesTag)
    { %>
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title"><asp:Label ID="SeriesTagTitle" runat="server"/></div>
-<div class="wbf-metadata-description">
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name"><asp:Label ID="SeriesTagTitle" runat="server"/></div>
+<div class="wbf-field-description">
 <asp:Label ID="SeriesTagDescription" runat="server"/>
 </div>
 </td>
-<td class="wbf-metadata-value-panel" valign="top">
+<td class="wbf-field-value-panel" valign="top">
 
+<div class="wbf-field-value">
 <asp:DropDownList ID="SeriesTagDropDownList" runat="server" />
-<div class="wbf-metadata-error">
+</div>
+<div class="wbf-field-error">
 <asp:Label ID="SeriesTagFieldMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
@@ -269,15 +288,17 @@ You must enter the following metadata for the document
  <% if (showScanDate)
    { %>
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title"><asp:Label ID="ScanDateTitle" runat="server"/></div>
-<div class="wbf-metadata-description">
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name"><asp:Label ID="ScanDateTitle" runat="server"/></div>
+<div class="wbf-field-description">
 <asp:Label ID="ScanDateDescription" runat="server"/>
 </div>
 </td>
-<td class="wbf-metadata-value-panel" valign="top">
+<td class="wbf-field-value-panel" valign="top">
+<div class="wbf-field-value">
     <SharePoint:DateTimeControl ID="ScanDate" runat="server" />
-<div class="wbf-metadata-error">
+</div>
+<div class="wbf-field-error">
 <asp:Label ID="ScanDateMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
@@ -286,16 +307,17 @@ You must enter the following metadata for the document
 
 
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title">Owning Team</div>
-<div class="wbf-metadata-description">
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Owning Team</div>
+<div class="wbf-field-description">
 A record of the team who owned this document when it was created.
 </div>
 </td>
-<td class="wbf-metadata-value-panel" valign="top">
-
+<td class="wbf-field-value-panel" valign="top">
+<div class="wbf-field-value">
 <Taxonomy:TaxonomyWebTaggingControl ID="OwningTeamField" ControlMode="display" runat="server" />
-<div class="wbf-metadata-error">
+</div>
+<div class="wbf-field-error">
 <asp:Label ID="OwningTeamFieldMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
@@ -304,16 +326,18 @@ A record of the team who owned this document when it was created.
 
 
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title">Involved Teams</div>
-<div class="wbf-metadata-description">
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Involved Teams</div>
+<div class="wbf-field-description">
 A record of the teams that were involved with the creation of this document.
 </div>
 </td>
-<td class="wbf-metadata-value-panel" valign="top">
+<td class="wbf-field-value-panel" valign="top">
 
+<div class="wbf-field-value">
 <Taxonomy:TaxonomyWebTaggingControl ID="InvolvedTeamsField" ControlMode="display" runat="server" />
-<div class="wbf-metadata-error">
+</div>
+<div class="wbf-field-error">
 <asp:Label ID="InvolvedTeamsFieldMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
@@ -340,7 +364,7 @@ A record of the teams that were involved with the creation of this document.
     <asp:HiddenField ID="ItemID" runat="server" />
     <asp:HiddenField ID="TheDestinationType" runat="server" />
     <asp:HiddenField ID="DestinationURL" runat="server" />
-
+</div>
 
 </asp:Content>
 

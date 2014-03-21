@@ -191,7 +191,7 @@ namespace WorkBoxFramework.ViewTeamsPublishedDocuments
 
                if (team == null) 
                {
-                   team = WBTeam.getFromTeamSite(teamsTaxonomy, SPContext.Current.Web);
+                   team = WBTeam.GetFromTeamSite(teamsTaxonomy, SPContext.Current.Web);
                }
             
                if (team == null)

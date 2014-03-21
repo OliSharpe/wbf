@@ -9,92 +9,107 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <SharePoint:CssRegistration ID="WBFCssRegistration"
+      name="WorkBoxFramework/css/WBF.css" 
+      After="corev4.css"
+      runat="server"
+    />
+
+    <SharePoint:ScriptLink ID="WBFScriptRegistration"
+        name="WorkBoxFramework/WorkBoxFramework.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-
+<div class="wbf-dialog">
+<div class="wbf-dialog-error">
 <asp:Label ID="ErrorMessageLabel" runat="server" Text="" ForeColor="Red"></asp:Label>
-<style type="text/css">
-td 
-{
-border-top:solid 1px grey;
-}
-</style>
+</div>
 
-<h2>Edit Work Box Properties</h2>
+<h2 class="wbf-dialog-title">Edit Work Box Properties</h2>
 
-<table width="100%" cellpadding="5" cellspacing="0">
+<table class="wbf-dialog-form">
 
 <tr>
-<td valign="top">
-<b>Work Box Title</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Work Box Title</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
-<b><asp:Label ID="WorkBoxTitle" runat="server" Text=""></asp:Label></b>
+<div class="wbf-field-read-only-title">
+<asp:Label ID="WorkBoxTitle" runat="server" Text=""></asp:Label>
+</div>
 
 </td>
 </tr>
 
 <tr>
-<td valign="top">
-<b>Owning Team</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Owning Team</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-read-only-value">
 <asp:Label ID="OwningTeam" runat="server" Text=""></asp:Label>
+</div>
 
 </td>
 </tr>
 
 <tr>
-<td valign="top">
-<b>Functional Area</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Functional Area</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-read-only-value">
 <asp:Label ID="FunctionalArea" runat="server" Text=""></asp:Label>
+</div>
 
 </td>
 </tr>
 
 <tr>
-<td valign="top">
-<b>Records Type</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Records Type</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-read-only-value">
 <asp:Label ID="RecordsType" runat="server" Text=""></asp:Label>
+</div>
 
 </td>
 </tr>
 
 
 <tr>
-<td valign="top">
-<b>Work Box Template</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Work Box Template</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-read-only-value">
 <asp:Label ID="WorkBoxTemplate" runat="server" Text=""></asp:Label>
+</div>
 
 </td>
 </tr>
 
 
 <tr>
-<td valign="top">
-<b>Work Box Status</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Work Box Status</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-read-only-value">
 <asp:Label ID="WorkBoxStatus" runat="server" Text=""></asp:Label>
+</div>
 
 </td>
 </tr>
@@ -102,38 +117,54 @@ border-top:solid 1px grey;
 
 
 <tr>
-<td valign="top">
-<b>Work Box URL</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Work Box URL</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-read-only-value">
 <asp:Label ID="WorkBoxURL" runat="server" Text=""></asp:Label>
+</div>
 
 </td>
 </tr>
 
 
 <tr>
-<td valign="top">
-<b>Work Box Short Title</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Work Box Short Title<span class="wbf-required-asterisk">*</span></div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-value">
 <asp:TextBox ID="WorkBoxShortTitle" runat="server" Text=""></asp:TextBox>
+</div>
+<div class="wbf-field-error">
+    <asp:RequiredFieldValidator ID="WorkBoxShortTitleValidator" runat="server" ErrorMessage="You must enter a short title."
+            ControlToValidate="WorkBoxShortTitle"></asp:RequiredFieldValidator>
+</div>
 
 </td>
 </tr>
 
 <tr>
-<td valign="top">
-<b>Work Box Pretty Title</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Title In Work Box<span class="wbf-required-asterisk">*</span></div>
+<div class="wbf-field-description">
+This title will only be visible in the work box itself.
+</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
-<asp:TextBox ID="WorkBoxPrettyTitle" runat="server" Text=""></asp:TextBox>
+<div class="wbf-field-value">
+<asp:TextBox ID="WorkBoxPrettyTitle" runat="server" Text="" Columns="50"></asp:TextBox>
+</div>
+
+<div class="wbf-field-error">
+    <asp:RequiredFieldValidator ID="WorkBoxPrettyTitleValidator" runat="server" ErrorMessage="You must enter a title for inside the work box."
+            ControlToValidate = "WorkBoxPrettyTitle"></asp:RequiredFieldValidator>
+</div>
+
 
 </td>
 </tr>
@@ -141,13 +172,14 @@ border-top:solid 1px grey;
 <% if (showReferenceID)
    { %>
 <tr>
-<td valign="top">
-<b>Reference ID</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Reference ID</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-value">
 <asp:TextBox ID="ReferenceID" runat="server" Text=""></asp:TextBox>
+</div>
 
 </td>
 </tr>
@@ -157,13 +189,14 @@ border-top:solid 1px grey;
 <% if (showReferenceDate)
    { %>
 <tr>
-<td valign="top">
-<b>Reference Date</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name-panel">Reference Date</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-value">
 <SharePoint:DateTimeControl ID="ReferenceDate" runat="server" />
+</div>
 
 </td>
 </tr>
@@ -172,16 +205,16 @@ border-top:solid 1px grey;
 
 
 <tr>
-<td colspan="2" align="center" valign="top">
+<td colspan="2" class="wbf-buttons-panel">
     <asp:Button ID="SaveButton" runat="server" Text="Save"  OnClick="saveButton_OnClick" />
 &nbsp;
-    <asp:Button ID="CancelButton" runat="server" Text="Cancel" OnClick="cancelButton_OnClick"/>
-
+    <asp:Button ID="CancelButton" runat="server" Text="Cancel" CausesValidation="False" OnClick="cancelButton_OnClick"/>
 </td>
 </tr>
 
 
 </table>
+</div>
 
 </asp:Content>
 

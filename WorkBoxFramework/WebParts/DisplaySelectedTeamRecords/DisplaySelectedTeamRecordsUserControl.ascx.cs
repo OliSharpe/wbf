@@ -45,7 +45,7 @@ namespace WorkBoxFramework.DisplaySelectedTeamRecords
             WBTaxonomy teams = WBTaxonomy.GetTeams(SPContext.Current.Site);
             WBTaxonomy recordsTypes = WBTaxonomy.GetRecordsTypes(teams);
 
-            WBTeam team = WBTeam.getFromTeamSite(teams, SPContext.Current);
+            WBTeam team = WBTeam.GetFromTeamSite(teams, SPContext.Current);
 
             if (recordsTypeGUID == null
                 || recordsTypeGUID == ""

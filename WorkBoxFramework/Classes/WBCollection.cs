@@ -179,6 +179,16 @@ namespace WorkBoxFramework
         }
         #endregion
 
+        #region static methods
+
+        public static bool IsWebAWBCollection(SPWeb web)
+        {
+            return (web.AllProperties.ContainsKey(WBCollection.COLLECTION_PROPERTY__WORK_BOXES_LIST_NAME)
+                && !web.AllProperties[WBCollection.COLLECTION_PROPERTY__WORK_BOXES_LIST_NAME].Equals(""));
+        }
+
+        #endregion
+
         #region Object Properties
 
         private SPWeb _web = null;

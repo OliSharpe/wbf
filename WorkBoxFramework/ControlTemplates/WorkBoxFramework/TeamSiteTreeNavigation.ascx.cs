@@ -51,7 +51,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
             WBTaxonomy recordsTypesTaxonomy = WBTaxonomy.GetRecordsTypes(SPContext.Current.Site);
 
             string teamGUIDString = "";
-            Team = WBTeam.getFromTeamSite(SPContext.Current);
+            Team = WBTeam.GetFromTeamSite(SPContext.Current);
             if (Team == null) return;
                 
             teamGUIDString = WBExtensions.WBxToString(Team.Id);

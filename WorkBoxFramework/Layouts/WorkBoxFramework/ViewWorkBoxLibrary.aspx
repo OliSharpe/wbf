@@ -8,6 +8,20 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ViewWorkBoxLibrary.aspx.cs" Inherits="WorkBoxFramework.Layouts.WorkBoxFramework.ViewWorkBoxLibrary" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+
+    <SharePoint:CssRegistration ID="WBFCssRegistration"
+      name="WorkBoxFramework/css/WBF.css" 
+      After="corev4.css"
+      runat="server"
+    />
+
+    <SharePoint:ScriptLink ID="WBFScriptRegistration"
+        name="WorkBoxFramework/WorkBoxFramework.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
 <style type="text/css">
 BODY #s4-leftpanel { width: 0 !important; }
 .s4-ca { margin-left: 0 !important; }

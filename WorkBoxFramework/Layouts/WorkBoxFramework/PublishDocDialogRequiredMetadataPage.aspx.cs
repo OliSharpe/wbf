@@ -303,7 +303,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 if (documentRecordsType.IsDocumentSubjectTagsRequired)
                 {
-                    SubjectTagsTitle.Text = "Subject Tags";
+                    SubjectTagsTitle.Text = "Subject Tags" + WBConstant.REQUIRED_ASTERISK;
                 }
                 else
                 {
@@ -321,7 +321,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 if (documentRecordsType.IsDocumentReferenceIDRequired)
                 {
-                    ReferenceIDTitle.Text = "Reference ID";
+                    ReferenceIDTitle.Text = "Reference ID" + WBConstant.REQUIRED_ASTERISK;
                 }
                 else
                 {
@@ -335,7 +335,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 if (documentRecordsType.IsDocumentReferenceDateRequired)
                 {
-                    ReferenceDateTitle.Text = "Reference Date";
+                    ReferenceDateTitle.Text = "Reference Date" + WBConstant.REQUIRED_ASTERISK;
                 }
                 else
                 {
@@ -356,7 +356,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 if (documentRecordsType.IsDocumentSeriesTagRequired)
                 {
-                    SeriesTagTitle.Text = "Series Tag";
+                    SeriesTagTitle.Text = "Series Tag" + WBConstant.REQUIRED_ASTERISK;
                 }
                 else
                 {
@@ -379,7 +379,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 if (documentRecordsType.IsDocumentScanDateRequired)
                 {
-                    ScanDateTitle.Text = "Scan Date";
+                    ScanDateTitle.Text = "Scan Date" + WBConstant.REQUIRED_ASTERISK;
                 }
                 else
                 {
@@ -400,6 +400,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             TaxonomyFieldValueCollection involvedTeamsValues = sourceDocAsItem[WorkBox.COLUMN_NAME__INVOLVED_TEAMS] as TaxonomyFieldValueCollection;
             InvolvedTeamsField.Text = involvedTeamsValues.WBxUIControlValue();
 
+
+            if (functionalAreaFieldIsEditable)
+            {
+                FunctionalAreaField.Focus();
+            }
+            else
+            {
+                PickRecordsTypeButton.Focus();
+            }
         }
 
         private Hashtable checkMetadataState()

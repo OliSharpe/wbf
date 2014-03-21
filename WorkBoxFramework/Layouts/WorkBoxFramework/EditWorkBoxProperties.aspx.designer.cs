@@ -13,6 +13,24 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
     public partial class EditWorkBoxProperties {
         
         /// <summary>
+        /// WBFCssRegistration control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.CssRegistration WBFCssRegistration;
+        
+        /// <summary>
+        /// WBFScriptRegistration control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.ScriptLink WBFScriptRegistration;
+        
+        /// <summary>
         /// ErrorMessageLabel control.
         /// </summary>
         /// <remarks>
@@ -94,6 +112,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.TextBox WorkBoxShortTitle;
         
         /// <summary>
+        /// WorkBoxShortTitleValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator WorkBoxShortTitleValidator;
+        
+        /// <summary>
         /// WorkBoxPrettyTitle control.
         /// </summary>
         /// <remarks>
@@ -101,6 +128,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox WorkBoxPrettyTitle;
+        
+        /// <summary>
+        /// WorkBoxPrettyTitleValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator WorkBoxPrettyTitleValidator;
         
         /// <summary>
         /// ReferenceID control.

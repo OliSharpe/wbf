@@ -29,8 +29,11 @@ namespace WorkBoxFramework
 {
     public static class WBConstant
     {
-        public static int USER_PROFILE_SERVICE__MAXIMUM_STRING_LENGTH = 3600;
+        public const int USER_PROFILE_SERVICE__MAXIMUM_STRING_LENGTH = 3600;
 
-        public static string AD_GROUP__ALL_AUTHENTICATED_USERS = "NT AUTHORITY\\authenticated users";
+        public const string AD_GROUP__ALL_AUTHENTICATED_USERS = "NT AUTHORITY\\authenticated users";
+
+        public const string REQUIRED_ASTERISK = "<span class=\"wbf-required-asterisk\">*</span>";
+
     }
 }

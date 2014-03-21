@@ -1,0 +1,152 @@
+﻿/* CSS Styles for the Work Box Framework */
+
+
+/* Styling for standard WBF dialogs: */
+
+.wbf-dialog 
+{ 
+    /* Nothing at the moment */
+}
+
+.wbf-dialog-error 
+{     
+    /* Nothing at the moment */
+}
+
+.wbf-dialog-title 
+{     
+    /* Nothing at the moment */
+}
+
+.wbf-dialog-message 
+{
+    padding: 15px 8px 20px 8px; 
+    font-weight: normal;
+    text-align: left;    
+}
+
+table.wbf-dialog-form
+{
+    width: 100%;
+    border-spacing: 0px;
+}
+
+/*
+table.wbf-dialog-form td 
+{
+    border-top:solid 1px grey; 
+    padding: 8px; 
+    vertical-align: top;     
+    text-align: left;    
+}
+*/
+
+/* table.wbf-dialog-form td.wbf-field-name-panel */
+.wbf-field-name-panel 
+{ 
+    width: 300px; 
+    border-top:solid 1px grey; 
+    padding: 8px; 
+    vertical-align: top;     
+    text-align: left;    
+}
+
+.wbf-field-name 
+{ 
+    font-weight: bold; 
+    padding-bottom: 2px; 
+}
+
+.wbf-field-description 
+{ 
+    font-weight: normal; 
+    padding: 2px; 
+}
+
+/* table.wbf-dialog-form td.wbf-field-value-panel */
+.wbf-field-value-panel 
+{ 
+    width: 405px; 
+    border-top:solid 1px grey; 
+    padding: 8px; 
+    vertical-align: top;     
+    text-align: left;    
+    background-color: #f1f1f2;  
+}
+
+.wbf-field-value 
+{ 
+    /* Nothing at the moment */
+}
+
+.wbf-field-read-only-title 
+{ 
+    font-weight: bold; 
+    padding: 2px;     
+}
+
+.wbf-field-read-only-value 
+{ 
+    padding: 2px;     
+}
+
+.wbf-field-error 
+{ 
+    font-weight: normal; 
+    padding: 0px; 
+    color: Red; 
+}
+
+table.wbf-dialog-just-buttons
+{
+    width: 100%;
+    border-spacing: 0px;
+}
+
+.wbf-buttons-panel 
+{ 
+    border-top: solid 1px grey; 
+    padding: 8px; 
+    vertical-align: top;     
+    text-align: center !important;  
+}
+
+table.wbf-dialog-just-buttons .wbf-buttons-panel 
+{
+    border-top: 0px;
+}
+
+.wbf-required-asterisk 
+{    
+    color: Red;
+    font-weight:bold;
+    vertical-align: super;
+}
+
+
+/* Other WBF styles */
+
+.wbf-clipboard { padding: 10px; }
+
+.wbf-clipboard-item { padding-top: 8px; margin-left: 20px; }
+
+
+
+/* Old style classes still being used for some WBF dialogs */
+
+td.wbf-records-type { border: 0px; }
+td.wbf-metadata-title-panel { width: 300px; padding: 8px; border-top:solid 1px grey; vertical-align: top; }
+td.wbf-metadata-value-panel { width: 405px; padding: 8px; border-top:solid 1px grey; vertical-align: top; background-color: #f1f1f2;  }
+
+.wbf-metadata-title { font-weight: bold; padding-bottom: 2px; }
+.wbf-metadata-description { font-weight: normal; padding: 2px; }
+.wbf-metadata-read-only-value { font-weight: bold; padding: 2px; }
+.wbf-metadata-error { font-weight: normal; padding: 0px; color: Red; }
+td.wbf-create-new-title { padding: 6px; }
+div.wbf-create-new-title { font-weight: bold; font-size: 16px; vertical-align: top; padding-bottom: 4px; }
+table.wbf-title-table { padding: 6px 0px 12px 10px; }
+
+
+div.wbf-publish-out-title { font-weight: bold; font-size: 16px; vertical-align: top; padding-bottom:4px; }
+
+

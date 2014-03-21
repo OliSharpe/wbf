@@ -58,6 +58,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 OtherEmailSubject.Value = WorkBox.Template.InviteVisitingUserEmailSubject;
                 OtherEmailBody.Value = WorkBox.Template.InviteVisitingUserEmailBody;
 
+                IndividualsToInviteControl.Focus();
+
                 DisposeWorkBox();
             }
         }

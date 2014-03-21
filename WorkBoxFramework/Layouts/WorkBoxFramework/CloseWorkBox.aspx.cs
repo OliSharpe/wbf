@@ -31,6 +31,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         protected void Page_Load(object sender, EventArgs e)
         {
             WorkBoxTitle.Text = WorkBox.Web.Title;
+            CloseComment.Focus();
         }
 
         protected void closeWorkBoxButton_OnClick(object sender, EventArgs e)
