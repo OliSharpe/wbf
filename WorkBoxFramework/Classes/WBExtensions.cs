@@ -434,21 +434,21 @@ namespace WorkBoxFramework
             }
 
             // WBx Set and Get methods fail better than the direct Term methods
-            int previousCount = term.WBxGetProperty("wbf-" + bigPropertyName + "-number-of-chunks").WBxToInt();
+            int previousCount = term.WBxGetProperty("wbf__big_property__" + bigPropertyName + "__number_of_chunks").WBxToInt();
 
             IList<String> chunks = value.WBxSplitIntoChunksOfSize(BIG_CUSTOM_PROPERTIES__CHUNK_SIZE);
 
-            term.WBxSetProperty("wbf-" + bigPropertyName + "-number-of-chunks", chunks.Count.ToString());
+            term.WBxSetProperty("wbf__big_property__" + bigPropertyName + "__number_of_chunks", chunks.Count.ToString());
             for (int i = 0; i < chunks.Count; i++)
             {
-                term.WBxSetProperty("wbf-" + bigPropertyName + "-chunk-" + i, chunks[i]);
+                term.WBxSetProperty("wbf__big_property__" + bigPropertyName + "__chunk_" + i, chunks[i]);
             }
 
             // Now we need to remove any extra custom properies from previous, longer values being stored:
             for (int i = chunks.Count; i < previousCount; i++)
             {
                 // THis WBx method will delete blank custom properties:
-                term.WBxSetProperty("wbf-" + bigPropertyName + "-chunk-" + i, "");
+                term.WBxSetProperty("wbf__big_property__" + bigPropertyName + "__chunk_" + i, "");
             }
 
         }
@@ -467,7 +467,7 @@ namespace WorkBoxFramework
             }
 
             // WBx Set and Get methods fail better than the direct Term methods
-            int count = term.WBxGetProperty("wbf-" + bigPropertyName + "-number-of-chunks").WBxToInt();
+            int count = term.WBxGetProperty("wbf__big_property__" + bigPropertyName + "__number_of_chunks").WBxToInt();
 
             // If the property doesn't exist or has empty value then we'll get back a count of zero
             // but the following code should still return a blank string:
@@ -475,7 +475,7 @@ namespace WorkBoxFramework
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < count; i++)
             {
-                builder.Append(term.WBxGetProperty("wbf-" + bigPropertyName + "-chunk-" + i));
+                builder.Append(term.WBxGetProperty("wbf__big_property__" + bigPropertyName + "__chunk_" + i));
             }
 
             return builder.ToString();
