@@ -334,7 +334,7 @@ namespace WorkBoxFramework.TeamSiteWorkBoxes
 
 
             WBRecordsType recordsType = null;
-            WBTeam team = WBTeam.getFromTeamSite(teams, SPContext.Current.Web);
+            WBTeam team = WBTeam.GetFromTeamSite(teams, SPContext.Current.Web);
 
             if (team != null)
             {
@@ -392,28 +392,36 @@ namespace WorkBoxFramework.TeamSiteWorkBoxes
                         query.AddEqualsFilter(WBColumn.WorkBoxStatus, statusFilter);
                     }
 
-
-                    using (WBCollection collection = new WBCollection(recordsType.WorkBoxCollectionUrl))
+                    try
                     {
-
-                        DataTable dataTable = collection.Query(query);
-
-                        SelectedWorkBoxes.DataSource = dataTable;
-                        SelectedWorkBoxes.DataBind();
-
-                        if (recordsType.CanCurrentUserCreateWorkBoxForTeam(collection, team))
+                        using (WBCollection collection = new WBCollection(recordsType.WorkBoxCollectionUrl))
                         {
-                            string createNewURL = collection.GetUrlForNewDialog(recordsType, team);
-                            string createNewText = recordsType.CreateNewWorkBoxText;
 
-                            CreateNewWorkBoxLink.Text = "<a href=\"#\" onclick=\"javascript: WorkBoxFramework_commandAction('" + createNewURL + "', 730, 800);\">" + createNewText + "</a>";
-                        }
-                        else
-                        {
-                            CreateNewWorkBoxLink.Text = "";
-                        }
+                            DataTable dataTable = collection.Query(query);
 
+                            SelectedWorkBoxes.DataSource = dataTable;
+                            SelectedWorkBoxes.DataBind();
+
+                            if (recordsType.CanCurrentUserCreateWorkBoxForTeam(collection, team))
+                            {
+                                string createNewURL = collection.GetUrlForNewDialog(recordsType, team);
+                                string createNewText = recordsType.CreateNewWorkBoxText;
+
+                                CreateNewWorkBoxLink.Text = "<a href=\"#\" onclick=\"javascript: WorkBoxFramework_commandAction('" + createNewURL + "', 730, 800);\">" + createNewText + "</a>";
+                            }
+                            else
+                            {
+                                CreateNewWorkBoxLink.Text = "";
+                            }
+
+                        }
                     }
+                    catch (Exception e)
+                    {
+                        // We'll use this location to output the exception message for the moment - not ideal, but better than nothing for the moment.
+                        CreateNewWorkBoxLink.Text = "<em>(An exception occured when trying to query the work boxes for this records type!)</em>";
+                    }
+
 
                 }
                 else

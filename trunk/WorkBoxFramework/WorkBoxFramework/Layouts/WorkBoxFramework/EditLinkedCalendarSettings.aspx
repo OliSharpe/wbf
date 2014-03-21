@@ -9,6 +9,19 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <SharePoint:CssRegistration ID="WBFCssRegistration"
+      name="WorkBoxFramework/css/WBF.css" 
+      After="corev4.css"
+      runat="server"
+    />
+
+    <SharePoint:ScriptLink ID="WBFScriptRegistration"
+        name="WorkBoxFramework/WorkBoxFramework.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">

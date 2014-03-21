@@ -9,51 +9,73 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <SharePoint:CssRegistration ID="WBFCssRegistration"
+      name="WorkBoxFramework/css/WBF.css" 
+      After="corev4.css"
+      runat="server"
+    />
+
+    <SharePoint:ScriptLink ID="WBFjQueryScriptRegistration"
+        name="WorkBoxFramework/jquery-1.7.2.min.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
+    <SharePoint:ScriptLink ID="WBFScriptRegistration"
+        name="WorkBoxFramework/WorkBoxFramework.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
+
+<div class="wbf-dialog">
+<div class="wbf-dialog-error">
 <asp:Label ID="ErrorMessageLabel" runat="server" Text="" ForeColor="Red"></asp:Label>
-<style type="text/css">
-td 
-{
-border-top:solid 1px grey;
-}
-</style>
+</div>
 
-<p>
+<div class="wbf-dialog-message">
 Are you sure you wish to close this Work Box?
-</p>
+</div>
 
-<table width="100%" cellpadding="5" cellspacing="0">
+<table class="wbf-dialog-form">
 
 <tr>
-<td valign="top">
-<b>Work Box Title</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Work Box Title</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-read-only-title">
 <asp:Label ID="WorkBoxTitle" runat="server" Text=""></asp:Label>
+</div>
 
 </td>
 </tr>
 
 <tr>
-<td valign="top">
-<b>Comment:</b>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Comment:<span class="wbf-required-asterisk">*</span></div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel" valign="top">
 
+<div class="wbf-field-value">
 <asp:TextBox ID="CloseComment" runat="server" Text="" TextMode="multiline" Rows="3" Columns="30"></asp:TextBox>
+</div>
+<div class="wbf-field-error">
     <asp:RequiredFieldValidator ID="CloseCommentRequiredFieldValidator" runat="server" ErrorMessage="You must enter a comment."
             ControlToValidate = "CloseComment"></asp:RequiredFieldValidator>
-
+</div>
 </td>
 </tr>
 
 
 <tr>
-<td colspan="2" align="center" valign="top">
+<td colspan="2" class="wbf-buttons-panel">
     <asp:Button ID="CloseWorkBoxButton" runat="server" Text="Close Work Box"  OnClick="closeWorkBoxButton_OnClick"/>
 &nbsp;
     <asp:Button ID="CancelButton" runat="server" Text="Cancel" CausesValidation="False" OnClick="cancelButton_OnClick"/>
@@ -63,6 +85,7 @@ Are you sure you wish to close this Work Box?
 
 
 </table>
+</div>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">

@@ -73,6 +73,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     Message.Text = "The work box has been added to your favourites.";
                 }
 
+                okButton.Focus();
             }
         }
 

@@ -417,7 +417,7 @@ namespace WorkBoxFramework.ViewRecordsLibraryWebPart
                 }
 
 
-                WBTeam team = WBTeam.getFromTeamSite(teamsTaxonomy, SPContext.Current.Web);
+                WBTeam team = WBTeam.GetFromTeamSite(teamsTaxonomy, SPContext.Current.Web);
 
                 WBFarm farm = WBFarm.Local;
 

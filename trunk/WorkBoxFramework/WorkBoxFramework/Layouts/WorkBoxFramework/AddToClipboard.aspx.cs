@@ -96,6 +96,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 {
                     ItemsOnClipboard.Text = "There was an error with the passed through values";
                 }
+
+                closeButton.Focus();
             }
 
 

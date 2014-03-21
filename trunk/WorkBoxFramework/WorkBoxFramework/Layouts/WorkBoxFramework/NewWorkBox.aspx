@@ -10,23 +10,34 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <SharePoint:CssRegistration ID="WBFCssRegistration"
+      name="WorkBoxFramework/css/WBF.css" 
+      After="corev4.css"
+      runat="server"
+    />
+
+    <SharePoint:ScriptLink ID="WBFjQueryScriptRegistration"
+        name="WorkBoxFramework/jquery-1.7.2.min.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
+    <SharePoint:ScriptLink ID="WBFScriptRegistration"
+        name="WorkBoxFramework/WorkBoxFramework.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
+
+<div class="wbf-dialog">
+<div class="wbf-dialog-error">
 <asp:Label ID="ErrorMessageLabel" runat="server" Text="" ForeColor="Red"></asp:Label>
-<style type="text/css">
-td.wbf-records-type { border: 0px; }
-td.wbf-metadata-title-panel { width: 300px; padding: 8px; border-top:solid 1px grey; vertical-align: top; }
-td.wbf-metadata-value-panel { width: 405px; padding: 8px; border-top:solid 1px grey; vertical-align: top; background-color: #f1f1f2;  }
-td.wbf-buttons-panel { border-top:solid 1px grey; text-align: center; vertical-align: top; }
-.wbf-metadata-title { font-weight: bold; padding-bottom: 2px; }
-.wbf-metadata-description { font-weight: normal; padding: 2px; }
-.wbf-metadata-read-only-value { font-weight: bold; padding: 2px; }
-.wbf-metadata-error { font-weight: normal; padding: 0px; color: Red; }
-td.wbf-create-new-title { padding: 6px; }
-div.wbf-create-new-title { font-weight: bold; font-size: 16px; vertical-align: top; padding-bottom: 4px; }
-table.wbf-title-table { padding: 6px 0px 12px 10px; }
-</style>
+</div>
 
 <table cellpadding="0" cellspacing="0" class="wbf-title-table">
 <tr>
@@ -44,27 +55,28 @@ You must enter the following metadata details for your new Work Box.
 </tr>
 </table>
 
-<table width="100%" cellpadding="5" cellspacing="0">
-
+<table class="wbf-dialog-form">
 
 <tr>
-<td class="wbf-metadata-title-panel">
-<div class="wbf-metadata-title">Functional Area</div>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Functional Area<span class="wbf-required-asterisk">*</span></div>
 </td>
-<td class="wbf-metadata-value-panel">
+<td class="wbf-field-value-panel">
 
 <% if (functionalAreaFieldIsEditable)
    { %>
+<div class="wbf-field-value">
 <Taxonomy:TaxonomyWebTaggingControl ID="FunctionalAreaField" ControlMode="display" runat="server" />
+</div>
 <% }
    else
    { %>
-<div class="wbf-metadata-read-only-value">
+<div class="wbf-field-read-only-value">
 <asp:Label ID="ReadOnlyFunctionalAreaField" runat="server" />
 </div>
 <% } %>
 
-<div class="wbf-metadata-error">
+<div class="wbf-field-error">
 <asp:Label ID="FunctionalAreaFieldMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 
@@ -72,16 +84,16 @@ You must enter the following metadata details for your new Work Box.
 </tr>
 
 <tr>
-<td class="wbf-metadata-title-panel">
-<div class="wbf-metadata-title">Records Type</div>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Records Type<span class="wbf-required-asterisk">*</span></div>
 </td>
-<td class="wbf-metadata-value-panel">
+<td class="wbf-field-value-panel">
 
-<div class="wbf-metadata-read-only-value">
+<div class="wbf-field-read-only-value">
 <asp:Label ID="RecordsType" runat="server" />
 </div>
 
-<div class="wbf-metadata-error">
+<div class="wbf-field-error">
 <asp:Label ID="RecordsTypeFieldMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 
@@ -89,12 +101,12 @@ You must enter the following metadata details for your new Work Box.
 </tr>
 
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title">Work Box Naming Convention</div>
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Work Box Naming Convention</div>
 </td>
-<td class="wbf-metadata-value-panel">
+<td class="wbf-field-value-panel">
 
-    <div class="wbf-metadata-read-only-value">
+    <div class="wbf-field-read-only-value">
     <asp:Label ID="WorkBoxNamingConvention" runat="server"></asp:Label>
     </div>
 
@@ -102,17 +114,17 @@ You must enter the following metadata details for your new Work Box.
 </tr>
 
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title">Work Box Template</div>
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Work Box Template<span class="wbf-required-asterisk">*</span></div>
 </td>
-<td class="wbf-metadata-value-panel">
+<td class="wbf-field-value-panel">
 
 <% if (onlyOneWorkBoxTemplate)
    { %>
-<div class="wbf-metadata-read-only-value">
+<div class="wbf-field-read-only-value">
     <asp:Label ID="WorkBoxTemplate" runat="server"></asp:Label>
     </div>
-    <div class="wbf-metadata-error">
+    <div class="wbf-field-error">
 <asp:Label ID="NoTemplatesError" runat="server" Text="" ForeColor="Red"/>
 </div>
     <asp:HiddenField ID="WorkBoxTemplateID" runat="server"></asp:HiddenField>
@@ -120,7 +132,9 @@ You must enter the following metadata details for your new Work Box.
 <% }
    else
    { %>
+    <div class="wbf-field-value">
     <asp:DropDownList ID="WorkBoxTemplates" runat="server"></asp:DropDownList>
+    </div>
 <% } %>
 
 </td>
@@ -129,15 +143,15 @@ You must enter the following metadata details for your new Work Box.
 <% if (showShortTitle)
    { %>
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title"><asp:Label ID="ShortTitleTitle" runat="server"/></div>
-<div class="wbf-metadata-description">
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name"><asp:Label ID="ShortTitleTitle" runat="server"/></div>
+<div class="wbf-field-description">
 <asp:Label ID="ShortTitleDescription" runat="server"/>
 </div>
 </td>
-<td class="wbf-metadata-value-panel" valign="top">
+<td class="wbf-field-value-panel" valign="top">
     <asp:TextBox ID="WorkBoxShortTitle" runat="server" />
-<div class="wbf-metadata-error">
+<div class="wbf-field-error">
 <asp:Label ID="WorkBoxShortTitleMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
@@ -150,15 +164,17 @@ You must enter the following metadata details for your new Work Box.
 <% if (showReferenceID)
    { %>
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title"><asp:Label ID="ReferenceIDTitle" runat="server"/></div>
-<div class="wbf-metadata-description">
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name"><asp:Label ID="ReferenceIDTitle" runat="server"/></div>
+<div class="wbf-field-description">
 <asp:Label ID="ReferenceIDDescription" runat="server"/>
 </div>
 </td>
-<td class="wbf-metadata-value-panel" valign="top">
+<td class="wbf-field-value-panel" valign="top">
+    <div class="wbf-field-value">
     <asp:TextBox ID="ReferenceID" runat="server" />
-<div class="wbf-metadata-error">
+    </div>
+<div class="wbf-field-error">
 <asp:Label ID="ReferenceIDMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
@@ -168,15 +184,17 @@ You must enter the following metadata details for your new Work Box.
 <% if (showReferenceDate)
    { %>
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title"><asp:Label ID="ReferenceDateTitle" runat="server"/></div>
-<div class="wbf-metadata-description">
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name"><asp:Label ID="ReferenceDateTitle" runat="server"/></div>
+<div class="wbf-field-description">
 <asp:Label ID="ReferenceDateDescription" runat="server"/>
 </div>
 </td>
-<td class="wbf-metadata-value-panel" valign="top">
+<td class="wbf-field-value-panel" valign="top">
+    <div class="wbf-field-value">
     <SharePoint:DateTimeControl ID="ReferenceDate" runat="server" />
-<div class="wbf-metadata-error">
+    </div>
+<div class="wbf-field-error">
 <asp:Label ID="ReferenceDateMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
@@ -186,15 +204,17 @@ You must enter the following metadata details for your new Work Box.
 <% if (showSeriesTag)
    { %>
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title"><asp:Label ID="SeriesTagTitle" runat="server"/></div>
-<div class="wbf-metadata-description">
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name"><asp:Label ID="SeriesTagTitle" runat="server"/></div>
+<div class="wbf-field-description">
 <asp:Label ID="SeriesTagDescription" runat="server"/>
 </div>
 </td>
-<td class="wbf-metadata-value-panel" valign="top">
+<td class="wbf-field-value-panel" valign="top">
+<div class="wbf-field-value">
 <asp:DropDownList ID="SeriesTagDropDownList" runat="server" />
-<div class="wbf-metadata-error">
+</div>
+<div class="wbf-field-error">
 <asp:Label ID="SeriesTagFieldMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
@@ -203,42 +223,41 @@ You must enter the following metadata details for your new Work Box.
 
  
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title">Owning Team</div>
-<div class="wbf-metadata-description">
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Owning Team</div>
+<div class="wbf-field-description">
 The team who will own this work box.
 </div>
 </td>
-<td class="wbf-metadata-value-panel" valign="top">
+<td class="wbf-field-value-panel" valign="top">
 
-<div class="wbf-metadata-read-only-value">
+<div class="wbf-field-read-only-value">
 <asp:Label ID="OwningTeamField" ControlMode="display" runat="server" />
 </div>
 
 <asp:HiddenField ID="OwningTeamUIControlValue" runat="server" />
-<div class="wbf-metadata-error">
+<div class="wbf-field-error">
 <asp:Label ID="OwningTeamFieldMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
 </tr>
 
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title">Involved Teams</div>
-<div class="wbf-metadata-description">
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Involved Teams</div>
+<div class="wbf-field-description">
 The teams who can collaborate in this work box.
 </div>
 </td>
-<td class="wbf-metadata-value-panel" valign="top">
-
+<td class="wbf-field-value-panel" valign="top">
+    <div class="wbf-field-value">
 <Taxonomy:TaxonomyWebTaggingControl ID="InvolvedTeamsField" ControlMode="display" runat="server" />
-<div class="wbf-metadata-error">
+</div>
+<div class="wbf-field-error">
 <asp:Label ID="InvolvedTeamsFieldMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
 </tr>
-
-
 
 <tr>
 <td colspan="2" class="wbf-buttons-panel">
@@ -256,6 +275,8 @@ The teams who can collaborate in this work box.
 
     <asp:HiddenField ID="RelatedWorkBoxUrl" runat="server" />
     <asp:HiddenField ID="RelationType" runat="server" />
+
+</div>
 
 </asp:Content>
 

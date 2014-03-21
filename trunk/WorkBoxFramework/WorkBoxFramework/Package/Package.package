@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="122d1e78-156a-4d31-adc1-66fee258b162" solutionId="122d1e78-156a-4d31-adc1-66fee258b162" resetWebServer="false" name="WorkBoxFramework v0.9.5i" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="122d1e78-156a-4d31-adc1-66fee258b162" solutionId="122d1e78-156a-4d31-adc1-66fee258b162" resetWebServer="false" name="WorkBoxFramework v0.9.5i.uat" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
   <assemblies>
     <customAssembly location="Newtonsoft.Json.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="Include\Newtonsoft.Json.dll" />
   </assemblies>
@@ -21,5 +21,6 @@
     <projectItemReference itemId="9517df5e-7212-4ae7-98a4-141ea4c73939" />
     <projectItemReference itemId="ab4dfa97-7233-44ec-b9d1-2ad3515f0a68" />
     <projectItemReference itemId="ad111b85-98d1-4df8-8f5f-ef3141011c5c" />
+    <projectItemReference itemId="8d4eacdb-7abc-472f-af7b-35b4091fbc88" />
   </projectItems>
 </package>

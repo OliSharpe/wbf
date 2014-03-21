@@ -9,17 +9,29 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <SharePoint:CssRegistration ID="WBFCssRegistration"
+      name="WorkBoxFramework/css/WBF.css" 
+      After="corev4.css"
+      runat="server"
+    />
+
+    <SharePoint:ScriptLink ID="WBFjQueryScriptRegistration"
+        name="WorkBoxFramework/jquery-1.7.2.min.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
+    <SharePoint:ScriptLink ID="WBFScriptRegistration"
+        name="WorkBoxFramework/WorkBoxFramework.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-
-<asp:Label ID="ErrorMessageLabel" runat="server" Text="" ForeColor="Red"></asp:Label>
-<style type="text/css">
-td 
-{
-border-top:solid 1px grey;
-}
-</style>
 
 <script type="text/javascript">
 
@@ -63,55 +75,56 @@ border-top:solid 1px grey;
     }
 </script>
 
-
+<div class="wbf-dialog">
+<div class="wbf-dialog-error">
 <asp:Label ID="ErrorText" ForeColor="Red"  runat="server" />
+</div>
 
-<p>
+<div class="wbf-dialog-message">
 Select the individuals you want to invite to this work box.
-</p>
+</div>
 
-<table width="100%" cellpadding="5" cellspacing="0">
+<table class="wbf-dialog-form">
 
 <tr>
-<td valign="top">
-<b>Work Box Title</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Work Box Title</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
-<b>
+<div class="wbf-field-read-only-title">
 <asp:Label ID="WorkBoxTitle" runat="server" Text=""></asp:Label>
-</b>
+</div>
 
 </td>
 </tr>
 
 
 <tr>
-<td valign="top">
-<b>Select Individuals</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Select Individuals<span class="wbf-required-asterisk">*</span></div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
-
+<td class="wbf-field-value-panel">
+<div class="wbf-field-value">
 			<SharePoint:PeopleEditor id="IndividualsToInviteControl" runat="server"
 				SelectionSet="User"
 				ValidatorEnabled="true"
-				AllowEmpty = "true"
+				AllowEmpty = "false"
 				MultiSelect = "true"
 				/>
 
+</div>
 
 </td>
 </tr>
 
 <tr>
-<td valign="top">
-<b>Invite as:</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Invite as:</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-value">
 <asp:RadioButtonList ID="InviteType" runat="server" onclick="javascript: toggleEmailText(this);">
 
 <asp:ListItem Text="Involved individual (read, add and edit work box content)" Value="Involved"/>
@@ -121,7 +134,7 @@ Select the individuals you want to invite to this work box.
 </asp:RadioButtonList>
 
 <asp:HiddenField ID="CurrentlySelectedValue" runat="server" />
-
+</div>
 
 </td>
 </tr>
@@ -129,11 +142,11 @@ Select the individuals you want to invite to this work box.
 
 
 <tr>
-<td valign="top">
-<b>Send invite email?</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Send invite email?</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
+<div class="wbf-field-value">
 <div>
 <asp:CheckBox ID="SendInviteEmail" Text="Send invite email?" runat="server" />
 </div>
@@ -143,54 +156,57 @@ Select the individuals you want to invite to this work box.
 <div>
 <asp:CheckBox ID="CCToYou" Text="CC email(s) to yourself?" runat="server" />
 </div>
+</div>
 
 </td>
 </tr>
 
 <tr>
-<td valign="top">
-<b>Subject of invite email</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Subject of invite email</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-value">
 <asp:TextBox ID="EmailSubject" Text="" Columns="50" runat="server" />
+</div>
 
 </td>
 </tr>
 
 <tr>
-<td valign="top">
-<b>Text of invite email</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Text of invite email</div>
+<div class="wbf-field-description">
 <p>Template tags:<br />
 [WORK_BOX_TITLE]<br />
 [WORK_BOX_URL]<br />
 [USER_NAME]
 </p>
+</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-value">
 <asp:TextBox ID="EmailBody" TextMode="MultiLine" Rows="8" Columns="50" Text="" runat="server" />
 
 <asp:HiddenField ID="OtherEmailSubject" runat="server" />
 <asp:HiddenField ID="OtherEmailBody" runat="server" />
+</div>
 
 </td>
 </tr>
 
 <tr>
-<td colspan="2" align="center" valign="top">
+<td colspan="2" class="wbf-buttons-panel">
     <asp:Button ID="InviteButton" runat="server" Text="Invite"  OnClick="inviteButton_OnClick" />
 &nbsp;
-    <asp:Button ID="CancelButton" runat="server" Text="Cancel" OnClick="cancelButton_OnClick"/>
-
+    <asp:Button ID="CancelButton" runat="server" Text="Cancel" CausesValidation="False" OnClick="cancelButton_OnClick"/>
 </td>
 </tr>
 
-
 </table>
-
+</div>
 
 </asp:Content>
 

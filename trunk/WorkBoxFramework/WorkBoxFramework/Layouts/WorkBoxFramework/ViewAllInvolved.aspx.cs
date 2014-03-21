@@ -61,16 +61,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             string html = "<p>Users Involved with <b>" + WorkBox.Title + "</b></p>\n";
 
-            html += "<table width=\"100%\" cellpadding=\"5\" cellspacing=\"0\">\n";
+            html += "<table class=\"wbf-dialog-form\">\n";
            
             if (WorkBox.OwningTeam != null)
             {
-
-                html += "<tr><td valign=\"top\"><b>Owning Team:</b><ul><li>";
+                html += "<tr><td class=\"wbf-field-name-panel\"><b>Owning Team:</b><ul><li>";
 
                 html += WBUtils.GenerateLinkToEmailGroup("Email work box owners", WorkBox.GetAllOwners(SPContext.Current.Site).WBxToEmails(), headers);
 
-                html += "</li></ul></td><td class=\"ms-authoringcontrols\" valign=\"top\">\n";
+                html += "</li></ul></td><td class=\"wbf-field-value-panel\">\n";
 
                 html += renderTeamAsFieldSet(SPContext.Current.Site, WorkBox.OwningTeam);
 
@@ -78,11 +77,11 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
 
 
-            html += "<tr><td valign=\"top\"><b>Involved Teams:</b><ul><li>";
+            html += "<tr><td class=\"wbf-field-name-panel\"><b>Involved Teams:</b><ul><li>";
 
             html += WBUtils.GenerateLinkToEmailGroup("Email all involved with work box", WorkBox.GetAllInvolved(SPContext.Current.Site).WBxToEmails(), headers);
 
-            html += "</li></ul></td><td class=\"ms-authoringcontrols\" valign=\"top\">\n";
+            html += "</li></ul></td><td class=\"wbf-field-value-panel\">\n";
 
             if (WorkBox.InvolvedTeams != null && WorkBox.OwningTeam != null)
             {
@@ -96,7 +95,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             html += "</td></tr>\n";
 
-            html += "<tr><td valign=\"top\"><b>Involved Individuals:</b></td><td class=\"ms-authoringcontrols\" valign=\"top\"><ul>\n";
+            html += "<tr><td class=\"wbf-field-name-panel\"><b>Involved Individuals:</b></td><td class=\"wbf-field-value-panel\"><ul>\n";
 
             if (WorkBox.InvolvedIndividuals != null)
             {
@@ -110,11 +109,11 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             html += "</td></tr>\n";
 
 
-            html += "<tr><td valign=\"top\"><b>Visiting Teams:</b><ul><li>";
+            html += "<tr><td class=\"wbf-field-name-panel\"><b>Visiting Teams:</b><ul><li>";
 
             html += WBUtils.GenerateLinkToEmailGroup("Email everyone who can visit the work box", WorkBox.GetAllWhoCanVisit(SPContext.Current.Site).WBxToEmails(), headers);
 
-            html += "</li></ul></td><td class=\"ms-authoringcontrols\" valign=\"top\">\n";
+            html += "</li></ul></td><td class=\"wbf-field-value-panel\">\n";
 
             if (WorkBox.VisitingTeams != null)
             {
@@ -126,7 +125,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             html += "</td></tr>\n";
 
-            html += "<tr><td valign=\"top\"><b>Visiting Individuals:</b></td><td class=\"ms-authoringcontrols\" valign=\"top\"><ul>\n";
+            html += "<tr><td class=\"wbf-field-name-panel\"><b>Visiting Individuals:</b></td><td class=\"wbf-field-value-panel\"><ul>\n";
 
             if (WorkBox.VisitingIndividuals != null)
             {

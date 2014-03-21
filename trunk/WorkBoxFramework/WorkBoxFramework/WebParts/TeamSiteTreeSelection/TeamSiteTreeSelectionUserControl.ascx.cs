@@ -125,7 +125,7 @@ namespace WorkBoxFramework.TeamSiteTreeSelection
         
         private void RefreshBoundData()
         {
-            if (SelectedRecordsTypeGUID != "")
+            if (!String.IsNullOrEmpty(SelectedRecordsTypeGUID))
             {
                 WBTaxonomy recordsTypes = WBTaxonomy.GetRecordsTypes(SPContext.Current.Site);
                 WBTaxonomy teams = WBTaxonomy.GetTeams(recordsTypes);
@@ -139,7 +139,7 @@ namespace WorkBoxFramework.TeamSiteTreeSelection
                 SelectionTitle.Text = recordsTypePath;
                 SelectionDescription.Text = recordsType.Description;
 
-                WBTeam team = WBTeam.getFromTeamSite(teams, SPContext.Current.Web);
+                WBTeam team = WBTeam.GetFromTeamSite(teams, SPContext.Current.Web);
 
                 WBFarm farm = WBFarm.Local;
 

@@ -9,15 +9,22 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <SharePoint:CssRegistration ID="WBFCssRegistration"
+      name="WorkBoxFramework/css/WBF.css" 
+      After="corev4.css"
+      runat="server"
+    />
+
+    <SharePoint:ScriptLink ID="WBFScriptRegistration"
+        name="WorkBoxFramework/WorkBoxFramework.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-<style type="text/css">
-td 
-{
-border-top:solid 1px grey;
-}
-</style>
 
 <asp:Panel ID="JavascriptPanel" runat="server">
 <script type="text/javascript">
@@ -33,7 +40,7 @@ border-top:solid 1px grey;
 
     <asp:Literal ID="GeneratedViewOfAllInvolved" runat="server"></asp:Literal>
 
-    <div align="center">
+    <div class="wbf-buttons-panel">
         <asp:Button ID="RefreshTeams" runat="server" Text="Refresh Team Membership"  OnClick="refreshTeams_OnClick"/>
         <asp:Button ID="CloseDialog" runat="server" Text="Close"  OnClick="close_OnClick"/>
     </div>

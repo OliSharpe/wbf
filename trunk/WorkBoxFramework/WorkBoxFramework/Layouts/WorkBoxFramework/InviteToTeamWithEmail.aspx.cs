@@ -38,7 +38,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         protected void Page_Load(object sender, EventArgs e)
         {
             teams = WBTaxonomy.GetTeams(SPContext.Current.Site);
-            team = WBTeam.getFromTeamSite(teams, SPContext.Current);
+            team = WBTeam.GetFromTeamSite(teams, SPContext.Current);
 
             if (team == null)
             {

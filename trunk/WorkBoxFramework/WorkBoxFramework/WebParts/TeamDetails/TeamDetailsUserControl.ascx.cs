@@ -43,7 +43,7 @@ namespace WorkBoxFramework.TeamDetails
 
             if (!IsPostBack)
             {
-                WBTeam team = WBTeam.getFromTeamSite(SPContext.Current);
+                WBTeam team = WBTeam.GetFromTeamSite(SPContext.Current);
 
                 if (team == null)
                 {

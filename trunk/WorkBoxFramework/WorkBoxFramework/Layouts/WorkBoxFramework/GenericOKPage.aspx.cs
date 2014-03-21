@@ -67,6 +67,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 pageTitle = Request.QueryString["pageTitle"];
                 pageText = Request.QueryString["pageText"];
 
+                okButton.Focus();
+
             }
         }
 

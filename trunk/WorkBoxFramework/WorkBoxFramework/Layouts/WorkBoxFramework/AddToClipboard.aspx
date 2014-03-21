@@ -9,20 +9,27 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <SharePoint:CssRegistration ID="WBFCssRegistration"
+      name="WorkBoxFramework/css/WBF.css" 
+      After="corev4.css"
+      runat="server"
+    />
+
+    <SharePoint:ScriptLink ID="WBFScriptRegistration"
+        name="WorkBoxFramework/WorkBoxFramework.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-<style type="text/css">
 
-.wbf-clipboard { padding: 10px; }
+<div class="wbf-dialog">
+<h2 class="wbf-dialog-title">Copied to clipboard</h2>
 
-.wbf-clipboard-item { padding-top: 8px; margin-left: 20px; }
-
-</style>
-
-<h2>Copied to clipboard</h2>
-
-<p>You have just copied the following items to your clipboard:</p>
+<div class="wbf-dialog-message">You have just copied the following items to your clipboard:</div>
 
 <asp:Literal ID="ItemsOnClipboard" runat="server" />
 
@@ -30,6 +37,7 @@
 
     <asp:Button ID="closeButton" runat="server" Text="Close"  OnClick="closeButton_OnClick"/>
 
+</div>
 </div>
 
 </asp:Content>

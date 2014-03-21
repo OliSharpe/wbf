@@ -57,6 +57,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 WorkBoxShortTitle.Text = WorkBox.ShortTitle;
                 WorkBoxPrettyTitle.Text = WorkBox.Web.Title;
 
+                WorkBoxShortTitle.Focus();
+
                 if (showReferenceID)
                 {
                     ReferenceID.Text = WorkBox.ReferenceID;

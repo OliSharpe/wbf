@@ -9,24 +9,39 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <SharePoint:CssRegistration ID="WBFCssRegistration"
+      name="WorkBoxFramework/css/WBF.css" 
+      After="corev4.css"
+      runat="server"
+    />
+
+    <SharePoint:ScriptLink ID="WBFScriptRegistration"
+        name="WorkBoxFramework/WorkBoxFramework.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
-<p>
-    <asp:Label ID="Message" runat="server" Text="Label"></asp:Label>
-</p>
+<div class="wbf-dialog">
 
-<table width="100%" cellpadding="5" cellspacing="0">
+<div class="wbf-dialog-message">
+    <asp:Label ID="Message" runat="server" Text="Label"></asp:Label>
+</div>
+
+<table class="wbf-dialog-just-buttons">
 
 <tr>
-<td colspan="2" align="center" valign="top">
+<td colspan="2" class="wbf-buttons-panel">
     <asp:Button ID="okButton" runat="server" Text="OK"  OnClick="okButton_OnClick"/>
 </td>
 </tr>
 
-
 </table>
+</div>
 
 </asp:Content>
 

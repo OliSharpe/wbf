@@ -58,20 +58,32 @@ namespace WorkBoxFramework
 
         #region Constructors and Factories
 
+        [Obsolete("getFromTeamSite is deprecated, please use capitalised GetFromTeamSite instead.", true)]
         public static WBTeam getFromTeamSite(SPContext context)
         {
-            return getFromTeamSite(WBTaxonomy.GetTeams(context.Site), context.Web);
+            return GetFromTeamSite(WBTaxonomy.GetTeams(context.Site), context.Web);
         }
 
+        [Obsolete("getFromTeamSite is deprecated, please use capitalised GetFromTeamSite instead.", true)]
         public static WBTeam getFromTeamSite(WBTaxonomy teams, SPContext context)
         {
-            return getFromTeamSite(teams, context.Web);
+            return GetFromTeamSite(teams, context.Web);
         }
 
-
-        public static WBTeam getFromTeamSite(WBTaxonomy teams, SPWeb web)
+        [Obsolete("getFromTeamSite is deprecated, please use capitalised GetFromTeamSite instead.", true)]
+        public static WBTeam getFromTeamSite(WBTaxonomy teams, SPWeb web) 
         {
             return GetFromTeamSite(teams, web);
+        }
+
+        public static WBTeam GetFromTeamSite(SPContext context)
+        {
+            return GetFromTeamSite(WBTaxonomy.GetTeams(context.Site), context.Web);
+        }
+
+        public static WBTeam GetFromTeamSite(WBTaxonomy teams, SPContext context)
+        {
+            return GetFromTeamSite(teams, context.Web);
         }
 
         public static WBTeam GetFromTeamSite(WBTaxonomy teams, SPWeb web)

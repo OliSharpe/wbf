@@ -10,7 +10,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            team = WBTeam.getFromTeamSite(SPContext.Current);
+            team = WBTeam.GetFromTeamSite(SPContext.Current);
 
             if (team == null)
             {

@@ -7,6 +7,20 @@
 <%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="TeamSiteWorkBoxesUserControl.ascx.cs" Inherits="WorkBoxFramework.TeamSiteWorkBoxes.TeamSiteWorkBoxesUserControl" %>
 
+   <SharePoint:ScriptLink ID="WBFjQueryScriptRegistration"
+        name="WorkBoxFramework/jquery-1.7.2.min.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
+   <SharePoint:ScriptLink ID="WBFScriptRegistration"
+        name="WorkBoxFramework/WorkBoxFramework.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
 <script type="text/javascript">
 
     var wbf__id_of_hidden_submit_link = "<%= HiddenSubmitLink.ClientID %>";

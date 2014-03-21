@@ -44,6 +44,10 @@ namespace WorkBoxFramework
 {
     public static class WBExtensions
     {
+        public const int BIG_CUSTOM_PROPERTIES__MAXIMUM_LENGTH = 10000;
+        public const int BIG_CUSTOM_PROPERTIES__CHUNK_SIZE = 254;
+
+
 
         #region General Object Extensions
         public static String WBxToString(this Object value)
@@ -89,6 +93,53 @@ namespace WorkBoxFramework
             return text;
         }
 
+        /// <summary>
+        /// Returns 0 if string is empty otherwise uses Convert.ToInt32()
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static int WBxToInt(this String text)
+        {
+            if (String.IsNullOrEmpty(text)) return 0;
+            return Convert.ToInt32(text);
+        }
+
+        // Lazily based on the answer here:
+        // http://stackoverflow.com/questions/1632078/split-string-in-512-char-chunks
+        /// <summary>
+        /// Splits the intput text string into chunks of chunkSize returning at least one blank chunk even if text is null.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="chunkSize"></param>
+        /// <returns></returns>
+        public static IList<String> WBxSplitIntoChunksOfSize(this String text, int chunkSize)
+        {
+            // We're going to treat null strings as a blank string:
+            if (String.IsNullOrEmpty(text)) text = "";
+
+            List<String> chunks = new List<String>();
+            int offset = 0;
+            while (offset < text.Length)
+            {
+                int size = Math.Min(chunkSize, text.Length - offset);
+                chunks.Add(text.Substring(offset, size));
+                offset += size;
+            }
+
+            // If the string was empty we'll have no chunks at this point and we should return at 
+            // least one blank chunk to represent the blank input string:
+            if (chunks.Count == 0)
+            {
+                chunks.Add("");
+            }
+
+            return chunks;
+        }
+
+
+        #endregion
+
+        #region WebControl extensions
 
         public static Control WBxFindNestedControlByID(this Control root, String id)
         {
@@ -159,10 +210,6 @@ namespace WorkBoxFramework
         }
 
 
-        #endregion
-
-        #region WebControl extensions
-
         public static void WBxSetSelectedDate(this DateTimeControl dateTimeControl, SPListItem item, WBColumn column)
         {
             if (item.WBxHasValue(column))
@@ -177,13 +224,13 @@ namespace WorkBoxFramework
 
         #endregion
 
-        #region SPFarm SPWeb and Term Property Set and Get Extensions
+        #region SPFarm SPWeb and SPList Property Set and Get Extensions
 
         public static int WBxGetIntProperty(this SPWeb web, String key)
         {
-            string value = web.WBxGetProperty(key);
-            if (value == "") return 0;
-            return Convert.ToInt32(value);
+            return web.WBxGetProperty(key).WBxToInt();
+//            if (value == "") return 0;
+//            return Convert.ToInt32(value);
         }
 
         public static void WBxSetIntProperty(this SPWeb web, String key, int value)
@@ -191,23 +238,13 @@ namespace WorkBoxFramework
             web.WBxSetProperty(key, value);
         }
 
-        public static int WBxGetIntProperty(this Term term, String key)
-        {
-            string value = term.WBxGetProperty(key);
-            if (value == "") return 0;
-            return Convert.ToInt32(value);
-        }
-
-        public static void WBxSetIntProperty(this Term term, String key, int value)
-        {
-            term.WBxSetProperty(key, value);
-        }
-
         public static int WBxGetIntProperty(this SPList list, String key)
         {
-            string value = list.WBxGetProperty(key);
-            if (value == "") return 0;
-            return Convert.ToInt32(value);
+            return list.WBxGetProperty(key).WBxToInt();
+
+//            string value = list.WBxGetProperty(key);
+//            if (value == "") return 0;
+//            return Convert.ToInt32(value);
         }
 
         public static void WBxSetIntProperty(this SPList list, String key, int value)
@@ -270,71 +307,11 @@ namespace WorkBoxFramework
         }
 
 
-
-        public static String WBxGetProperty(this Term term, String key)
-        {
-            if (term == null) return "";
-//            string value = safeGetPropertyAsString(term.CustomProperties, key);
-//            WBUtils.logMessage("Getting the term value: term | key | has value : " + term.Name + " | " + key + " | " + value);
-//            return value;
-            return safeGetPropertyAsString(term.CustomProperties, key);
-        }
-
-        public static String WBxGetPropertyOrDefault(this Term term, String key, String defaultValue)
-        {
-            string value = term.WBxGetProperty(key);
-            if (value == "") return defaultValue;
-            return value;
-        }
-
-        public static bool WBxGetBoolProperty(this Term term, String key)
-        {
-            if (term == null) return false;
-            return true.ToString().Equals(term.WBxGetProperty(key));
-        }
-
-        public static bool WBxGetBoolPropertyOrDefault(this Term term, String key, bool defaultValue)
-        {
-            string value = term.WBxGetProperty(key);
-            if (value == "") return defaultValue;
-            return true.ToString().Equals(value);
-        }
-
-
-
-
-        public static void WBxSetProperty(this Term term, String key, Object value)
-        {
-            term.WBxSetProperty(key, value.WBxToString());
-        }
-
-        public static void WBxSetBoolProperty(this Term term, String key, bool value)
-        {
-            term.WBxSetProperty(key, value.WBxToString());
-        }                           
-
-        public static void WBxSetProperty(this Term term, String key, String value)
-        {
-            value = value.WBxTrim();
-            if (value == "") 
-            {
-                if (term.CustomProperties.ContainsKey(key))
-                {
-                    term.DeleteCustomProperty(key);
-                }
-            }
-            else
-            {
-//                WBUtils.logMessage("Setting term | key | value: " + term.Name + " | " + key + " | " + value);
-                term.SetCustomProperty(key, value);
-            }
-        }
-
         public static void WBxSetProperty(this SPWeb web, String key, Object value)
         {
             web.WBxSetProperty(key, value.WBxToString());
         }
-        
+
         public static void WBxSetProperty(this SPWeb web, String key, String value)
         {
             //WBUtils.logMessage("Setting: " + key + " = " + value + " on: " + web.Url);
@@ -361,6 +338,149 @@ namespace WorkBoxFramework
         {
             safeSetPropertyAsString(farm.Properties, key, value);
         }
+
+
+#endregion
+
+#region Term Set and Get Extensions
+
+        public static void WBxSetProperty(this Term term, String key, String value)
+        {
+            value = value.WBxTrim();
+            if (value == "")
+            {
+                if (term.CustomProperties.ContainsKey(key))
+                {
+                    term.DeleteCustomProperty(key);
+                }
+            }
+            else
+            {
+                //                WBUtils.logMessage("Setting term | key | value: " + term.Name + " | " + key + " | " + value);
+                term.SetCustomProperty(key, value);
+            }
+        }
+
+        public static void WBxSetProperty(this Term term, String key, Object value)
+        {
+            term.WBxSetProperty(key, value.WBxToString());
+        }
+
+        public static String WBxGetProperty(this Term term, String key)
+        {
+            if (term == null) return "";
+            return safeGetPropertyAsString(term.CustomProperties, key);
+        }
+
+        public static String WBxGetPropertyOrDefault(this Term term, String key, String defaultValue)
+        {
+            string value = term.WBxGetProperty(key);
+            if (value == "") return defaultValue;
+            return value;
+        }
+
+
+        public static void WBxSetBoolProperty(this Term term, String key, bool value)
+        {
+            term.WBxSetProperty(key, value.WBxToString());
+        }
+        
+        public static bool WBxGetBoolProperty(this Term term, String key)
+        {
+            if (term == null) return false;
+            return true.ToString().Equals(term.WBxGetProperty(key));
+        }
+
+        public static bool WBxGetBoolPropertyOrDefault(this Term term, String key, bool defaultValue)
+        {
+            string value = term.WBxGetProperty(key);
+            if (value == "") return defaultValue;
+            return true.ToString().Equals(value);
+        }
+
+
+        public static void WBxSetIntProperty(this Term term, String key, int value)
+        {
+            term.WBxSetProperty(key, value);
+        }
+
+        public static int WBxGetIntProperty(this Term term, String key)
+        {
+            return term.WBxGetProperty(key).WBxToInt();
+
+//            string value = ;
+//            if (value == "") return 0;
+//            return Convert.ToInt32(value);
+        }
+
+        /// <summary>
+        /// Sets a 'big' custom property on a term by splitting it into multiple shorter custom properties.
+        /// </summary>
+        /// <param name="term"></param>
+        /// <param name="bigPropertyName"></param>
+        /// <param name="value"></param>
+        public static void WBxSetBigProperty(this Term term, String bigPropertyName, String value)
+        {
+            if (String.IsNullOrEmpty(bigPropertyName))
+            {
+                throw new ArgumentException("You must use a non-empty value for the big property's name");
+            }
+
+            // We're going to treat setting to 'null' the same as setting to blank.
+            if (value == null) value = "";
+            if (value.Length > BIG_CUSTOM_PROPERTIES__MAXIMUM_LENGTH)
+            {
+                throw new ArgumentException("Length of value being set exceeds maximum limit of : " + BIG_CUSTOM_PROPERTIES__MAXIMUM_LENGTH);
+            }
+
+            // WBx Set and Get methods fail better than the direct Term methods
+            int previousCount = term.WBxGetProperty("wbf-" + bigPropertyName + "-number-of-chunks").WBxToInt();
+
+            IList<String> chunks = value.WBxSplitIntoChunksOfSize(BIG_CUSTOM_PROPERTIES__CHUNK_SIZE);
+
+            term.WBxSetProperty("wbf-" + bigPropertyName + "-number-of-chunks", chunks.Count.ToString());
+            for (int i = 0; i < chunks.Count; i++)
+            {
+                term.WBxSetProperty("wbf-" + bigPropertyName + "-chunk-" + i, chunks[i]);
+            }
+
+            // Now we need to remove any extra custom properies from previous, longer values being stored:
+            for (int i = chunks.Count; i < previousCount; i++)
+            {
+                // THis WBx method will delete blank custom properties:
+                term.WBxSetProperty("wbf-" + bigPropertyName + "-chunk-" + i, "");
+            }
+
+        }
+
+        /// <summary>
+        /// Retrieves a 'big' custom property from a term by collating the various smaller custom properties that were set by the WBxSetBigProperty method.
+        /// </summary>
+        /// <param name="term"></param>
+        /// <param name="bigPropertyName"></param>
+        /// <returns></returns>
+        public static String WBxGetBigProperty(this Term term, String bigPropertyName)
+        {
+            if (String.IsNullOrEmpty(bigPropertyName))
+            {
+                throw new ArgumentException("You must use a non-empty value for the big property's name");
+            }
+
+            // WBx Set and Get methods fail better than the direct Term methods
+            int count = term.WBxGetProperty("wbf-" + bigPropertyName + "-number-of-chunks").WBxToInt();
+
+            // If the property doesn't exist or has empty value then we'll get back a count of zero
+            // but the following code should still return a blank string:
+
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < count; i++)
+            {
+                builder.Append(term.WBxGetProperty("wbf-" + bigPropertyName + "-chunk-" + i));
+            }
+
+            return builder.ToString();
+        }
+
 
         #endregion
 
@@ -2374,8 +2494,11 @@ namespace WorkBoxFramework
                     }
                 }
             }
+
             return emails;
         }
+
+
 
 
 
