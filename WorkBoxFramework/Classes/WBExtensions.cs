@@ -1180,7 +1180,7 @@ namespace WorkBoxFramework
 
         #endregion
 
-        #region PeoeplEditor
+        #region PeopleEditor
 
         public static void WBxInitialise(this PeopleEditor peopleEditor, List<SPUser> users)
         {
