@@ -14,18 +14,20 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <SharePoint:CssRegistration ID="WBFCssRegistration"
+      name="WorkBoxFramework/css/WBF.css" 
+      After="corev4.css"
+      runat="server"
+    />
+
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
-<style type="text/css">
-.wbf-admin-page { padding: 10px }
-</style>
 
 <div class="wbf-admin-page">
 
-
-<h1>Farm Wide Admin of Work Box Framework</h1>
+<h1>Core WBF Configuration</h1>
 
 	<table class="ms-propertysheet" border="0" width="100%" cellspacing="0" cellpadding="0">
 

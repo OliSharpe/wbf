@@ -68,10 +68,14 @@ Select the individuals you want to invite to this team.
 			<SharePoint:PeopleEditor id="IndividualsToInviteControl" runat="server"
 				SelectionSet="User"
 				ValidatorEnabled="true"
-				AllowEmpty = "false"
+				AllowEmpty = "true"
 				MultiSelect = "true"
 				/>
 </div>
+<div class="wbf-field-error">
+<asp:Label ID="IndividualsToInviteFieldMessage" runat="server" Text="" ForeColor="Red"/>
+</div>
+
 
 </td>
 </tr>

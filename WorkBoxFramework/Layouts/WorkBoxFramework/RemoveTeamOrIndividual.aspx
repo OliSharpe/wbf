@@ -26,12 +26,13 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
+<div class="wbf-dialog">
 
-<h2><asp:Label ID="DialogTitle" runat="server" /></h2>
+<h2 class="wbf-dialog-title"><asp:Label ID="DialogTitle" runat="server" /></h2>
 
-<p>
+<div class="wbf-dialog-message">
 <asp:Label ID="AreYouSureText" runat="server" />
-</p>
+</div>
 
 <p style="padding-left: 20px;">
 <asp:Label ID="NameOfTeamOrIndividual" runat="server" />
@@ -42,10 +43,10 @@
 <asp:HiddenField ID="LoginNameOfUserToRemove" runat="server" />
 <asp:HiddenField ID="InvolvedOrVisiting" runat="server" />
 
-<table width="100%" cellpadding="5" cellspacing="0">
+<table class="wbf-dialog-just-buttons">
 
 <tr>
-<td align="center" valign="top">
+<td class="wbf-buttons-panel">
     <asp:Button ID="RemoveButton" runat="server" Text="Remove"  OnClick="removeButton_OnClick" />
 &nbsp;
     <asp:Button ID="CancelButton" runat="server" Text="Cancel" OnClick="cancelButton_OnClick"/>
@@ -54,8 +55,7 @@
 
 
 </table>
-
-
+</div>
 
 </asp:Content>
 

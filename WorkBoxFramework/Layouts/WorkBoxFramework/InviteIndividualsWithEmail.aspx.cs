@@ -68,6 +68,12 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             List<SPUser> newUsers = IndividualsToInviteControl.WBxGetMultiResolvedUsers(SPContext.Current.Web);
 
+            if (newUsers.Count == 0)
+            {
+                IndividualsToInviteFieldMessage.Text = "You must enter at least one individual to invite.";
+                return;
+            }
+
             List<String> newUsersNames = new List<String>();
             foreach (SPUser user in newUsers)
             {

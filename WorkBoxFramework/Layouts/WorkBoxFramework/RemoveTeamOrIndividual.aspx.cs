@@ -59,6 +59,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 {
                     LoginNameOfUserToRemove.Value = Request.QueryString["LoginNameOfUserToRemove"];
                 }
+
+                CancelButton.Focus();
             }
 
             if (String.IsNullOrEmpty(TeamOrIndividual.Value))

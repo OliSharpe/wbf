@@ -95,6 +95,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 DefaultOwningTeam.Text = collection.DefaultOwningTeamUIControlValue;
 
                 UsesLinkedCalendars.Checked = collection.UsesLinkedCalendars;
+
+                ReturnUrl.Value = Request.QueryString["ReturnUrl"];
             }
         }
 
@@ -162,12 +164,26 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 SPUtility.TransferToErrorPage("An exception occurred : " + exception.StackTrace, "Return to site settings page", "/_layouts/settings.aspx");
             }
 
-            SPUtility.Redirect("settings.aspx", SPRedirectFlags.RelativeToLayoutsPage, Context);
+            if (String.IsNullOrEmpty(ReturnUrl.Value))
+            {
+                SPUtility.Redirect("settings.aspx", SPRedirectFlags.RelativeToLayoutsPage, Context);
+            }
+            else
+            {
+                SPUtility.Redirect(ReturnUrl.Value, SPRedirectFlags.Static, Context);
+            }
         }
 
         protected void cancelButton_OnClick(object sender, EventArgs e)
         {
-            SPUtility.Redirect("settings.aspx", SPRedirectFlags.RelativeToLayoutsPage, Context);
+            if (String.IsNullOrEmpty(ReturnUrl.Value))
+            {
+                SPUtility.Redirect("settings.aspx", SPRedirectFlags.RelativeToLayoutsPage, Context);
+            }
+            else
+            {
+                SPUtility.Redirect(ReturnUrl.Value, SPRedirectFlags.Static, Context);
+            }
         }
     }
 }

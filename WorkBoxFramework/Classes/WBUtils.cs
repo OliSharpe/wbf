@@ -21,6 +21,7 @@
 #endregion
 
 using System;
+using System.Web;
 using System.Net;
 using System.IO;
 using System.Collections;
@@ -36,6 +37,7 @@ using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Taxonomy;
 using Microsoft.SharePoint.Publishing;
+using Microsoft.Office.Server.UserProfiles;
 using System.Web.UI.WebControls;
 
 namespace WorkBoxFramework
@@ -154,6 +156,9 @@ namespace WorkBoxFramework
 
             WBLogging.Teams.Verbose("Found group in the 'from' site collection. ");
 
+            SPServiceContext serviceContext = SPServiceContext.GetContext(fromSite);
+            UserProfileManager profileManager = new UserProfileManager(serviceContext);
+
             SPGroup toGroup = toSite.RootWeb.WBxGetGroupOrNull(groupName);
 
             toSite.AllowUnsafeUpdates = true;
@@ -199,6 +204,13 @@ namespace WorkBoxFramework
             // And now we'll add into the group all of missing users from the fromGroup that need to be added:
             foreach (SPUser fromUser in fromGroup.Users)
             {
+                // If the user doesn't exist in the user profile - then we assume that they've been disabled:
+                if (!profileManager.UserExists(fromUser.LoginName))
+                {
+                    WBLogging.Teams.Monitorable("Ignoring user as they appear to be disabled: " + fromUser.LoginName);
+                    continue;
+                }
+
                 SPUser toUser = toSite.RootWeb.WBxEnsureUserOrNull(fromUser.LoginName);
 
                 try
@@ -1209,23 +1221,36 @@ namespace WorkBoxFramework
             String cssString = "";
             if (!String.IsNullOrEmpty(cssClass))
             {
-                cssString = " class='" + cssClass + "'";
+                cssString = " class=\"" + cssClass + "\"";
             }
 
             String headersString = "";
+            List<String> parameters = new List<String>();
             if (headers != null)
             {
-                headersString = "?";
-                List<String> parameters = new List<String>();
                 foreach (String key in headers.Keys)
                 {
                     parameters.Add(key + "=" + headers[key]);
                 }
 
-                headersString += String.Join("&", parameters.ToArray());
+                headersString = HttpUtility.UrlEncode("?" + String.Join("&", parameters.ToArray()));
             }
 
-            return "<a href='mailto:" + String.Join(";", emails.ToArray()) + headersString + "'" + cssString + ">" + text + "</a>";
+            String mailToLink = "mailto:" + String.Join(";", emails.ToArray()) + headersString;
+
+            WBFarm farm = WBFarm.Local;
+            if (farm.UseMailToLinks && mailToLink.Length < farm.ChatacterLimitForMailToLinks)
+            {
+                return "<a href=\"" + mailToLink + "\"" + cssString + ">" + text + "</a>";
+            }
+            else
+            {
+                parameters.Add("to=" + String.Join("; ", emails.ToArray()));
+                headersString = HttpUtility.UrlEncode("?" + String.Join("&", parameters.ToArray()));
+
+                return "<a href=\"javascript: WorkBoxFramework_relativeCommandAction('MailToLinkReplacement.aspx" + headersString + "', 0, 0); \"" + cssString + ">" + text + "</a>";
+            }
+           
         }
 
 

@@ -13,6 +13,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
     public partial class FarmWideAdmin {
         
         /// <summary>
+        /// WBFCssRegistration control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.CssRegistration WBFCssRegistration;
+        
+        /// <summary>
         /// FarmInstanceSection control.
         /// </summary>
         /// <remarks>

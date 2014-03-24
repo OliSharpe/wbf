@@ -26,14 +26,16 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
-<p>
-    <asp:Label ID="Message" runat="server" Text="Label"></asp:Label>
-</p>
+<div class="wbf-dialog">
 
-<table width="100%" cellpadding="5" cellspacing="0">
+<div class="wbf-dialog-message">
+    <asp:Label ID="Message" runat="server" Text="Label"></asp:Label>
+</div>
+
+<table class="wbf-dialog-just-buttons">
 
 <tr>
-<td colspan="2" align="center" valign="top">
+<td class="wbf-buttons-panel">
     <asp:Button ID="removeFromFavouritesButton" runat="server" Text="Remove From Favourites"  OnClick="removeFromFavouritesButton_OnClick"/>
     &nbsp;
     <asp:Button ID="cancel" runat="server" Text="Cancel"  OnClick="cancelButton_OnClick"/>
@@ -46,6 +48,8 @@
 
     <asp:HiddenField ID="WorkBoxTitle" runat="server" />
     <asp:HiddenField ID="WorkBoxGuid" runat="server" />
+
+</div>
 
 </asp:Content>
 

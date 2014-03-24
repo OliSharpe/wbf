@@ -127,6 +127,13 @@
     <Compile Include="Layouts\WorkBoxFramework\EditLinkedCalendarSettings.aspx.designer.cs">
       <DependentUpon>EditLinkedCalendarSettings.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\FarmWideSettings.aspx.cs">
+      <DependentUpon>FarmWideSettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\FarmWideSettings.aspx.designer.cs">
+      <DependentUpon>FarmWideSettings.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx.cs">
       <DependentUpon>GoToTeamManagement.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -140,6 +147,13 @@
     </Compile>
     <Compile Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx.designer.cs">
       <DependentUpon>GoToWBCollectionSettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\MailToLinkReplacement.aspx.cs">
+      <DependentUpon>MailToLinkReplacement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\MailToLinkReplacement.aspx.designer.cs">
+      <DependentUpon>MailToLinkReplacement.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
@@ -918,11 +932,17 @@
     <Content Include="Layouts\WorkBoxFramework\EditLinkedCalendarSettings.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
+    <Content Include="ADMIN\WorkBoxFramework\FarmWideSettings.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="CustomActions\LinkedCalendarSettingsCustomAction\Elements.xml" />
     <Content Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\MailToLinkReplacement.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="STYLES\WorkBoxFramework\css\WBF.css" />

@@ -81,6 +81,10 @@ namespace WorkBoxFramework
         private const string FARM_PROPERTY__INVITE_TO_TEAM_DEFAULT_EMAIL_BODY = "wbf__farm__invite_to_team_default_email_body";
 
 
+        private const string FARM_PROPERTY__USE_MAILTO_LINKS = "wbf__farm__use_mailto_links";
+        private const string FARM_PROPERTY__CHARACTER_LIMIT_FOR_MAILTO_LINKS = "wbf__farm__character_limit_for_mailto_links";
+        private const int DEFAULT_FARM_PROPERTY__CHARACTER_LIMIT_FOR_MAILTO_LINKS = 1024;
+
         private const string FARM_PROPERTY__ALL_WORK_BOX_COLLECTIONS = "wbf__farm__all_work_box_collections";
 
         private const string FARM_PROPERTY__MIGRATION_TYPE = "wbf__farm__migration_type";
@@ -107,6 +111,9 @@ namespace WorkBoxFramework
         public const string FARM_INSTANCE__DEVELOPMENT_FARM = "Development Farm";
         public const string FARM_INSTANCE__PROTECTED_INTERNAL_FARM = "Protected Internal Farm";
         public const string FARM_INSTANCE__PUBLIC_EXTERNAL_FARM = "Public External Farm";
+
+
+
 
         #region Constructors
 
@@ -311,6 +318,18 @@ namespace WorkBoxFramework
         {
             get { return _farm.WBxGetPropertyOrDefault(FARM_PROPERTY__INVITE_TO_TEAM_DEFAULT_EMAIL_BODY, "You have been invited to be a [ROLE_WITHIN_TEAM] of the team [TEAM_NAME]. \n\nYou can visit the team's site here: [TEAM_SITE_URL]"); }
             set { _farm.WBxSetProperty(FARM_PROPERTY__INVITE_TO_TEAM_DEFAULT_EMAIL_BODY, value); }
+        }
+
+        public bool UseMailToLinks
+        {
+            get { return _farm.WBxGetBoolPropertyOrDefault(FARM_PROPERTY__USE_MAILTO_LINKS, true); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__USE_MAILTO_LINKS, value); }
+        }
+
+        public int ChatacterLimitForMailToLinks
+        {
+            get { return _farm.WBxGetIntPropertyOrDefault(FARM_PROPERTY__CHARACTER_LIMIT_FOR_MAILTO_LINKS, DEFAULT_FARM_PROPERTY__CHARACTER_LIMIT_FOR_MAILTO_LINKS); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__CHARACTER_LIMIT_FOR_MAILTO_LINKS, value); }
         }
 
 

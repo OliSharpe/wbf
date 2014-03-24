@@ -37,11 +37,25 @@ namespace WorkBoxFramework
         public const String CLIPBOARD_ACTION__COPY = "COPY";
         public const String CLIPBOARD_ACTION__CUT = "CUT";
 
-        public SPUser User { get; private set; }   
+        public SPUser User { get; private set; }
+
 
         public WBUser(SPUser user)
         {
             User = user;
+        }
+
+        public WBUser(SPWeb web)
+        {
+            User = web.CurrentUser;
+            IsCurrentUser = true;
+        }
+
+        private bool _isCurrentUser = false;
+        public bool IsCurrentUser
+        {
+            get { return _isCurrentUser; }
+            private set { _isCurrentUser = value; }
         }
 
         public String GetUrlToMyUnprotectedWorkBox(SPSite site)        
@@ -59,12 +73,23 @@ namespace WorkBoxFramework
             return url;
         }
 
-
         public UserProfile GetUserProfile(SPSite site)
         {
             SPServiceContext _serviceContext = SPServiceContext.GetContext(site);
             UserProfileManager _profileManager = new UserProfileManager(_serviceContext);
-            UserProfile profile = _profileManager.GetUserProfile(true);
+            UserProfile profile = null;
+
+            if (IsCurrentUser)
+            {
+                profile = _profileManager.GetUserProfile(true);
+            }
+            else
+            {
+                if (_profileManager.UserExists(User.LoginName))
+                {
+                    profile = _profileManager.GetUserProfile(User.LoginName);
+                }
+            }
                 
             return profile;
         }

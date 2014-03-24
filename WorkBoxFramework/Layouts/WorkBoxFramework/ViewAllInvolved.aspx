@@ -42,6 +42,7 @@
 
     <div class="wbf-buttons-panel">
         <asp:Button ID="RefreshTeams" runat="server" Text="Refresh Team Membership"  OnClick="refreshTeams_OnClick"/>
+    &nbsp;
         <asp:Button ID="CloseDialog" runat="server" Text="Close"  OnClick="close_OnClick"/>
     </div>
 

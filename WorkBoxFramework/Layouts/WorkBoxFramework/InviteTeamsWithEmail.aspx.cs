@@ -73,6 +73,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void inviteButton_OnClick(object sender, EventArgs e)
         {
+            if (String.IsNullOrEmpty(TeamsToInviteControl.Text))
+            {
+                InvolvedTeamsFieldMessage.Text = "You must enter at least one team to invite";
+                return;
+            }
+
+
             WBTermCollection<WBTeam> newTeams = new WBTermCollection<WBTeam>(teamsTaxonomy, TeamsToInviteControl.Text);
 
             String newTeamsString = newTeams.Names().Replace(";", ",");

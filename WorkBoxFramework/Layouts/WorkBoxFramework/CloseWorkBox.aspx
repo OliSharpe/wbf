@@ -64,7 +64,7 @@ Are you sure you wish to close this Work Box?
 <td class="wbf-field-value-panel" valign="top">
 
 <div class="wbf-field-value">
-<asp:TextBox ID="CloseComment" runat="server" Text="" TextMode="multiline" Rows="3" Columns="30"></asp:TextBox>
+<asp:TextBox ID="CloseComment" runat="server" Text="" TextMode="multiline" Rows="4" Columns="50"></asp:TextBox>
 </div>
 <div class="wbf-field-error">
     <asp:RequiredFieldValidator ID="CloseCommentRequiredFieldValidator" runat="server" ErrorMessage="You must enter a comment."

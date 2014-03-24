@@ -83,6 +83,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                         action.SetControlValues();
                     }
                 }
+
+                ReturnUrl.Value = Request.QueryString["ReturnUrl"];
             }
 
         }
@@ -102,13 +104,26 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 collection.Update();
             }
 
-            SPUtility.Redirect("settings.aspx", SPRedirectFlags.RelativeToLayoutsPage, Context);
+            if (String.IsNullOrEmpty(ReturnUrl.Value))
+            {
+                SPUtility.Redirect("settings.aspx", SPRedirectFlags.RelativeToLayoutsPage, Context);
+            } else {
+                SPUtility.Redirect(ReturnUrl.Value, SPRedirectFlags.Static, Context);
+            }
+
         }
 
 
         protected void CancelButton_OnClick(object sender, EventArgs e)
         {
-            SPUtility.Redirect("settings.aspx", SPRedirectFlags.RelativeToLayoutsPage, Context);
+            if (String.IsNullOrEmpty(ReturnUrl.Value))
+            {
+                SPUtility.Redirect("settings.aspx", SPRedirectFlags.RelativeToLayoutsPage, Context);
+            }
+            else
+            {
+                SPUtility.Redirect(ReturnUrl.Value, SPRedirectFlags.Static, Context);
+            }
         }
 
 

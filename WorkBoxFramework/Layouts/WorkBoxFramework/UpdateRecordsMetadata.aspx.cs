@@ -163,6 +163,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 libraryWeb.Dispose();
                 librarySite.Dispose();
+
+                LiveOrArchived.Focus();
             }
         }
 

@@ -37,6 +37,28 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 WBFarm farm = WBFarm.Local;
 
+                if (!String.IsNullOrEmpty(farm.TermStoreName)) {
+                    try
+                    {
+                        WBTaxonomy teams = WBTaxonomy.GetTeams(SPContext.Current.Site);
+
+                        if (teams == null) WBLogging.Debug("teams was null");
+
+                        WBTeam systemAdminTeam = farm.SystemAdminTeam(teams);
+
+                        if (systemAdminTeam != null)
+                        {
+                            AdminTeamSiteURL.Text = systemAdminTeam.TeamSiteUrl;
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        WBLogging.Generic.HighLevel("Couldn't find the current admin team site URL: " + exception.Message);
+                    }
+                }
+
+                TimerJobsServerName.Text = farm.TimerJobsServerName;
+
                 TermStoreName.Text = farm.TermStoreName;
                 TermStoreGroupName.Text = farm.TermStoreGroupName;
 

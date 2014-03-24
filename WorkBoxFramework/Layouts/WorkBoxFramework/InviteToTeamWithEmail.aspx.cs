@@ -49,7 +49,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (!team.IsCurrentUserTeamOwnerOrSystemAdmin())
             {
-                ErrorText.Text = "Only team owners can invite individuals to a team.";
+                ErrorText.Text = "Only team owners or system admin can invite individuals to a team.";
                 return;
             }
 
@@ -68,12 +68,19 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 EmailSubject.Text = WBFarm.Local.InviteToTeamDefaultEmailSubject;
                 EmailBody.Text = WBFarm.Local.InviteToTeamDefaultEmailBody;
 
+                IndividualsToInviteControl.Focus();
             }
         }
 
         protected void inviteButton_OnClick(object sender, EventArgs e)
         {
             List<SPUser> newUsers = IndividualsToInviteControl.WBxGetMultiResolvedUsers(SPContext.Current.Web);
+
+            if (newUsers.Count == 0)
+            {
+                IndividualsToInviteFieldMessage.Text = "You must enter at least one individual to invite.";
+                return;
+            }
 
             List<String> newUsersNames = new List<String>();
             foreach (SPUser user in newUsers)

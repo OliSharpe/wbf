@@ -11,10 +11,10 @@
   </CustomActionGroup>
 
   <CustomAction Id="WorkBoxFramework.FarmWideAdmin" GroupId="WorkBoxFrameworkAdmin"
-    Location="Microsoft.SharePoint.Administration.Applications"
-    Sequence="10"
-    Title="Farm Wide Admin" Description="">
-    <UrlAction Url="_admin/WorkBoxFramework/FarmWideAdmin.aspx" />
+  Location="Microsoft.SharePoint.Administration.Applications"
+  Sequence="10"
+  Title="Farm Wide Settings" Description="">
+    <UrlAction Url="_admin/WorkBoxFramework/FarmWideSettings.aspx" />
   </CustomAction>
 
   <CustomAction Id="WorkBoxFramework.DefaultInviteEmailTemplates" GroupId="WorkBoxFrameworkAdmin"
@@ -23,12 +23,19 @@
     Title="Default Invite Email Templates" Description="">
     <UrlAction Url="_admin/WorkBoxFramework/DefaultInviteEmailTemplates.aspx" />
   </CustomAction>
-  
+
   <CustomAction Id="WorkBoxFramework.CheckConfiguration" GroupId="WorkBoxFrameworkAdmin"
   Location="Microsoft.SharePoint.Administration.Applications"
   Sequence="30"
   Title="Check Configuration" Description="">
     <UrlAction Url="_admin/WorkBoxFramework/CheckConfiguration.aspx" />
+  </CustomAction>
+
+  <CustomAction Id="WorkBoxFramework.FarmWideAdmin" GroupId="WorkBoxFrameworkAdmin"
+  Location="Microsoft.SharePoint.Administration.Applications"
+  Sequence="40"
+  Title="Core WBF Configuration" Description="">
+    <UrlAction Url="_admin/WorkBoxFramework/FarmWideAdmin.aspx" />
   </CustomAction>
 
 </Elements>

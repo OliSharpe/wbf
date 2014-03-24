@@ -110,9 +110,6 @@ function WorkBoxFramework_callback(dialogResult, returnValue) {
     }
 
 
-
-
-
     setTimeout(WorkBoxFramework_removeStatus, 5000);
 }
 
@@ -133,13 +130,18 @@ function WorkBoxFramework_commandAction(urlValue, width, height) {
 
     var options = {
         url: urlValue,
-        tite: 'Work Box Dialog',
+        title: 'Work Box Dialog',
         allowMaximize: false,
         showClose: true,
-        width: width,
-        height: height,
         dialogReturnValueCallback: WorkBoxFramework_callback
     };
+
+    // We're only going to add the width and height if both are set. Otherwise we'll let the modal
+    // dialog API automatically size the modal dialog window:
+    if (width > 0 && height > 0) {
+        options.width = width;
+        options.height = height;
+    }
 
     SP.UI.ModalDialog.showModalDialog(options);    
 }
@@ -151,6 +153,36 @@ function WorkBoxFramework_actionIsEnabled(actionKey) {
     } else {
         return false;
     }
+}
+
+function WorkBoxFramework_showActionDialog(action) {
+    WorkBoxFramework_showActionDialogWithDetails(action, action.ActionUrl, 'Work Box Action', WorkBoxFramework_callback);
+}
+
+function WorkBoxFramework_showActionDialogWithDetails(action, urlValue, titleValue, callbackFunction) {
+
+    if (action.IsModal) {
+        var options = {
+            url: urlValue,
+            title: titleValue,
+            allowMaximize: action.AllowMaximise,
+            showClose: action.ShowClose,
+            dialogReturnValueCallback: callbackFunction
+        };
+
+        // We're only going to add the width and height if both are set. Otherwise we'll let the modal
+        // dialog API automatically size the modal dialog window:
+        if (action.Width > 0 && action.Height > 0) {
+            options.width = action.Width;
+            options.height = action.Height;
+        }
+
+        SP.UI.ModalDialog.showModalDialog(options);
+
+    } else {
+        window.location = urlValue;
+    }
+
 }
 
 function WorkBoxFramework_doAction(actionKey) {
@@ -165,27 +197,7 @@ function WorkBoxFramework_doAction(actionKey) {
         return;
     }
 
-    if (action.IsModal) {
-        var options = {
-            url: action.ActionUrl,
-            tite: 'Work Box Action',
-            allowMaximize: action.AllowMaximise,
-            showClose: action.ShowClose,
-            dialogReturnValueCallback: WorkBoxFramework_callback
-        };
-
-        // We're only going to add the width and height if both are set. Otherwise we'll let the modal
-        // dialog API automatically size the modal dialog window:
-        if (action.Width > 0 && action.Height > 0) {
-            options.width = action.Width;
-            options.height = action.Height;
-        }
-
-        SP.UI.ModalDialog.showModalDialog(options);
-
-    } else {
-        window.location = action.ActionUrl;
-    }
+    WorkBoxFramework_showActionDialog(action);
 }
 
 
@@ -217,6 +229,8 @@ function WorkBoxFramework_PublishDoc_commandAction() {
 
     var urlValue = action.ActionUrl + '?selectedItemsIDsString=' + selectedItemsIDsString + '&selectedListGUID=' + selectedListGUID;
 
+    WorkBoxFramework_showActionDialogWithDetails(action, urlValue, 'Publish Document', WorkBoxFramework_callback);
+    /*
     if (action.IsModal) {
         var options = {
             url: urlValue,
@@ -233,6 +247,7 @@ function WorkBoxFramework_PublishDoc_commandAction() {
     } else {
         window.location = action.ActionUrl;
     }
+    */
 }
 
 function WorkBoxFramework_PublishDoc_enabled() {
@@ -270,22 +285,7 @@ function WorkBoxFramework_AddToClipboard_commandAction(clipboardAction) {
 
     var urlValue = action.ActionUrl + '?clipboardAction=' + clipboardAction + '&selectedItemsIDsString=' + selectedItemsIDsString + '&selectedListGUID=' + selectedListGUID;
 
-    if (action.IsModal) {
-        var options = {
-            url: urlValue,
-            tite: 'Add To Clipboard Dialog',
-            allowMaximize: action.AllowMaximise,
-            showClose: action.ShowClose,
-            width: action.Width,
-            height: action.Height,
-            dialogReturnValueCallback: WorkBoxFramework_callback
-        };
-
-        SP.UI.ModalDialog.showModalDialog(options);
-
-    } else {
-        window.location = action.ActionUrl;
-    }
+    WorkBoxFramework_showActionDialogWithDetails(action, urlValue, 'Add To Clipboard', WorkBoxFramework_callback);
 }
 
 function WorkBoxFramework_AddToClipboard_enable() {
@@ -326,10 +326,13 @@ function WorkBoxFramework_PasteFromClipboard_commandAction() {
 
     var urlValue = action.ActionUrl + '?RootFolder=' + folderUrl;
 
+    WorkBoxFramework_showActionDialogWithDetails(action, urlValue, 'Paste From Clipboard', WorkBoxFramework_callback);
+
+    /*
     if (action.IsModal) {
         var options = {
             url: urlValue,
-            tite: 'Paste From Clipboard Dialog',
+            title: 'Paste From Clipboard Dialog',
             allowMaximize: action.AllowMaximise,
             showClose: action.ShowClose,
             width: action.Width,
@@ -342,6 +345,7 @@ function WorkBoxFramework_PasteFromClipboard_commandAction() {
     } else {
         window.location = action.ActionUrl;
     }
+    */
 }
 
 function WorkBoxFramework_PasteFromClipboard_enabled() {
@@ -373,7 +377,7 @@ function WorkBoxFramework_pickAWorkBox(callbackFunction) {
 
     var options = {
         url: urlValue,
-        tite: 'Work Box Picker',
+        title: 'Work Box Picker',
         allowMaximize: false,
         showClose: true,
         width: 600,
@@ -390,7 +394,7 @@ function WorkBoxFramework_pickANewRecordsType(callbackFunction, currentRecordsTy
 
     var options = {
         url: urlValue,
-        tite: 'Records Type Picker',
+        title: 'Records Type Picker',
         allowMaximize: false,
         showClose: true,
         width: 600,
@@ -408,7 +412,7 @@ function WorkBoxFramework_pickAPublishedDocument(callbackFunction, protectiveZon
 
     var options = {
         url: urlValue,
-        tite: 'Published Document Picker',
+        title: 'Published Document Picker',
         allowMaximize: false,
         showClose: true,
         width: 900,

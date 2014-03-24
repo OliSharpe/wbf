@@ -21,45 +21,41 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-
+using Microsoft.SharePoint.Utilities;
+using Microsoft.SharePoint.Administration;
 
 namespace WorkBoxFramework.Layouts.WorkBoxFramework
 {
-    public partial class ViewAuditLog : WorkBoxDialogPageBase
+    public partial class FarmWideSettings : LayoutsPageBase
     {
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                WorkBoxTitle.Text = WorkBox.Title;
+                WBFarm farm = WBFarm.Local;
 
-                string html = "<table class=\"wbf-view-audit-log\">";
-
-                List<WBAuditLogEntry> auditLog = WorkBox.AuditLog;
-
-                foreach (WBAuditLogEntry logEntry in auditLog)
-                {
-                    html += string.Format("<tr><td>{0}</td><td>{1}</td><td><b>{2}</b></td><td>{3}</td></tr>",
-                        logEntry.DateTimeAsString,
-                        logEntry.UserLoginName,
-                        logEntry.Title,
-                        logEntry.Comment);
-                }
-
-                html += "</table>";
-
-                GeneratedAuditLogTable.Text = html;
-
-                CloseButton.Focus();
+                UseMailToLinks.Checked = farm.UseMailToLinks;
+                CharacterLimitForMailToLinks.Text = farm.ChatacterLimitForMailToLinks.WBxToString();
             }
         }
 
-        protected void CloseButton_OnClick(object sender, EventArgs e)
+        protected void OKButton_OnClick(object sender, EventArgs e)
         {
-            this.CloseDialogWithOK();
+            WBFarm farm = WBFarm.Local;
+
+            farm.UseMailToLinks = UseMailToLinks.Checked;
+            farm.ChatacterLimitForMailToLinks = CharacterLimitForMailToLinks.Text.WBxToInt();
+
+            farm.Update();
+
+            SPUtility.Redirect("/applications.aspx", SPRedirectFlags.Static, Context);
+        }
+
+        protected void CancelButton_OnClick(object sender, EventArgs e)
+        {
+            SPUtility.Redirect("/applications.aspx", SPRedirectFlags.Static, Context);
         }
 
 

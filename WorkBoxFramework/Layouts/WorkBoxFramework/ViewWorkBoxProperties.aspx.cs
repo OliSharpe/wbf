@@ -29,14 +29,25 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 {
     public partial class ViewWorkBoxProperties : WorkBoxDialogPageBase
     {
-        protected bool showReferenceID = true;
-        protected bool showReferenceDate = true;
+        protected bool showReferenceID = false;
+        protected bool showReferenceDate = false;
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            WBRecordsType recordsType = WorkBox.RecordsType;
+
+            if (recordsType.WorkBoxReferenceIDRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN)
+            {
+                showReferenceID = true;
+            }
+
+            if (recordsType.WorkBoxReferenceDateRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN)
+            {
+                showReferenceDate = true;
+            }
+
             if (!IsPostBack)
             {
-                WBRecordsType recordsType = WorkBox.RecordsType;
 
                 WorkBoxTitle.Text = WorkBox.Title;
                 OwningTeam.Text = WorkBox.OwningTeam.Name;
@@ -48,26 +59,21 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 WorkBoxShortTitle.Text = WorkBox.ShortTitle;
                 WorkBoxPrettyTitle.Text = WorkBox.Web.Title;
 
-                if (recordsType.WorkBoxReferenceIDRequirement == WBRecordsType.METADATA_REQUIREMENT__HIDDEN)
-                {
-                    showReferenceID = false;
-                }
-                else
+                if (showReferenceID)
                 {
                     ReferenceID.Text = WorkBox.ReferenceID;
                 }
 
-                if (recordsType.WorkBoxReferenceDateRequirement == WBRecordsType.METADATA_REQUIREMENT__HIDDEN)
-                {
-                    showReferenceDate = false;
-                }
-                else
+                if (showReferenceDate)
                 {
                     if (WorkBox.ReferenceDateHasValue)
                     {
                         ReferenceDate.Text = WorkBox.ReferenceDate.ToShortDateString();
                     }
                 }
+
+                WBAction editAction = WorkBox.GetAction(WBAction.ACTION_KEY__EDIT_PROPERTIES);
+                EditButton.Enabled = editAction.IsEnabled;
 
             }
         }
@@ -76,9 +82,17 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             WBAction editAction = WorkBox.GetAction(WBAction.ACTION_KEY__EDIT_PROPERTIES);
 
+            if (editAction.IsEnabled)
+            {
+                SPUtility.Redirect(editAction.ActionUrl, SPRedirectFlags.Trusted, Context);
+            }
+            else
+            {
+                ErrorMessageLabel.Text = "You don't have permission to edit the work box properties";
+            }
+
             //WBLogging.Debug("Got an action URL for edit page as being: " + editAction.ActionUrl);
 
-            SPUtility.Redirect(editAction.ActionUrl, SPRedirectFlags.Trusted, Context);
         }
 
         protected void closeButton_OnClick(object sender, EventArgs e)

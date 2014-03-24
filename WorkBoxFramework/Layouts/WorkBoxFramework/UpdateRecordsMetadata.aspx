@@ -27,135 +27,129 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
-<style type="text/css">
-td 
-{
-border-top:solid 1px grey;
-}
-</style>
+<div class="wbf-dialog">
 
 <asp:Panel ID="AccessDeniedPanel" runat="server" Visible="false">
-<h2>Access Denied</h2>
-<p>
+<h2 class="wbf-dialog-title">Access Denied</h2>
+<div class="wbf-dialog-message">
 You are not a member of the records management group therefore you do not have permission to perform this action.
-</p>
+</div>
 </asp:Panel>
 
 <asp:Panel ID="UpdateRecordsMetadataPanel" runat="server">
 
-<p>
+<div class="wbf-dialog-message">
 As a records manager you have the right to modify the following metadata fields.
-</p>
+</div>
 
-<table width="100%" cellpadding="5" cellspacing="0">
+<table class="wbf-dialog-form">
 
 <tr>
-<td valign="top">
-<b>Record's Filename</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Record's Filename</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
-<b>
+<div class="wbf-field-read-only-title">
 <asp:Label ID="Filename" runat="server" Text=""></asp:Label>
-</b>
+</div>
 
 </td>
 </tr>
 
 <tr>
-<td valign="top">
-<b>Record's Title</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Record's Title</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
-<b>
+<div class="wbf-field-read-only-title">
 <asp:Label ID="Title" runat="server" Text=""></asp:Label>
-</b>
+</div>
 
 </td>
 </tr>
 
 <tr>
-<td valign="top">
-<b>Functional Area</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Functional Area</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
-<b>
+<div class="wbf-field-read-only-title">
 <asp:Label ID="FunctionalArea" runat="server" Text=""></asp:Label>
-</b>
+</div>
 
 </td>
 </tr>
 
 <tr>
-<td valign="top">
-<b>Records Type</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Records Type</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
-<b>
+<div class="wbf-field-read-only-title">
 <asp:Label ID="RecordsType" runat="server" Text=""></asp:Label>
-</b>
+</div>
 
 </td>
 </tr>
 
 
 <tr>
-<td valign="top">
-<b>Unique Record ID</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Unique Record ID</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
-<b>
+<div class="wbf-field-read-only-title">
 <asp:Label ID="RecordID" runat="server" Text=""></asp:Label>
-</b>
+</div>
 
 </td>
 </tr>
 
 <tr>
-<td valign="top">
-<b>Update Live / Archived:</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Update Live / Archived:</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-value">
 <asp:DropDownList ID="LiveOrArchived" runat="server" />
+</div>
 
 </td>
 </tr>
 
 
 <tr>
-<td valign="top">
-<b>Update Protective Zone:</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Update Protective Zone:</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-value">
 <asp:DropDownList ID="ProtectiveZone" runat="server" />
+</div>
 
 </td>
 </tr>
 
 
 <tr>
-<td valign="top">
-<b>Update Subject Tags:</b>
-<p></p>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Update Subject Tags:</div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-value">
 <Taxonomy:TaxonomyWebTaggingControl ID="SubjectTags" ControlMode="display" runat="server" />
-<br />
+</div>
+<div class="wbf-field-error">
 <asp:Label ID="SubjectTagsErrorMessage" runat="server" Text="" ForeColor="Red"/>
+</div>
 
 </td>
 </tr>
@@ -163,13 +157,15 @@ As a records manager you have the right to modify the following metadata fields.
 
 
 <tr>
-<td valign="top">
-<b>Reason for change</b>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Reason for change<span class="wbf-required-asterisk">*</span></div>
 </td>
-<td class="ms-authoringcontrols" valign="top">
+<td class="wbf-field-value-panel">
 
+<div class="wbf-field-value">
 <asp:TextBox ID="ReasonForChange" TextMode="MultiLine" Rows="4" Columns="50" runat="server" />
-<div>
+</div>
+<div class="wbf-field-error">
 <asp:RequiredFieldValidator ControlToValidate="ReasonForChange" ErrorMessage="You must provide a reason for making this change." runat="server"/>
 </div>
 </td>
@@ -177,7 +173,7 @@ As a records manager you have the right to modify the following metadata fields.
 
 
 <tr>
-<td colspan="2" align="center" valign="top">
+<td colspan="2" class="wbf-buttons-panel">
     <asp:Button ID="UpdateButton" runat="server" Text="Update Record"  OnClick="updateButton_OnClick"/>
 &nbsp;
     <asp:Button ID="CancelButton" runat="server" Text="Cancel" CausesValidation="False" OnClick="cancelButton_OnClick"/>
@@ -193,6 +189,7 @@ As a records manager you have the right to modify the following metadata fields.
 <asp:HiddenField ID="ItemID" runat="server" />
 
 </asp:Panel>
+</div>
 
 </asp:Content>
 

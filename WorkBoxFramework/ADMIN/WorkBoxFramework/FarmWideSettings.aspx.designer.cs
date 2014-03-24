@@ -10,7 +10,7 @@
 namespace WorkBoxFramework.Layouts.WorkBoxFramework {
     
     
-    public partial class ViewAuditLog {
+    public partial class FarmWideSettings {
         
         /// <summary>
         /// WBFCssRegistration control.
@@ -22,39 +22,48 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::Microsoft.SharePoint.WebControls.CssRegistration WBFCssRegistration;
         
         /// <summary>
-        /// WBFScriptRegistration control.
+        /// EmailMailToSettings control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Microsoft.SharePoint.WebControls.ScriptLink WBFScriptRegistration;
+        protected global::System.Web.UI.UserControl EmailMailToSettings;
         
         /// <summary>
-        /// WorkBoxTitle control.
+        /// UseMailToLinks control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label WorkBoxTitle;
+        protected global::System.Web.UI.WebControls.CheckBox UseMailToLinks;
         
         /// <summary>
-        /// GeneratedAuditLogTable control.
+        /// CharacterLimitForMailToLinks control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal GeneratedAuditLogTable;
+        protected global::System.Web.UI.WebControls.TextBox CharacterLimitForMailToLinks;
         
         /// <summary>
-        /// CloseButton control.
+        /// OKButton control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button CloseButton;
+        protected global::System.Web.UI.WebControls.Button OKButton;
+        
+        /// <summary>
+        /// CancelButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button CancelButton;
     }
 }

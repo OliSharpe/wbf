@@ -26,6 +26,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using Microsoft.SharePoint;
+using Microsoft.Office.Server.UserProfiles;
 
 namespace WorkBoxFramework.TeamDetails
 {
@@ -106,6 +107,10 @@ namespace WorkBoxFramework.TeamDetails
         private String generateTable(WBTeam team, String groupName, String groupType, String title, List<String> groupEmails)
         {
             string html = "";
+
+            SPServiceContext serviceContext = SPServiceContext.GetContext(SPContext.Current.Site);
+            UserProfileManager profileManager = new UserProfileManager(serviceContext);
+
             SPGroup group = SPContext.Current.Site.RootWeb.WBxGetGroupOrNull(groupName);
 
             if (group == null)
@@ -115,7 +120,7 @@ namespace WorkBoxFramework.TeamDetails
             }
             else
             {
-                // 
+                // If the current user is not allowed to see the members then we'll return blank:
                 if (group.OnlyAllowMembersViewMembership && !group.ContainsCurrentUser) return "";
 
                 html += "<h3>" + title + ":</h3>\n";
@@ -126,7 +131,7 @@ namespace WorkBoxFramework.TeamDetails
                 html += "<table cellpadding='5'><tr><td><ul>";
                 foreach (SPUser user in group.Users)
                 {
-                    html += "<li>" + user.WBxToHTML(Context); //renderUser(user, SPContext.Current.Site.RootWeb);
+                    html += "<li>" + user.WBxToHTML(profileManager, Context); //renderUser(user, SPContext.Current.Site.RootWeb);
 
                     if (team.IsUserTeamManager(user))
                     {
@@ -138,16 +143,18 @@ namespace WorkBoxFramework.TeamDetails
                         {
                             string actionURL = "RemoveFromTeam.aspx?userLogin=" + user.LoginName.Replace("\\", "\\\\") + "&role=" + groupType;
 
-                            html += " <a href=\"javascript: WorkBoxFramework_relativeCommandAction('" + actionURL + "', 400, 200); \">(remove)</a>";
+                            html += " <a href=\"javascript: WorkBoxFramework_relativeCommandAction('" + actionURL + "', 0, 0); \">(remove)</a>";
                         }
                     }
 
                     html += "</li>";
 
-                    if (!String.IsNullOrEmpty(user.Email) && !groupEmails.Contains(user.Email))
+                    if (profileManager.UserExists(user.LoginName) && !String.IsNullOrEmpty(user.Email) && !groupEmails.Contains(user.Email))
                     {
                         groupEmails.Add(user.Email);
                     }
+
+
                 }
 
                 html += "</ul></td></tr>\n";
