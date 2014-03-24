@@ -10,7 +10,7 @@
 namespace WorkBoxFramework.Layouts.WorkBoxFramework {
     
     
-    public partial class ViewAuditLog {
+    public partial class MailToLinkReplacement {
         
         /// <summary>
         /// WBFCssRegistration control.
@@ -22,6 +22,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::Microsoft.SharePoint.WebControls.CssRegistration WBFCssRegistration;
         
         /// <summary>
+        /// WBFjQueryScriptRegistration control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.ScriptLink WBFjQueryScriptRegistration;
+        
+        /// <summary>
         /// WBFScriptRegistration control.
         /// </summary>
         /// <remarks>
@@ -31,22 +40,49 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::Microsoft.SharePoint.WebControls.ScriptLink WBFScriptRegistration;
         
         /// <summary>
-        /// WorkBoxTitle control.
+        /// ErrorMessageLabel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label WorkBoxTitle;
+        protected global::System.Web.UI.WebControls.Label ErrorMessageLabel;
         
         /// <summary>
-        /// GeneratedAuditLogTable control.
+        /// ExplanationMessage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal GeneratedAuditLogTable;
+        protected global::System.Web.UI.WebControls.Label ExplanationMessage;
+        
+        /// <summary>
+        /// EmailTo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label EmailTo;
+        
+        /// <summary>
+        /// EmailSubject control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label EmailSubject;
+        
+        /// <summary>
+        /// EmailBody control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label EmailBody;
         
         /// <summary>
         /// CloseButton control.

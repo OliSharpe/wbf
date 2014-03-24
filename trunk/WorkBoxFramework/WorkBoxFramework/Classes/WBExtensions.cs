@@ -306,6 +306,19 @@ namespace WorkBoxFramework
             return value;
         }
 
+        public static bool WBxGetBoolPropertyOrDefault(this SPFarm farm, String key, bool defaultValue)
+        {
+            string value = farm.WBxGetProperty(key);
+            if (value == "") return defaultValue;
+            return true.ToString().Equals(value);
+        }
+
+        public static int WBxGetIntPropertyOrDefault(this SPFarm farm, String key, int defaultValue)
+        {
+            string value = farm.WBxGetProperty(key);
+            if (value == "") return defaultValue;
+            return value.WBxToInt();
+        }
 
         public static void WBxSetProperty(this SPWeb web, String key, Object value)
         {
@@ -2126,15 +2139,21 @@ namespace WorkBoxFramework
             return new WBUser(user);
         }
 
-        public static String WBxToHTML(this SPUser user, HttpContext context)
+        public static String WBxToHTML(this SPUser user, UserProfileManager profileManager, HttpContext context)
         {
-            return WBxToHTML(user, context, SPContext.Current.Site.RootWeb);
+            return WBxToHTML(user, profileManager, context, SPContext.Current.Site.RootWeb);
         }
 
         // Based on ideas picked up from: 
         // http://blogs.msdn.com/b/uksharepoint/archive/2010/05/07/office-communicator-integration-presence-in-a-custom-webpart-for-sharepoint-2010.aspx
-        public static String WBxToHTML(this SPUser user, HttpContext context, SPWeb rootWeb)
+        public static String WBxToHTML(this SPUser user, UserProfileManager profileManager, HttpContext context, SPWeb rootWeb)
         {
+            // If the user doesn't exist in the user profile - then we assume that they've been disabled:
+            if (!profileManager.UserExists(user.LoginName))
+            {
+                return "<span class=\"wbf-disabled-user\">" + user.Name + "</span>";
+            }
+
             // Is there a better way of having this page level variable?
             int currentPawnCount = 0;
             if (context.Items.Contains("WBF_PresencePawnCount"))

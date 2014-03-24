@@ -26,6 +26,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Taxonomy;
+using Microsoft.Office.Server.UserProfiles;
 
 namespace WorkBoxFramework
 {
@@ -728,6 +729,9 @@ namespace WorkBoxFramework
                 using (SPSite site = new SPSite(farm.TimerJobsManagementSiteUrl))
                 using (SPWeb web = site.OpenWeb())
                 {
+                    SPServiceContext serviceContext = SPServiceContext.GetContext(site);
+                    UserProfileManager profileManager = new UserProfileManager(serviceContext);
+
                     SPList dailyJobs = web.Lists[WBTimerTasksJob.DAILY_TIMER_TASKS__LIST_NAME];
                     SPView inOrderToExecute = dailyJobs.Views[WBTimerTasksJob.DAILY_TIMER_TASKS__ORDERED_VIEW_NAME];
 
@@ -763,6 +767,13 @@ namespace WorkBoxFramework
 
                                     foreach (SPUser fromUser in newUsers)
                                     {
+                                        // If the user doesn't exist in the user profile - then we assume that they've been disabled:
+                                        if (!profileManager.UserExists(fromUser.LoginName))
+                                        {
+                                            WBLogging.Teams.Monitorable("Ignoring user as they appear to be disabled: " + fromUser.LoginName);
+                                            continue;
+                                        }
+
                                         WBLogging.Teams.Verbose("Copying across a user: " + fromUser.LoginName);
 
                                         SPUser toUser = toSite.RootWeb.WBxEnsureUserOrNull(fromUser.LoginName);

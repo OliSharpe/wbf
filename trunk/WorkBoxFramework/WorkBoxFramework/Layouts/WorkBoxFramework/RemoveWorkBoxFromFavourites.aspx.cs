@@ -42,6 +42,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 WorkBoxGuid.Value = Request.QueryString["workBoxGuid"]; ;
 
                 Message.Text = "Are you sure you want to remove the work box called '" + WorkBoxTitle.Value + "' from your list of favourite work boxes?";
+
+                cancel.Focus();
             }
 
 

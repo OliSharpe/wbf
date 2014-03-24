@@ -125,7 +125,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
 
 
                     // Now let's check or set the last visited Guid:
-                    WBUser user = new WBUser(workBox.Web.CurrentUser);
+                    WBUser user = new WBUser(workBox.Web);
                     UserProfile profile = user.GetUserProfile(workBox.Site);
 
 //                    SPSite _site = SPContext.Current.Site;

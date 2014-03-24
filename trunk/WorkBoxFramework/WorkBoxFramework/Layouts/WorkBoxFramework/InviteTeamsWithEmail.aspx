@@ -108,9 +108,9 @@ Select the teams you want to invite to this work box.
 
 <div class="wbf-field-value">
 <Taxonomy:TaxonomyWebTaggingControl ID="TeamsToInviteControl" ControlMode="display" runat="server" />
+</div>
 <div class="wbf-field-error">
 <asp:Label ID="InvolvedTeamsFieldMessage" runat="server" Text="" ForeColor="Red"/>
-</div>
 </div>
 
 </td>

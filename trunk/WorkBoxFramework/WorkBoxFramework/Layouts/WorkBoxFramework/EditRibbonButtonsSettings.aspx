@@ -36,6 +36,8 @@
 
     <asp:Button ID="CancelButton" runat="server" Text="Cancel" OnClick="CancelButton_OnClick" />
 
+<asp:HiddenField ID="ReturnUrl" runat="server" />
+
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">

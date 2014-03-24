@@ -34,6 +34,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             String redirectionURL = "";
 
             String settingsPage = Request.QueryString["SettingsPage"];
+            String returnUrl = Request.QueryString["ReturnUrl"];
             if (String.IsNullOrEmpty(settingsPage))
             {
                 settingsPage = "WorkBoxCollectionSettingsPage.aspx";
@@ -73,6 +74,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             }
 
+            redirectionURL = redirectionURL + "?ReturnUrl=" + returnUrl;
 
             SPUtility.Redirect(redirectionURL, SPRedirectFlags.Static, Context);
         }

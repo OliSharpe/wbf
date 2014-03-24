@@ -61,7 +61,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     WBLogging.Generic.Unexpected("Now using folder path: " + folderPath);
 
 
-                    WBUser user = new WBUser(WorkBox.Web.CurrentUser);
+                    WBUser user = new WBUser(WorkBox.Web);
 
                     String clipboardAction = user.PasteClipboard(WorkBox, folderPath);
 

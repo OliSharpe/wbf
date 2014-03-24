@@ -50,7 +50,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         private void RenderClipboard()
         {
-            WBUser user = new WBUser(WorkBox.Web.CurrentUser);
+            WBUser user = new WBUser(WorkBox.Web);
 
             CutOrCopiedText.Text = user.RenderClipboardAction(SPContext.Current.Site);
 
@@ -72,7 +72,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void clearAllButton_OnClick(object sender, EventArgs e)
         {
-            WBUser user = new WBUser(WorkBox.Web.CurrentUser);
+            WBUser user = new WBUser(WorkBox.Web);
 
             WorkBox.Web.AllowUnsafeUpdates = true;
             user.ClearClipboard(SPContext.Current.Site);

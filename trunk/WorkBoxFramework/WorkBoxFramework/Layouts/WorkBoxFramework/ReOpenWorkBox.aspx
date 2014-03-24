@@ -57,7 +57,7 @@ Are you sure you wish to re-open this Work Box?
 <td class="wbf-field-value-panel">
 
 <div class="wbf-field-value">
-<asp:TextBox ID="ReOpenComment" runat="server" Text="" TextMode="multiline" Rows="3" Columns="30"></asp:TextBox>
+<asp:TextBox ID="ReOpenComment" runat="server" Text="" TextMode="multiline" Rows="4" Columns="50"></asp:TextBox>
 </div>
 <div class="wbf-field-error">
     <asp:RequiredFieldValidator ID="ReOpenCommentCommentRequiredFieldValidator" runat="server" ErrorMessage="You must enter a comment."

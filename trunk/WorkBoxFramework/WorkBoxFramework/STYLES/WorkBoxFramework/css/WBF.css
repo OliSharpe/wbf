@@ -27,7 +27,7 @@
 
 table.wbf-dialog-form
 {
-    width: 100%;
+    min-width: 587px;
     border-spacing: 0px;
 }
 
@@ -45,7 +45,7 @@ table.wbf-dialog-form td
 /* table.wbf-dialog-form td.wbf-field-name-panel */
 .wbf-field-name-panel 
 { 
-    width: 300px; 
+    width: 150px; 
     border-top:solid 1px grey; 
     padding: 8px; 
     vertical-align: top;     
@@ -125,12 +125,31 @@ table.wbf-dialog-just-buttons .wbf-buttons-panel
 }
 
 
+.wbf-admin-page { padding: 10px }
+
+
 /* Other WBF styles */
 
 .wbf-clipboard { padding: 10px; }
 
 .wbf-clipboard-item { padding-top: 8px; margin-left: 20px; }
 
+
+table.wbf-view-audit-log 
+{
+    width: 700px;
+    border-spacing: 0px;
+}
+
+table.wbf-view-audit-log td 
+{
+    border-top: solid 1px grey; 
+    border-right: 0px;
+    border-left: 0px;
+    margin: 0px;
+    padding: 10px; 
+    vertical-align: top;     
+}
 
 
 /* Old style classes still being used for some WBF dialogs */
@@ -150,4 +169,455 @@ table.wbf-title-table { padding: 6px 0px 12px 10px; }
 
 div.wbf-publish-out-title { font-weight: bold; font-size: 16px; vertical-align: top; padding-bottom:4px; }
 
+/* WBF styles that were in the LBI intranet CSS files! */
 
+
+/* Go full screen width when in a work box: */
+.wbf-full-width div#s4-bodyContainer{ 
+	text-align:left; 
+	width: 100% !important;
+	margin: 0px auto; 
+	padding: 0; 
+}
+
+.wbf-full-width div#s4-titlerow{
+	padding: 0; 
+	background-image:none;
+	background-color:#009acf; 
+	margin: 0;
+	border: 0;
+}
+
+.wbf-full-width div#s4-mainarea{
+	padding: 0; 
+	background-image:none;
+	background-color:#fff; 
+	margin: 0;
+	border: 0;
+}
+
+.wbf-view-records-library td,
+.wbf-view-work-box-library td {
+    font-size: 10pt;   
+}
+
+
+h3.wbf-leftpanel-header a:visited {
+	 color: #676767;		
+}
+
+div#wbf-site-local-breadcrumb {
+	font-size: 8pt;
+	font-weight: normal;
+	padding: 15px;
+	padding-bottom: 5px;
+}
+
+/* Changing the padding around the local breadcrumb in a work box */
+.wbf-work-box div#wbf-site-local-breadcrumb {
+	padding:0px 10px;
+	position: relative;
+	top: -5px;
+}
+
+.wbf-work-box div#wbf-site-local-breadcrumb table {
+ width:100%;
+}
+
+span#wbf-site-title {
+	font-size: 14pt;
+	font-weight: bold;	
+}
+
+.lbi-team-tab-selected span#wbf-site-title a{
+    line-height: 120%;
+    font-size: 1.45em;
+}
+
+div#wbf-site-local-breadcrumb .ms-ltviewselectormenuheader .ms-viewselector a,.ms-ltviewselectormenuheader .ms-viewselectorhover a {
+	font-size:8pt;
+}
+
+#wbf-work-box-icon, div#wbf-work-box-icon { width: 96px; height:96px; }
+#wbf-work-box-icon a, div#wbf-work-box-icon a { width: 100%; height: 100%; display:block; background:url(/_layouts/images/WorkBoxFramework/box_96x96.png) no-repeat 0 0; }
+#wbf-work-box-icon a span, div#wbf-work-box-icon a span { display:none; }
+
+
+
+
+.wbf-full-width .s4-ca {
+	width: auto !important; 
+}
+
+
+h1#wbf-work-box-text { display:none; }
+
+
+.wbf-work-box-owner {
+    padding:3px;
+	font-weight:bold;
+}
+
+
+.wbf-full-width #menuShadow { left: 0px; width: 100%; background-image: url(images/page-top-shadow.png);  }
+	
+
+.wbf-full-width ul#mainNav li { }
+.wbf-work-box ul#mainNav li {  }
+
+
+/* ---  CSS for the team sites including for the records type navigation --- */
+
+a.wbf-link{
+    color: black;
+    text-decoration: none;
+}
+
+a.wbf-link:hover { 
+    color: red; 
+}
+
+a.wbf-create-new-link {
+    color: blue;
+}
+
+div.wbf-records-classes-list {
+
+    border-width: 1px;
+    border-style: solid;
+    border-color: black;
+    border-collapse: collapse;
+
+    border-bottom-width: 0px;
+
+    width:155px;
+}
+
+
+div.wbf-records-class-header {
+    font-family: arial, sans-serif;
+    font-size: 12px;
+    font-weight:bold;
+
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: black;    
+}
+
+div.wbf-records-types {
+
+    display: none;
+
+    font-family: arial, sans-serif;
+    font-size:12px;
+}
+
+div.wbf-selected-records-class {
+	display: block;
+}
+
+div.wbf-records-type {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: black;
+    
+}
+
+span.wbf-records-class {
+    margin:1px;
+}
+
+span.wbf-records-type {
+    margin:1px;
+    margin-left:20px;
+}
+
+
+div.lbi-our-work div.wbf-records-class-header {
+    background-color: rgb(200,190,220);
+}
+
+div.lbi-our-work div.wbf-records-class {
+    background-color: rgb(220,210,240);
+}
+
+div.lbi-council-wide-business div.wbf-records-class-header {
+    background-color: rgb(210,230,190);
+}
+
+div.lbi-council-wide-business div.wbf-records-class {
+    background-color: rgb(230,250,210);
+}
+
+
+div.lbi-team-admin div.wbf-records-class-header {
+    background-color: rgb(250,210,180);
+}
+
+div.lbi-team-admin div.wbf-records-class {
+    background-color: rgb(255,230,200);
+}
+
+div.wbf-selected-records-type {
+    background-color: yellow;
+}
+
+div.lbi-our-work div.wbf-selected-records-type {
+    background-color: yellow;
+}
+
+div.lbi-council-wide-business div.wbf-selected-records-type {
+    background-color: yellow;
+}
+
+div.lbi-team-admin div.wbf-selected-records-type {
+    background-color: yellow;
+}
+
+
+div.wbf-create-new-link {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: black;
+}
+    
+div.wbf-create-new-link a.wbf-link {
+	color: blue;    
+}
+
+
+
+
+/*WORKBOX SPECIFIC [PAGE STUFF */
+body .wbf-work-box #s4-leftpanel { width: 200px; padding-top: 30px; background: transparent; }
+.wbf-work-box span#wbf-site-title, .wbf-work-box span#wbf-site-title a:link, .wbf-work-box span#wbf-site-title a:visited { color:#a28700; }
+#wbf-work-box-icon { display:none; }
+.wbf-work-box #wbf-site-local-breadcrumb { padding: 0px; position: relative; top: 0;  left: 0; margin-top:35px; }
+.wbf-work-box-owner span { font-size:14px; line-height: 20px; color:#009ACF; }
+
+.wb-backMenu a{ clear:both; float:none; padding: 7px 0 5px 45px; display:block; font-weight:bold; font-size:14px; }
+.wb-backMenu a.backToTeam { background:url(images/icon-team-tiny.png) no-repeat 0 0; color:#650260; }
+.wb-backMenu a.backToWorkboxHome { width: 200px; padding-top: 40px; background: url(images/icon-workbox-small.png) no-repeat 10px 0; }
+
+
+
+.wbf-work-box span#wbf-site-title { border-top: 1px solid #a28700; border-bottom: 2px solid #a28700; line-height:120%; font-weight:normal; width:100%; display:block; margin-bottom:10px; }
+
+/* -------------------  New Set of classes added for new Look and Feel (Tree view)-------------- */
+
+.wbf-show-tree a.wbf-link{
+    color: black;
+    text-decoration: none;
+}
+
+.wbf-show-tree a.wbf-link:hover { 
+    color: red; 
+}
+
+.wbf-show-tree a.wbf-create-new-link {
+    color: blue;
+}
+
+.wbf-show-tree div.wbf-records-classes-list {
+
+  /*  border-width: 1px;
+    border-style: solid;
+    border-color: black;
+    border-collapse: collapse;
+
+    border-bottom-width: 0px;*/
+
+    width:155px;
+}
+
+
+.wbf-show-tree div.wbf-records-class-header {
+    font-family: arial, sans-serif;
+    font-size: 12px;
+    font-weight:bold;
+
+  /*  border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: black;    */
+    padding-bottom:4px !important;
+    padding-top:0px !important;
+    padding-left:40px !important;
+    padding-right:5px !important;
+
+}
+
+
+.wbf-show-tree div.wbf-selected-records-class {
+	/*display: block;*/
+}
+
+/*WBF-RECORDS-TYPES*/
+
+.wbf-show-tree div.wbf-records-types {
+    display: none;
+    font-family: arial, sans-serif;
+    font-size:12px;
+    background-color:gray;
+}
+
+
+.wbf-show-tree div.wbf-records-type {
+  /*  border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: black;*/
+    padding-bottom:4px !important;
+    padding-top:0px !important;
+    padding-left:35px !important;
+    padding-right:5px !important;
+}
+
+.wbf-show-tree div.wbf-records-type { width: 100%; height: 100%; display:block; background:url("/_layouts/images/WorkBoxFramework/type.gif") no-repeat 0 0; }
+
+.wbf-show-tree span.wbf-records-type {
+    margin:1px;
+    margin-left:20px;
+}
+
+
+.wbf-show-tree span.wbf-records-class {
+    margin:1px;
+}
+
+.wbf-show-tree div.lbi-our-work div.wbf-records-class-header {
+   /* background-color: rgb(200,190,220);*/
+   background-color:gray;
+}
+
+.wbf-show-tree div.lbi-our-work div.wbf-selected-records-class { width: 100%; height: 100%; display:block; background:url("/_layouts/images/WorkBoxFramework/open-class.gif") no-repeat 0 0 !important; }
+
+.wbf-show-tree div.wbf-records-class-header { width: 100%; height: 100%; display:block; background:url("/_layouts/images/WorkBoxFramework/closed-class.gif") no-repeat 0 0; }
+
+.wbf-show-tree div.wbf-last-type { width: 100%; height: 100%; display:block; background:url("/_layouts/images/WorkBoxFramework/last-type.gif") no-repeat 0 0; }
+
+.wbf-show-tree div.wbf-last-class { width: 100%; height: 100%; display:block; background:url("/_layouts/images/WorkBoxFramework/last-closed-class.gif") no-repeat 0 0; }
+
+
+.wbf-show-tree div.lbi-our-work div.wbf-records-class {
+		/*    background-color: rgb(220,210,240);*/
+		 background-color:gray;
+
+}
+
+.wbf-show-tree div.wbf-selected-records-type {
+    background-color: yellow;
+}
+
+.wbf-show-tree div.lbi-our-work div.wbf-selected-records-type {
+   /* background-color: yellow;*/
+   background-color:gray;
+   font-weight:bold;
+}
+
+
+
+.wbf-show-tree div.wbf-create-new-link {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: black;
+}
+    
+.wbf-show-tree div.wbf-create-new-link a.wbf-link {
+	color: blue;    
+}
+
+
+
+
+.wbf-show-tree div.lbi-council-wide-business div.wbf-records-class-header {
+  /*  background-color: rgb(210,230,190);*/
+    background-color:gray;
+
+}
+
+.wbf-show-tree div.lbi-council-wide-business div.wbf-records-class {
+   /* background-color: rgb(230,250,210);*/
+     background-color:gray;
+
+}
+
+
+.wbf-show-tree div.lbi-team-admin div.wbf-records-class-header {
+   /*background-color: rgb(250,210,180);*/
+     background-color:gray;
+
+}
+
+.wbf-show-tree div.lbi-team-admin div.wbf-records-class {
+    /*background-color: rgb(255,230,200);*/
+      background-color:gray;
+
+}
+
+.wbf-show-tree div.lbi-council-wide-business div.wbf-selected-records-type {
+    /*background-color: yellow;*/
+    background-color:gray;
+   font-weight:bold;
+
+}
+
+.wbf-show-tree div.lbi-team-admin div.wbf-selected-records-type {
+  /*  background-color: yellow;*/
+  background-color:gray;
+   font-weight:bold;
+
+}
+
+ul.wbf-my-teams-list { font-size:10pt; color:#333; margin:15px 0; }
+
+.lbi-team-admin div.wbf-records-type-tree-nav  {	
+	background-color: rgb(240,240,250);
+	font-weight:normal;
+}
+
+.lbi-our-work div.wbf-records-type-tree-nav  {	
+	background-color: rgb(240,220,250);
+	font-weight:normal;
+}
+
+.lbi-council-wide-business div.wbf-records-type-tree-nav  {	
+	background-color: rgb(230,250,210);
+	font-weight:normal;
+}
+
+.wbf-time-to-auto-close {
+	
+	font-size:14px;
+	font-weight:bold;
+}
+
+
+.wbf-tree-selection-title {
+	color:#650260;
+	font-weight:bold;
+	font-size:16px;
+	padding: 2px;
+	
+}
+
+.wbf-tree-selection-description {
+	padding:4px;
+}
+
+.wbf-tree-selection-no-work-boxes {
+	
+	padding:4px;
+	font-weight:bold;
+	font-style:oblique;
+	text-align:	center;
+}
+
+.wbf-create-new-work-box-link {
+	
+	padding:6px;
+	
+}
+ul.wbf-my-work-boxes-list li { background:url(images/bullet-blue-square.png) no-repeat 2px 10px; }
+
+.wbf-show-documents-for-subject table.ms-listviewtable tr:hover {
+    background-color: #D2EFFA;
+}

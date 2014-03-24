@@ -43,7 +43,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (!team.IsCurrentUserTeamOwnerOrSystemAdmin())
             {
-                AreYouSureText.Text = "Only team owners can remove users from a team.";
+                AreYouSureText.Text = "Only team owners or system admin can remove users from a team.";
                 RemoveButton.Enabled = false;
                 return;
             }
@@ -73,6 +73,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     AreYouSureText.Text = "Are you sure you want to remove the following user:";
                     NameOfIndividual.Text = RoleToRemove.Value + ": " + userToRemove.Name;
                 }
+
+                CancelButton.Focus();
             }
 
         }

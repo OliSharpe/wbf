@@ -25,6 +25,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using Microsoft.Office.Server.UserProfiles;
 
 namespace WorkBoxFramework.Layouts.WorkBoxFramework
 {
@@ -41,7 +42,6 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
         }
 
-
         private void generateTableOfAllInvolved()
         {
             WBAction inviteIndividualsAction = WorkBox.GetAction(WBAction.ACTION_KEY__INVITE_INDIVIDUALS);
@@ -55,6 +55,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 currentUserCanRemoveTeams = true;
             }
+
+            SPServiceContext serviceContext = SPServiceContext.GetContext(SPContext.Current.Site);
+            UserProfileManager profileManager = new UserProfileManager(serviceContext);
 
             Dictionary<String, String> headers = new Dictionary<String, String>();
             headers.Add("body", "%0D%0A%0D%0A%0D%0AWork Box Title: " + WorkBox.Title + "%0D%0AWork Box URL: " + WorkBox.Url);
@@ -71,7 +74,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                 html += "</li></ul></td><td class=\"wbf-field-value-panel\">\n";
 
-                html += renderTeamAsFieldSet(SPContext.Current.Site, WorkBox.OwningTeam);
+                html += renderTeamAsFieldSet(profileManager, SPContext.Current.Site, WorkBox.OwningTeam);
 
                 html += "</td></tr>\n";
             }
@@ -89,7 +92,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 {
                     if (involved.Id.Equals(WorkBox.OwningTeam.Id)) continue;
 
-                    html += renderTeamAsFieldSet(SPContext.Current.Site, involved, "Involved");
+                    html += renderTeamAsFieldSet(profileManager, SPContext.Current.Site, involved, "Involved");
                 }
             }
 
@@ -101,7 +104,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 foreach (SPUser user in WorkBox.InvolvedIndividuals)
                 {
-                    html += "<li>" + renderUser(user, "Involved") + "</li>";
+                    html += "<li>" + renderUser(profileManager, user, "Involved") + "</li>";
                 }
             }
 
@@ -119,7 +122,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 foreach (WBTeam visiting in WorkBox.VisitingTeams)
                 {
-                    html += renderTeamAsFieldSet(SPContext.Current.Site, visiting, "Visiting");
+                    html += renderTeamAsFieldSet(profileManager, SPContext.Current.Site, visiting, "Visiting");
                 }
             }
 
@@ -131,7 +134,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 foreach (SPUser user in WorkBox.VisitingIndividuals)
                 {
-                    html += "<li>" + renderUser(user, "Visiting") + "</li>";
+                    html += "<li>" + renderUser(profileManager, user, "Visiting") + "</li>";
                 }
             }
 
@@ -144,12 +147,12 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             GeneratedViewOfAllInvolved.Text = html;
 
         }
-        private String renderTeamAsFieldSet(SPSite site, WBTeam team)
+        private String renderTeamAsFieldSet(UserProfileManager profileManager, SPSite site, WBTeam team)
         {
-            return renderTeamAsFieldSet(site, team, "");
+            return renderTeamAsFieldSet(profileManager, site, team, "");
         }
 
-        private String renderTeamAsFieldSet(SPSite site, WBTeam team, String involvedOrVisiting)
+        private String renderTeamAsFieldSet(UserProfileManager profileManager, SPSite site, WBTeam team, String involvedOrVisiting)
         {
             SPGroup group = team.MembersGroup(site);
 
@@ -170,7 +173,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 foreach (SPUser user in group.Users)
                 {
-                    html += "<li>" + renderUser(user, "") + "</li>\n";
+                    html += "<li>" + renderUser(profileManager, user, "") + "</li>\n";
                 }
             }
 
@@ -180,16 +183,16 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             return html;
         }
 
-        private String renderUser(SPUser user)
+        private String renderUser(UserProfileManager profileManager, SPUser user)
         {
-            return renderUser(user, "");
+            return renderUser(profileManager, user, "");
         }
 
-        private String renderUser(SPUser user, String involvedOrVisiting)
+        private String renderUser(UserProfileManager profileManager, SPUser user, String involvedOrVisiting)
         {
             string html = "<span class=\"wbf-view-involved-user\">\n";
 
-            html += user.WBxToHTML(Context);
+            html += user.WBxToHTML(profileManager, Context);
 
             if (!String.IsNullOrEmpty(involvedOrVisiting) && currentUserCanRemoveIndividuals)
             {

@@ -416,10 +416,15 @@ namespace WorkBoxFramework.TeamSiteWorkBoxes
 
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception exception)
                     {
-                        // We'll use this location to output the exception message for the moment - not ideal, but better than nothing for the moment.
-                        CreateNewWorkBoxLink.Text = "<em>(An exception occured when trying to query the work boxes for this records type!)</em>";
+                        SelectedWorkBoxes.DataSource = null;
+                        SelectedWorkBoxes.DataBind();
+
+                        SelectionDescription.Text = SelectionDescription.Text + "<p><em>(An exception occured when trying to query the work boxes for this records type!)</em></p>";
+                        CreateNewWorkBoxLink.Text = "";
+
+                        WBLogging.RecordsTypes.Unexpected("Exception occurred on a team site when trying to query the work boxes of records type: " + recordsTypePath, exception);
                     }
 
 

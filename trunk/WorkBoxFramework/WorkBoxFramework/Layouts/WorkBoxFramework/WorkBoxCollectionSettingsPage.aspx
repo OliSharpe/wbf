@@ -478,6 +478,8 @@
 <asp:Label ID="CurrentProperties" runat="server" Text=""></asp:Label> 
 </p>
 
+<asp:HiddenField ID="ReturnUrl" runat="server" />
+
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">

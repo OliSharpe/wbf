@@ -26,10 +26,19 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
-<h3>Audit Log for <asp:Label ID="WorkBoxTitle" runat="server" Text=""></asp:Label></h3>
+
+<div class="wbf-dialog">
+<h2 class="wbf-dialog-title">Audit Log for <asp:Label ID="WorkBoxTitle" runat="server" Text=""></asp:Label></h2>
+
 
     <asp:Literal ID="GeneratedAuditLogTable" runat="server"></asp:Literal>
 
+<div class="wbf-buttons-panel">
+    <asp:Button ID="CloseButton" runat="server" Text="Close"  OnClick="CloseButton_OnClick"/>
+</div>
+
+
+</div>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
