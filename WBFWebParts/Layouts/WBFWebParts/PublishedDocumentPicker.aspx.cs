@@ -380,7 +380,7 @@ namespace WBFWebParts.Layouts.WBFWebParts
                 }
 
 
-                WBTeam team = WBTeam.getFromTeamSite(teamsTaxonomy, SPContext.Current.Web);
+                WBTeam team = WBTeam.GetFromTeamSite(teamsTaxonomy, SPContext.Current.Web);
 
                 String recordsLibraryURL = WBFWebPartsUtils.GetPublicLibraryURL(SPContext.Current);
 
