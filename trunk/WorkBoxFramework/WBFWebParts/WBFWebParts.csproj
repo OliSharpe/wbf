@@ -146,6 +146,7 @@
     </None>
     <None Include="Releases\v0.9.5i-final-2014.03.11\WBFWebParts v0.9.5i.wsp" />
     <None Include="Releases\v0.9.5i-final-2014.03.11\WBFWebParts v0.9.5i - Public.wsp" />
+    <None Include="Releases\v0.9.5i-final-2014.03.11\WBFWebParts.v0.9.5i - Final Release Notes 2014-03-11.doc" />
     <None Include="WebParts\CentralListOfLinks\CentralListOfLinks.webpart" />
     <None Include="WebParts\CentralListOfLinks\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{9f40976c-f218-45c0-9a9e-51527a65eaa5}</SharePointProjectItemId>

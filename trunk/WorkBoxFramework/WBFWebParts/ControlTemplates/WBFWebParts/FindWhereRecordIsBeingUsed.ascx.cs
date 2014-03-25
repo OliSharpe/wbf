@@ -90,7 +90,10 @@ namespace WBFWebParts.ControlTemplates.WBFWebParts
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                string[] publishingSites = { "http://uatstagingweb/", "http://uatizzi/", "http://uatevidencehub/" };
+                // This is a horrible hack - but this feature is only experimental at the moment until further
+                // feedback has confirmed that the feature is going in right direction
+//                string[] publishingSites = { "http://uatstagingweb/", "http://uatizzi/", "http://uatevidencehub/" };
+                string[] publishingSites = { "http://stagingweb/", "http://sp.izzi/", "http://evidencehub.stagingweb/" };
 
                 foreach (string publishingSiteURL in publishingSites)
                 {
