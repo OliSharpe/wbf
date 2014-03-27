@@ -192,7 +192,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             string html = "<span class=\"wbf-view-involved-user\">\n";
 
-            html += user.WBxToHTML(profileManager, Context);
+            html += user.WBxToHTML(profileManager);
 
             if (!String.IsNullOrEmpty(involvedOrVisiting) && currentUserCanRemoveIndividuals)
             {

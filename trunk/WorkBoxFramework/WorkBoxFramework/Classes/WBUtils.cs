@@ -1248,10 +1248,31 @@ namespace WorkBoxFramework
             }
             else
             {
-                forDialogLink.Add("to=" + String.Join("; ", emails.ToArray()));
-                headersString = "?" + String.Join("&", forDialogLink.ToArray());
+                if (headers == null)
+                {
+                    headers = new Dictionary<String, String>();
+                }
 
-                return "<a href=\"javascript: WorkBoxFramework_relativeCommandAction('MailToLinkReplacement.aspx" + headersString + "', 0, 0); \"" + cssString + ">" + text + "</a>";
+                if (!headers.ContainsKey("subject")) { headers["subject"] = ""; }
+                if (!headers.ContainsKey("body")) { headers["body"] = ""; }
+
+                String emailsList = "";
+                if (emails != null && emails.Count > 0)
+                {
+                    emailsList = String.Join("; ", emails.ToArray());
+                }
+
+                int mailtoReplacementCounter = WBUtils.Counter("WBF_MailtoReplacementCounter");
+
+                String html = "<script type=\"text/javascript\">\n";
+                html += "    var emailTo_" + mailtoReplacementCounter + " = \"" + HttpUtility.UrlEncode(emailsList) + "\";\n";
+                html += "    var emailSubject_" + mailtoReplacementCounter + " = \"" + HttpUtility.UrlEncode(headers["subject"]) + "\";\n";
+                html += "    var emailBody_" + mailtoReplacementCounter + " = \"" + HttpUtility.UrlEncode(headers["body"]) + "\";\n";
+                html += "</script>\n";
+
+                html += "<a href=\"javascript: WorkBoxFramework_relativeCommandAction('MailToLinkReplacement.aspx?to=' + emailTo_" + mailtoReplacementCounter + " + '&subject=' + emailSubject_" + mailtoReplacementCounter + " + '&body=' + emailBody_" + mailtoReplacementCounter + " , 0, 0); \"" + cssString + ">" + text + "</a>\n";
+
+                return html;
             }
            
         }
@@ -1431,6 +1452,21 @@ namespace WorkBoxFramework
             }
 
             return actual.ToString();
+        }
+
+        public static int Counter(String counterID)
+        {
+            HttpContext context = HttpContext.Current;
+
+            int currentCount = 0;
+            if (context.Items.Contains(counterID))
+            {
+                currentCount = (int)context.Items[counterID];
+            }
+            currentCount++;
+            context.Items[counterID] = currentCount;
+
+            return currentCount;
         }
     }
 }
