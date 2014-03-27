@@ -27,6 +27,7 @@
 
 table.wbf-dialog-form
 {
+    width: 100%;
     min-width: 587px;
     border-spacing: 0px;
 }
@@ -51,6 +52,12 @@ table.wbf-dialog-form td
     vertical-align: top;     
     text-align: left;    
 }
+
+.wbf-field-name-panel.wbf-wider 
+{
+    width: 250px;
+} 
+
 
 .wbf-field-name 
 { 
@@ -127,6 +134,7 @@ table.wbf-dialog-just-buttons .wbf-buttons-panel
 
 .wbf-admin-page { padding: 10px }
 
+.wbf-disabled-user { font-style: italic; }
 
 /* Other WBF styles */
 

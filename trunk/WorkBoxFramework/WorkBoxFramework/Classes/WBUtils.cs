@@ -1225,15 +1225,18 @@ namespace WorkBoxFramework
             }
 
             String headersString = "";
-            List<String> parameters = new List<String>();
+            List<String> forMailTo = new List<String>();
+            List<String> forDialogLink = new List<String>();
+
             if (headers != null)
             {
                 foreach (String key in headers.Keys)
                 {
-                    parameters.Add(key + "=" + headers[key]);
+                    forMailTo.Add(key + "=" + HttpUtility.UrlPathEncode(headers[key]));
+                    forDialogLink.Add(key + "=" + headers[key]);
                 }
 
-                headersString = HttpUtility.UrlEncode("?" + String.Join("&", parameters.ToArray()));
+                headersString = "?" + String.Join("&", forMailTo.ToArray());
             }
 
             String mailToLink = "mailto:" + String.Join(";", emails.ToArray()) + headersString;
@@ -1245,8 +1248,8 @@ namespace WorkBoxFramework
             }
             else
             {
-                parameters.Add("to=" + String.Join("; ", emails.ToArray()));
-                headersString = HttpUtility.UrlEncode("?" + String.Join("&", parameters.ToArray()));
+                forDialogLink.Add("to=" + String.Join("; ", emails.ToArray()));
+                headersString = "?" + String.Join("&", forDialogLink.ToArray());
 
                 return "<a href=\"javascript: WorkBoxFramework_relativeCommandAction('MailToLinkReplacement.aspx" + headersString + "', 0, 0); \"" + cssString + ">" + text + "</a>";
             }
@@ -1409,6 +1412,25 @@ namespace WorkBoxFramework
         }
 
 
+        public static String JoinUpToLimit(String joinString, IEnumerable<String> strings, int characterLimit)
+        {
+            StringBuilder test = new StringBuilder();
+            StringBuilder actual = new StringBuilder();
 
+            bool first = true;
+            foreach (String nextString in strings)
+            {
+                if (!first) test.Append(joinString);
+                test.Append(nextString);
+
+                if (test.Length > characterLimit) break;
+
+                if (first) first = false;
+                else actual.Append(joinString);
+                actual.Append(nextString);
+            }
+
+            return actual.ToString();
+        }
     }
 }

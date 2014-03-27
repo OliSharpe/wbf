@@ -34,7 +34,6 @@
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 <div class="wbf-dialog">
 <div class="wbf-dialog-error">
-<asp:Label ID="ErrorMessageLabel" runat="server" Text="" ForeColor="Red"></asp:Label>
 <asp:Label ID="ErrorText" ForeColor="Red"  runat="server" />
 </div>
 

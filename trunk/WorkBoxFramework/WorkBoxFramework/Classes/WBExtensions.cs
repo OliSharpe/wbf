@@ -2133,10 +2133,10 @@ namespace WorkBoxFramework
             return user;
         }
 
-        public static WBUser WBxUser(this SPUser user)
+        public static WBUser WBxUser(this SPUser user, SPSite site, SPWeb web)
         {
             if (user == null) return null;
-            return new WBUser(user);
+            return new WBUser(site, web, user);
         }
 
         public static String WBxToHTML(this SPUser user, UserProfileManager profileManager, HttpContext context)

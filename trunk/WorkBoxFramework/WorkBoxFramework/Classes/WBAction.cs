@@ -110,6 +110,7 @@ namespace WorkBoxFramework
         /// value here has to be duplicated manually into the LabelText attribute for the action within 
         /// the Elements.xml file that actually defines the custom actions for the ribbon buttons.
         /// </summary>
+        [JsonProperty]
         public String Label { get; private set; }
 
         /// <summary>
@@ -312,9 +313,9 @@ namespace WorkBoxFramework
 
                         //ActionUrl = "[CollectionURL]/Lists/[AllWorkBoxesListName]/DispForm.aspx?ID=[ID]";
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/ViewWorkBoxProperties.aspx";
-                        
-                        Width = 700;
-                        Height = 500;
+
+                        Width = 0; // 700;
+                        Height = 0; // 500;
 
                         break;
                     }
@@ -334,8 +335,8 @@ namespace WorkBoxFramework
 
                         //ActionUrl = "[CollectionURL]/Lists/[AllWorkBoxesListName]/EditForm.aspx?ID=[ID]";
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/EditWorkBoxProperties.aspx";
-                        Width = 700;
-                        Height = 500;
+                        Width = 0; // 700;
+                        Height = 0; // 500;
 
                         break;
                     }
@@ -354,8 +355,8 @@ namespace WorkBoxFramework
                         AllowMaximise = true;
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/ViewAuditLog.aspx";
-                        Width = 700;
-                        Height = 500;
+                        Width = 0; // 700;
+                        Height = 0; // 500;
 
                         break;
                     }
@@ -374,8 +375,8 @@ namespace WorkBoxFramework
                         AllowMaximise = true;
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/ViewAllInvolved.aspx";
-                        Width = 700;
-                        Height = 500;
+                        Width = 0; // 700;
+                        Height = 0; // 500;
 
                         break;
                     }
@@ -394,8 +395,8 @@ namespace WorkBoxFramework
                         AllowMaximise = false;
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/InviteTeamsWithEmail.aspx";
-                        Width = 660;
-                        Height = 500;
+                        Width = 0; // 660;
+                        Height = 0; // 500;
 
                         break;
                     }
@@ -414,8 +415,8 @@ namespace WorkBoxFramework
                         AllowMaximise = false;
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/InviteIndividualsWithEmail.aspx";
-                        Width = 660;
-                        Height = 600;
+                        Width = 0; // 660;
+                        Height = 0; // 600;
 
                         break;
                     }
@@ -434,8 +435,8 @@ namespace WorkBoxFramework
                         AllowMaximise = false;
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/ChangeWorkBoxOwner.aspx";
-                        Width = 600;
-                        Height = 200;
+                        Width = 0; // 600;
+                        Height = 0; // 200;
 
                         break;
                     }
@@ -454,8 +455,8 @@ namespace WorkBoxFramework
                         AllowMaximise = false;
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/CloseWorkBox.aspx";
-                        Width = 400;
-                        Height = 200;
+                        Width = 0; // 400;
+                        Height = 0; // 200;
 
                         break;
                     }
@@ -474,8 +475,8 @@ namespace WorkBoxFramework
                         AllowMaximise = false;
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/ReOpenWorkBox.aspx";
-                        Width = 400;
-                        Height = 200;
+                        Width = 0; // 400;
+                        Height = 0; // 200;
 
                         break;
                     }
@@ -494,8 +495,8 @@ namespace WorkBoxFramework
                         AllowMaximise = false;
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/AddWorkBoxToFavourites.aspx";
-                        Width = 400;
-                        Height = 200;
+                        Width = 0; // 400;
+                        Height = 0; // 200;
 
                         break;
                     }
@@ -517,8 +518,8 @@ namespace WorkBoxFramework
                         AllowMaximise = false;
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/AddToClipboard.aspx";
-                        Width = 600;
-                        Height = 250;
+                        Width = 0; // 600;
+                        Height = 0; // 250;
 
                         break;
                     }
@@ -538,8 +539,8 @@ namespace WorkBoxFramework
                         AllowMaximise = false;
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/AddToClipboard.aspx";
-                        Width = 600;
-                        Height = 250;
+                        Width = 0; // 600;
+                        Height = 0; // 250;
 
                         break;
                     }
@@ -558,8 +559,8 @@ namespace WorkBoxFramework
                         AllowMaximise = false;
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/PasteFromClipboard.aspx";
-                        Width = 600;
-                        Height = 250;
+                        Width = 0; // 600;
+                        Height = 0; // 250;
 
                         break;
                     }
@@ -578,8 +579,8 @@ namespace WorkBoxFramework
                         AllowMaximise = false;
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/ViewClipboard.aspx";
-                        Width = 800;
-                        Height = 400;
+                        Width = 0; // 800;
+                        Height = 0; // 400;
 
                         break;
                     }
@@ -599,8 +600,8 @@ namespace WorkBoxFramework
                         AllowMaximise = false;
 
                         ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/PublishDocDialogSelectDestinationPage.aspx";
-                        Width = 730;
-                        Height = 800;
+                        Width = 0; // 730;
+                        Height = 0; // 800;
 
                         break;
                     }

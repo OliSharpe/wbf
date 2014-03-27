@@ -190,7 +190,7 @@ This title will only be visible in the work box itself.
    { %>
 <tr>
 <td class="wbf-field-name-panel">
-<div class="wbf-field-name-panel">Reference Date</div>
+<div class="wbf-field-name">Reference Date</div>
 </td>
 <td class="wbf-field-value-panel">
 

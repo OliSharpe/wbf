@@ -42,7 +42,7 @@ namespace WorkBoxFramework.RedirectToMyWorkBox
                 return;
             }
 
-            WBUser currentUser = new WBUser(SPContext.Current.Web);
+            WBUser currentUser = new WBUser(SPContext.Current);
 
             String myWBUrl = currentUser.GetUrlToMyUnprotectedWorkBox(SPContext.Current.Site);
 

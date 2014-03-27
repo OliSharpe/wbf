@@ -32,23 +32,72 @@ using Microsoft.Office.Server.UserProfiles;
 
 namespace WorkBoxFramework
 {
+    /// <summary>
+    /// The WBUser class provides a wrapper object for SPUser that also holds references to the relevant SPSite and SPWeb in which
+    /// the user is being looked at. This then provides easy access to the user's profile and the WBF specific profile properties.
+    /// The lifecycle of the SPSite and SPWeb objects must be managed by the context that passes them into the WBUser constructor as WBUser
+    /// will not attempt to dispose of them.
+    /// </summary>
     public class WBUser
     {
         public const String CLIPBOARD_ACTION__COPY = "COPY";
         public const String CLIPBOARD_ACTION__CUT = "CUT";
 
-        public SPUser User { get; private set; }
-
-
-        public WBUser(SPUser user)
+        #region Constructors
+        public WBUser(SPSite site, SPWeb web, SPUser user)
         {
+            Site = site;
+            Web = web;
             User = user;
         }
 
-        public WBUser(SPWeb web)
+        public WBUser(WorkBox workBox)
         {
-            User = web.CurrentUser;
+            Site = workBox.Site;
+            Web = workBox.Web;
+            User = Web.CurrentUser;
+
             IsCurrentUser = true;
+        }
+
+        public WBUser(SPContext context)
+        {
+            Site = context.Site;
+            Web = context.Web;
+            User = Web.CurrentUser;
+
+            IsCurrentUser = true;
+        }
+
+        #endregion
+
+        #region Properties
+        public SPUser User { get; private set; }
+        public SPSite Site { get; private set; }
+        public SPWeb Web { get; private set; }
+
+        private bool _checkedForProfile = false;
+        private UserProfile _profile = null;
+        public UserProfile Profile
+        {
+            get
+            {
+                if (_profile == null && !_checkedForProfile)
+                {
+                    _profile = GetUserProfile(Site);
+                    _checkedForProfile = true;
+                }
+
+                return _profile;
+            }
+        }
+
+        public bool HasProfile
+        {
+            get
+            {
+                return Profile != null;
+            }
         }
 
         private bool _isCurrentUser = false;
@@ -57,6 +106,8 @@ namespace WorkBoxFramework
             get { return _isCurrentUser; }
             private set { _isCurrentUser = value; }
         }
+
+        #endregion
 
         public String GetUrlToMyUnprotectedWorkBox(SPSite site)        
         {
@@ -73,7 +124,7 @@ namespace WorkBoxFramework
             return url;
         }
 
-        public UserProfile GetUserProfile(SPSite site)
+        private UserProfile GetUserProfile(SPSite site)
         {
             SPServiceContext _serviceContext = SPServiceContext.GetContext(site);
             UserProfileManager _profileManager = new UserProfileManager(_serviceContext);
@@ -104,8 +155,6 @@ namespace WorkBoxFramework
         {
             String errorString = "";
 
-            UserProfile userProfile = GetUserProfile(workBox.Site);
-
             Dictionary<String, List<int>> clipboardItems = new Dictionary<String, List<int>>();
             String clipboardAction = "";
             if (clearExistingItems)
@@ -115,7 +164,7 @@ namespace WorkBoxFramework
             }
             else
             {
-                clipboardAction = GetClipboard(userProfile, clipboardItems);
+                clipboardAction = GetClipboard(Profile, clipboardItems);
                 if (String.IsNullOrEmpty(clipboardAction))
                 {
                     clipboardAction = action;
@@ -151,7 +200,7 @@ namespace WorkBoxFramework
             {
                 clipboardItems[workBox.Url] = currentIDsForWorkBox;
 
-                return SetClipboard(userProfile, clipboardAction, clipboardItems);
+                return SetClipboard(Profile, clipboardAction, clipboardItems);
             }
 
             return errorString;
@@ -520,6 +569,152 @@ namespace WorkBoxFramework
             html += "</div>\n";
 
             return html;
+        }
+
+        public static void CheckLastModifiedDatesAndTitlesOfRecentWorkBoxes(SPSite cacheSite, SPList cacheList, UserProfile profile, long ticksAtLastUpdate)
+        {
+            WBLogging.TimerTasks.Verbose("Looking at work boxes recently visited by: " + profile.DisplayName);                
+
+            UserProfileValueCollection workBoxesRecentlyVisited = profile[WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES];
+            String recentlyVisitedDetails = workBoxesRecentlyVisited.Value.WBxToString();
+            if (!String.IsNullOrEmpty(recentlyVisitedDetails))
+            {
+                string[] recentWorkBoxes = recentlyVisitedDetails.Split(';');
+
+                if (recentWorkBoxes.Length > 0)
+                {
+                    WBLogging.TimerTasks.Verbose("Found recently visited work boxes: " + recentWorkBoxes.Length);
+
+                    bool hasChangesToSave = false;
+
+                    List<String> updatedRecentWorkBoxes = new List<String>();
+
+                    foreach (string recentWorkBox in recentWorkBoxes)
+                    {
+                        string[] details = recentWorkBox.Split('|');
+                        string workBoxTitle = details[0];
+                        string workBoxUrl = details[1];
+                        string workBoxUniqueID = details[2];
+                        string workBoxGUID = details[3];
+
+                        try
+                        {
+                            long ticksWhenVisited = 0;
+                            if (details.Length >= 5)
+                            {
+                                string ticksWhenVisitedString = details[4];
+                                ticksWhenVisited = Convert.ToInt64(details[4]);
+
+                                // Would we have already done this recently visited work box during the last update:
+                                if (ticksWhenVisited > ticksAtLastUpdate)
+                                {
+                                    // OK so we're going to update the details for this work box:
+                                    using (WorkBox workBox = new WorkBox(workBoxUrl))
+                                    {
+                                        workBox.RecentlyVisited(cacheList, ticksWhenVisited);
+                                    }
+                                }
+                            }
+
+                            WBQuery query = new WBQuery();
+                            query.AddEqualsFilter(WBColumn.WorkBoxGUID, workBoxGUID);
+                            query.AddViewColumn(WBColumn.Title);
+
+                            SPListItemCollection items = cacheList.WBxGetItems(cacheSite, query);
+
+                            if (items.Count > 0)
+                            {
+                                String cachedWBTitle = items[0].WBxGetAsString(WBColumn.Title);
+                                if (cachedWBTitle != workBoxTitle)
+                                {
+                                    WBLogging.TimerTasks.Verbose("Updating work box title in recently visited list: " + workBoxTitle + " -> " + cachedWBTitle);
+                                    details[0] = cachedWBTitle;
+                                    hasChangesToSave = true;
+                                }
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            WBLogging.Teams.Monitorable("Something went wrong when searching for a favourite work box" + exception.Message);
+                        }
+
+
+
+                        updatedRecentWorkBoxes.Add(String.Join("|", details));
+                    }
+
+
+                    if (hasChangesToSave)
+                    {
+                        profile[WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES].Value = WBUtils.JoinUpToLimit(";", updatedRecentWorkBoxes, 3100);
+                        profile.Commit();
+                    }
+                }
+            }
+        }
+
+        public static void CheckTitlesOfFavouriteWorkBoxes(SPSite cacheSite, SPList cacheList, UserProfile profile) 
+        {
+            WBLogging.TimerTasks.Verbose("Checking titles of favourite work boxes of: " + profile.DisplayName);
+            
+            UserProfileValueCollection favouriteWorkBoxesPropertyValue = profile[WorkBox.USER_PROFILE_PROPERTY__MY_FAVOURITE_WORK_BOXES];
+            String favouriteWBDetails = favouriteWorkBoxesPropertyValue.Value.WBxToString();
+            if (!String.IsNullOrEmpty(favouriteWBDetails))
+            {
+                string[] favouriteWorkBoxes = favouriteWBDetails.Split(';');
+
+                if (favouriteWorkBoxes.Length > 0)
+                {
+                    WBLogging.TimerTasks.Verbose("Found favourite work boxes: " + favouriteWorkBoxes.Length);
+
+                    bool hasChangesToSave = false;
+
+                    List<String> updatedFavouriteWorkBoxes = new List<String>();
+
+                    foreach (string favouriteWorkBox in favouriteWorkBoxes)
+                    {
+                        string[] details = favouriteWorkBox.Split('|');
+                        string workBoxTitle = details[0];
+                        string workBoxUrl = details[1];
+                        string workBoxUniqueID = details[2];
+                        string workBoxGUID = details[3];
+
+                        try
+                        {
+                            WBQuery query = new WBQuery();
+                            query.AddEqualsFilter(WBColumn.WorkBoxGUID, workBoxGUID);
+                            query.AddViewColumn(WBColumn.Title);
+
+                            SPListItemCollection items = cacheList.WBxGetItems(cacheSite, query);
+
+                            if (items.Count > 0)
+                            {
+                                String cachedWBTitle = items[0].WBxGetAsString(WBColumn.Title);
+                                if (cachedWBTitle != workBoxTitle)
+                                {
+                                    WBLogging.TimerTasks.Verbose("Updating work box title in favourite list: " + workBoxTitle + " -> " + cachedWBTitle);
+                                    details[0] = cachedWBTitle;
+                                    hasChangesToSave = true;
+                                }
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            WBLogging.Teams.Monitorable("Something went wrong when searching for a favourite work box" + exception.Message);
+                        }
+
+
+                        updatedFavouriteWorkBoxes.Add(String.Join("|", details));
+                    }
+
+
+                    if (hasChangesToSave)
+                    {
+                        profile[WorkBox.USER_PROFILE_PROPERTY__MY_FAVOURITE_WORK_BOXES].Value = WBUtils.JoinUpToLimit(";", updatedFavouriteWorkBoxes, 3100);
+                        profile.Commit();
+                    }
+                }
+            }
         }
 
     }

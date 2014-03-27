@@ -422,7 +422,7 @@ namespace WorkBoxFramework
         }
 
 
-        private static void doUpdateRecentlyVisitedWorkBoxes(String workBoxCollectionURL, String flag)
+        private static void doUpdateRecentlyVisitedWorkBoxes(String targetURL, String flag)
         {
             WBLogging.TimerTasks.Monitorable("Running doUpdateRecentlyVisitedWorkBoxes command");
             WBFarm farm = WBFarm.Local;
@@ -449,46 +449,11 @@ namespace WorkBoxFramework
 
                 foreach (UserProfile profile in profileManager)
                 {
-                    WBLogging.TimerTasks.Verbose("Looking at work boxes recently visited by: " + profile.DisplayName);                
-
                     try 
                     {
-                        UserProfileValueCollection workBoxesRecentlyVisited = profile[WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES];
-                        String recentlyVisitedDetails = workBoxesRecentlyVisited.Value.WBxToString();
-                        if (!String.IsNullOrEmpty(recentlyVisitedDetails))
-                        {
-                            string[] recentWorkBoxes = recentlyVisitedDetails.Split(';');
+                        WBUser.CheckLastModifiedDatesAndTitlesOfRecentWorkBoxes(cacheSite, cacheList, profile, ticksAtLastUpdate);
 
-                            if (recentWorkBoxes.Length > 0)
-                            {
-                                WBLogging.TimerTasks.Verbose("Found recently visited work boxes: " + recentWorkBoxes.Length);                
-
-
-                                foreach (string recentWorkBox in recentWorkBoxes)
-                                {
-                                    string[] details = recentWorkBox.Split('|');
-                                    string workBoxUrl = details[1];
-
-                                    long ticksWhenVisited = 0;
-                                    if (details.Length >= 5)
-                                    {
-                                        string ticksWhenVisitedString = details[4];
-                                        ticksWhenVisited = Convert.ToInt64(details[4]);
-
-                                        // Would we have already done this recently visited work box during the last update:
-                                        if (ticksWhenVisited > ticksAtLastUpdate)
-                                        {
-                                            // OK so we're going to update the details for this work box:
-                                            using (WorkBox workBox = new WorkBox(workBoxUrl))
-                                            {
-                                                workBox.RecentlyVisited(cacheList, ticksWhenVisited);
-                                            }
-                                        }
-                                    }
-
-                                }
-                            }
-                        }
+                        WBUser.CheckTitlesOfFavouriteWorkBoxes(cacheSite, cacheList, profile);
                     }
                     catch (Exception exception)
                     {
@@ -503,7 +468,6 @@ namespace WorkBoxFramework
 
 
         }
-
 
         private static void doPrecreateWorkBoxes(String workBoxCollectionURL, String flag)
         {

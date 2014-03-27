@@ -127,10 +127,13 @@ function WorkBoxFramework_relativeCommandAction(relativePageName, width, height)
 }
 
 function WorkBoxFramework_commandAction(urlValue, width, height) {
+    
+    // This was the default name but it looks wrong in certain contexts.
+    // title: 'Work Box Dialog',
+
 
     var options = {
         url: urlValue,
-        title: 'Work Box Dialog',
         allowMaximize: false,
         showClose: true,
         dialogReturnValueCallback: WorkBoxFramework_callback
@@ -156,7 +159,7 @@ function WorkBoxFramework_actionIsEnabled(actionKey) {
 }
 
 function WorkBoxFramework_showActionDialog(action) {
-    WorkBoxFramework_showActionDialogWithDetails(action, action.ActionUrl, 'Work Box Action', WorkBoxFramework_callback);
+    WorkBoxFramework_showActionDialogWithDetails(action, action.ActionUrl, action.Label, WorkBoxFramework_callback);
 }
 
 function WorkBoxFramework_showActionDialogWithDetails(action, urlValue, titleValue, callbackFunction) {

@@ -148,7 +148,7 @@
 
 <tr>
 <td class="wbf-field-name-panel">
-<div class="wbf-field-name">Work Box Pretty Title</div>
+<div class="wbf-field-name">Title In Work Box</div>
 </td>
 <td class="wbf-field-value-panel">
 

@@ -75,11 +75,11 @@ namespace WorkBoxFramework.TeamDetails
 
                         if (userIsTeamOwnerOrSystemAdmin)
                         {
-                            teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('InviteToTeamWithEmail.aspx', 660, 600); \">Invite user to team</a></li>";
+                            teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('InviteToTeamWithEmail.aspx', 0, 0); \">Invite user to team</a></li>";
 
                             if (team.IsCurrentUserTeamManagerOrSystemAdmin())
                             {
-                                teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('ChangeTeamManager.aspx', 660, 300); \">Change team manager</a></li>";
+                                teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('ChangeTeamManager.aspx', 0, 0); \">Change team manager</a></li>";
                             }
 
                             if (webPart.ShowAddManagerReportsLinks)
@@ -91,9 +91,14 @@ namespace WorkBoxFramework.TeamDetails
                                 }
                                 else
                                 {
-                                    teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('AddManagersDirectReports.aspx', 400, 200); \">Add manager's direct reports</a></li>";
-                                    teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('AddAllManagersReports.aspx', 400, 200); \">Add all manager's reports</a></li>";
+                                    teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('AddManagersDirectReports.aspx', 0, 0); \">Add manager's direct reports</a></li>";
+                                    teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('AddAllManagersReports.aspx', 0, 0); \">Add all manager's reports</a></li>";
                                 }
+                            }
+
+                            if (WBFarm.Local.IsCurrentUserSystemAdmin())
+                            {
+                                teamActionsHTML += "<li><a href=\"javascript: WorkBoxFramework_relativeCommandAction('CheckTeamSync.aspx', 0, 0); \">Check team synchronisation</a></li>";
                             }
                         }
                         teamActionsHTML += "\n</ul>";

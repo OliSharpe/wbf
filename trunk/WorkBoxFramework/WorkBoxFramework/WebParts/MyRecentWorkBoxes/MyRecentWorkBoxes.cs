@@ -65,7 +65,7 @@ namespace WorkBoxFramework.MyRecentWorkBoxes
             UserProfileManager _profileManager = new UserProfileManager(_serviceContext);
             UserProfile profile = _profileManager.GetUserProfile(true);
 
-            UserProfileValueCollection workBoxesRecentlyVisited = profile[WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES];
+            UserProfileValueCollection workBoxesRecentlyVisited = profile[WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES];         
 
             // If the NumberToShow value isn't set or is set zero or negative then fix the web part to show 5 items:
             if (NumberToShow <= 0) NumberToShow = 5;
@@ -76,20 +76,25 @@ namespace WorkBoxFramework.MyRecentWorkBoxes
 
                 if (recentWorkBoxes.Length > 0)
                 {
-                    html += "<table cellpadding='5'>";
+                    html += "<table cellpadding='5' width='100%'>";
                     int count = 0;
                     bool hasExtraItems = false;
                     String cssClass = "";
+
                     foreach (string recentWorkBox in recentWorkBoxes)
                     {
                         string[] details = recentWorkBox.Split('|');
 
+                        String workBoxTitle = details[0];
+                        String workBoxUrl = details[1];
+                        String workBoxUniqueID = details[2];
+
                         // We're going to skip any work box whose title matches the unique prefix being filtered:
                         if (!String.IsNullOrEmpty(UniquePrefixToFilter))
                         {
-                            if (details[0].StartsWith(UniquePrefixToFilter)) continue;
+                            if (workBoxUniqueID.StartsWith(UniquePrefixToFilter)) continue;
                         }
-                        
+
                         count++;
                         if (count > NumberToShow)
                         {
@@ -98,8 +103,8 @@ namespace WorkBoxFramework.MyRecentWorkBoxes
                         }
 
                         html += "<tr" + cssClass + "><td><img src='/_layouts/images/WorkBoxFramework/work-box-16.png'/></td><td><a href='";
-                        html += details[1];
-                        html += "'>" + details[0] + "</a></td></tr>";
+                        html += workBoxUrl;
+                        html += "'>" + workBoxTitle + "</a></td></tr>";
 
                     }
 
@@ -110,6 +115,7 @@ namespace WorkBoxFramework.MyRecentWorkBoxes
                     }
 
                     html += "</table>";
+
                 }
                 else
                 {
@@ -126,5 +132,6 @@ namespace WorkBoxFramework.MyRecentWorkBoxes
 
             this.Controls.Add(literal);
         }
+
     }
 }
