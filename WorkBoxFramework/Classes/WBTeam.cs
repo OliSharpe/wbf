@@ -688,11 +688,11 @@ namespace WorkBoxFramework
                 return;
             }
 
-            WBUser manager = Manager(web).WBxUser();
+            WBUser manager = Manager(web).WBxUser(site, web);
 
-            if (manager != null)
+            if (manager != null && manager.HasProfile)
             {
-                AddMembers(site, WBUtils.GetSPUsers(web, manager.GetUserProfile(site).WBxGetDirectReportsLogins()));
+                AddMembers(site, WBUtils.GetSPUsers(web, manager.Profile.WBxGetDirectReportsLogins()));
             }
         }
 
@@ -710,11 +710,11 @@ namespace WorkBoxFramework
                 return;
             }
 
-            WBUser manager = Manager(web).WBxUser();
+            WBUser manager = Manager(web).WBxUser(site, web);
 
-            if (manager != null)
+            if (manager != null && manager.HasProfile)
             {
-                AddMembers(site, WBUtils.GetSPUsers(web, manager.GetUserProfile(site).WBxGetAllReportsLogins()));
+                AddMembers(site, WBUtils.GetSPUsers(web, manager.Profile.WBxGetAllReportsLogins()));
             }
         }
 

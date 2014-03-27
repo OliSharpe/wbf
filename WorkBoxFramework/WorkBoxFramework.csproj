@@ -112,6 +112,13 @@
       <DependentUpon>ChangeTeamManager.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\WBTeamSiteCalendarChangeEventReceiver.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\CheckTeamSync.aspx.cs">
+      <DependentUpon>CheckTeamSync.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\CheckTeamSync.aspx.designer.cs">
+      <DependentUpon>CheckTeamSync.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\WorkBoxFramework\ConfigureLinkedCalendar.aspx.cs">
       <DependentUpon>ConfigureLinkedCalendar.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -924,6 +931,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\ChangeTeamManager.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\CheckTeamSync.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\ConfigureLinkedCalendar.aspx">

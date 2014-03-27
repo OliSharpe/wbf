@@ -125,8 +125,8 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
 
 
                     // Now let's check or set the last visited Guid:
-                    WBUser user = new WBUser(workBox.Web);
-                    UserProfile profile = user.GetUserProfile(workBox.Site);
+                    WBUser user = new WBUser(workBox);
+                    UserProfile profile = user.Profile;
 
 //                    SPSite _site = SPContext.Current.Site;
   //                  SPServiceContext _serviceContext = SPServiceContext.GetContext(_site);
@@ -184,7 +184,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
                             }
                         }
 
-                        profile[WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES].Value = String.Join(";", newList.ToArray());
+                        profile[WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES].Value = WBUtils.JoinUpToLimit(";", newList, 3100);
 
                         profile.Commit();
                         workBoxWeb.AllowUnsafeUpdates = false;

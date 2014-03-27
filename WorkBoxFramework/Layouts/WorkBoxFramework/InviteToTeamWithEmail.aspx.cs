@@ -42,7 +42,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (team == null)
             {
-                ErrorMessageLabel.Text = "You do not appear to be viewing this form while on a team site.";
+                ErrorText.Text = "You do not appear to be viewing this form while on a team site.";
                 return;
             }
 

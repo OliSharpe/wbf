@@ -73,7 +73,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                         //WBUtils.logMessage("The ItemID was: " + ItemID.Value);
                         // SPDocumentLibrary sourceDocLib = (SPDocumentLibrary)WorkBox.Web.Lists[sourceListGuid];
 
-                        WBUser user = new WBUser(WorkBox.Web);
+                        WBUser user = new WBUser(WorkBox);
 
                         WorkBox.Web.AllowUnsafeUpdates = true;
                         String error = user.AddToClipboard(clipboardAction, WorkBox, selectedItemsIDs, false);
@@ -111,7 +111,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         private void RenderClipboard()
         {
-            WBUser user = new WBUser(WorkBox.Web);
+            WBUser user = new WBUser(WorkBox);
 
             ItemsOnClipboard.Text = user.RenderClipboardItems(SPContext.Current.Site);
         }

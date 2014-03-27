@@ -24,6 +24,7 @@ using System;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Utilities;
+using Microsoft.Office.Server.UserProfiles;
 
 namespace WorkBoxFramework.Layouts.WorkBoxFramework
 {
@@ -117,6 +118,29 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 WBUtils.SendErrorReport(SPContext.Current.Web, "Exception in EditWorkBoxPropertise.saveButton_OnClick()", "Something went wrong when saving: " + exception.Message + " ... " + exception.StackTrace);
                 throw new NotImplementedException("Something went wrong when saving the properties changes");
+            }
+
+            WBFarm farm = WBFarm.Local;
+            String cachedDetailsListUrl = farm.OpenWorkBoxesCachedDetailsListUrl;
+
+            if (!String.IsNullOrEmpty(cachedDetailsListUrl))
+            {
+                using (SPSite cacheSite = new SPSite(cachedDetailsListUrl))
+                using (SPWeb cacheWeb = cacheSite.OpenWeb())
+                {
+                    SPList cacheList = cacheWeb.GetList(cachedDetailsListUrl);
+
+                    SPServiceContext serviceContext = SPServiceContext.GetContext(cacheSite);
+                    UserProfileManager profileManager = new UserProfileManager(serviceContext);
+
+                    // Get the current user's user profile:
+                    UserProfile profile = profileManager.GetUserProfile(true);
+
+                    // We're using the 'now' plus one hour ticks as we're not really looking to update the last modified dates of other work boxes.
+                    WBUser.CheckLastModifiedDatesAndTitlesOfRecentWorkBoxes(cacheSite, cacheList, profile, DateTime.Now.AddHours(1).Ticks);
+
+                    WBUser.CheckTitlesOfFavouriteWorkBoxes(cacheSite, cacheList, profile);
+                }
             }
 
             returnFromDialogOK("");

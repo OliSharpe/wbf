@@ -60,7 +60,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             UserProfileManager profileManager = new UserProfileManager(serviceContext);
 
             Dictionary<String, String> headers = new Dictionary<String, String>();
-            headers.Add("body", "%0D%0A%0D%0A%0D%0AWork Box Title: " + WorkBox.Title + "%0D%0AWork Box URL: " + WorkBox.Url);
+            headers.Add("body", "\n\nWork Box Title: " + WorkBox.Title + "\nWork Box URL: " + WorkBox.Url);
 
             string html = "<p>Users Involved with <b>" + WorkBox.Title + "</b></p>\n";
 
@@ -68,7 +68,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
            
             if (WorkBox.OwningTeam != null)
             {
-                html += "<tr><td class=\"wbf-field-name-panel\"><b>Owning Team:</b><ul><li>";
+                html += "<tr><td class=\"wbf-field-name-panel wbf-wider\"><b>Owning Team:</b><ul><li>";
 
                 html += WBUtils.GenerateLinkToEmailGroup("Email work box owners", WorkBox.GetAllOwners(SPContext.Current.Site).WBxToEmails(), headers);
 
@@ -80,7 +80,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
 
 
-            html += "<tr><td class=\"wbf-field-name-panel\"><b>Involved Teams:</b><ul><li>";
+            html += "<tr><td class=\"wbf-field-name-panel wbf-wider\"><b>Involved Teams:</b><ul><li>";
 
             html += WBUtils.GenerateLinkToEmailGroup("Email all involved with work box", WorkBox.GetAllInvolved(SPContext.Current.Site).WBxToEmails(), headers);
 
@@ -98,7 +98,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             html += "</td></tr>\n";
 
-            html += "<tr><td class=\"wbf-field-name-panel\"><b>Involved Individuals:</b></td><td class=\"wbf-field-value-panel\"><ul>\n";
+            html += "<tr><td class=\"wbf-field-name-panel wbf-wider\"><b>Involved Individuals:</b></td><td class=\"wbf-field-value-panel\"><ul>\n";
 
             if (WorkBox.InvolvedIndividuals != null)
             {
@@ -112,7 +112,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             html += "</td></tr>\n";
 
 
-            html += "<tr><td class=\"wbf-field-name-panel\"><b>Visiting Teams:</b><ul><li>";
+            html += "<tr><td class=\"wbf-field-name-panel wbf-wider\"><b>Visiting Teams:</b><ul><li>";
 
             html += WBUtils.GenerateLinkToEmailGroup("Email everyone who can visit the work box", WorkBox.GetAllWhoCanVisit(SPContext.Current.Site).WBxToEmails(), headers);
 
@@ -128,7 +128,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             html += "</td></tr>\n";
 
-            html += "<tr><td class=\"wbf-field-name-panel\"><b>Visiting Individuals:</b></td><td class=\"wbf-field-value-panel\"><ul>\n";
+            html += "<tr><td class=\"wbf-field-name-panel wbf-wider\"><b>Visiting Individuals:</b></td><td class=\"wbf-field-value-panel\"><ul>\n";
 
             if (WorkBox.VisitingIndividuals != null)
             {

@@ -66,9 +66,12 @@ namespace WorkBoxFramework.MyFavouriteWorkBoxes
             {
                 string[] myFavouriteWorkBoxes = myFavouriteWorkBoxesPropertyValue.Value.ToString().Split(';');
 
+                // We actually want to display the most recently added favourite first even though it'll be last in the list so:
+                Array.Reverse(myFavouriteWorkBoxes);
+
                 if (myFavouriteWorkBoxes.Length > 0)
                 {
-                    html += "<table cellpadding='5'>";
+                    html += "<table cellpadding='5' width='100%'>";
                     int count = 0;
                     bool hasExtraItems = false;
                     String cssClass = "";
@@ -92,7 +95,10 @@ namespace WorkBoxFramework.MyFavouriteWorkBoxes
                         html += "<tr" + cssClass + "><td><img src='/_layouts/images/WorkBoxFramework/work-box-16.png'/></td><td><a href='";
                         html += details[1];
                         html += "'>" + details[0] + "</a></td>";
-                        html += "<td><a href='#' onclick='javascript: RemoveFavourite_commandAction(\"" + details[0] + "\", \"" + guidString + "\");'>remove</a></td>";
+
+                        String command = "RemoveWorkBoxFromFavourites.aspx?workBoxTitle=" + HttpUtility.UrlEncode(details[0]) + "&workBoxGuid=" + guidString;
+
+                        html += "<td><a href='#' onclick='javascript: WorkBoxFramework_relativeCommandAction(\"" + command + "\", 0, 0);'>remove</a></td>";
                         html += "</tr>";
 
                     }

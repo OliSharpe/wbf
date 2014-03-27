@@ -29,11 +29,11 @@
 <asp:Panel ID="JavascriptPanel" runat="server">
 <script type="text/javascript">
     function removeTeam(involvedOrVisiting, teamGUID) {
-        WorkBoxFramework_commandAction("<%= SPContext.Current.Web.Url %>/_layouts/WorkBoxFramework/RemoveTeamOrIndividual.aspx?TeamOrIndividual=Team&InvolvedOrVisiting=" + involvedOrVisiting + "&GUIDOfTeamToRemove=" + teamGUID, 400, 200);
+        WorkBoxFramework_commandAction("<%= SPContext.Current.Web.Url %>/_layouts/WorkBoxFramework/RemoveTeamOrIndividual.aspx?TeamOrIndividual=Team&InvolvedOrVisiting=" + involvedOrVisiting + "&GUIDOfTeamToRemove=" + teamGUID, 0, 0);
     }
 
     function removeIndividual(involvedOrVisiting, loginName) {
-        WorkBoxFramework_commandAction("<%= SPContext.Current.Web.Url %>/_layouts/WorkBoxFramework/RemoveTeamOrIndividual.aspx?TeamOrIndividual=Individual&InvolvedOrVisiting=" + involvedOrVisiting + "&LoginNameOfUserToRemove=" + loginName, 400, 200);
+        WorkBoxFramework_commandAction("<%= SPContext.Current.Web.Url %>/_layouts/WorkBoxFramework/RemoveTeamOrIndividual.aspx?TeamOrIndividual=Individual&InvolvedOrVisiting=" + involvedOrVisiting + "&LoginNameOfUserToRemove=" + loginName, 0, 0);
     }
 </script>
 </asp:Panel>
