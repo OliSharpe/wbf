@@ -110,6 +110,36 @@ namespace WorkBoxFramework
 
         public int Count { get { return List.Count; } }
 
+
+
+        private List<T> _list = null;
+        private List<T> List
+        {
+            get
+            {
+                if (_list == null) makeList();
+                return _list;
+            }
+        }
+
+        private void makeList()
+        {
+            _list = new List<T>();
+            if (_UIControlValue == null || _UIControlValue == "") return;
+
+            string[] values = _UIControlValue.Split(';');
+            foreach (string value in values)
+            {
+                T term = new T();
+                term.Initialise(_taxonomy, value);
+                _list.Add(term);
+            }
+        }
+
+        #endregion
+
+        #region Public Methods
+
         public void Add(WBTermCollection<T> collection)
         {
             foreach (T term in collection)
@@ -143,36 +173,6 @@ namespace WorkBoxFramework
                 Remove(term);
             }
         }
-
-
-        private List<T> _list = null;
-        private List<T> List
-        {
-            get
-            {
-                if (_list == null) makeList();
-                return _list;
-            }
-        }
-
-        private void makeList()
-        {
-            _list = new List<T>();
-            if (_UIControlValue == null || _UIControlValue == "") return;
-
-            string[] values = _UIControlValue.Split(';');
-            foreach (string value in values)
-            {
-                T term = new T();
-                term.Initialise(_taxonomy, value);
-                _list.Add(term);
-            }
-        }
-
-
-        #endregion
-
-        #region Public Methods
 
         public override String ToString()
         {

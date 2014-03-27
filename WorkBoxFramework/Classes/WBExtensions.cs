@@ -2139,14 +2139,14 @@ namespace WorkBoxFramework
             return new WBUser(site, web, user);
         }
 
-        public static String WBxToHTML(this SPUser user, UserProfileManager profileManager, HttpContext context)
+        public static String WBxToHTML(this SPUser user, UserProfileManager profileManager)
         {
-            return WBxToHTML(user, profileManager, context, SPContext.Current.Site.RootWeb);
+            return WBxToHTML(user, profileManager, SPContext.Current.Site.RootWeb);
         }
 
         // Based on ideas picked up from: 
         // http://blogs.msdn.com/b/uksharepoint/archive/2010/05/07/office-communicator-integration-presence-in-a-custom-webpart-for-sharepoint-2010.aspx
-        public static String WBxToHTML(this SPUser user, UserProfileManager profileManager, HttpContext context, SPWeb rootWeb)
+        public static String WBxToHTML(this SPUser user, UserProfileManager profileManager, SPWeb rootWeb)
         {
             // If the user doesn't exist in the user profile - then we assume that they've been disabled:
             if (!profileManager.UserExists(user.LoginName))
@@ -2154,14 +2154,7 @@ namespace WorkBoxFramework
                 return "<span class=\"wbf-disabled-user\">" + user.Name + "</span>";
             }
 
-            // Is there a better way of having this page level variable?
-            int currentPawnCount = 0;
-            if (context.Items.Contains("WBF_PresencePawnCount"))
-            {
-                currentPawnCount = (int)context.Items["WBF_PresencePawnCount"];
-            }
-            currentPawnCount++;
-            context.Items["WBF_PresencePawnCount"] = currentPawnCount;
+            int currentPawnCount = WBUtils.Counter("WBF_PresencePawnCounter");
 
             SPListItem userListItem = rootWeb.SiteUserInfoList.GetItemById(user.ID);
             string sipAddress = userListItem.WBxGetColumnAsString("SipAddress");
@@ -2424,6 +2417,18 @@ namespace WorkBoxFramework
             if (term.Parent == null) return term.Name;
             return term.Parent.WBxFullPath() + "/" + term.Name;
         }
+
+
+        public static bool WBxContainsCurrentUserAsTeamMember(this WBTermCollection<WBTeam> teams)
+        {
+            foreach (WBTeam team in teams)
+            {
+                if (team.IsCurrentUserTeamMember()) return true;
+            }
+
+            return false;
+        }
+
 
         #endregion
 

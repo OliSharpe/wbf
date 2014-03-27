@@ -329,15 +329,19 @@ namespace WorkBoxFramework
             get { return Term.WBxGetPropertyOrDefault(RECORDS_TYPE_TERM_PROPERTY__CREATE_NEW_WORK_BOX_TEXT, DEFAULT__CREATE_NEW_WORK_BOX_TEXT); }
             set { Term.WBxSetProperty(RECORDS_TYPE_TERM_PROPERTY__CREATE_NEW_WORK_BOX_TEXT, value); }
         }
-        
 
+        
         // This is here as an accessor for the actual property value for editing purposes:
         public String WorkBoxCollectionUrlProperty
         {
             get { return Term.WBxGetProperty(RECORDS_TYPE_TERM_PROPERTY__WORK_BOX_COLLECTION_URL); }
             set { Term.WBxSetProperty(RECORDS_TYPE_TERM_PROPERTY__WORK_BOX_COLLECTION_URL, value); }
         }
-
+        /// <summary>
+        /// Then the following property on WBRecordsType is the one that is actually used to find the Url for the 
+        /// work box collection that is associated with this reocrds type. It traverses
+        /// back up the term hierarchy to find the first term that has a value set and uses that value:
+        /// </summary>
         public String WorkBoxCollectionUrl
         {
             get {

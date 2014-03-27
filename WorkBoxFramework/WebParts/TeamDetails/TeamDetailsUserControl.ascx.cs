@@ -136,7 +136,7 @@ namespace WorkBoxFramework.TeamDetails
                 html += "<table cellpadding='5'><tr><td><ul>";
                 foreach (SPUser user in group.Users)
                 {
-                    html += "<li>" + user.WBxToHTML(profileManager, Context); //renderUser(user, SPContext.Current.Site.RootWeb);
+                    html += "<li>" + user.WBxToHTML(profileManager); //renderUser(user, SPContext.Current.Site.RootWeb);
 
                     if (team.IsUserTeamManager(user))
                     {
