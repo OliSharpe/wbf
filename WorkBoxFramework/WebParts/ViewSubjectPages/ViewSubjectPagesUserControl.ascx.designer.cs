@@ -13,6 +13,24 @@ namespace WorkBoxFramework.ViewSubjectPages {
     public partial class ViewSubjectPagesUserControl {
         
         /// <summary>
+        /// wbfCssSectionTags control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.CssRegistration wbfCssSectionTags;
+        
+        /// <summary>
+        /// WBFScriptRegistration control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.ScriptLink WBFScriptRegistration;
+        
+        /// <summary>
         /// PageName control.
         /// </summary>
         /// <remarks>
@@ -20,6 +38,33 @@ namespace WorkBoxFramework.ViewSubjectPages {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal PageName;
+        
+        /// <summary>
+        /// btnNewSubjectTag control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnNewSubjectTag;
+        
+        /// <summary>
+        /// btnEditSubjectTag control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnEditSubjectTag;
+        
+        /// <summary>
+        /// udpPageContent control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel udpPageContent;
         
         /// <summary>
         /// PageSubjectTagDescription control.
@@ -31,6 +76,51 @@ namespace WorkBoxFramework.ViewSubjectPages {
         protected global::System.Web.UI.WebControls.Label PageSubjectTagDescription;
         
         /// <summary>
+        /// panInternalContact control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel panInternalContact;
+        
+        /// <summary>
+        /// wbfInternalContact control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl wbfInternalContact;
+        
+        /// <summary>
+        /// litInternalContact control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litInternalContact;
+        
+        /// <summary>
+        /// panExternalContact control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel panExternalContact;
+        
+        /// <summary>
+        /// litExternalContact control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litExternalContact;
+        
+        /// <summary>
         /// TableOfChildSubjects control.
         /// </summary>
         /// <remarks>
@@ -38,6 +128,15 @@ namespace WorkBoxFramework.ViewSubjectPages {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal TableOfChildSubjects;
+        
+        /// <summary>
+        /// btnUpdTrick control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnUpdTrick;
         
         /// <summary>
         /// ShowSelectionPanel control.
