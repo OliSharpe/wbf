@@ -29,6 +29,9 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Taxonomy;
+using Microsoft.Office.Server.UserProfiles;
+using WorkBoxFramework.ControlTemplates.WorkBoxFramework;
+using System.Text;
 
 namespace WorkBoxFramework.ViewSubjectPages
 {
@@ -48,6 +51,8 @@ namespace WorkBoxFramework.ViewSubjectPages
         public bool showAtoZ = true;
         public bool showFilters = false;
         public bool onRootOfAtoZ = false;
+        // SC: Controls whether the Add/Edit buttons are rendered.
+        public bool canEditOrCreate = false;
 
         bool foundChildSubjectTags = false;
 
@@ -121,10 +126,12 @@ namespace WorkBoxFramework.ViewSubjectPages
 
 
             Term pageSubjectTagTerm = subjectTags.GetSelectedTermByPath(FullSubjectTagPath);
-            WBTerm pageSubjectTag = null;
+            //SC: WBTerm pageSubjectTag = null;
+            WBSubjectTag pageSubjectTag = null;
 
             if (pageSubjectTagTerm != null)
-                pageSubjectTag = new WBTerm(subjectTags, pageSubjectTagTerm);
+                //SC: pageSubjectTag = new WBTerm(subjectTags, pageSubjectTagTerm);
+                pageSubjectTag = new WBSubjectTag(subjectTags, pageSubjectTagTerm);
 
             if (pageSubjectTag == null)
             {
@@ -211,7 +218,37 @@ namespace WorkBoxFramework.ViewSubjectPages
 
                 PageName.Text = BuildPageNamePath(names, path, justRecordsType);
 
-                PageSubjectTagDescription.Text = pageSubjectTag.Description;
+                //SC: PageSubjectTagDescription.Text = pageSubjectTag.Description;
+                if(String.IsNullOrEmpty(pageSubjectTag.PageContent))
+                    PageSubjectTagDescription.Text = pageSubjectTag.Description;
+                else
+                    PageSubjectTagDescription.Text = pageSubjectTag.PageContent;
+
+                // Contacts
+                if (!String.IsNullOrEmpty(pageSubjectTag.InternalContactLoginName))
+                {
+                    panInternalContact.Visible = true;
+                    var user = pageSubjectTag.InternalContact;
+                    if (user != null)
+                    {
+                        // Bind user to control for presentation
+                        ((WBFUser)wbfInternalContact).User = user;
+                    }
+                }
+                else
+                {
+                    panInternalContact.Visible = false;
+                }
+                if (!pageSubjectTag.ExternalContact.WBxIsHtmlFieldEmpty())
+                {
+                    panExternalContact.Visible = true;
+                    litExternalContact.Text = pageSubjectTag.ExternalContact;
+                }
+                else
+                {
+                    panExternalContact.Visible = false;
+                }
+
 
                 foundChildSubjectTags = false;
 
@@ -295,7 +332,13 @@ namespace WorkBoxFramework.ViewSubjectPages
                 }
             }
 
-            TableOfChildSubjects.Text = html;
+            if (!String.IsNullOrEmpty(html))
+            {
+                TableOfChildSubjects.Text = String.Concat("<h3>Child Subject Tags</h3>", html);
+            }
+
+            // Added by Steve Clements
+            SetupAddEditButtons(pageSubjectTag);
         }
 
         private bool CheckTermIsAllowed(Term term)
@@ -506,6 +549,9 @@ namespace WorkBoxFramework.ViewSubjectPages
         private void RefreshBoundDocumentsList()
         {
             WBFarm farm = WBFarm.Local;
+
+            // SC
+            if (String.IsNullOrEmpty(farm.ProtectedRecordsLibraryUrl)) return;
 
             bool foundDocuments = false;
 
@@ -1028,5 +1074,31 @@ namespace WorkBoxFramework.ViewSubjectPages
             set { ViewState["WBF_SelectedLiveOrArchivedStatusFilter"] = value; }
         }
 
+
+        /* Added by Steve Clements to support Add / Edit tag functionality */
+
+        /// <summary>
+        /// Setup the properties for the add / edit buttons
+        /// </summary>
+        void SetupAddEditButtons(WBSubjectTag tag)
+        {
+            canEditOrCreate = false;
+            if (tag == null) return;
+
+            WBTaxonomy teamsTax = WBTaxonomy.GetTeams(SPContext.Current.Site);
+
+            if (tag.TeamsWithPermissionToEdit(teamsTax).WBxContainsCurrentUserAsTeamMember())
+            {
+                canEditOrCreate = true;
+
+                // properties on the button
+                var mmspath = String.Concat(webPart.RootSubjectTag, Request.QueryString["AdditionalPath"] ?? String.Empty);
+                btnNewSubjectTag.Attributes.Add("data-mmspath", mmspath);
+                btnEditSubjectTag.Attributes.Add("data-mmspath", mmspath);
+            }
+        }
+
+
+        /* End Added by SC */
     }
 }
