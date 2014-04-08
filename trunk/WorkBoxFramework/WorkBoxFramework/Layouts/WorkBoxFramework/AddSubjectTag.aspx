@@ -9,7 +9,7 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AddSubjectTag.aspx.cs" Inherits="WorkBoxFramework.Layouts.WorkBoxFramework.AddSubjectTag" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
-    <SharePoint:CssRegistration ID="wbfCssSectionTags" Name="WorkBoxFramework/SubjectTags.css" After="corev4.css" runat="server" />
+    <SharePoint:CssRegistration ID="wbfCssSectionTags" Name="WorkBoxFramework/css/SubjectTags.css" After="corev4.css" runat="server" />
     <script src="jquery-1.7.2.min.js" type="text/javascript"></script>
     <SharePoint:ScriptLink ID="subjectTagsScriptLink" Name="/_layouts/WorkBoxFramework/SubjectTags.js" runat="server" OnDemand="false" Localizable="false" />
 </asp:Content>

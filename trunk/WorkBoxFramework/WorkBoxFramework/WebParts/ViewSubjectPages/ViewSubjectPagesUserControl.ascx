@@ -9,7 +9,7 @@
 <%@ Register TagPrefix="wbf" TagName="WBFUser" src="/_controltemplates/WorkBoxFramework/WBFUser.ascx" %> 
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ViewSubjectPagesUserControl.ascx.cs" Inherits="WorkBoxFramework.ViewSubjectPages.ViewSubjectPagesUserControl" %>
 
-<SharePoint:CssRegistration ID="wbfCssSectionTags" Name="WorkBoxFramework/SubjectTags.css" After="corev4.css" runat="server" />
+<SharePoint:CssRegistration ID="wbfCssSectionTags" Name="WorkBoxFramework/css/SubjectTags.css" After="corev4.css" runat="server" />
 <SharePoint:ScriptLink ID="WBFScriptRegistration" name="/_layouts/WorkBoxFramework/SubjectTags.js" language="javascript" localizable="false" runat="server" OnDemand="false" />
 
 <style type="text/css">
