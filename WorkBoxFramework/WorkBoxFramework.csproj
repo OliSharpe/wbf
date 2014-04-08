@@ -419,6 +419,14 @@
     <Compile Include="WebParts\RedirectToMyWorkBox\RedirectToMyWorkBoxUserControl.ascx.designer.cs">
       <DependentUpon>RedirectToMyWorkBoxUserControl.ascx.cs</DependentUpon>
     </Compile>
+    <Compile Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPart.cs" />
+    <Compile Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPartUserControl.ascx.cs">
+      <DependentUpon>TeamSiteTreeNavWebPartUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPartUserControl.ascx.designer.cs">
+      <DependentUpon>TeamSiteTreeNavWebPartUserControl.ascx.cs</DependentUpon>
+    </Compile>
     <Compile Include="WebParts\TeamSiteWorkBoxes\TeamSiteWorkBoxes.cs" />
     <Compile Include="WebParts\TeamSiteWorkBoxes\TeamSiteWorkBoxesUserControl.ascx.cs">
       <DependentUpon>TeamSiteWorkBoxesUserControl.ascx</DependentUpon>
@@ -742,6 +750,10 @@
     <None Include="CustomActions\LinkedCalendarSettingsCustomAction\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{1e23a6c4-0355-4468-ae40-72b4eceaa13f}</SharePointProjectItemId>
     </None>
+    <None Include="SharePointProjectItem.spdata" />
+    <None Include="STYLES\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{1ca521ef-acba-48d0-9e8b-c059e038e1ac}</SharePointProjectItemId>
+    </None>
     <None Include="WebParts\ConfigurationStatus\ConfigurationStatus.webpart" />
     <None Include="WebParts\ConfigurationStatus\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{15e0ce8c-93d9-4277-8d9e-649b36a80214}</SharePointProjectItemId>
@@ -777,6 +789,10 @@
     <None Include="WebParts\RedirectToMyWorkBox\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{cadbbcc3-f14b-4c9f-bbdf-dcf52ef24a9c}</SharePointProjectItemId>
     </None>
+    <None Include="WebParts\TeamSiteTreeNavWebPart\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{852b83e2-616c-4d29-b00d-e40dc15f3a3b}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPart.webpart" />
     <None Include="WebParts\TeamSiteWorkBoxes\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{b03744bc-efc3-4f64-aa30-7743074db1a9}</SharePointProjectItemId>
     </None>
@@ -953,9 +969,7 @@
     <Content Include="Layouts\WorkBoxFramework\AddManagersDirectReports.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\WorkBoxFramework\AddSubjectTag.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="Layouts\WorkBoxFramework\AddSubjectTag.aspx" />
     <Content Include="Layouts\WorkBoxFramework\ChangeTeamManager.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -975,7 +989,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="CustomActions\LinkedCalendarSettingsCustomAction\Elements.xml" />
-    <Content Include="Layouts\1033\styles\WorkBoxFramework\SubjectTags.css" />
     <Content Include="Layouts\WorkBoxFramework\SubjectTags.js" />
     <Content Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx">
       <SubType>ASPXCodeBehind</SubType>
@@ -983,6 +996,7 @@
     <Content Include="Layouts\WorkBoxFramework\MailToLinkReplacement.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
+    <Content Include="STYLES\WorkBoxFramework\css\SubjectTags.css" />
     <Content Include="STYLES\WorkBoxFramework\css\WBF.css" />
     <Content Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
@@ -1135,6 +1149,8 @@
     <Content Include="WebParts\RedirectToMyWorkBox\RedirectToMyWorkBoxUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
+    <Content Include="WebParts\TeamSiteTreeNavWebPart\Elements.xml" />
+    <Content Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPartUserControl.ascx" />
     <Content Include="WebParts\TeamSiteWorkBoxes\Elements.xml" />
     <Content Include="WebParts\TeamSiteWorkBoxes\TeamSiteWorkBoxesUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
