@@ -2122,6 +2122,10 @@ namespace WorkBoxFramework
         public static SPUser WBxEnsureUserOrNull(this SPWeb web, String loginName)
         {
             SPUser user = null;
+
+            bool previousSettingForAllowUnsafeUpdates = web.AllowUnsafeUpdates;
+            web.AllowUnsafeUpdates = true;
+
             try
             {
                 user = web.EnsureUser(loginName);
@@ -2129,6 +2133,8 @@ namespace WorkBoxFramework
             catch (Exception e)
             {                
             }
+
+            web.AllowUnsafeUpdates = previousSettingForAllowUnsafeUpdates;
 
             return user;
         }
