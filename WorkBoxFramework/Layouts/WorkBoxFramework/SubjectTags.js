@@ -51,8 +51,8 @@ var Tags = (function () {
         ,
         DialogClosed: function (result, target) {
             if (result) {
-                //location.reload(true);
-                __doPostBack(_btnId, "");
+                SP.UI.ModalDialog.RefreshPage(result);
+                //__doPostBack(_btnId, ""); This throws an error in izzi...
             }
         }
         

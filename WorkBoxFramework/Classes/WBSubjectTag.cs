@@ -76,43 +76,15 @@ namespace WorkBoxFramework
         private SPUser _internalContact;
 
         /// <summary>
-        /// Internal Contact 
+        /// Get the Internal Contact SPUser object
         /// </summary>
-        public SPUser InternalContact
+        public SPUser InternalContact(SPWeb web)
         {
-            get {
-                if (_internalContact == null)
-                {
-                    if (!String.IsNullOrEmpty(this.InternalContactLoginName))
-                    {
-                        // SC: Wasn't sure of the behaviour you wanted in the extension, so I've put this code here...
-                        //      I had problems with the extension not finding my user and I'm really not sure if this is down to my dev machine or not.  
-                        //      It's not on a domain and uses local users.
-                        // _internalContact = SPContext.Current.Web.WBxEnsureUserOrNull(this.InternalContactLoginName);
-                        //
-                        SPSecurity.RunWithElevatedPrivileges(() =>
-                        {
-                            using (SPSite site = new SPSite(SPContext.Current.Site.ID))
-                            {
-                                using (SPWeb web = site.OpenWeb())
-                                {
-                                    try
-                                    {
-                                        web.AllowUnsafeUpdates = true;
-                                        _internalContact = web.EnsureUser(InternalContactLoginName);
-                                        web.AllowUnsafeUpdates = false;
-                                    }
-                                    catch (Exception)
-                                    {
-                                        _internalContact = null;
-                                    }
-                                }
-                            }
-                        });
-                    }
-                }
-                return _internalContact; 
+            if (_internalContact == null)
+            {
+                _internalContact = web.WBxEnsureUserOrNull(InternalContactLoginName);
             }
+            return _internalContact;
         }
 
         /// <summary>
@@ -200,7 +172,7 @@ namespace WorkBoxFramework
                 WBTermCollection<WBTeam> teams = new WBTermCollection<WBTeam>(null, TeamsWithPermissionToEditUIControlValue);
 
                 // Then we’ll add all of the teams set with permission to edit higher up the subject tags hierarchy
-                if (Parent != null && IsInheritingPermissions)
+                if (Parent != null)
                 {
                     teams.Add(new WBTermCollection<WBTeam>(null, Parent.InheritedTeamsWithPermissionToEditUIControlValue));
                 }

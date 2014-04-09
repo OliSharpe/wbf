@@ -228,7 +228,7 @@ namespace WorkBoxFramework.ViewSubjectPages
                 if (!String.IsNullOrEmpty(pageSubjectTag.InternalContactLoginName))
                 {
                     panInternalContact.Visible = true;
-                    var user = pageSubjectTag.InternalContact;
+                    var user = pageSubjectTag.InternalContact(SPContext.Current.Web);
                     if (user != null)
                     {
                         // Bind user to control for presentation
@@ -330,11 +330,13 @@ namespace WorkBoxFramework.ViewSubjectPages
                 {
                     RefreshBoundDocumentsList();
                 }
+                else
+                    h3RelatedDocs.Visible = false;
             }
 
             if (!String.IsNullOrEmpty(html))
             {
-                TableOfChildSubjects.Text = String.Concat("<h3>Child Subject Tags</h3>", html);
+                TableOfChildSubjects.Text = String.Concat("<h3 class='wbf-subject-tag-section-head'>Child Subject Tags</h3>", html);
             }
 
             // Added by Steve Clements
@@ -725,7 +727,6 @@ namespace WorkBoxFramework.ViewSubjectPages
 
                     showFilters = true;
                 }
-
 
                 if (archivedDocs > 0)
                 {

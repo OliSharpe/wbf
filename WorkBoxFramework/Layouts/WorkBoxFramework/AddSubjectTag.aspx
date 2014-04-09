@@ -95,7 +95,7 @@
                         <tbody>
                             <tr>
                                 <td align="right" width="100%" nowrap="nowrap">
-                                    <asp:Button Text="Save" ID="btnAdd" runat="server" OnClick="addButton_OnClick" ToolTip="Save" />
+                                    <asp:Button Text="Save" ID="btnAdd" runat="server" OnClick="addButton_OnClick" ToolTip="Save" Font-Size="12px" />
                                 </td>
                             </tr>
                         </tbody>
@@ -109,7 +109,7 @@
                         <tbody>
                             <tr>
                                 <td align="right" width="100%" nowrap="nowrap">
-                                    <asp:Button Text="Cancel" runat="server" ID="btnCancel" OnClientClick="Tags.CloseDialog(this);return false;" ToolTip="Cancel without saving" />
+                                    <asp:Button Text="Cancel" runat="server" ID="btnCancel" OnClientClick="Tags.CloseDialog(this);return false;" ToolTip="Cancel without saving" Font-Size="12px" />
                                 </td>
                             </tr>
                         </tbody>

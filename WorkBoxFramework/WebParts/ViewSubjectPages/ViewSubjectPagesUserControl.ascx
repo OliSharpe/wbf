@@ -50,14 +50,14 @@
 <div class="wbf-subjects-contacts">
     <div class="wbf-subjects-internal-contact">
         <asp:Panel runat="server" CssClass="wbf-tbl" ID="panInternalContact" Visible="false">
-            <h3>Internal Contact</h3>
+            <h3 class="wbf-subject-tag-section-head">Internal Contact</h3>
             <wbf:WBFUser runat="server" id="wbfInternalContact" />
             <asp:Literal Text="" ID="litInternalContact" runat="server" /> 
         </asp:Panel>
     </div>
     <div class="wbf-subjects-external-contact">
         <asp:Panel runat="server" CssClass="wbf-tbl" ID="panExternalContact" Visible="false">
-            <h3>Other Contact</h3>
+            <h3 class="wbf-subject-tag-section-head">Other Contact</h3>
             <asp:Literal runat="server" ID="litExternalContact"></asp:Literal>
         </asp:Panel>
     </div>
@@ -79,6 +79,7 @@
     <ContentTemplate>
 
 <div class="wbf-show-documents-for-subject">
+<h3 class="wbf-subject-tag-section-head" id="h3RelatedDocs" runat="server">Related Documents</h3>
 
 <% if (showFilters)
    { %>
