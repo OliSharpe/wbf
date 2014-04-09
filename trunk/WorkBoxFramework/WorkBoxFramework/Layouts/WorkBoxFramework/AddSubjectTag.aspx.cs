@@ -104,7 +104,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                         else
                             htmlDescription.Field.Html = subjectTag.PageContent;
 
-                        ppInternalContact.WBxInitialise(subjectTag.InternalContact); // This takes a little while
+                        ppInternalContact.WBxInitialise(subjectTag.InternalContact(SPContext.Current.Web)); // It's an option to use the RootWeb of the elevated site here, I have used SPContext for consistency
                         htmlExternalContact.Field.Html = subjectTag.ExternalContact;
                     }
                     else
@@ -170,11 +170,16 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                         {
                             subjectTag.ExternalContact = htmlExternalContact.Html;
                         }
-                        if (ppInternalContact.Entities != null && ppInternalContact.Entities.Count > 0)
+                        SPUser pickedUser = ppInternalContact.WBxGetSingleResolvedUser(elevatedSite.RootWeb);
+                        if (pickedUser != null)
+                        {
+                            subjectTag.InternalContactLoginName = pickedUser.LoginName;
+                        }
+                        /*if (ppInternalContact.Entities != null && ppInternalContact.Entities.Count > 0)
                         {
                             PickerEntity pe = (PickerEntity)ppInternalContact.Entities[0];
                             subjectTag.InternalContactLoginName = pe.DisplayText;
-                        }
+                        }*/
                         wbTax.CommitAll();
                     }
                     else
@@ -206,15 +211,19 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                             return;
                     }
 
-                    // TODO: decide whether to wipte out the old description
-                    //subjectTag.Description = String.Empty;
                     subjectTag.PageContent = htmlDescription.Html;
 
+                    SPUser pickedUser = ppInternalContact.WBxGetSingleResolvedUser(elevatedSite.RootWeb);
+                    if (pickedUser != null)
+                    {
+                        subjectTag.InternalContactLoginName = pickedUser.LoginName;
+                    }
+                    /*
                     if (ppInternalContact.Entities != null && ppInternalContact.Entities.Count > 0)
                     {
                         PickerEntity pe = (PickerEntity)ppInternalContact.Entities[0];
                         subjectTag.InternalContactLoginName = pe.DisplayText;
-                    }
+                    }*/
                     else
                     {
                         subjectTag.InternalContactLoginName = string.Empty;
@@ -235,7 +244,6 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 CommitForm();
 
-                //CloseDialogAndRefresh(); // This doesnt seem to work.  Doing this in javascript now.  SubjectTags.js
                 CloseDialogWithOK();
             }
             else

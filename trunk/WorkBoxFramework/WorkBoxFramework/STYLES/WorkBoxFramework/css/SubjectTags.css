@@ -22,21 +22,24 @@
 /********************************************* 
     Subject Tag Presentation web part
 *********************************************/
-.wbf-a-to-z-letters a {
+.wbf-a-to-z-letters a:link {
     display: inline-block;
-    width: 12px;
-    text-align:center;   
+    text-align:center;  
+    width:12px; 
     padding: 3px 3px 2px 2px !important;
     margin-right: 5px;
+    border: 1px solid #053C60;
+    color: #053C60 !important;
 }
 span.wbf-view-subject-pages-controls {
     float: right;
-    display: inline-block;   
+    display: inline-block; 
+    margin-top:-4px;  
 }
     span.wbf-view-subject-pages-controls input[type='submit'],
     span.wbf-view-subject-pages-controls button{
         padding: 1px;
-        font-size: 70%;
+        font-size: 14px;
         width: 45px;
         margin-left: 5px;
         font-weight: normal;
@@ -68,7 +71,8 @@ span.wbf-view-subject-pages-controls {
 
 /* Table display for contacts */
 .wbf-tbl {
-    display: table;   
+    display: table;
+    width:100%;   
 }
     .wbf-tbl .trow {
         display:table-row;
@@ -86,6 +90,14 @@ span.wbf-view-subject-pages-controls {
     }
     .wbf-tbl .tcell {
     }
+
+.wbf-show-documents-for-subject th{
+    text-align: left;
+}
+
+h3.wbf-subject-tag-section-head {
+    border-bottom: 1px solid #dcdcdc;   
+}
 
 /********************************************* 
     Add / Edit form 
