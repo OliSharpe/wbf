@@ -22,11 +22,12 @@
 /********************************************* 
     Subject Tag Presentation web part
 *********************************************/
-.wbf-a-to-z-letters a:link {
+.wbf-a-to-z-letters a:link,
+.wbf-a-to-z-letters a:visited {
     display: inline-block;
     text-align:center;  
     width:12px; 
-    padding: 3px 3px 2px 2px !important;
+    padding: 3px !important;
     margin-right: 5px;
     border: 1px solid #053C60;
     color: #053C60 !important;
