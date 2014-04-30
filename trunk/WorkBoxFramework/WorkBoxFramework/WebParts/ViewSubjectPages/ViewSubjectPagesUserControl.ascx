@@ -79,7 +79,8 @@
     <ContentTemplate>
 
 <div class="wbf-show-documents-for-subject">
-<h3 class="wbf-subject-tag-section-head" id="h3RelatedDocs" runat="server">Related Documents</h3>
+<%-- Header is made visible only when required --%>
+<h3 class="wbf-subject-tag-section-head" id="h3RelatedDocs" runat="server" style="display:none;">Related Documents</h3>
 
 <% if (showFilters)
    { %>

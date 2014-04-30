@@ -55,7 +55,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             CreateNew = ((Request.QueryString["Mode"] ?? "1") == "1") ? true : false;
             lblMMSPath.Text = _path;
 
-            
+            if (!CreateNew && !IsPostBack)
+            {
+                string currentTagName = GetCurrentTagName();
+                lblMMSPath.Text = _path.Replace(currentTagName, string.Empty);
+                txtEdit_CurrentTagName.Text = currentTagName;
+            }
+
             if (!IsPostBack)
             {
                 BindForm();
@@ -211,25 +217,26 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                             return;
                     }
 
+                    // Page content
                     subjectTag.PageContent = htmlDescription.Html;
 
+                    // Internal Contact
                     SPUser pickedUser = ppInternalContact.WBxGetSingleResolvedUser(elevatedSite.RootWeb);
                     if (pickedUser != null)
                     {
                         subjectTag.InternalContactLoginName = pickedUser.LoginName;
                     }
-                    /*
-                    if (ppInternalContact.Entities != null && ppInternalContact.Entities.Count > 0)
-                    {
-                        PickerEntity pe = (PickerEntity)ppInternalContact.Entities[0];
-                        subjectTag.InternalContactLoginName = pe.DisplayText;
-                    }*/
                     else
                     {
                         subjectTag.InternalContactLoginName = string.Empty;
                     }
+
+                    // External Contact
                     subjectTag.ExternalContact = htmlExternalContact.Html;
-                    
+
+                    // Tag Name
+                    subjectTag.Name = txtEdit_CurrentTagName.Text;
+
                     subjectTag.Update();
                 }
             });
@@ -244,7 +251,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 CommitForm();
 
-                CloseDialogWithOK();
+                // Return the new tag path, so the parent page can redirect if the tag name is updated.
+                CloseDialogWithOK(GetNewMMSPathForWebPart());
             }
             else
             {
@@ -273,6 +281,38 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             field.AllowReusableContent = false;
 
             return field;
+        }
+
+        /// <summary>
+        /// Extracts the current tag name from the path
+        /// </summary>
+        string GetCurrentTagName()
+        {
+            if (String.IsNullOrEmpty(_path)) return string.Empty;
+
+            string[] sa = _path.Split('/');
+            return sa[sa.Length - 1];
+        }
+
+        /// <summary>
+        /// Get the path to the tag, excluding the first part (for use in the ViewSubjectPages Web part)
+        /// </summary>
+        string GetNewMMSPathForWebPart()
+        {
+            if (String.IsNullOrEmpty(_path)) return string.Empty;
+
+            string newPath = string.Empty;
+
+            string[] sa = _path.Split('/');
+            for (int i = 1; i <= sa.Length - 1; i++)
+            {
+                if (i == sa.Length - 1)
+                    newPath += "/" + txtEdit_CurrentTagName.Text;
+                else
+                    newPath += "/" + sa[i];
+            }
+
+            return newPath;
         }
     }
 }

@@ -51,7 +51,7 @@ var Tags = (function () {
         ,
         DialogClosed: function (result, target) {
             if (result) {
-                SP.UI.ModalDialog.RefreshPage(result);
+                window.location.href = window.location.href.split('?')[0] + "?AdditionalPath=" + target;
                 //__doPostBack(_btnId, ""); This throws an error in izzi...
             }
         }

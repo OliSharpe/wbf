@@ -27,7 +27,13 @@
                     <h3 class="ms-standardheader"><%= CreateNew ? "Create tag in" : "Edit tag" %></h3>
                 </td>
                 <td class="ms-formbody" valign="top">
-                    <h4 class="wbf-form-lbl"><asp:Label Text="" ID="lblMMSPath" runat="server" /></h4>
+                    <h4 class="wbf-form-lbl">
+                        <asp:Label Text="" ID="lblMMSPath" runat="server"/>
+                        <% if (!CreateNew)
+                           { %>
+                           <asp:TextBox runat="server" ID="txtEdit_CurrentTagName" style="padding: 4px; border:1px solid #828790;"></asp:TextBox>
+                        <%} %>
+                    </h4>
                     <%= CreateNew ? "<em>Your new tag will be created as a child of this location</em>" : ""%>
                 </td>
             </tr>

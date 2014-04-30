@@ -123,6 +123,7 @@ namespace WorkBoxFramework
             set
             {
                 Term.Name = value;
+                setNameAndId();
             }
 
         }

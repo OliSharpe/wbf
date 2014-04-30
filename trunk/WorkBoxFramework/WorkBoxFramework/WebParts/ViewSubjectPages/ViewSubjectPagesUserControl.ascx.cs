@@ -138,8 +138,7 @@ namespace WorkBoxFramework.ViewSubjectPages
                 PageName.Text = "<i>(Could not find the page subject tag with path: " + FullSubjectTagPath + ")</i>";
                 return;
             }
-
-
+                        
             string html = "";
 
             string recordsTypeParameter = "";
@@ -325,20 +324,18 @@ namespace WorkBoxFramework.ViewSubjectPages
                     }
                 }
 
-
                 if (showDocuments)
                 {
                     RefreshBoundDocumentsList();
                 }
-                else
-                    h3RelatedDocs.Visible = false;
             }
 
             if (!String.IsNullOrEmpty(html))
             {
-                TableOfChildSubjects.Text = String.Concat("<h3 class='wbf-subject-tag-section-head'>Child Subject Tags</h3>", html);
+                //TableOfChildSubjects.Text = String.Concat("<h3 class='wbf-subject-tag-section-head'>Child Subject Tags</h3>", html);
+                TableOfChildSubjects.Text = html;
             }
-
+            
             // Added by Steve Clements
             SetupAddEditButtons(pageSubjectTag);
         }
@@ -705,7 +702,6 @@ namespace WorkBoxFramework.ViewSubjectPages
                 {
                     WBUtils.logMessage("pageSubjectTag was null");
                 }
-
             }
 
 
@@ -741,6 +737,12 @@ namespace WorkBoxFramework.ViewSubjectPages
             else
             {
                 DynamicNoDocumentsMessage.Text = "";
+            }
+
+            // Show Related docs header if docs or message being displayed
+            if (DocumentsForSubject.Rows.Count > 0 || !String.IsNullOrEmpty(DynamicNoDocumentsMessage.Text))
+            {
+                h3RelatedDocs.Style.Add(HtmlTextWriterStyle.Display, "block");
             }
         }
 
