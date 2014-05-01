@@ -274,7 +274,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             var field = new Microsoft.SharePoint.Publishing.WebControls.RichHtmlField();
             field.ControlMode = SPControlMode.Edit;
             field.Html = "<div></div>";
-            field.AllowFonts = false;
+            field.AllowFonts = true;
             field.AllowFontColorsMenu = false;
             field.MinimumEditHeight = "200px";
             field.EnableViewState = true;

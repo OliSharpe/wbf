@@ -57,7 +57,7 @@
     </div>
     <div class="wbf-subjects-external-contact">
         <asp:Panel runat="server" CssClass="wbf-tbl" ID="panExternalContact" Visible="false">
-            <h3 class="wbf-subject-tag-section-head">Other Contact</h3>
+            <h3 class="wbf-subject-tag-section-head">Additional Information</h3>
             <asp:Literal runat="server" ID="litExternalContact"></asp:Literal>
         </asp:Panel>
     </div>

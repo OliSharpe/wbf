@@ -24,14 +24,18 @@
         <tbody>
             <tr>
                 <td class="ms-formlabel" valign="top">
-                    <h3 class="ms-standardheader"><%= CreateNew ? "Create tag in" : "Edit tag" %></h3>
+                    <h3 class="ms-standardheader"><%= CreateNew ? "Create tag in" : "Edit tag <span style='color:red'>*</span>" %></h3>
+                    <%if (!CreateNew)
+                      {%>
+                      <asp:RequiredFieldValidator ID="RequiredFieldValidator2" ErrorMessage="Required" ControlToValidate="txtEdit_CurrentTagName" Display="Dynamic" InitialValue="" ForeColor="Red" runat="server" />
+                    <%} %>
                 </td>
                 <td class="ms-formbody" valign="top">
                     <h4 class="wbf-form-lbl">
                         <asp:Label Text="" ID="lblMMSPath" runat="server"/>
                         <% if (!CreateNew)
                            { %>
-                           <asp:TextBox runat="server" ID="txtEdit_CurrentTagName" style="padding: 4px; border:1px solid #828790;"></asp:TextBox>
+                           <asp:TextBox runat="server" ID="txtEdit_CurrentTagName" style="padding: 4px; border:1px solid #828790;" CssClass="wbf-text"></asp:TextBox>
                         <%} %>
                     </h4>
                     <%= CreateNew ? "<em>Your new tag will be created as a child of this location</em>" : ""%>
@@ -39,7 +43,7 @@
             </tr>
             <tr style='<%= CreateNew ? "" : "display: none;" %>'>
                 <td class="ms-formlabel" valign="top">
-                    <h3 class="ms-standardheader">Subject Tag Name *<asp:RequiredFieldValidator ID="RequiredFieldValidator1" ErrorMessage="Required" ControlToValidate="txtTagName" Display="Static" InitialValue="" ForeColor="Red" runat="server" /></h3>
+                    <h3 class="ms-standardheader">Subject Tag Name <span style='color:red'>*</span><asp:RequiredFieldValidator ID="RequiredFieldValidator1" ErrorMessage="Required" ControlToValidate="txtTagName" Display="Static" InitialValue="" ForeColor="Red" runat="server" /></h3>
                 </td>
                 <td class="ms-formbody" valign="top">
                     <span>
@@ -72,7 +76,7 @@
             </tr>
             <tr>
                 <td class="ms-formlabel" valign="top">
-                    <h3 class="ms-standardheader">Other Contact</h3>
+                    <h3 class="ms-standardheader">Additional Information</h3>
                 </td>
                 <td class="ms-formbody" valign="top">
                     <span>
