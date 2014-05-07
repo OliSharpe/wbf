@@ -27,7 +27,7 @@
                     <h3 class="ms-standardheader"><%= CreateNew ? "Create tag in" : "Edit tag <span style='color:red'>*</span>" %></h3>
                     <%if (!CreateNew)
                       {%>
-                      <asp:RequiredFieldValidator ID="RequiredFieldValidator2" ErrorMessage="Required" ControlToValidate="txtEdit_CurrentTagName" Display="Dynamic" InitialValue="" ForeColor="Red" runat="server" />
+                      <asp:RequiredFieldValidator ID="rfv_CurrentTagName" ErrorMessage="Required" ControlToValidate="txtEdit_CurrentTagName" Display="Dynamic" InitialValue="" ForeColor="Red" runat="server" />
                     <%} %>
                 </td>
                 <td class="ms-formbody" valign="top">

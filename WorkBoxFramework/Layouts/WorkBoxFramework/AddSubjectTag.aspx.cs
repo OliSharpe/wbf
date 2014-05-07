@@ -54,6 +54,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             _path = Request.QueryString["Path"] ?? String.Empty;
             CreateNew = ((Request.QueryString["Mode"] ?? "1") == "1") ? true : false;
             lblMMSPath.Text = _path;
+            rfv_CurrentTagName.Enabled = !CreateNew;
 
             if (!CreateNew && !IsPostBack)
             {
@@ -302,14 +303,21 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             if (String.IsNullOrEmpty(_path)) return string.Empty;
 
             string newPath = string.Empty;
-
             string[] sa = _path.Split('/');
-            for (int i = 1; i <= sa.Length - 1; i++)
+
+            if (CreateNew)
             {
-                if (i == sa.Length - 1)
-                    newPath += "/" + txtEdit_CurrentTagName.Text;
-                else
-                    newPath += "/" + sa[i];
+                newPath = _path.Replace(sa[0], string.Empty);
+            }
+            else
+            {
+                for (int i = 1; i <= sa.Length - 1; i++)
+                {
+                    if (i == sa.Length - 1)
+                        newPath += "/" + txtEdit_CurrentTagName.Text;
+                    else
+                        newPath += "/" + sa[i];
+                }
             }
 
             return newPath;
