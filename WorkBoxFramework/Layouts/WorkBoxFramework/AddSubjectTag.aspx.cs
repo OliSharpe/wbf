@@ -150,9 +150,16 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         /// </summary>
         void CreateNewTag()
         {
+            // It appears that a TaxonomySession will always run as the current user, even if elevated.
+            // See: http://scle.me/1skLGCY
+
+            var currentSiteGuid = SPContext.Current.Site.ID;
+            var oldContext = HttpContext.Current;
+            HttpContext.Current = null;
+
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                using (SPSite elevatedSite = new SPSite(SPContext.Current.Site.ID))
+                using (SPSite elevatedSite = new SPSite(currentSiteGuid))
                 {
                     WBTaxonomy wbTax = WBTaxonomy.GetSubjectTags(elevatedSite);
 
@@ -201,6 +208,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     }
                 }
             });
+            HttpContext.Current = oldContext;
         }
 
         /// <summary>
