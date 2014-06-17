@@ -26,6 +26,7 @@ using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Taxonomy;
 using Microsoft.SharePoint.Utilities;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace WorkBoxFramework.Layouts.WorkBoxFramework
 {
@@ -113,6 +114,10 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                         ppInternalContact.WBxInitialise(subjectTag.InternalContact(SPContext.Current.Web)); // It's an option to use the RootWeb of the elevated site here, I have used SPContext for consistency
                         htmlExternalContact.Field.Html = subjectTag.ExternalContact;
+
+                        // Added this due to issue with the Html editor in IE in a modal dialog!  If the value is null, you cannot click in to start editing.
+                        if(String.IsNullOrEmpty(htmlExternalContact.Field.Html)) htmlExternalContact.Field.Html = " ";
+                        if(String.IsNullOrEmpty(htmlDescription.Field.Html)) htmlDescription.Field.Html = " ";
                     }
                     else
                     {
@@ -177,6 +182,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                         {
                             subjectTag.ExternalContact = htmlExternalContact.Html;
                         }
+                        
                         SPUser pickedUser = ppInternalContact.WBxGetSingleResolvedUser(elevatedSite.RootWeb);
                         if (pickedUser != null)
                         {
@@ -202,9 +208,16 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         /// </summary>
         void UpdateTag()
         {
+            // It appears that a TaxonomySession will always run as the current user, even if elevated.
+            // See: http://scle.me/1skLGCY
+
+            var currentSiteGuid = SPContext.Current.Site.ID;
+            var oldContext = HttpContext.Current;
+            HttpContext.Current = null;
+
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                using (SPSite elevatedSite = new SPSite(SPContext.Current.Site.ID))
+                using (SPSite elevatedSite = new SPSite(currentSiteGuid))
                 {
                     WBTaxonomy wbTax = WBTaxonomy.GetSubjectTags(elevatedSite);
 
@@ -220,7 +233,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                     // Page content
                     subjectTag.PageContent = htmlDescription.Html;
-
+                    
                     // Internal Contact
                     SPUser pickedUser = ppInternalContact.WBxGetSingleResolvedUser(elevatedSite.RootWeb);
                     if (pickedUser != null)
@@ -231,16 +244,17 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     {
                         subjectTag.InternalContactLoginName = string.Empty;
                     }
-
+                    
                     // External Contact
                     subjectTag.ExternalContact = htmlExternalContact.Html;
 
                     // Tag Name
                     subjectTag.Name = txtEdit_CurrentTagName.Text;
-
                     subjectTag.Update();
                 }
             });
+
+            HttpContext.Current = oldContext;
         }
 
         /// <summary>

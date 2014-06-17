@@ -203,9 +203,7 @@
         $(function () {
             //sp-scroll
             $(window).resize(function () {
-                console.log("resized");
                 $spremem = $(".sp-scroll");
-                console.log($(".wbf-management-selector-panel").height());
             });
         });
     </script>
