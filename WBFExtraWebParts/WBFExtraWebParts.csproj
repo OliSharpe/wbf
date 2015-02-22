@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{692AF2FA-B02E-47C9-9F63-EA03D0C8742F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WBFExtraWebParts</RootNamespace>
+    <AssemblyName>WBFExtraWebParts</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SandboxedSolution>False</SandboxedSolution>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.SharePoint" />
+    <Reference Include="Microsoft.SharePoint.Security" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Layouts\WBFExtraWebParts\EditBlockButtonsDetails.aspx.cs">
+      <DependentUpon>EditBlockButtonsDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WBFExtraWebParts\EditBlockButtonsDetails.aspx.designer.cs">
+      <DependentUpon>EditBlockButtonsDetails.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\BlockButtons\BlockButtons.cs" />
+    <Compile Include="WebParts\BlockButtons\BlockButtonsUserControl.ascx.cs">
+      <DependentUpon>BlockButtonsUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\BlockButtons\BlockButtonsUserControl.ascx.designer.cs">
+      <DependentUpon>BlockButtonsUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{384742c9-8f56-409f-8fd9-9b5ff2945a85}</SharePointProjectItemId>
+    </None>
+    <None Include="Layouts\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{5a368dfe-eb31-4b05-8464-ebe5d39674ca}</SharePointProjectItemId>
+    </None>
+    <None Include="STYLES\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{7783e9cc-52fd-449b-92f6-81b83dad1162}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\BlockButtons\BlockButtons.webpart" />
+    <None Include="WebParts\BlockButtons\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{0ce0ba56-03b4-404f-9599-c5d2d13dc50d}</SharePointProjectItemId>
+    </None>
+    <None Include="Features\WBFExtraWebParts\WBFExtraWebParts.feature">
+      <FeatureId>{2045a770-8e8b-4823-8f1a-6fbd4feaa4fc}</FeatureId>
+    </None>
+    <None Include="key.snk" />
+    <None Include="Package\Package.package">
+      <PackageId>{1169ee50-cdc4-4b55-899c-49b4e33601c5}</PackageId>
+    </None>
+    <None Include="Package\Package.Template.xml">
+      <DependentUpon>Package.package</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WorkBoxFramework\WorkBoxFramework.csproj">
+      <Project>{0E53B68A-6901-49B0-B614-7C859A434430}</Project>
+      <Name>WorkBoxFramework</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Images\WBFExtraWebParts\chain.png" />
+    <Content Include="Images\WBFExtraWebParts\chain_unchain.png" />
+    <Content Include="Layouts\WBFExtraWebParts\colpick.js" />
+    <Content Include="Layouts\WBFExtraWebParts\EditBlockButtonsDetails.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WBFExtraWebParts\WBFExtraWebParts.js" />
+    <Content Include="STYLES\WBFExtraWebParts\css\colpick.css" />
+    <Content Include="STYLES\WBFExtraWebParts\css\BlockButtons.css" />
+    <Content Include="WebParts\BlockButtons\BlockButtonsUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\BlockButtons\Elements.xml" />
+    <Content Include="Features\WBFExtraWebParts\WBFExtraWebParts.Template.xml">
+      <DependentUpon>WBFExtraWebParts.feature</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" />
+</Project>

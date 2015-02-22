@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<webParts>
+  <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
+    <metaData>
+      <type name="WBFExtraWebParts.BlockButtons.BlockButtons, $SharePoint.Project.AssemblyFullName$" />
+      <importErrorMessage>$Resources:core,ImportErrorMessage;</importErrorMessage>
+    </metaData>
+    <data>
+      <properties>
+        <property name="Title" type="string">Block Buttons</property>
+        <property name="Description" type="string">Display a row of block buttons</property>
+        <property name="ChromeType" type="chrometype">None</property>
+        <property name="CssExtraClass" type="string"></property>
+        <property name="CssExtraStyles" type="string"></property>
+        <property name="BlockButtonsWidth" type="string">150px</property>
+        <property name="BlockButtonsHeight" type="string">60px</property>
+        <property name="BlockButtonsDetails" type="string">New Button | # | Extra text | #044376 | c | #8ea9c1 | c | #dddddd</property>
+      </properties>
+    </data>
+  </webPart>
+</webParts>
