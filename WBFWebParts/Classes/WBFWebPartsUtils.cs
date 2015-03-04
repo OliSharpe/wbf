@@ -40,7 +40,7 @@ namespace WBFWebParts
 
         internal static bool OnIzziOrPublicWeb(SPContext context)
         {
-            string[] izziOrPublicWeb = { "sp.izzi", "collection.izzi", "izzi", "collection", "teststagingweb", "stagingweb", "liveweb", "www.islington.gov.uk" };
+            string[] izziOrPublicWeb = { "sp.izzi", "collection.izzi", "izzi", "collection", "teststagingweb", "stagingweb", "liveweb", "www.islington.gov.uk", "uatizzi", "uatcollection" };
 
             if (izziOrPublicWeb.Contains(context.Site.HostName))
             {
@@ -57,8 +57,8 @@ namespace WBFWebParts
         {
             WBFarm farm = WBFarm.Local;
 
-            string[] internalSites = { "sp.izzi", "collection.izzi", "izzi", "collection" };
-            string[] publicSites = { "teststagingweb", "stagingweb", "liveweb", "www.islington.gov.uk" };
+            string[] internalSites = { "sp.izzi", "collection.izzi", "izzi", "collection", "uatizzi", "uatcollection" };
+            string[] publicSites = { "teststagingweb", "stagingweb", "liveweb", "www.islington.gov.uk", "livewebtst", "tstisl.islington.gov.uk", "uatstagingweb" };
 
             if (OnPublicSite(context))
             {
@@ -109,7 +109,7 @@ namespace WBFWebParts
         {
 //            string [] publicSites = { "teststagingweb", "stagingweb", "liveweb", "www.islington.gov.uk" };
 
-            string[] internalSites = { "sp.izzi", "collection.izzi" , "izzi", "collection" };
+            string[] internalSites = { "sp.izzi", "collection.izzi" , "izzi", "collection", "uatizzi", "uatcollection" };
 
             return (!internalSites.Contains(context.Site.HostName));
         }
