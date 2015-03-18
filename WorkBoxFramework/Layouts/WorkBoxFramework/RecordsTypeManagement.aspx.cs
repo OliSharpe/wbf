@@ -98,7 +98,6 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             WorkBoxShortTitleDescription.Text = recordsType.WorkBoxShortTitleDescription;
 
-
             WorkBoxReferenceIDRequirement.DataSource = WBRecordsType.getRequirementOptions();
             WorkBoxReferenceIDRequirement.DataBind();
             WorkBoxReferenceIDRequirement.WBxSafeSetSelectedValue(recordsType.WorkBoxReferenceIDRequirement);

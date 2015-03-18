@@ -59,74 +59,81 @@ namespace WorkBoxFramework.MyRecentWorkBoxes
             Literal literal = new Literal();
             string html = "<style type=\"text/css\">\n tr.wbf-extra-recent-items {display:none;}\n</style>\n\n";
 
-            // Now let's check or set the last visited Guid:
-            SPSite _site = SPContext.Current.Site;
-            SPServiceContext _serviceContext = SPServiceContext.GetContext(_site);
-            UserProfileManager _profileManager = new UserProfileManager(_serviceContext);
-            UserProfile profile = _profileManager.GetUserProfile(true);
-
-            UserProfileValueCollection workBoxesRecentlyVisited = profile[WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES];         
-
-            // If the NumberToShow value isn't set or is set zero or negative then fix the web part to show 5 items:
-            if (NumberToShow <= 0) NumberToShow = 5;
-
-            if (workBoxesRecentlyVisited.Value != null)
+            try
             {
-                string[] recentWorkBoxes = workBoxesRecentlyVisited.Value.ToString().Split(';');
+                // Now let's check or set the last visited Guid:
+                SPSite _site = SPContext.Current.Site;
+                SPServiceContext _serviceContext = SPServiceContext.GetContext(_site);
+                UserProfileManager _profileManager = new UserProfileManager(_serviceContext);
+                UserProfile profile = _profileManager.GetUserProfile(true);
 
-                if (recentWorkBoxes.Length > 0)
+                UserProfileValueCollection workBoxesRecentlyVisited = profile[WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES];
+
+                // If the NumberToShow value isn't set or is set zero or negative then fix the web part to show 5 items:
+                if (NumberToShow <= 0) NumberToShow = 5;
+
+                if (workBoxesRecentlyVisited.Value != null)
                 {
-                    html += "<table cellpadding='5' width='100%'>";
-                    int count = 0;
-                    bool hasExtraItems = false;
-                    String cssClass = "";
+                    string[] recentWorkBoxes = workBoxesRecentlyVisited.Value.ToString().Split(';');
 
-                    foreach (string recentWorkBox in recentWorkBoxes)
+                    if (recentWorkBoxes.Length > 0)
                     {
-                        string[] details = recentWorkBox.Split('|');
+                        html += "<table cellpadding='5' width='100%'>";
+                        int count = 0;
+                        bool hasExtraItems = false;
+                        String cssClass = "";
 
-                        String workBoxTitle = details[0];
-                        String workBoxUrl = details[1];
-                        String workBoxUniqueID = details[2];
-
-                        // We're going to skip any work box whose title matches the unique prefix being filtered:
-                        if (!String.IsNullOrEmpty(UniquePrefixToFilter))
+                        foreach (string recentWorkBox in recentWorkBoxes)
                         {
-                            if (workBoxUniqueID.StartsWith(UniquePrefixToFilter)) continue;
+                            string[] details = recentWorkBox.Split('|');
+
+                            String workBoxTitle = details[0];
+                            String workBoxUrl = details[1];
+                            String workBoxUniqueID = details[2];
+
+                            // We're going to skip any work box whose title matches the unique prefix being filtered:
+                            if (!String.IsNullOrEmpty(UniquePrefixToFilter))
+                            {
+                                if (workBoxUniqueID.StartsWith(UniquePrefixToFilter)) continue;
+                            }
+
+                            count++;
+                            if (count > NumberToShow)
+                            {
+                                cssClass = " class='wbf-extra-recent-items'";
+                                hasExtraItems = true;
+                            }
+
+                            html += "<tr" + cssClass + "><td><img src='/_layouts/images/WorkBoxFramework/work-box-16.png'/></td><td><a href='";
+                            html += workBoxUrl;
+                            html += "'>" + workBoxTitle + "</a></td></tr>";
+
                         }
 
-                        count++;
-                        if (count > NumberToShow)
+                        if (hasExtraItems)
                         {
-                            cssClass = " class='wbf-extra-recent-items'";
-                            hasExtraItems = true;
+                            html += "<tr class=\"wbf-show-more-recent-link\"><td colspan='2' align='right'><a href='#' onclick='javascript: $(\".wbf-extra-recent-items\").show(); $(\".wbf-show-more-recent-link\").hide(); '>More recent work boxes ...</a></td></tr>";
+                            html += "<tr class=\"wbf-extra-recent-items\"><td colspan='2' align='right'><a href='#' onclick='javascript: $(\".wbf-extra-recent-items\").hide(); $(\".wbf-show-more-recent-link\").show(); '>Fewer recent work boxes</a></td></tr>";
                         }
 
-                        html += "<tr" + cssClass + "><td><img src='/_layouts/images/WorkBoxFramework/work-box-16.png'/></td><td><a href='";
-                        html += workBoxUrl;
-                        html += "'>" + workBoxTitle + "</a></td></tr>";
+                        html += "</table>";
 
                     }
-
-                    if (hasExtraItems)
+                    else
                     {
-                        html += "<tr class=\"wbf-show-more-recent-link\"><td colspan='2' align='right'><a href='#' onclick='javascript: $(\".wbf-extra-recent-items\").show(); $(\".wbf-show-more-recent-link\").hide(); '>More recent work boxes ...</a></td></tr>";
-                        html += "<tr class=\"wbf-extra-recent-items\"><td colspan='2' align='right'><a href='#' onclick='javascript: $(\".wbf-extra-recent-items\").hide(); $(\".wbf-show-more-recent-link\").show(); '>Fewer recent work boxes</a></td></tr>";
+                        html += "<i>(No recently visited work boxes)</i>";
                     }
-
-                    html += "</table>";
-
                 }
                 else
                 {
                     html += "<i>(No recently visited work boxes)</i>";
                 }
-            }
-            else
-            {
-                html += "<i>(No recently visited work boxes)</i>";
-            }
 
+            }
+            catch (Exception e)
+            {
+                html += "<i>(An error occurred)</i> \n\n <!-- \n Exception was: " + e.WBxFlatten() + " \n\n -->";
+            }
 
             literal.Text = html;
 

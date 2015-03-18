@@ -59,18 +59,25 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 }
                 else
                 {
-                    if (myFavouriteWorkBoxesString.Length > 0)
-                    {
-                        myFavouriteWorkBoxesString += ";";
-                    }
-                    myFavouriteWorkBoxesString += WorkBox.Web.Title + "|" + WorkBox.Web.Url + "|" + WorkBox.UniqueID + "|" + WorkBox.Web.ID.ToString();
+                    List<String> favourites = new List<String>(myFavouriteWorkBoxesString.Split(';'));
+
+                    favourites.Add(WorkBox.Web.Title + "|" + WorkBox.Web.Url + "|" + WorkBox.UniqueID + "|" + WorkBox.Web.ID.ToString());
+
+                    myFavouriteWorkBoxesString = WBUtils.JoinUpToLimit(";", favourites, 3100);
 
                     myFavouriteWorkBoxesPropertyValue.Value = myFavouriteWorkBoxesString;
                     WorkBox.Web.AllowUnsafeUpdates = true;
                     profile.Commit();
                     WorkBox.Web.AllowUnsafeUpdates = false;
 
-                    Message.Text = "The work box has been added to your favourites.";
+                    if (myFavouriteWorkBoxesString.Contains(WorkBox.Web.ID.ToString()))
+                    {
+                        Message.Text = "The work box has been added to your favourites.";
+                    }
+                    else
+                    {
+                        Message.Text = "The work box could not be added to your favourites as your list of favourites is too long.";
+                    }
                 }
 
                 okButton.Focus();

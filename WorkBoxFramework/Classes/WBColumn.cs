@@ -247,6 +247,12 @@ namespace WorkBoxFramework
             return dateColumn;
         }
 
+        public static WBColumn DateColumn(String displayName, bool internalNameHasSpaceCharacters)
+        {
+            WBColumn dateColumn = new WBColumn(displayName, internalNameHasSpaceCharacters, WBColumn.DataTypes.DateTime);
+            dateColumn.UseDateAndTime = false;
+            return dateColumn;
+        }
 
         public static WBColumn DateTimeColumn(String displayName, bool internalNameHasSpaceCharacters)
         {
@@ -333,6 +339,12 @@ namespace WorkBoxFramework
             return column;
         }
 
+        public static WBColumn LookupColumn(String displayName, bool internalNameHasSpaceCharacters, String lookupListName)
+        {
+            WBColumn lookupColumn = new WBColumn(displayName, internalNameHasSpaceCharacters, WBColumn.DataTypes.Lookup);
+            lookupColumn.TermSetName = lookupListName;
+            return lookupColumn;
+        }
 
         #endregion
 
@@ -781,10 +793,12 @@ namespace WorkBoxFramework
 
         private static string[] changeRequestOptions = 
         {
-            "Create",
-            "Open",
-            "Close",
-            "Delete"                                        
+            WorkBox.REQUEST_WORK_BOX_STATUS_CHANGE__CREATE,
+            WorkBox.REQUEST_WORK_BOX_STATUS_CHANGE__OPEN,
+            WorkBox.REQUEST_WORK_BOX_STATUS_CHANGE__CLOSE,
+            // WorkBox.REQUEST_WORK_BOX_STATUS_CHANGE__ARCHIVE  // This option is not being used yet - so not creating it here.
+            WorkBox.REQUEST_WORK_BOX_STATUS_CHANGE__DELETE,
+            WorkBox.REQUEST_WORK_BOX_STATUS_CHANGE__REAPPLY_PERMISSIONS                            
         };
         public static readonly WBColumn WorkBoxStatusChangeRequest = WBColumn.ChoiceColumn(WorkBox.COLUMN_NAME__WORK_BOX_STATUS_CHANGE_REQUEST, changeRequestOptions);
 

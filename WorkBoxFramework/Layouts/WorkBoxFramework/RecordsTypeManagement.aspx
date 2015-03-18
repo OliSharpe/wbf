@@ -20,6 +20,13 @@
       runat="server"
     />
 
+    <SharePoint:ScriptLink ID="WBFjQueryScriptRegistration"
+        name="WorkBoxFramework/jquery-1.7.2.min.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
     <SharePoint:ScriptLink ID="WBFScriptRegistration"
         name="WorkBoxFramework/WorkBoxFramework.js"
         language="javascript"

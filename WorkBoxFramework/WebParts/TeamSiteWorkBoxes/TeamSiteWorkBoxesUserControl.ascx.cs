@@ -70,6 +70,11 @@ namespace WorkBoxFramework.TeamSiteWorkBoxes
                     SelectedWorkBoxView = VIEW__SELECTED_RECORDS_TYPE;
                     ViewState["SortExpression"] = "";
                 }
+                else
+                {
+                    SetSortColumn(WBColumn.WorkBoxDateLastModified);
+                    GridViewSortDirection = SortDirection.Descending;
+                }
 
                 WBLogging.Debug("Not in post back so setting guid value to be: " + SelectedRecordsTypeGUID);
                 RefreshBoundData();

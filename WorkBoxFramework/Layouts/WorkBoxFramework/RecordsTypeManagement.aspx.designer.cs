@@ -22,6 +22,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::Microsoft.SharePoint.WebControls.CssRegistration WBFCssRegistration;
         
         /// <summary>
+        /// WBFjQueryScriptRegistration control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.ScriptLink WBFjQueryScriptRegistration;
+        
+        /// <summary>
         /// WBFScriptRegistration control.
         /// </summary>
         /// <remarks>

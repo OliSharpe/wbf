@@ -41,10 +41,20 @@ namespace WorkBoxFramework
             }
         }
 
+        private bool hasBeenDisposed = false;
         protected void DisposeWorkBox()
         {
-            if (_workBox != null) _workBox.Dispose();
+            if (_workBox != null && !hasBeenDisposed)
+            {
+                _workBox.Dispose();
+                _workBox = null;
+                hasBeenDisposed = true;
+            }
         }
 
+        protected void Page_UnLoad(object sender, EventArgs e)
+        {
+            DisposeWorkBox();
+        }
     }
 }

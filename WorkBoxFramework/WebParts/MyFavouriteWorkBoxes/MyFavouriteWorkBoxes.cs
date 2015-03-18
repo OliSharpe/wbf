@@ -50,77 +50,85 @@ namespace WorkBoxFramework.MyFavouriteWorkBoxes
         {
 
             Literal literal = new Literal();
-            string html = "<style type=\"text/css\">\n tr.wbf-extra-favourites-items {display:none;}\n</style>\n\n" + getScriptCode();
+            string html = "";
 
-            SPSite _site = SPContext.Current.Site;
-            SPServiceContext _serviceContext = SPServiceContext.GetContext(_site);
-            UserProfileManager _profileManager = new UserProfileManager(_serviceContext);
-            UserProfile profile = _profileManager.GetUserProfile(true);
-
-            UserProfileValueCollection myFavouriteWorkBoxesPropertyValue = profile[WorkBox.USER_PROFILE_PROPERTY__MY_FAVOURITE_WORK_BOXES];
-
-            // If the NumberToShow value isn't set or is set zero or negative then fix the web part to show 5 items:
-            if (NumberToShow <= 0) NumberToShow = 5;
-
-            if (myFavouriteWorkBoxesPropertyValue.Value != null)
+            try
             {
-                string[] myFavouriteWorkBoxes = myFavouriteWorkBoxesPropertyValue.Value.ToString().Split(';');
+                html += "<style type=\"text/css\">\n tr.wbf-extra-favourites-items {display:none;}\n</style>\n\n" + getScriptCode();
 
-                // We actually want to display the most recently added favourite first even though it'll be last in the list so:
-                Array.Reverse(myFavouriteWorkBoxes);
+                SPSite _site = SPContext.Current.Site;
+                SPServiceContext _serviceContext = SPServiceContext.GetContext(_site);
+                UserProfileManager _profileManager = new UserProfileManager(_serviceContext);
+                UserProfile profile = _profileManager.GetUserProfile(true);
 
-                if (myFavouriteWorkBoxes.Length > 0)
+                UserProfileValueCollection myFavouriteWorkBoxesPropertyValue = profile[WorkBox.USER_PROFILE_PROPERTY__MY_FAVOURITE_WORK_BOXES];
+
+                // If the NumberToShow value isn't set or is set zero or negative then fix the web part to show 5 items:
+                if (NumberToShow <= 0) NumberToShow = 5;
+
+                if (myFavouriteWorkBoxesPropertyValue.Value != null)
                 {
-                    html += "<table cellpadding='5' width='100%'>";
-                    int count = 0;
-                    bool hasExtraItems = false;
-                    String cssClass = "";
+                    string[] myFavouriteWorkBoxes = myFavouriteWorkBoxesPropertyValue.Value.ToString().Split(';');
 
-                    foreach (string recentWorkBox in myFavouriteWorkBoxes)
+                    // We actually want to display the most recently added favourite first even though it'll be last in the list so:
+                    Array.Reverse(myFavouriteWorkBoxes);
+
+                    if (myFavouriteWorkBoxes.Length > 0)
                     {
-                        count++;
+                        html += "<table cellpadding='5' width='100%'>";
+                        int count = 0;
+                        bool hasExtraItems = false;
+                        String cssClass = "";
 
-                        if (count > NumberToShow)
+                        foreach (string recentWorkBox in myFavouriteWorkBoxes)
                         {
-                            cssClass = " class='wbf-extra-favourites-items'";
-                            hasExtraItems = true;
+                            count++;
+
+                            if (count > NumberToShow)
+                            {
+                                cssClass = " class='wbf-extra-favourites-items'";
+                                hasExtraItems = true;
+                            }
+
+                            string[] details = recentWorkBox.Split('|');
+
+                            string guidString = details[2];
+                            if (details.Length == 4)
+                                guidString = details[3];
+
+                            html += "<tr" + cssClass + "><td><img src='/_layouts/images/WorkBoxFramework/work-box-16.png'/></td><td><a href='";
+                            html += details[1];
+                            html += "'>" + details[0] + "</a></td>";
+
+                            String command = "RemoveWorkBoxFromFavourites.aspx?workBoxTitle=" + HttpUtility.UrlEncode(details[0]) + "&workBoxGuid=" + guidString;
+
+                            html += "<td><a href='#' onclick='javascript: WorkBoxFramework_relativeCommandAction(\"" + command + "\", 0, 0);'>remove</a></td>";
+                            html += "</tr>";
+
                         }
 
-                        string[] details = recentWorkBox.Split('|');
+                        if (hasExtraItems)
+                        {
+                            html += "<tr class=\"wbf-show-more-favourites-link\"><td colspan='3' align='right'><a href='#' onclick='javascript: $(\".wbf-extra-favourites-items\").show(); $(\".wbf-show-more-favourites-link\").hide(); '>More favourite work boxes ...</a></td></tr>";
+                            html += "<tr class=\"wbf-extra-favourites-items\"><td colspan='3' align='right'><a href='#' onclick='javascript: $(\".wbf-extra-favourites-items\").hide(); $(\".wbf-show-more-favourites-link\").show(); '>Fewer favourite work boxes</a></td></tr>";
+                        }
 
-                        string guidString = details[2];
-                        if (details.Length == 4)
-                            guidString = details[3];
-
-                        html += "<tr" + cssClass + "><td><img src='/_layouts/images/WorkBoxFramework/work-box-16.png'/></td><td><a href='";
-                        html += details[1];
-                        html += "'>" + details[0] + "</a></td>";
-
-                        String command = "RemoveWorkBoxFromFavourites.aspx?workBoxTitle=" + HttpUtility.UrlEncode(details[0]) + "&workBoxGuid=" + guidString;
-
-                        html += "<td><a href='#' onclick='javascript: WorkBoxFramework_relativeCommandAction(\"" + command + "\", 0, 0);'>remove</a></td>";
-                        html += "</tr>";
-
+                        html += "</table>";
                     }
-
-                    if (hasExtraItems)
+                    else
                     {
-                        html += "<tr class=\"wbf-show-more-favourites-link\"><td colspan='3' align='right'><a href='#' onclick='javascript: $(\".wbf-extra-favourites-items\").show(); $(\".wbf-show-more-favourites-link\").hide(); '>More favourite work boxes ...</a></td></tr>";
-                        html += "<tr class=\"wbf-extra-favourites-items\"><td colspan='3' align='right'><a href='#' onclick='javascript: $(\".wbf-extra-favourites-items\").hide(); $(\".wbf-show-more-favourites-link\").show(); '>Fewer favourite work boxes</a></td></tr>";
+                        html += "<i>(No favourite work boxes)</i>";
                     }
-
-                    html += "</table>";
                 }
                 else
                 {
                     html += "<i>(No favourite work boxes)</i>";
                 }
             }
-            else
+            catch (Exception e)
             {
-                html += "<i>(No favourite work boxes)</i>";
-            }
-
+                html += "<i>(An error occurred)</i> \n\n <!-- \n Exception was: " + e.WBxFlatten() + " \n\n -->";
+            }            
 
             literal.Text = html;
 

@@ -609,6 +609,8 @@ namespace WorkBoxFramework
             }
             set
             {
+                WBLogging.WorkBoxes.Verbose("Setting the WB records type: " + value);
+
                 Item.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__RECORDS_TYPE, value);
                 _recordsType = value;
                 _updateMustRedoPermissions = true;
@@ -1599,13 +1601,19 @@ namespace WorkBoxFramework
 
                 SetStatusNow(WorkBox.WORK_BOX_STATUS__CREATING);
 
-                WBLogging.WorkBoxes.Verbose("Trying to create a work box: " + Title);
+                WBLogging.WorkBoxes.Verbose("Trying to create a Work Box: " + Title);
 
                 // Before we do anything we need to set the Work Box's template type:
                 if (this.Template == null) this.Template = Collection.DefaultTemplate();
 
+                WBLogging.WorkBoxes.Verbose("Found the WB Template: " + this.Template.Title);
+
+
                 // And then set the records type based on the template:
                 this.RecordsType = Template.RecordsType(this.RecordsTypes);
+
+                WBLogging.WorkBoxes.Verbose("Found the records type: " + this.RecordsType);
+
 
                 //this.RecordsType = Type.RecordsType;
                 //Item[WorkBox.COLUMN_NAME__RECORDS_TYPE] = Template.Item[WorkBox.COLUMN_NAME__RECORDS_TYPE];
@@ -1614,8 +1622,14 @@ namespace WorkBoxFramework
                 // We'll only try to generate the ID if it's not already set:
                 if (Collection.GenerateUniqueIDs && UniqueID == "")
                 {
+                    WBLogging.WorkBoxes.Verbose("Generating a unique ID");
+
                     if (LocalIDAsString == "") GenerateLocalID();
                     GenerateUniqueID();
+                }
+                else
+                {
+                    WBLogging.WorkBoxes.Verbose("No need to generate a unique ID: " + UniqueID);
                 }
 
                 GenerateTitle();
