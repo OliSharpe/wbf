@@ -1435,19 +1435,23 @@ namespace WorkBoxFramework
 
         public static String JoinUpToLimit(String joinString, IEnumerable<String> strings, int characterLimit)
         {
-            StringBuilder test = new StringBuilder();
             StringBuilder actual = new StringBuilder();
 
             bool first = true;
+            int charactersToAdd = 0;
             foreach (String nextString in strings)
             {
-                if (!first) test.Append(joinString);
-                test.Append(nextString);
+                if (!first) charactersToAdd = joinString.Length;
+                else charactersToAdd = 0;
 
-                if (test.Length > characterLimit) break;
+                charactersToAdd += nextString.Length;
 
+                if (actual.Length + charactersToAdd > characterLimit) break;
+
+                // We have to set first to false here to make sure first stays true for the first string until now:
                 if (first) first = false;
                 else actual.Append(joinString);
+
                 actual.Append(nextString);
             }
 

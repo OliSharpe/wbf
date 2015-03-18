@@ -175,7 +175,7 @@ namespace WorkBoxFramework
             }
 
             String query = queryBuilder.ToString();
-            WBLogging.Queries.Monitorable("The query XML is: " + query);
+            WBLogging.Queries.HighLevel("The query XML is: " + query);
 
             return query;
         }
@@ -223,7 +223,7 @@ namespace WorkBoxFramework
                     }
                 }
 
-                WBLogging.Queries.Monitorable("The view XML is: " + viewBuilder.ToString());
+                WBLogging.Queries.HighLevel("The view XML is: " + viewBuilder.ToString());
 
                 query.ViewFields = viewBuilder.ToString();
                 query.ViewFieldsOnly = true;

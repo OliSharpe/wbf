@@ -803,11 +803,28 @@ namespace WorkBoxFramework
         }
 
 
+        public static bool WBxGetAsBool(this SPListItem item, WBColumn column)
+        {
+            return item.WBxGetColumnAsBool(column.DisplayName);
+        }
+
+        public static void WBxSetAsBool(this SPListItem item, WBColumn column, bool value)
+        {
+            item[column.DisplayName] = value;
+        }
+
         public static bool WBxGetColumnAsBool(this SPListItem item, String columnName)
         {
             return (item.WBxGetColumnAsString(columnName) == "True");
         }
 
+
+        public static int WBxGetAsInt(this SPListItem item, WBColumn column, int defaultValue)
+        {
+            return item.WBxGetColumnAsInt(column.DisplayName, defaultValue);
+        }
+
+        // This one is slightly out of sync with the naming convention used by others in this series of methods.
         public static int WBxGetColumnAsInt(this SPListItem item, WBColumn column, int defaultValue)
         {
             return item.WBxGetColumnAsInt(column.DisplayName, defaultValue);
@@ -2528,6 +2545,51 @@ namespace WorkBoxFramework
             return emails;
         }
 
+
+        public static String WBxFlatten(this Exception exception)
+        {
+            var stringBuilder = new StringBuilder();
+
+            while (exception != null)
+            {
+                stringBuilder.AppendLine(exception.Message);
+                stringBuilder.AppendLine(exception.StackTrace);
+
+                exception = exception.InnerException;
+                if (exception != null)
+                {
+                    stringBuilder.AppendLine("    ---- Inner Exception: ----");
+                }
+            }
+
+            return stringBuilder.ToString();
+        }
+
+        public static void WBxSetLookupValue(this SPListItem item, WBColumn column, System.Web.UI.WebControls.DropDownList ddlControl)
+        {
+            item[column.DisplayName] = new SPFieldLookupValue(Convert.ToInt32(ddlControl.SelectedItem.Value), ddlControl.SelectedItem.Text);
+        }
+
+        public static void WBxPopulateLookupDropDownList(this System.Web.UI.WebControls.DropDownList ddlControl, SPWeb web, WBColumn column, SPListItem item)
+        {
+            SPListItemCollection listItems = web.Lists[column.TermSetName].Items;
+
+            foreach (SPListItem membitem in listItems)
+            {
+                ddlControl.Items.Add(new System.Web.UI.WebControls.ListItem(membitem.WBxGetColumnAsString("Title"), membitem.ID.ToString()));
+            }
+
+            SPFieldLookupValue lookupValue = new SPFieldLookupValue(item.WBxGetAsString(column));
+            if (lookupValue != null)
+            {
+                WBLogging.Debug("Setting the selected value of " + column.DisplayName + " to be: " + lookupValue.LookupId.ToString());
+                ddlControl.SelectedValue = lookupValue.LookupId.ToString();
+            }
+            else
+            {
+                WBLogging.Debug("The lookup value for " + column.DisplayName + " was null!");
+            }
+        }
 
 
 

@@ -18,6 +18,8 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <AssemblyDeploymentTarget>GlobalAssemblyCache</AssemblyDeploymentTarget>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -30,10 +32,8 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <ActiveDeploymentConfiguration>Upgrade Solution %28CKSDev%29</ActiveDeploymentConfiguration>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,6 +45,7 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Debug\WorkBoxFramework.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -990,9 +991,6 @@
     </Content>
     <Content Include="CustomActions\LinkedCalendarSettingsCustomAction\Elements.xml" />
     <Content Include="Layouts\WorkBoxFramework\SubjectTags.js" />
-    <Content Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="Layouts\WorkBoxFramework\MailToLinkReplacement.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1201,7 +1199,9 @@
     <Content Include="WebParts\FindWorkBoxByLocalID\FindWorkBoxByLocalIDUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\WorkBoxFramework\ChangeWorkBoxOwner.aspx" />
+    <Content Include="Layouts\WorkBoxFramework\ChangeWorkBoxOwner.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\InviteIndividuals.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

@@ -170,12 +170,10 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
                         if (workBoxesRecentlyVisited.Value != null)
                         {
                             string[] recentWorkBoxes = workBoxesRecentlyVisited.Value.ToString().Split(';');
-                            int count = 0;
                             int totalLength = 0;
                             foreach (string recentWorkBox in recentWorkBoxes)
                             {
-                                count++;
-                                if (count > 15 || totalLength >= 3000) break;
+                                if (totalLength >= 3000) break;
                                 if (!recentWorkBox.Contains(currentGuidString))
                                 {
                                     newList.Add(recentWorkBox);
