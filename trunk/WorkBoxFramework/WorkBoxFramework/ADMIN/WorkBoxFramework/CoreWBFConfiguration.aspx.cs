@@ -28,7 +28,7 @@ using Microsoft.SharePoint.Administration;
 
 namespace WorkBoxFramework.Layouts.WorkBoxFramework
 {
-    public partial class FarmWideAdmin : LayoutsPageBase
+    public partial class CoreWBFConfiguration : LayoutsPageBase
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -80,6 +80,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                 DocumentContentTypeName.Text = farm.WorkBoxDocumentContentTypeName;
                 RecordContentTypeName.Text = farm.WorkBoxRecordContentTypeName;
+
+                SendErrorReportsTo.Text = farm.SendErrorReportEmailsTo;
             }
         }
 
@@ -133,6 +135,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             farm.WorkBoxDocumentContentTypeName = DocumentContentTypeName.Text;
             farm.WorkBoxRecordContentTypeName = RecordContentTypeName.Text;
+
+            farm.SendErrorReportEmailsTo = SendErrorReportsTo.Text;
 
             farm.Update();
 

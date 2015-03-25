@@ -18,9 +18,9 @@ This page should just redirect you to the appropriate work box collection settin
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-Application Page
+Go To Work Box Collection Settings Page
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
-My Application Page
+Go To Work Box Collection Settings Page
 </asp:Content>

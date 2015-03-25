@@ -59,9 +59,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 }
                 else
                 {
-                    List<String> favourites = new List<String>(myFavouriteWorkBoxesString.Split(';'));
+                    List<String> favourites = new List<String>();
 
-                    favourites.Add(WorkBox.Web.Title + "|" + WorkBox.Web.Url + "|" + WorkBox.UniqueID + "|" + WorkBox.Web.ID.ToString());
+                    if (!String.IsNullOrEmpty(myFavouriteWorkBoxesString.WBxTrim())) favourites.AddRange(myFavouriteWorkBoxesString.Split(';'));
+
+                    WBLink newFavourite = new WBLink(WorkBox, false);
+                    favourites.Add(newFavourite.ToString());
+                    //favourites.Add(WorkBox.Web.Title + "|" + WorkBox.Web.Url + "|" + WorkBox.UniqueID + "|" + WorkBox.Web.ID.ToString());
 
                     myFavouriteWorkBoxesString = WBUtils.JoinUpToLimit(";", favourites, 3100);
 

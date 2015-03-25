@@ -35,7 +35,7 @@
   Location="Microsoft.SharePoint.Administration.Applications"
   Sequence="40"
   Title="Core WBF Configuration" Description="">
-    <UrlAction Url="_admin/WorkBoxFramework/FarmWideAdmin.aspx" />
+    <UrlAction Url="_admin/WorkBoxFramework/CoreWBFConfiguration.aspx" />
   </CustomAction>
 
 </Elements>

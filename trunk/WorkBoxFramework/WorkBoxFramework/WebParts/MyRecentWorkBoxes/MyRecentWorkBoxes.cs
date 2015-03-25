@@ -83,18 +83,21 @@ namespace WorkBoxFramework.MyRecentWorkBoxes
                         bool hasExtraItems = false;
                         String cssClass = "";
 
-                        foreach (string recentWorkBox in recentWorkBoxes)
+                        foreach (string workBoxLinkDetails in recentWorkBoxes)
                         {
-                            string[] details = recentWorkBox.Split('|');
+                            WBLink workBoxLink = new WBLink(workBoxLinkDetails);
+                            if (!workBoxLink.IsOK) continue;
 
-                            String workBoxTitle = details[0];
-                            String workBoxUrl = details[1];
-                            String workBoxUniqueID = details[2];
+                            //string[] details = workBoxLinkDetails.Split('|');
+
+                            //String workBoxTitle = details[0];
+                            //String workBoxUrl = details[1];
+                            //String workBoxUniqueID = details[2];
 
                             // We're going to skip any work box whose title matches the unique prefix being filtered:
                             if (!String.IsNullOrEmpty(UniquePrefixToFilter))
                             {
-                                if (workBoxUniqueID.StartsWith(UniquePrefixToFilter)) continue;
+                                if (workBoxLink.UniqueID.StartsWith(UniquePrefixToFilter)) continue;
                             }
 
                             count++;
@@ -105,8 +108,8 @@ namespace WorkBoxFramework.MyRecentWorkBoxes
                             }
 
                             html += "<tr" + cssClass + "><td><img src='/_layouts/images/WorkBoxFramework/work-box-16.png'/></td><td><a href='";
-                            html += workBoxUrl;
-                            html += "'>" + workBoxTitle + "</a></td></tr>";
+                            html += workBoxLink.URL;
+                            html += "'>" + workBoxLink.Title + "</a></td></tr>";
 
                         }
 

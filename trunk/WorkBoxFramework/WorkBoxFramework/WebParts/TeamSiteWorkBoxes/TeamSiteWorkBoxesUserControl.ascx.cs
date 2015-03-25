@@ -220,7 +220,7 @@ namespace WorkBoxFramework.TeamSiteWorkBoxes
                     currentView = VIEW__RECENTLY_MODIFIED;
                     ViewState["WBF_SelectedWorkBoxView"] = currentView;
 
-                    SetSortColumn(WBColumn.WorkBoxDateCreated);
+                    SetSortColumn(WBColumn.WorkBoxDateLastModified);
                     GridViewSortDirection = SortDirection.Descending;
                 }
                 return currentView;

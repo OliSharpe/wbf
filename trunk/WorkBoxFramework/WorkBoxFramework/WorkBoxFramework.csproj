@@ -182,6 +182,14 @@
     <Compile Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx.designer.cs">
       <DependentUpon>GoToTeamManagement.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx.cs">
+      <DependentUpon>GoToWBCollectionSettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx.designer.cs">
+      <DependentUpon>GoToWBCollectionSettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WBLink.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
@@ -632,12 +640,12 @@
     <Compile Include="Layouts\WorkBoxFramework\DisplayUserProfileInfo.aspx.designer.cs">
       <DependentUpon>DisplayUserProfileInfo.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="ADMIN\WorkBoxFramework\FarmWideAdmin.aspx.cs">
-      <DependentUpon>FarmWideAdmin.aspx</DependentUpon>
+    <Compile Include="ADMIN\WorkBoxFramework\CoreWBFConfiguration.aspx.cs">
+      <DependentUpon>CoreWBFConfiguration.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="ADMIN\WorkBoxFramework\FarmWideAdmin.aspx.designer.cs">
-      <DependentUpon>FarmWideAdmin.aspx.cs</DependentUpon>
+    <Compile Include="ADMIN\WorkBoxFramework\CoreWBFConfiguration.aspx.designer.cs">
+      <DependentUpon>CoreWBFConfiguration.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\WorkBoxFramework\GenericOKPage.aspx.cs">
       <DependentUpon>GenericOKPage.aspx</DependentUpon>
@@ -990,6 +998,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="CustomActions\LinkedCalendarSettingsCustomAction\Elements.xml" />
+    <Content Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\SubjectTags.js" />
     <Content Include="Layouts\WorkBoxFramework\MailToLinkReplacement.aspx">
       <SubType>ASPXCodeBehind</SubType>
@@ -1258,7 +1269,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\DisplayUserProfileInfo.aspx" />
-    <Content Include="ADMIN\WorkBoxFramework\FarmWideAdmin.aspx">
+    <Content Include="ADMIN\WorkBoxFramework\CoreWBFConfiguration.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\GenericOKPage.aspx">
