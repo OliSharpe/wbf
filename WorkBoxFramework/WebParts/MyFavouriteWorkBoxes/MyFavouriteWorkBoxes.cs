@@ -52,6 +52,7 @@ namespace WorkBoxFramework.MyFavouriteWorkBoxes
             Literal literal = new Literal();
             string html = "";
 
+
             try
             {
                 html += "<style type=\"text/css\">\n tr.wbf-extra-favourites-items {display:none;}\n</style>\n\n" + getScriptCode();
@@ -80,8 +81,11 @@ namespace WorkBoxFramework.MyFavouriteWorkBoxes
                         bool hasExtraItems = false;
                         String cssClass = "";
 
-                        foreach (string recentWorkBox in myFavouriteWorkBoxes)
+                        foreach (string workBoxLinkDetails in myFavouriteWorkBoxes)
                         {
+                            WBLink workBoxLink = new WBLink(workBoxLinkDetails);
+                            if (!workBoxLink.IsOK) continue;
+
                             count++;
 
                             if (count > NumberToShow)
@@ -90,7 +94,8 @@ namespace WorkBoxFramework.MyFavouriteWorkBoxes
                                 hasExtraItems = true;
                             }
 
-                            string[] details = recentWorkBox.Split('|');
+                            /*
+                            string[] details = recentWorkBoxDetails.Split('|');
 
                             string guidString = details[2];
                             if (details.Length == 4)
@@ -104,6 +109,17 @@ namespace WorkBoxFramework.MyFavouriteWorkBoxes
 
                             html += "<td><a href='#' onclick='javascript: WorkBoxFramework_relativeCommandAction(\"" + command + "\", 0, 0);'>remove</a></td>";
                             html += "</tr>";
+                            */
+
+                            html += "<tr" + cssClass + "><td><img src='/_layouts/images/WorkBoxFramework/work-box-16.png'/></td><td><a href='";
+                            html += workBoxLink.URL;
+                            html += "'>" + workBoxLink.Title + "</a></td>";
+
+                            String command = "RemoveWorkBoxFromFavourites.aspx?workBoxTitle=" + HttpUtility.UrlEncode(workBoxLink.Title) + "&workBoxGuid=" + workBoxLink.SPWebGUID;
+
+                            html += "<td><a href='#' onclick='javascript: WorkBoxFramework_relativeCommandAction(\"" + command + "\", 0, 0);'>remove</a></td>";
+                            html += "</tr>";
+
 
                         }
 

@@ -40,38 +40,31 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 settingsPage = "WorkBoxCollectionSettingsPage.aspx";
             }
 
-            // If we're on the work box collection then we can just stick with a relative redirect link:
-            if (WBCollection.IsWebAWBCollection(SPContext.Current.Web))
+            // By default we will assume that we're either on the WBC or even that we are creating the WBC for the first time:
+            redirectionURL = SPContext.Current.Web.Url + "/_layouts/WorkBoxFramework/" + settingsPage;
+
+            // But if we are on a work box then we'll need to redirect to the wb collection's URL:
+            WorkBox workBox = WorkBox.GetIfWorkBox(SPContext.Current);
+            if (workBox != null)
             {
-                redirectionURL = SPContext.Current.Web.Url + "/_layouts/WorkBoxFramework/" + settingsPage;
+                redirectionURL = workBox.Collection.Url + "/_layouts/WorkBoxFramework/" + settingsPage;
+
+                // This will dispose of the WBCollection object too.
+                workBox.Dispose();
             }
             else
             {
-                // But if we are on a work box then we'll need to redirect to the wb collection's URL:
-                WorkBox workBox = WorkBox.GetIfWorkBox(SPContext.Current);
-                if (workBox != null)
+                // Maybe we're on one of the container sites so the parent site will be the WBCollection:
+                SPWeb parent = SPContext.Current.Web.ParentWeb;
+                if (parent != null)
                 {
-                    redirectionURL = workBox.Collection.Url + "/_layouts/WorkBoxFramework/" + settingsPage;
-
-                    // This will dispose of the WBCollection object too.
-                    workBox.Dispose();
-                }
-                else
-                {
-                    // Maybe we're on one of the container sites so the parent site will be the WBCollection:
-                    SPWeb parent = SPContext.Current.Web.ParentWeb;
-                    if (parent != null)
+                    if (WBCollection.IsWebAWBCollection(parent))
                     {
-                        if (WBCollection.IsWebAWBCollection(parent))
-                        {
-                            redirectionURL = parent.Url + "/_layouts/WorkBoxFramework/" + settingsPage;
-                        }
-
-                        parent.Dispose();
+                        redirectionURL = parent.Url + "/_layouts/WorkBoxFramework/" + settingsPage;
                     }
+
+                    parent.Dispose();
                 }
-
-
             }
 
             redirectionURL = redirectionURL + "?ReturnUrl=" + returnUrl;

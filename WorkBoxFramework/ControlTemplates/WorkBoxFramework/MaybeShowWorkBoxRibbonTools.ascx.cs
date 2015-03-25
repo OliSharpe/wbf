@@ -161,11 +161,12 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
                         UserProfileValueCollection workBoxesRecentlyVisited = profile[WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES];
 
 
-                        string mostRecentWorkBoxDetails = workBoxWeb.Title + "|" + workBoxWeb.Url + "|" + workBox.UniqueID + "|" + workBoxWeb.ID.ToString() + "|" + DateTime.Now.Ticks;
+                        //string mostRecentWorkBoxDetails = workBoxWeb.Title + "|" + workBoxWeb.Url + "|" + workBox.UniqueID + "|" + workBoxWeb.ID.ToString() + "|" + DateTime.Now.Ticks;
+                        WBLink mostRecentWorkBoxDetails = new WBLink(workBox, true);
                         WBUtils.logMessage("The most recent work box details are: " + mostRecentWorkBoxDetails);
 
                         List<String> newList = new List<String>();
-                        newList.Add(mostRecentWorkBoxDetails);
+                        newList.Add(mostRecentWorkBoxDetails.ToString());
 
                         if (workBoxesRecentlyVisited.Value != null)
                         {

@@ -87,6 +87,8 @@ namespace WorkBoxFramework
 
         private const string FARM_PROPERTY__ALL_WORK_BOX_COLLECTIONS = "wbf__farm__all_work_box_collections";
 
+        private const string FARM_PROPERTY__SEND_ERROR_REPORT_EMAILS_TO = "wbf__farm__send_error_report_emails_to";
+
         private const string FARM_PROPERTY__MIGRATION_TYPE = "wbf__farm__migration_type";
         private const string FARM_PROPERTY__MIGRATION_SOURCE_SYSTEM = "wbf__farm__migration_source_system";
         private const string FARM_PROPERTY__MIGRATION_CONTROL_LIST_URL = "wbf__farm__migration_control_list_url";
@@ -107,8 +109,8 @@ namespace WorkBoxFramework
         internal const string MIGRATION_TYPE__MIGRATE_DOCUMENTS_TO_LIBRARY = "Migrate Documents To Records Library";
         internal const string MIGRATION_TYPE__MIGRATE_DOCUMENTS_TO_WORK_BOXES = "Migrate Documents To Work Boxes";
 
-        public const string FARM_INSTANCE__PRODUCTION_FARM = "Production Farm";
         public const string FARM_INSTANCE__DEVELOPMENT_FARM = "Development Farm";
+        public const string FARM_INSTANCE__UAT_FARM = "User Acceptance Testing (UAT) Farm";
         public const string FARM_INSTANCE__PROTECTED_INTERNAL_FARM = "Protected Internal Farm";
         public const string FARM_INSTANCE__PUBLIC_EXTERNAL_FARM = "Public External Farm";
 
@@ -349,6 +351,13 @@ namespace WorkBoxFramework
         public List<WBCollection> PublicWorkBoxCollections
         {
             get { return null; } 
+        }
+
+        
+        public String SendErrorReportEmailsTo
+        {
+            get { return _farm.WBxGetProperty(FARM_PROPERTY__SEND_ERROR_REPORT_EMAILS_TO); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__SEND_ERROR_REPORT_EMAILS_TO, value); }
         }
 
         public String MigrationType
@@ -1162,6 +1171,7 @@ namespace WorkBoxFramework
             List<String> list = new List<String>();
             list.Add(FARM_INSTANCE__PROTECTED_INTERNAL_FARM);
             list.Add(FARM_INSTANCE__PUBLIC_EXTERNAL_FARM);
+            list.Add(FARM_INSTANCE__UAT_FARM);
             list.Add(FARM_INSTANCE__DEVELOPMENT_FARM);
 
             return list;

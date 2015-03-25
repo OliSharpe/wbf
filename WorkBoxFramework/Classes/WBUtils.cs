@@ -1105,11 +1105,11 @@ namespace WorkBoxFramework
             }
         }
 
-        public static void SendEmais(SPWeb spWeb, List<String> emails, String subject, String body, bool isBodyHtml)
+        public static void SendEmails(SPWeb spWeb, List<String> emails, String subject, String body, bool isBodyHtml)
         {
             foreach (String email in emails)
             {
-                SendEmail(spWeb, email, subject, body, isBodyHtml);
+                SendEmail(spWeb, email.WBxTrim(), subject, body, isBodyHtml);
             }
         }
 
@@ -1158,10 +1158,34 @@ namespace WorkBoxFramework
 
         public static void SendErrorReport(SPWeb spWeb, String subject, String body)
         {
-            WBLogging.Generic.Unexpected("SENDING ERROR REPORT: " + subject);
+            WBLogging.Generic.Unexpected("Sending error report: " + subject);
 
-            // This obviously a very very early implementation of this method!!
-            WBUtils.SendEmail(spWeb, "oli.sharpe@islington.gov.uk", subject, body, false);
+            try
+            {
+                String emailAddressToUse = WBFarm.Local.SendErrorReportEmailsTo;
+
+                if (String.IsNullOrEmpty(emailAddressToUse))
+                {
+                    WBLogging.Generic.Unexpected("No configured email address to send error reports from this farm: " + subject + "\n\n" + body);
+                    return;
+                }
+
+                if (emailAddressToUse.Contains(";"))
+                {
+                    List<String> emailAddresses = new List<String>(emailAddressToUse.Split(';'));
+
+                    WBUtils.SendEmails(spWeb, emailAddresses, subject, body, false);
+                }
+                else
+                {
+                    WBUtils.SendEmail(spWeb, emailAddressToUse, subject, body, false);
+                }
+
+            }
+            catch (Exception e)
+            {
+                WBLogging.Generic.Unexpected("Something went wrong when trying to send an error report", e);
+            }
         }
 
         internal static List<SPUser> RemoveUser(List<SPUser> users, SPUser userToRemove)

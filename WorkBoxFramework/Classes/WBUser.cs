@@ -589,27 +589,33 @@ namespace WorkBoxFramework
 
                     List<String> updatedRecentWorkBoxes = new List<String>();
 
-                    foreach (string recentWorkBox in recentWorkBoxes)
+                    foreach (string recentWorkBoxLinkDetails in recentWorkBoxes)
                     {
-                        string[] details = recentWorkBox.Split('|');
+                        WBLink workBoxLink = new WBLink(recentWorkBoxLinkDetails);
+                        if (!workBoxLink.IsOK) continue;
+
+                        /*
+                        string[] details = recentWorkBoxLinkDetails.Split('|');
                         string workBoxTitle = details[0];
                         string workBoxUrl = details[1];
                         string workBoxUniqueID = details[2];
                         string workBoxGUID = details[3];
+                        */
 
                         try
                         {
                             long ticksWhenVisited = 0;
-                            if (details.Length >= 5)
+                            //if (details.Length >= 5)
+                            if (workBoxLink.UsingTicksWhenVisited)
                             {
-                                string ticksWhenVisitedString = details[4];
-                                ticksWhenVisited = Convert.ToInt64(details[4]);
+                                string ticksWhenVisitedString = workBoxLink.TicksWhenVisitedString;
+                                ticksWhenVisited = Convert.ToInt64(workBoxLink.TicksWhenVisitedString);
 
                                 // Would we have already done this recently visited work box during the last update:
                                 if (ticksWhenVisited > ticksAtLastUpdate)
                                 {
                                     // OK so we're going to update the details for this work box:
-                                    using (WorkBox workBox = new WorkBox(workBoxUrl))
+                                    using (WorkBox workBox = new WorkBox(workBoxLink.URL))
                                     {
                                         workBox.RecentlyVisited(cacheList, ticksWhenVisited);
                                     }
@@ -617,7 +623,7 @@ namespace WorkBoxFramework
                             }
 
                             WBQuery query = new WBQuery();
-                            query.AddEqualsFilter(WBColumn.WorkBoxGUID, workBoxGUID);
+                            query.AddEqualsFilter(WBColumn.WorkBoxGUID, workBoxLink.SPWebGUID);
                             query.AddViewColumn(WBColumn.Title);
 
                             SPListItemCollection items = cacheList.WBxGetItems(cacheSite, query);
@@ -625,10 +631,10 @@ namespace WorkBoxFramework
                             if (items.Count > 0)
                             {
                                 String cachedWBTitle = items[0].WBxGetAsString(WBColumn.Title);
-                                if (cachedWBTitle != workBoxTitle)
+                                if (cachedWBTitle != workBoxLink.Title)
                                 {
-                                    WBLogging.TimerTasks.Verbose("Updating work box title in recently visited list: " + workBoxTitle + " -> " + cachedWBTitle);
-                                    details[0] = cachedWBTitle;
+                                    WBLogging.TimerTasks.Verbose("Updating work box title in recently visited list: " + workBoxLink.Title + " -> " + cachedWBTitle);
+                                    workBoxLink.Title = cachedWBTitle;
                                     hasChangesToSave = true;
                                 }
                             }
@@ -638,9 +644,7 @@ namespace WorkBoxFramework
                             WBLogging.Teams.Monitorable("Something went wrong when searching for a favourite work box" + exception.Message);
                         }
 
-
-
-                        updatedRecentWorkBoxes.Add(String.Join("|", details));
+                        updatedRecentWorkBoxes.Add(workBoxLink.ToString());
                     }
 
 
@@ -671,18 +675,23 @@ namespace WorkBoxFramework
 
                     List<String> updatedFavouriteWorkBoxes = new List<String>();
 
-                    foreach (string favouriteWorkBox in favouriteWorkBoxes)
+                    foreach (string favouriteWorkBoxLinkDetails in favouriteWorkBoxes)
                     {
-                        string[] details = favouriteWorkBox.Split('|');
+                        WBLink workBoxLink = new WBLink(favouriteWorkBoxLinkDetails);
+                        if (!workBoxLink.IsOK) continue;
+
+                        /*
+                        string[] details = favouriteWorkBoxLinkDetails.Split('|');
                         string workBoxTitle = details[0];
                         string workBoxUrl = details[1];
                         string workBoxUniqueID = details[2];
                         string workBoxGUID = details[3];
+                        */
 
                         try
                         {
                             WBQuery query = new WBQuery();
-                            query.AddEqualsFilter(WBColumn.WorkBoxGUID, workBoxGUID);
+                            query.AddEqualsFilter(WBColumn.WorkBoxGUID, workBoxLink.SPWebGUID);
                             query.AddViewColumn(WBColumn.Title);
 
                             SPListItemCollection items = cacheList.WBxGetItems(cacheSite, query);
@@ -690,10 +699,10 @@ namespace WorkBoxFramework
                             if (items.Count > 0)
                             {
                                 String cachedWBTitle = items[0].WBxGetAsString(WBColumn.Title);
-                                if (cachedWBTitle != workBoxTitle)
+                                if (cachedWBTitle != workBoxLink.Title)
                                 {
-                                    WBLogging.TimerTasks.Verbose("Updating work box title in favourite list: " + workBoxTitle + " -> " + cachedWBTitle);
-                                    details[0] = cachedWBTitle;
+                                    WBLogging.TimerTasks.Verbose("Updating work box title in favourite list: " + workBoxLink.Title + " -> " + cachedWBTitle);
+                                    workBoxLink.Title = cachedWBTitle;
                                     hasChangesToSave = true;
                                 }
                             }
@@ -704,7 +713,7 @@ namespace WorkBoxFramework
                         }
 
 
-                        updatedFavouriteWorkBoxes.Add(String.Join("|", details));
+                        updatedFavouriteWorkBoxes.Add(workBoxLink.ToString());
                     }
 
 

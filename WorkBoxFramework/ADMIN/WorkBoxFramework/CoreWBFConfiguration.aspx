@@ -10,7 +10,7 @@
 <%@ Register TagPrefix="wssuc" TagName="ButtonSection" src="/_controltemplates/ButtonSection.ascx" %> 
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="FarmWideAdmin.aspx.cs" Inherits="WorkBoxFramework.Layouts.WorkBoxFramework.FarmWideAdmin" DynamicMasterPageFile="~masterurl/default.master" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CoreWBFConfiguration.aspx.cs" Inherits="WorkBoxFramework.Layouts.WorkBoxFramework.CoreWBFConfiguration" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
@@ -341,6 +341,33 @@
 
 
 
+<!-- Error Reports Emails -->
+<wssuc:InputFormSection
+	id="ErrorReportsSection"
+	title="Emailed Error Reports"
+	description="Where should any emailed error reports be sent to?"
+	runat="server"
+	>
+	<Template_InputFormControls>
+		<wssuc:InputFormControl runat="server">
+			<Template_Control>
+				<table border="0" width="100%" cellspacing="0" cellpadding="2">
+					<tr>
+                        <td>
+                            <b><nobr>Email Address To Send To</nobr></b><br />
+                        </td>
+						<td class="ms-authoringcontrols" valign="top" align="left">
+                            <asp:TextBox ID="SendErrorReportsTo" runat="server" columns="50"/>
+                        </td>
+                    </tr>
+				</table>
+			</Template_Control>
+		</wssuc:InputFormControl>
+	</Template_InputFormControls>
+</wssuc:InputFormSection>
+
+
+
 <!-- Buttons Section -->
 <wssuc:ButtonSection runat="server" ShowStandardCancelButton="false">
 	<Template_Buttons>
@@ -358,9 +385,9 @@
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-Farm Wide Admin
+Core WBF Configuration
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
-Farm Wide Admin
+Core WBF Configuration
 </asp:Content>

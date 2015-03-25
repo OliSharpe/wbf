@@ -10,7 +10,7 @@
 namespace WorkBoxFramework.Layouts.WorkBoxFramework {
     
     
-    public partial class FarmWideAdmin {
+    public partial class CoreWBFConfiguration {
         
         /// <summary>
         /// WBFCssRegistration control.
@@ -272,6 +272,24 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator RecordContentTypeNameValidator;
+        
+        /// <summary>
+        /// ErrorReportsSection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl ErrorReportsSection;
+        
+        /// <summary>
+        /// SendErrorReportsTo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox SendErrorReportsTo;
         
         /// <summary>
         /// okButton control.
