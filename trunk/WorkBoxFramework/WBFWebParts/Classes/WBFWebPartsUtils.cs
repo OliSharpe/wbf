@@ -31,89 +31,120 @@ namespace WBFWebParts
 {
     internal class WBFWebPartsUtils
     {
+        internal const String WBF_WEB_PARTS__RECORDS_LIBRARY__PUBLIC = "Public Library";
+        internal const String WBF_WEB_PARTS__RECORDS_LIBRARY__PROTECTED = "Protected Library";
 
-        internal static bool InDMZ(SPContext context)
+        internal const String SP_SITE_PROPERTY__RECORDS_LIBRARY_TO_USE = "wbf__sp_site__wbf_web_parts__records_library_to_use";
+        internal const String SP_SITE_PROPERTY__USE_EXTRANET_LIBRARY = "wbf__sp_site__wbf_web_parts__use_extranet_library";
+        internal const String SP_SITE_PROPERTY__SHOW_FILE_ICONS = "wbf__sp_site__wbf_web_parts__show_file_icons";
+        internal const String SP_SITE_PROPERTY__SHOW_KB_FILE_SIZE = "wbf__sp_site__wbf_web_parts__show_kb_file_size";
+        internal const String SP_SITE_PROPERTY__SHOW_DESCRIPTION = "wbf__sp_site__wbf_web_parts__show_description";
+
+        internal static List<String> GetRecordsLibraryOptions()
         {
-            return false;
+            List<String> options = new List<String>();
+
+            options.Add(WBF_WEB_PARTS__RECORDS_LIBRARY__PUBLIC);
+
+            WBFarm farm = WBFarm.Local;
+            if (!String.IsNullOrEmpty(farm.FarmInstance) && !farm.FarmInstance.Equals(WBFarm.FARM_INSTANCE__PUBLIC_EXTERNAL_FARM))
+            {
+                // So we're only adding the option to link to the protected library if we are not on the external public farm
+                options.Add(WBF_WEB_PARTS__RECORDS_LIBRARY__PROTECTED);
+            }
+
+            return options;
         }
 
+        internal static String GetRecordsLibraryToUse(SPSite site) {
+            WBFarm farm = WBFarm.Local;
 
-        internal static bool OnIzziOrPublicWeb(SPContext context)
-        {
-            string[] izziOrPublicWeb = { "sp.izzi", "collection.izzi", "izzi", "collection", "teststagingweb", "stagingweb", "liveweb", "www.islington.gov.uk", "uatizzi", "uatcollection" };
-
-            if (izziOrPublicWeb.Contains(context.Site.HostName))
+            if (String.IsNullOrEmpty(farm.FarmInstance) || farm.FarmInstance.Equals(WBFarm.FARM_INSTANCE__PUBLIC_EXTERNAL_FARM))
             {
-                return true;
+                return WBF_WEB_PARTS__RECORDS_LIBRARY__PUBLIC;
             }
             else
             {
-                return false;
-            }
-
-        }
-
-        internal static String GetPublicLibraryURL(SPContext context)
-        {
-            WBFarm farm = WBFarm.Local;
-
-            string[] internalSites = { "sp.izzi", "collection.izzi", "izzi", "collection", "uatizzi", "uatcollection" };
-            string[] publicSites = { "teststagingweb", "stagingweb", "liveweb", "www.islington.gov.uk", "livewebtst", "tstisl.islington.gov.uk", "uatstagingweb" };
-
-            if (OnPublicSite(context))
-            {
-                WBLogging.Debug("On a public site");
-
-                if (publicSites.Contains(context.Site.HostName))
+                if (site.RootWeb.WBxGetProperty(SP_SITE_PROPERTY__RECORDS_LIBRARY_TO_USE) == WBF_WEB_PARTS__RECORDS_LIBRARY__PROTECTED)
                 {
-                    return "http://" + context.Site.HostName + "/publicrecords/library/";
+                    return WBF_WEB_PARTS__RECORDS_LIBRARY__PROTECTED;
                 }
                 else
                 {
-                    if (InDMZ(context))
-                    {
-                        return "http://www.islington.gov.uk/publicrecords/library/";
-                    }
-                    else
-                    {
-                        return farm.PublicRecordsLibraryUrl;
-                    }
+                    return WBF_WEB_PARTS__RECORDS_LIBRARY__PUBLIC;
                 }
-            }
-            else
-            {
-                WBLogging.Debug("Not on a public site");
-                return farm.ProtectedRecordsLibraryUrl;
             }
         }
 
-
-        internal static String GetPublicExtranetLibraryURL(SPContext context)
+        internal static void SetRecordsLibraryToUse(SPSite site, String recordsLibraryToUse)
         {
             WBFarm farm = WBFarm.Local;
 
-            if (InDMZ(context))
+            if (String.IsNullOrEmpty(farm.FarmInstance) || farm.FarmInstance.Equals(WBFarm.FARM_INSTANCE__PUBLIC_EXTERNAL_FARM))
             {
-                WBLogging.Debug("In DMZ");
+                recordsLibraryToUse = WBF_WEB_PARTS__RECORDS_LIBRARY__PUBLIC;
+            }
 
-                return "http://extranets.islington.gov.uk/records/library";
+            site.RootWeb.WBxSetProperty(SP_SITE_PROPERTY__RECORDS_LIBRARY_TO_USE, recordsLibraryToUse);
+        }
+
+        internal static String GetRecordsLibraryURL(SPSite site)
+        {
+            WBFarm farm = WBFarm.Local;
+
+            if (GetRecordsLibraryToUse(site) == WBF_WEB_PARTS__RECORDS_LIBRARY__PROTECTED)
+            {
+                return farm.ProtectedRecordsLibraryUrl;
             }
             else
             {
-                return "http://stagingextranets/records/library";
+                return farm.PublicRecordsLibraryUrl;
             }
         }
 
+        
 
-        internal static bool OnPublicSite(SPContext context)
+
+        internal static bool UseExtranetLibrary(SPSite site)
         {
-//            string [] publicSites = { "teststagingweb", "stagingweb", "liveweb", "www.islington.gov.uk" };
-
-            string[] internalSites = { "sp.izzi", "collection.izzi" , "izzi", "collection", "uatizzi", "uatcollection" };
-
-            return (!internalSites.Contains(context.Site.HostName));
+            return site.RootWeb.WBxGetBoolPropertyOrDefault(SP_SITE_PROPERTY__USE_EXTRANET_LIBRARY, false);            
         }
 
+        internal static void SetUseExtranetLibrary(SPSite site, bool value)
+        {
+            site.RootWeb.WBxSetBoolProperty(SP_SITE_PROPERTY__USE_EXTRANET_LIBRARY, value);         
+        }
+
+
+        internal static bool ShowKBFileSize(SPSite site)
+        {
+            return site.RootWeb.WBxGetBoolPropertyOrDefault(SP_SITE_PROPERTY__SHOW_KB_FILE_SIZE, false);            
+        }
+
+        internal static void SetShowKBFileSize(SPSite site, bool value)
+        {
+            site.RootWeb.WBxSetBoolProperty(SP_SITE_PROPERTY__SHOW_KB_FILE_SIZE, value);         
+        }
+
+        internal static bool ShowFileIcons(SPSite site)
+        {
+            return site.RootWeb.WBxGetBoolPropertyOrDefault(SP_SITE_PROPERTY__SHOW_FILE_ICONS, false);
+        }
+
+        internal static void SetShowFileIcons(SPSite site, bool value)
+        {
+            site.RootWeb.WBxSetBoolProperty(SP_SITE_PROPERTY__SHOW_FILE_ICONS, value);
+        }
+
+        internal static bool ShowDescription(SPSite site)
+        {
+            return site.RootWeb.WBxGetBoolPropertyOrDefault(SP_SITE_PROPERTY__SHOW_DESCRIPTION, false);
+        }
+
+        internal static void SetShowDescription(SPSite site, bool value)
+        {
+            site.RootWeb.WBxSetBoolProperty(SP_SITE_PROPERTY__SHOW_DESCRIPTION, value);
+        }
 
 
         internal static SPListItem GetRecord(SPSite site, SPWeb web, SPList library, String zone, String recordID)

@@ -90,7 +90,7 @@ namespace WBFWebParts.PublicRecordsLibraryViewer
         private void RefreshBrowsableTreeView()
         {
 
-            String recordsLibraryURL = WBFWebPartsUtils.GetPublicLibraryURL(SPContext.Current);
+            String recordsLibraryURL = WBFWebPartsUtils.GetRecordsLibraryURL(SPContext.Current.Site);
 
             using (SPSite site = new SPSite(recordsLibraryURL))
             {
@@ -401,7 +401,7 @@ namespace WBFWebParts.PublicRecordsLibraryViewer
 
                 }
 
-                String recordsLibraryURL = WBFWebPartsUtils.GetPublicLibraryURL(SPContext.Current);
+                String recordsLibraryURL = WBFWebPartsUtils.GetRecordsLibraryURL(SPContext.Current.Site);
 
                 using (SPSite site = new SPSite(recordsLibraryURL))
                 {

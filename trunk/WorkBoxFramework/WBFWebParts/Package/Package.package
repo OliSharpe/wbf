@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="b32a8c64-fa93-454a-a541-2ac4abe02186" solutionId="b32a8c64-fa93-454a-a541-2ac4abe02186" resetWebServer="false" name="WBFWebParts v0.9.5i.u1" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="b32a8c64-fa93-454a-a541-2ac4abe02186" solutionId="b32a8c64-fa93-454a-a541-2ac4abe02186" resetWebServer="false" name="WBFWebParts v0.9.6u" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+  <assemblies>
+    <projectOutputAssembly location="WorkBoxFramework.dll" deploymentTarget="GlobalAssemblyCache" projectPath="..\WorkBoxFramework\WorkBoxFramework.csproj" />
+  </assemblies>
   <features>
     <featureReference itemId="17e13b5d-3985-408c-857c-e8bdd63eb727" />
     <featureReference itemId="29136b9c-a30c-498d-bc1f-1b0def8b1b68" />
@@ -8,5 +11,6 @@
   <projectItems>
     <projectItemReference itemId="9752ad71-1af0-4f62-9dfd-5c615c4b5776" />
     <projectItemReference itemId="51d75317-6203-4bd4-9b34-ded752d680bb" />
+    <projectItemReference itemId="26b0455b-a541-4030-824c-b296337f028a" />
   </projectItems>
 </package>
