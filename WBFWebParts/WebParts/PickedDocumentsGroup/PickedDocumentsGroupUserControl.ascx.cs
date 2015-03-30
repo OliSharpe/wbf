@@ -138,7 +138,7 @@ namespace WBFWebParts.PickedDocumentsGroup
                 return;
             }
 
-            String extranetRecordsLibraryURL = WBFWebPartsUtils.GetPublicExtranetLibraryURL(SPContext.Current);
+            String extranetRecordsLibraryURL = WBFarm.Local.PublicExtranetRecordsLibraryUrl;
 
             SPSite extranetRecordsSite = null;
             SPWeb extranetRecordsWeb = null;
@@ -148,7 +148,7 @@ namespace WBFWebParts.PickedDocumentsGroup
             {
                 string[] documentsDetailsArray = webPart.PickedDocumentsDetails.Split(';');
 
-                String publicRecordsLibraryURL = WBFWebPartsUtils.GetPublicLibraryURL(SPContext.Current);
+                String publicRecordsLibraryURL = WBFWebPartsUtils.GetRecordsLibraryURL(SPContext.Current.Site);
 
                 using (SPSite publicRecordsSite = new SPSite(publicRecordsLibraryURL))
                 using (SPWeb publicRecordsWeb = publicRecordsSite.OpenWeb())

@@ -43,7 +43,7 @@ namespace WBFWebParts.Layouts.WBFWebParts
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                String recordsLibraryURL = WBFWebPartsUtils.GetPublicLibraryURL(SPContext.Current);
+                String recordsLibraryURL = WBFWebPartsUtils.GetRecordsLibraryURL(SPContext.Current.Site);
 
                 using (_recordsSite = new SPSite(recordsLibraryURL))
                 using (_recordsWeb = _recordsSite.OpenWeb())

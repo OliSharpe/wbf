@@ -80,7 +80,7 @@ namespace WBFWebParts.PickRelatedDocuments
                         return;
                     }
 
-                    if (!WBFWebPartsUtils.OnIzziOrPublicWeb(SPContext.Current))
+                    if (WBFWebPartsUtils.ShowDescription(SPContext.Current.Site))
                     {
                         webPart.Title = WBUtils.PutBackDelimiterCharacters(newDetails[0]);
                         webPart.RelatedDocumentsDescription = WBUtils.PutBackDelimiterCharacters(newDetails[1]);
@@ -105,7 +105,7 @@ namespace WBFWebParts.PickRelatedDocuments
             }
 
             Description.Text = WBUtils.MaybeAddParagraphTags(webPart.RelatedDocumentsDescription);
-            if (!String.IsNullOrEmpty(Description.Text) && !WBFWebPartsUtils.OnIzziOrPublicWeb(SPContext.Current))
+            if (!String.IsNullOrEmpty(Description.Text) && WBFWebPartsUtils.ShowDescription(SPContext.Current.Site))
             {
                 showDescription = true;
             }
@@ -140,7 +140,7 @@ namespace WBFWebParts.PickRelatedDocuments
             {
                 string[] documentsDetailsArray = pickedDocumentsDetails.Split(';');
 
-                String recordsLibraryURL = WBFWebPartsUtils.GetPublicLibraryURL(SPContext.Current);
+                String recordsLibraryURL = WBFWebPartsUtils.GetRecordsLibraryURL(SPContext.Current.Site);
 
                 using (SPSite site = new SPSite(recordsLibraryURL))
                 using (SPWeb web = site.OpenWeb())
@@ -186,13 +186,13 @@ namespace WBFWebParts.PickRelatedDocuments
 
                             string additionalText = "";
 
-                            if (WBFWebPartsUtils.OnPublicSite(SPContext.Current))
+                            if (WBFWebPartsUtils.ShowKBFileSize(SPContext.Current.Site))
                             {
                                 long fileLength = (item.File.Length / 1024);
                                 additionalText = ", " + fileLength + "KB";
                             }
 
-                            if (!WBFWebPartsUtils.OnIzziOrPublicWeb(SPContext.Current))
+                            if (WBFWebPartsUtils.ShowFileIcons(SPContext.Current.Site))
                             {
                                 title = String.Format("<img src=\"{0}\" alt=\"{1}\" class=\"wbf-picked-doc-image\"/> {1}",
                                     WBUtils.DocumentIcon16(item.Name),

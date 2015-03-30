@@ -382,11 +382,11 @@ namespace WBFWebParts.Layouts.WBFWebParts
 
                 WBTeam team = WBTeam.GetFromTeamSite(teamsTaxonomy, SPContext.Current.Web);
 
-                String recordsLibraryURL = WBFWebPartsUtils.GetPublicLibraryURL(SPContext.Current);
+                String recordsLibraryURL = WBFWebPartsUtils.GetRecordsLibraryURL(SPContext.Current.Site);
 
                 if (Request.QueryString["Library"] == "Extranet")
                 {
-                    recordsLibraryURL = WBFWebPartsUtils.GetPublicExtranetLibraryURL(SPContext.Current);
+                    recordsLibraryURL = WBFarm.Local.PublicExtranetRecordsLibraryUrl;
                 }
 
                 using (SPSite site = new SPSite(recordsLibraryURL))

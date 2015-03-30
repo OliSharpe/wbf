@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+
+  <CustomAction Id="WBFWebPartsConfigLink"
+            GroupId="WorkBoxFramework.SiteSettingsGroup"
+            Location="Microsoft.SharePoint.SiteSettings"
+            Sequence="5100"
+            Title="WBF Web Parts Configuration"
+            RequireSiteAdministrator="TRUE">
+    <UrlAction Url="_layouts/WBFWebParts/WBFWebPartsConfig.aspx"/>
+  </CustomAction>
+
+</Elements>

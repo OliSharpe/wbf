@@ -146,7 +146,7 @@ namespace WBFWebParts.Layouts.WBFWebParts
 
             table.Rows.Add(headers);
 
-            String recordsLibraryURL = WBFWebPartsUtils.GetPublicLibraryURL(SPContext.Current);
+            String recordsLibraryURL = WBFWebPartsUtils.GetRecordsLibraryURL(SPContext.Current.Site);
             using (SPSite site = new SPSite(recordsLibraryURL))
             using (SPWeb web = site.OpenWeb())
             {
@@ -210,7 +210,7 @@ namespace WBFWebParts.Layouts.WBFWebParts
             {
                 if (extranetRecordsLibrary == null)
                 {
-                    string extranetRecordsLibraryURL = WBFWebPartsUtils.GetPublicExtranetLibraryURL(SPContext.Current);
+                    string extranetRecordsLibraryURL = WBFarm.Local.PublicExtranetRecordsLibraryUrl;
                     extranetRecordsSite = new SPSite(extranetRecordsLibraryURL);
                     extranetRecordsWeb = extranetRecordsSite.OpenWeb();
                     extranetRecordsLibrary = extranetRecordsWeb.GetList(extranetRecordsLibraryURL);

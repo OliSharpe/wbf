@@ -41,7 +41,7 @@ namespace WBFWebParts.Layouts.WBFWebParts
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            showNewUI = !WBFWebPartsUtils.OnIzziOrPublicWeb(SPContext.Current);
+            showNewUI = WBFWebPartsUtils.ShowDescription(SPContext.Current.Site);
 
             if (!IsPostBack)
             {
@@ -153,7 +153,7 @@ namespace WBFWebParts.Layouts.WBFWebParts
 
             table.Rows.Add(headers);
 
-            String recordsLibraryURL = WBFWebPartsUtils.GetPublicLibraryURL(SPContext.Current);
+            String recordsLibraryURL = WBFWebPartsUtils.GetRecordsLibraryURL(SPContext.Current.Site);
             using (SPSite site = new SPSite(recordsLibraryURL))
             using (SPWeb web = site.OpenWeb())
             {

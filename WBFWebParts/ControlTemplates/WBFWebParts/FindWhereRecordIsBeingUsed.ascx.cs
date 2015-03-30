@@ -42,7 +42,7 @@ namespace WBFWebParts.ControlTemplates.WBFWebParts
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                String publicRecordsLibraryURL = WBFWebPartsUtils.GetPublicLibraryURL(SPContext.Current);
+                String publicRecordsLibraryURL = WBFWebPartsUtils.GetRecordsLibraryURL(SPContext.Current.Site);
                // String publicExtranetRecordsLibraryURL = WBFWebPartsUtils.GetPublicExtranetLibraryURL(SPContext.Current);
               //  String protectedRecordsLibraryURL = WBFarm.Local.ProtectedRecordsLibraryUrl;
 
@@ -93,18 +93,29 @@ namespace WBFWebParts.ControlTemplates.WBFWebParts
                 // This is a horrible hack - but this feature is only experimental at the moment until further
                 // feedback has confirmed that the feature is going in right direction
 //                string[] publishingSites = { "http://uatstagingweb/", "http://uatizzi/", "http://uatevidencehub/" };
-                string[] publishingSites = { "http://stagingweb/", "http://sp.izzi/", "http://evidencehub.stagingweb/" };
+                string[] publishingSites = { "http://izzi/", "http://stagingweb/", "http://evidencehub.stagingweb/" };
 
-                foreach (string publishingSiteURL in publishingSites)
+                bool originalCatchValue = SPSecurity.CatchAccessDeniedException;
+                SPSecurity.CatchAccessDeniedException = false;
+
+                try
                 {
-                    using (SPSite site = new SPSite(publishingSiteURL))
-                    using (SPWeb rootWeb = site.RootWeb)
+                    foreach (string publishingSiteURL in publishingSites)
                     {
 
-                        AddResultsForSPWeb(site, rootWeb);
+                        using (SPSite site = new SPSite(publishingSiteURL))
+                        using (SPWeb rootWeb = site.RootWeb)
+                        {
 
-                        Response.Flush();
+                            AddResultsForSPWeb(site, rootWeb);
+
+                            Response.Flush();
+                        }
                     }
+                }
+                finally
+                {
+                    SPSecurity.CatchAccessDeniedException = originalCatchValue;
                 }
 
                 Response.Write("<script type=\"text/javascript\">finishedSearch();</script>\n");
@@ -116,19 +127,30 @@ namespace WBFWebParts.ControlTemplates.WBFWebParts
 
         private void AddResultsForSPWeb(SPSite site, SPWeb web)
         {
+            WBLogging.RecordsTypes.Verbose("In AddResultsForSPWeb(): looking at SPWeb: " + web.Url);
+
+            
             try
             {
                 PublishingWeb pubWeb = PublishingWeb.GetPublishingWeb(web);
 
                 foreach (PublishingPage page in pubWeb.GetPublishingPages())
                 {
-                    AddResultsForPublishingPage(page);
+                    WBLogging.RecordsTypes.Verbose("In AddResultsForSPWeb(): page = " + page.WBxToString());
+
+                    if (page != null)
+                    {
+                        AddResultsForPublishingPage(page);
+
+                        WBLogging.RecordsTypes.Verbose("InAddResultsForSPWeb() just finished for AddResultsForPublishingPage(): page = " + page.Name);
+
+                    }
                 }
 
             }
             catch (Exception e)
             {
-                WBLogging.Generic.HighLevel("In FindWhereRecordIsBeingUsed.AddResultsForSPWeb(): This SPWeb is probably not a publishing site: " + web.Url);
+                WBLogging.RecordsTypes.Verbose("In FindWhereRecordIsBeingUsed.AddResultsForSPWeb(): This SPWeb is probably not a publishing site: " + web.Url);
 
                 StringBuilder command = new StringBuilder();
                 command.Append("<script type=\"text/javascript\">errorProcessingPage(\"").Append(web.Url).Append("\", \"An exception occured at an SPWeb level: ").Append(e.Message).Append("\");</script>\n");
@@ -142,12 +164,28 @@ namespace WBFWebParts.ControlTemplates.WBFWebParts
                 Response.Flush();
             }
 
+            WBLogging.RecordsTypes.Verbose("InAddResultsForSPWeb() about to look at sub webs for SPWeb: " + web.Url);
+
             foreach (SPWeb subWeb in web.Webs)
             {
-                AddResultsForSPWeb(site, subWeb);
-                subWeb.Dispose();
+                if (subWeb != null)
+                {
+                    WBLogging.RecordsTypes.Verbose("InAddResultsForSPWeb() for a sub SPWeb: " + subWeb.Url);
+
+                    AddResultsForSPWeb(site, subWeb);
+
+                    WBLogging.RecordsTypes.Verbose("InAddResultsForSPWeb() returned from AddResultsForSPWeb for:" + subWeb.Url);
+
+                    subWeb.Dispose();
+                }
+                else
+                {
+                    WBLogging.RecordsTypes.Verbose("InAddResultsForSPWeb() subweb was null:");
+
+                }
             }
         
+
         }
 
         private void AddResultsForPublishingPage(PublishingPage page)
@@ -159,8 +197,14 @@ namespace WBFWebParts.ControlTemplates.WBFWebParts
             StringBuilder command = new StringBuilder();
             String pageURL = page.PublishingWeb.Web.Url + "/" + page.Url;
 
+            WBLogging.RecordsTypes.Verbose("In AddResultsForPublishingPage(): pageURL= " + pageURL);
+
+            
             // If this 'page' is actually not an aspx page at all but something else (e.g. an image file) then just ignore it:
             if (!pageURL.ToLower().EndsWith(".aspx")) return;
+
+            WBLogging.RecordsTypes.Verbose("In AddResultsForPublishingPage(): pageURL= " + pageURL + " About to try");
+
 
             try
             {
@@ -168,6 +212,9 @@ namespace WBFWebParts.ControlTemplates.WBFWebParts
 
                 if (webPartManager != null)
                 {
+
+                    WBLogging.RecordsTypes.Verbose("In AddResultsForPublishingPage(): pageURL= " + pageURL + " got a non-null webPartManager");
+
                     foreach (System.Web.UI.WebControls.WebParts.WebPart existingWebPart in webPartManager.WebParts)
                     {
                         string pickedDocumentsDetails = null;
@@ -188,7 +235,10 @@ namespace WBFWebParts.ControlTemplates.WBFWebParts
 
                         // If there are no listed documents then we can just skip this web part.
                         if (String.IsNullOrEmpty(pickedDocumentsDetails)) break;
-                        
+
+                        WBLogging.RecordsTypes.Verbose("In AddResultsForPublishingPage(): pageURL= " + pageURL + " we've got some non-empty picked document details: " +pickedDocumentsDetails);
+
+
                         string[] documentsDetailsArray = pickedDocumentsDetails.Split(';');
                         foreach (string documentDetails in documentsDetailsArray)
                         {
@@ -212,7 +262,14 @@ namespace WBFWebParts.ControlTemplates.WBFWebParts
                         if (inWebPart) break;
                     }
                 }
+                else
+                {
+                    WBLogging.RecordsTypes.Verbose("In AddResultsForPublishingPage(): pageURL= " + pageURL + " got a NULL webPartManager");
+                }
 
+                WBLogging.RecordsTypes.Verbose("In AddResultsForPublishingPage(): pageURL= " + pageURL + " About to do page content search");
+
+                
                 String content = page.ListItem.WBxGetColumnAsString("Page Content");
                 if (content != null && content.Contains(recordURLToSearchFor)) inPageContent = true;
 
@@ -231,6 +288,8 @@ namespace WBFWebParts.ControlTemplates.WBFWebParts
                         command.Append("<script type=\"text/javascript\">errorProcessingPage(\"").Append(pageURL).Append("\", \"").Append(errorString).Append("\");</script>\n");
                     }
                 }
+
+                WBLogging.RecordsTypes.Verbose("In AddResultsForPublishingPage(): pageURL= " + pageURL + " Command = " + command.ToString());
 
             }
             catch (Exception e)
