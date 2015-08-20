@@ -5,10 +5,20 @@
               GroupId="WorkBoxFramework.SiteSettingsGroup"
               Location="Microsoft.SharePoint.SiteSettings"
               Sequence="5000"
-              Title="Work Box Collection Settings"
+              Title="Configure Work Box Collection"
               RequireSiteAdministrator="TRUE">
-    <UrlAction Url="_layouts/WorkBoxFramework/GoToWBCollectionSettings.aspx?ReturnUrl={SiteUrl}/_layouts/settings.aspx"/>
+    <UrlAction Url="_layouts/WorkBoxFramework/GoToWBCollectionSettings.aspx?SettingsPage=ConfigureWorkBoxCollection.aspx&amp;ReturnUrl={SiteUrl}/_layouts/settings.aspx"/>
   </CustomAction>
+
+  <CustomAction Id="WorkBoxCollectionSettingsLink"
+            GroupId="WorkBoxFramework.SiteSettingsGroup"
+            Location="Microsoft.SharePoint.SiteSettings"
+            Sequence="5005"
+            Title="Work Box Collection Settings"
+            RequireSiteAdministrator="TRUE">
+    <UrlAction Url="_layouts/WorkBoxFramework/GoToWBCollectionSettings.aspx?SettingsPage=WorkBoxCollectionSettingsPage.aspx&amp;ReturnUrl={SiteUrl}/_layouts/settings.aspx"/>
+  </CustomAction>
+
 
   <CustomAction Id="EditRibbonButtonsSettingsLink"
               GroupId="WorkBoxFramework.SiteSettingsGroup"

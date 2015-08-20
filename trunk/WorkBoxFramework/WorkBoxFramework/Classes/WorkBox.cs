@@ -1044,7 +1044,7 @@ namespace WorkBoxFramework
             }
                         
             // Check if we're meant to be cacheing the details of this work box:
-            if (!IsOpen || !RecordsType.CacheDetailsForOpenWorkBoxes)                         
+            if ( /* !IsOpen || */ !RecordsType.CacheDetailsForOpenWorkBoxes)                         
             {
                 // If we've found a previous cached item we should delete it:
                 if (cachedItem != null) cachedItem.Delete();
@@ -1071,6 +1071,8 @@ namespace WorkBoxFramework
                                         WBColumn.OwningTeam,
                                         WBColumn.InvolvedTeams,
                                         WBColumn.VisitingTeams,
+                                        WBColumn.InvolvedIndividuals,
+                                        WBColumn.VisitingIndividuals,
                                         WBColumn.WorkBoxDateCreated,
                                         WBColumn.WorkBoxDateLastModified,
                                         WBColumn.WorkBoxDateLastVisited,

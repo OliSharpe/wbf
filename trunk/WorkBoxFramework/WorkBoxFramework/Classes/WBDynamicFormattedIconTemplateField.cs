@@ -1,6 +1,6 @@
 ﻿#region Copyright and License
 
-// Copyright (c) Islington Council 2010-2013
+// Copyright (c) Islington Council 2010-2015
 // Author: Oli Sharpe  (oli@gometa.co.uk)
 //
 // This file is part of the Work Box Framework.
@@ -29,41 +29,45 @@ using System.Web.UI.WebControls;
 
 namespace WorkBoxFramework
 {
-    public class WBFormatStringTemplateField : ITemplate
+    class WBDynamicFormattedIconTemplateField : ITemplate
     {
+        public WBColumn LinkURLDataColumn { get; set; }
         List<WBColumn> Columns { get; set; }
         String FormatString { get; set; }
-        bool UseLowerCase { get; set; }
+        bool UseLowerCaseIconURL { get; set; }
 
-        public WBFormatStringTemplateField(String formatString, List<WBColumn> columns)
+        public WBDynamicFormattedIconTemplateField(String formatString, List<WBColumn> columns, WBColumn linkURLDataColumn)
         {
+            LinkURLDataColumn = linkURLDataColumn;
             FormatString = formatString;
             Columns = columns;
-            UseLowerCase = false;
+            UseLowerCaseIconURL = true;
         }
 
-        public WBFormatStringTemplateField(String formatString, List<WBColumn> columns, bool useLowerCase)
+        public WBDynamicFormattedIconTemplateField(String formatString, List<WBColumn> columns, bool useLowerCaseIconURL, WBColumn linkURLDataColumn)
         {
+            LinkURLDataColumn = linkURLDataColumn;
             FormatString = formatString;
             Columns = columns;
-            UseLowerCase = useLowerCase;
+            UseLowerCaseIconURL = useLowerCaseIconURL;
         }
-
 
         public void InstantiateIn(System.Web.UI.Control container)
         {
-            Literal literal = new Literal();
+            HyperLink link = new HyperLink();
+            
+            link.DataBinding += new EventHandler(link_DataBinding);
 
-            literal.DataBinding += new EventHandler(literal_DataBinding);
-
-            container.Controls.Add(literal);
+            container.Controls.Add(link);
         }
 
-        void literal_DataBinding(object sender, EventArgs e)
+        void link_DataBinding(object sender, EventArgs e)
         {
-            Literal literal = (Literal)sender;
+            HyperLink link = (HyperLink)sender;
 
-            GridViewRow row = (GridViewRow)literal.NamingContainer;
+            GridViewRow row = (GridViewRow)link.NamingContainer;
+
+            link.NavigateUrl = DataBinder.Eval(row.DataItem, LinkURLDataColumn.InternalName).WBxToString();
 
             List<String> values = new List<String>();
 
@@ -73,9 +77,12 @@ namespace WorkBoxFramework
             }
 
             String formattedString = String.Format(FormatString, values.ToArray());
-            if (UseLowerCase) formattedString = formattedString.ToLower();
+            if (UseLowerCaseIconURL) formattedString = formattedString.ToLower();
 
-            literal.Text = formattedString;
+            link.ImageUrl = formattedString;
         }
+
     }
 }
+
+ 

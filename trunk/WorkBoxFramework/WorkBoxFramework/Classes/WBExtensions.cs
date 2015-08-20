@@ -1048,7 +1048,14 @@ namespace WorkBoxFramework
                         }
                         else
                         {
-                            throw new Exception("In WBxSet() for User column type: Either the column is a multi-User column");
+                            if (value is List<SPUser>)
+                            {
+                                item.WBxSetMultiUserColumn(item.Web, column, value as List<SPUser>);
+                            }
+                            else
+                            {
+                                throw new Exception("In WBxSet() for User column type: The value is not a List<SPUser> object when setting a multi-User column");
+                            }
                         }
                         break;
                     }
@@ -2590,6 +2597,87 @@ namespace WorkBoxFramework
                 WBLogging.Debug("The lookup value for " + column.DisplayName + " was null!");
             }
         }
+
+        public static void WBxCreateConfigurationStepsTable(this PlaceHolder placeHolder, ICollection<String> configurationStepsNames)
+        {
+            Table table = new Table();
+            table.CellPadding = 0;
+            table.CellSpacing = 5;
+
+            foreach (String stepName in configurationStepsNames)
+            {
+                TableRow row = new TableRow();
+                row.ID = placeHolder.WBxMakeControlID(stepName, "row");
+                row.CssClass = "wbf-configuration-step-table-row";
+
+                Image image = new Image();
+                image.ID = placeHolder.WBxMakeControlID(stepName, "image");
+                image.ImageUrl = "/_layouts/images/WorkBoxFramework/list-item-32.png";
+                image.Width = Unit.Pixel(32);
+                image.Height = Unit.Pixel(32);
+                row.CssClass = "wbf-configuration-step-image";
+                row.WBxAddInTableCell(image, "wbf-configuation-step-image-table-cell");
+
+                System.Web.UI.WebControls.Label label = new System.Web.UI.WebControls.Label();
+                label.ID = placeHolder.WBxMakeControlID(stepName, "name");
+                label.Text = stepName;
+                label.CssClass = "wbf-configuration-step-name";
+                row.WBxAddInTableCell(label, "wbf-configuation-step-name-table-cell");
+
+                label = new System.Web.UI.WebControls.Label();
+                label.ID = placeHolder.WBxMakeControlID(stepName, "status");
+                label.Text = "";
+                label.CssClass = "wbf-configuration-step-status";
+                row.WBxAddInTableCell(label, "wbf-configuation-step-status-table-cell");
+
+                Literal literal = new System.Web.UI.WebControls.Literal();
+                literal.ID = placeHolder.WBxMakeControlID(stepName, "feedback");
+                literal.Text = "";
+                row.WBxAddInTableCell(literal, "wbf-configuation-step-feedback-table-cell");
+
+                table.Rows.Add(row);
+            }
+
+            placeHolder.Controls.Add(table);
+        }
+
+
+        public static void WBxUpdateConfigurationStep(this PlaceHolder placeHolder, WBConfigStepFeedback feedback)
+        {
+            Image image = (Image)placeHolder.WBxFindNestedControlByID(placeHolder.WBxMakeControlID(feedback.Name, "image"));
+            if (feedback.Status == WBConfigStepFeedback.STATUS__SUCCESS)
+            {
+                image.ImageUrl = "/_layouts/images/WorkBoxFramework/green-tick-32.png";
+            }
+            else
+            {
+                image.ImageUrl = "/_layouts/images/WorkBoxFramework/red-cross-32.png";
+            }
+
+            System.Web.UI.WebControls.Label label = (System.Web.UI.WebControls.Label)placeHolder.WBxFindNestedControlByID(placeHolder.WBxMakeControlID(feedback.Name, "status"));
+            label.Text = feedback.UpdateType + " " + feedback.Status;
+
+            Literal literal = (System.Web.UI.WebControls.Literal)placeHolder.WBxFindNestedControlByID(placeHolder.WBxMakeControlID(feedback.Name, "feedback"));
+
+            if (feedback.Feedback.Count <= 3) literal.Text = String.Join("<br/>", feedback.Feedback.ToArray());
+            else
+            {
+                List<String> copy = new List<String>(feedback.Feedback);
+
+                String first = copy[0]; copy.RemoveAt(0);
+                String second = copy[0]; copy.RemoveAt(0);
+                String showID = "wbf-config-feedback-show--" + feedback.Name.Replace(" ", "-");
+                String hideID = "wbf-config-feedback-hide--" + feedback.Name.Replace(" ", "-");
+                StringBuilder html = new StringBuilder();
+                html.Append("<div>").Append(first).Append("<br/>").Append(second).Append("</div>");
+                html.Append("<div id='").Append(showID).Append("'>").Append("<a href='#' onclick=' $(\"#").Append(showID).Append("\").hide(); $(\"#").Append(hideID).Append("\").show(); '/> ... show more feedback</a></div>");
+                html.Append("<div id='").Append(hideID).Append("' style=' display: none;'>").Append(String.Join("<br/>", copy.ToArray())).Append("<br/><a href='#' onclick=' $(\"#").Append(hideID).Append("\").hide(); $(\"#").Append(showID).Append("\").show(); '/>Show less feedback</a></div>");
+
+                literal.Text = html.ToString();
+            }
+            
+        }
+
 
 
 

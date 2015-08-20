@@ -1,6 +1,6 @@
 ﻿#region Copyright and License
 
-// Copyright (c) Islington Council 2010-2013
+// Copyright (c) Islington Council 2010-2015
 // Author: Oli Sharpe  (oli@gometa.co.uk)
 //
 // This file is part of the Work Box Framework.
@@ -21,6 +21,10 @@
 #endregion
 
 using System;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Collections;
+using System.Collections.Generic;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Utilities;
@@ -30,6 +34,12 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
     public partial class CheckConfiguration : LayoutsPageBase
     {
         public bool doingInitialSetup = true;
+
+        protected void Page_Init(object sender, EventArgs e)
+        {
+            ConfigurationSteps.WBxCreateConfigurationStepsTable(WBFarm.ConfigurationStepsNames);
+            if (String.IsNullOrEmpty(NextConfigurationStep.Value)) NextConfigurationStep.Value = WBFarm.ConfigurationStepsNames[0];
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -65,16 +75,20 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 DocumentContentTypeName.Text = farm.WorkBoxDocumentContentTypeName;
                 RecordContentTypeName.Text = farm.WorkBoxRecordContentTypeName;
 
+                if (!String.IsNullOrEmpty(farm.TimerJobsManagementSiteUrl))
+                {
+                    DoInitialConfigStep.Text = "Check Configuration";
+                }
             }
         }
 
-        protected void DoInitialSetup_OnClick(object sender, EventArgs e)
+        protected void DoInitialConfigStep_OnClick(object sender, EventArgs e)
         {
-            WBLogging.Debug("AdminTeamSiteURL: " + AdminTeamSiteURL.Text);
-            WBLogging.Debug("TimerJobsServerName: " + TimerJobsServerName.Text);
-            WBLogging.Debug("TimerJobsServerName to upper: " + TimerJobsServerName.Text.ToUpper());
-
+            // First save the values set within the form to the farm object:
             WBFarm farm = WBFarm.Local;
+
+            farm.SystemAdminTeamSiteUrl = AdminTeamSiteURL.Text;
+            farm.TimerJobsServerName = TimerJobsServerName.Text.ToUpper();
 
             farm.TermStoreName = TermStoreName.Text;
             farm.TermStoreGroupName = TermStoreGroupName.Text;
@@ -84,11 +98,37 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             farm.Update();
 
-            WBFarm.Local.InitialFarmSetup(SPContext.Current.Site, AdminTeamSiteURL.Text, TimerJobsServerName.Text.ToUpper());
+            WBLogging.Config.Unexpected("farm.SystemAdminTeamSiteUrl = " + farm.SystemAdminTeamSiteUrl);
 
-            SPUtility.Redirect("/applications.aspx", SPRedirectFlags.Static, Context);
+            // Then start the configuration steps:
+            doNextConfigurationStep();
+
+            // old code:
+            // WBFarm.Local.InitialFarmSetup(SPContext.Current.Site, AdminTeamSiteURL.Text, TimerJobsServerName.Text.ToUpper());
         }
 
+
+        protected void DoNextConfigStep(object sender, EventArgs e)
+        {
+            doNextConfigurationStep();
+        }
+
+        private void doNextConfigurationStep()
+        {
+            WBConfigStepFeedback feedback = WBFarm.Local.DoConfigurationStep(NextConfigurationStep.Value);
+
+            ConfigurationSteps.WBxUpdateConfigurationStep(feedback);
+
+            if (!String.IsNullOrEmpty(feedback.NextStepName))
+            {
+                NextConfigurationStep.Value = feedback.NextStepName;
+                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "TriggerNextStepFunction", "WorkBoxFramework_triggerNextConfigurationStep();", true);
+            }
+            else
+            {
+                CancelButton.Text = "Done";
+            }
+        }
 
 
         protected void CancelButton_OnClick(object sender, EventArgs e)

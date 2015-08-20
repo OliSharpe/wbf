@@ -1,6 +1,6 @@
 ﻿#region Copyright and License
 
-// Copyright (c) Islington Council 2010-2013
+// Copyright (c) Islington Council 2010-2015
 // Author: Oli Sharpe  (oli@gometa.co.uk)
 //
 // This file is part of the Work Box Framework.
@@ -27,28 +27,17 @@ using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
+
 namespace WorkBoxFramework
 {
-    public class WBIconItemTemplateField : ITemplate
+    class WBStatusIconTemplateField : ITemplate
     {
-        public WBColumn LinkURLDataColumn { get; set; }
-        public WBColumn IconImageURLDataColumn { get; set; }
-        public String StaticIconImageURL { get; set; }
+        String Size { get; set; }
 
-        public WBIconItemTemplateField(WBColumn iconImageURLDataColumn, WBColumn linkURLDataColumn)
+        public WBStatusIconTemplateField(String size)
         {
-            LinkURLDataColumn = linkURLDataColumn;
-            IconImageURLDataColumn = iconImageURLDataColumn;
-            StaticIconImageURL = null;
+            Size = size;
         }
-
-        public WBIconItemTemplateField(String staticIconImageURL, WBColumn linkURLDataColumn)
-        {
-            LinkURLDataColumn = linkURLDataColumn;
-            StaticIconImageURL = staticIconImageURL;
-            IconImageURLDataColumn = null;
-        }
-
 
         public void InstantiateIn(System.Web.UI.Control container)
         {
@@ -65,17 +54,15 @@ namespace WorkBoxFramework
 
             GridViewRow row = (GridViewRow)link.NamingContainer;
 
-            link.NavigateUrl = DataBinder.Eval(row.DataItem, LinkURLDataColumn.InternalName).WBxToString();
+            link.NavigateUrl = DataBinder.Eval(row.DataItem, WBColumn.WorkBoxURL.InternalName).WBxToString();
 
-            if (IconImageURLDataColumn == null)
-            {
-                link.ImageUrl = StaticIconImageURL;
-            }
-            else
-            {
-                link.ImageUrl = DataBinder.Eval(row.DataItem, IconImageURLDataColumn.InternalName).WBxToString();
-            }
+            String status = DataBinder.Eval(row.DataItem, WBColumn.WorkBoxStatus.InternalName).WBxToString().ToLower();
+
+            link.ImageUrl = WBUtils.StatusIconImageURL(status, Size);
         }
 
     }
 }
+
+ 
+ 

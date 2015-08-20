@@ -18,6 +18,7 @@ namespace WorkBoxFramework.Features.WorkBoxCollections
     {
         // Uncomment the method below to handle the event raised after a feature has been activated.
 
+        
         public override void FeatureActivated(SPFeatureReceiverProperties properties)
         {
             WBLogging.Generic.HighLevel("WorkBoxCollectionsEventReceiver.FeatureActivated(): Activating the WBF Work Box Collections feature");
@@ -28,7 +29,7 @@ namespace WorkBoxFramework.Features.WorkBoxCollections
 
             WBLogging.Generic.HighLevel("WorkBoxCollectionsEventReceiver.FeatureActivated(): Activating the WBF Work Box Collections feature");
         }
-
+        
 
         // Uncomment the method below to handle the event raised before a feature is deactivated.
 

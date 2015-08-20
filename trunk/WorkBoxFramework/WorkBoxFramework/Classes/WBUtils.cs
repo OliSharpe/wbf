@@ -37,6 +37,7 @@ using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Taxonomy;
 using Microsoft.SharePoint.Publishing;
+using Microsoft.SharePoint.Navigation;
 using Microsoft.Office.Server.UserProfiles;
 using System.Web.UI.WebControls;
 
@@ -441,6 +442,33 @@ namespace WorkBoxFramework
             return iconLink;
         }
 
+        public static String StatusIconImageURL(String status, String size)
+        {
+            status = status.ToLower();
+
+            if (status != "open" && status != "closed" && status != "deleted") status = "error";
+
+            return "/_layouts/images/WorkBoxFramework/work-box-" + status + "-" + size + ".png";
+        }
+
+        public static TemplateField StatusIconTemplateField(String size)
+        {
+            TemplateField iconLink = new TemplateField();
+            iconLink.HeaderText = "";
+            iconLink.ItemTemplate = new WBStatusIconTemplateField(size);
+
+            return iconLink;
+        }
+
+        public static TemplateField DynamicFormattedIconTemplateField(String formatString, List<WBColumn> columns, WBColumn urlLinkColumn)
+        {
+            TemplateField iconLink = new TemplateField();
+            iconLink.HeaderText = "";
+            iconLink.ItemTemplate = new WBDynamicFormattedIconTemplateField(formatString, columns, urlLinkColumn);
+
+            return iconLink;
+        }
+
         public static TemplateField FormatStringTemplateField(String formatString, List<WBColumn> columns)
         {
             return FormatStringTemplateField("", formatString, columns);
@@ -454,6 +482,16 @@ namespace WorkBoxFramework
 
             return templateField;
         }
+
+        public static TemplateField FormatStringTemplateField(String headerText, String formatString, List<WBColumn> columns, bool useLowerCase)
+        {
+            TemplateField templateField = new TemplateField();
+            templateField.HeaderText = headerText;
+            templateField.ItemTemplate = new WBFormatStringTemplateField(formatString, columns, useLowerCase);
+
+            return templateField;
+        }
+
 
 
         public static List<String> GetReferencedURLs(String html)
@@ -1302,35 +1340,46 @@ namespace WorkBoxFramework
         }
 
 
-        public static SPList CreateOrCheckListUsingContentType(SPWeb rootWeb, SPWeb web, String listName, String itemContentTypeName)
+        /// <summary>
+        /// Returns true if the method created a new list otherwise false to indicate that the named list exists already.
+        /// </summary>
+        /// <param name="feedback"></param>
+        /// <param name="rootWeb"></param>
+        /// <param name="web"></param>
+        /// <param name="listName"></param>
+        /// <param name="itemContentTypeName"></param>
+        /// <returns></returns>
+        public static bool CreateOrCheckListUsingContentType(WBConfigStepFeedback feedback, SPWeb rootWeb, SPWeb web, String listName, String itemContentTypeName)
         {
-            WBLogging.Generic.Monitorable("Starting CreateOrCheckCustomList with custom content type for: " + listName);
+            feedback.JustLog("Starting CreateOrCheckCustomList with custom content type for: " + listName);
 
             SPList list = web.Lists.TryGetList(listName);
             if (list != null)
             {
-                WBLogging.Generic.Monitorable("Found existig list - not updating yet so: Finished CreateOrCheckCustomList for: " + listName);
+                feedback.Checked("Found existig list - not updating yet so: Finished CreateOrCheckCustomList for: " + listName);
 
-                return list;
+                return false;
             }
 
-            WBLogging.Generic.Monitorable("Here: " + listName);
+            feedback.JustLog("Here: " + listName);
 
             SPContentType itemContentType = rootWeb.ContentTypes.Cast<SPContentType>()
                 .FirstOrDefault(c => c.Name == itemContentTypeName);
 
-            WBLogging.Generic.Monitorable("Here now: " + listName);
+            feedback.JustLog("Here now: " + listName);
 
             if (itemContentType == null)
             {
                 throw new NotImplementedException("Not yet handling the situation where the list item content type for a new list has not yet been created as a site content type: " + itemContentTypeName);
             }
 
-            WBLogging.Generic.Monitorable("Next: " + listName);
+            feedback.JustLog("Next: " + listName);
 
             Guid newListGuid = web.Lists.Add(listName, "", SPListTemplateType.GenericList);
 
-            WBLogging.Generic.Monitorable("One more: " + listName);
+            feedback.Created("Created list: " + listName);
+
+            feedback.JustLog("One more: " + listName);
 
             list = web.Lists[newListGuid];
 
@@ -1343,10 +1392,10 @@ namespace WorkBoxFramework
             List<SPContentType> contentTypesToRemove = new List<SPContentType>();
             foreach (SPContentType contentType in list.ContentTypes)
             {
-                WBLogging.Generic.Monitorable("List has content type: " + contentType.Name);
+                feedback.JustLog("List has content type: " + contentType.Name);
                 if (contentType.Name != itemContentType.Name)
                 {
-                    WBLogging.Generic.Monitorable("Added to list to remove content type: " + contentType.Name);
+                    feedback.JustLog("Added to list to remove content type: " + contentType.Name);
                     contentTypesToRemove.Add(contentType);
                 }
 
@@ -1354,20 +1403,20 @@ namespace WorkBoxFramework
 
             foreach (SPContentType contentType in contentTypesToRemove)
             {
-                WBLogging.Generic.Monitorable("Trying to remove content type: " + contentType.Name);
+                feedback.JustLog("Trying to remove content type: " + contentType.Name);
                 list.ContentTypes.Delete(contentType.Id);
             }
 
             list.Update();
 
-            WBLogging.Generic.Monitorable("Finished CreateOrCheckCustomList for: " + listName);
+            feedback.Success("Finished config for: " + listName);
 
-            return list;
+            return true;
         }
 
-        public static SPList CreateOrCheckCustomList(SPWeb rootWeb, SPWeb web, String listName, IEnumerable<WBColumn> columns)
+        public static SPList CreateOrCheckCustomList(WBConfigStepFeedback feedback, SPWeb rootWeb, SPWeb web, String listName, IEnumerable<WBColumn> columns)
         {
-            WBLogging.Generic.Monitorable("Starting CreateOrCheckCustomList with custom columns for: " + listName);
+            feedback.JustLog("Starting CreateOrCheckCustomList with custom columns for: " + listName);
 
             SPList list = web.Lists.TryGetList(listName);
 
@@ -1376,10 +1425,15 @@ namespace WorkBoxFramework
             {
                 Guid listGuid = web.Lists.Add(listName, "A WBF configuration list", SPListTemplateType.GenericList);
 
+                feedback.Created("On " + web.Url + " Created list: " + listName);
+
                 list = web.Lists[listGuid];
                 listNeedsUpdating = true;
             }
-
+            else
+            {
+                feedback.Checked("On " + web.Url + " Found list: " + listName);
+            }
 
             foreach (WBColumn column in columns)
             {
@@ -1388,7 +1442,14 @@ namespace WorkBoxFramework
                     SPField field = rootWeb.Fields[column.DisplayName];
 
                     list.Fields.Add(field);
+
+                    feedback.Checked("List " + listName + " Added column: " + column.DisplayName);
+
                     listNeedsUpdating = true;
+                }
+                else
+                {
+                    feedback.Checked("List " + listName + " has column: " + column.DisplayName);
                 }
             }
 
@@ -1398,7 +1459,7 @@ namespace WorkBoxFramework
                 web.Update();
             }
 
-            WBLogging.Generic.Monitorable("Finished CreateOrCheckCustomList for: " + listName);
+            feedback.JustLog("Finished CreateOrCheckCustomList for: " + listName);
 
             return list;
         }
@@ -1406,6 +1467,7 @@ namespace WorkBoxFramework
 
 
         public static SPContentType CreateOrCheckContentType(
+            WBConfigStepFeedback feedback, 
             SPWeb web,
             String contentTypeName,
             String parentContentTypeName,
@@ -1420,13 +1482,13 @@ namespace WorkBoxFramework
 
             if (existingContentType != null)
             {
-                WBLogging.Generic.Monitorable("The content type " + contentTypeName + " already exists - so not trying to re-create it.");
-                WBLogging.Generic.Unexpected("Not yet checking existing content types have the right columns!!");
+                feedback.Checked("On " + web.Url + " Found content type " + contentTypeName);
+                feedback.JustLog("Not yet checking existing content types have the right columns!!");
                 return existingContentType;
             }
 
             // OK so now we can create the content type:
-            WBLogging.Generic.Monitorable("Creating content type: " + contentTypeName);
+            feedback.JustLog("On " + web.Url + " Creating content type: " + contentTypeName);
 
             SPContentType newContentType = new SPContentType(
                 web.ContentTypes[parentContentTypeName],
@@ -1453,9 +1515,147 @@ namespace WorkBoxFramework
             web.ContentTypes.Add(newContentType);
             newContentType.Update();
 
+            feedback.Created("On " + web.Url + " Created content type: " + contentTypeName);
+
             return newContentType;
         }
 
+
+        public static void CreateOrCheckPermissionLevel(
+            WBConfigStepFeedback feedback, 
+            SPSite site,
+            String permissionLevelName,
+            String permissionLevelDescription,
+            SPBasePermissions permissionLevelBasePermissions
+            )
+        {
+            SPRoleDefinitionCollection roles = site.RootWeb.RoleDefinitions;
+            foreach (SPRoleDefinition role in roles)
+            {
+                if (role.Name == permissionLevelName)
+                {
+                    feedback.Checked("Found permission level: " + permissionLevelName);
+                    return;
+                }
+            }
+
+            // if we're here the we haven't found the permission level:
+            SPRoleDefinition newPermissionLevel = new SPRoleDefinition();
+            newPermissionLevel.Name = permissionLevelName;
+            newPermissionLevel.Description = permissionLevelDescription;
+            newPermissionLevel.BasePermissions = permissionLevelBasePermissions;
+
+            site.RootWeb.RoleDefinitions.Add(newPermissionLevel);
+
+            feedback.Created("Created permission level: " + permissionLevelName);
+        }
+
+        /// <summary>
+        /// Create a new top level Quick Navigation link (internal to site collection)
+        /// </summary>
+        /// <param name="feedback"></param>
+        /// <param name="web"></param>
+        /// <param name="navLinkTitle"></param>
+        /// <param name="navLinkURL"></param>
+        public static void CheckOrCreateQuickLaunchNav(WBConfigStepFeedback feedback, SPWeb web, String navLinkTitle, String navLinkURL)
+        {
+            CheckOrCreateQuickLaunchNav(feedback, web, "", navLinkTitle, navLinkURL, false);
+        }
+
+        /// <summary>
+        /// Create a new second level Quick Navigation link (internal to site collection)
+        /// </summary>
+        /// <param name="feedback"></param>
+        /// <param name="web"></param>
+        /// <param name="heading"></param>
+        /// <param name="navLinkTitle"></param>
+        /// <param name="navLinkURL"></param>
+        public static void CheckOrCreateQuickLaunchNav(WBConfigStepFeedback feedback, SPWeb web, String heading, String navLinkTitle, String navLinkURL)
+        {
+            CheckOrCreateQuickLaunchNav(feedback, web, heading, navLinkTitle, navLinkURL, false);
+        }
+
+        /// <summary>
+        /// Create a new Quick Navigation link with all creation options available.
+        /// </summary>
+        /// <param name="feedback"></param>
+        /// <param name="web"></param>
+        /// <param name="heading"></param>
+        /// <param name="navLinkTitle"></param>
+        /// <param name="navLinkURL"></param>
+        /// <param name="isExternal"></param>
+        public static void CheckOrCreateQuickLaunchNav(WBConfigStepFeedback feedback, SPWeb web, String heading, String navLinkTitle, String navLinkURL, bool isExternal)
+        {
+            SPNavigationNodeCollection nodes = web.Navigation.QuickLaunch;
+
+            bool webNeedsUpdating = false;
+
+            SPNavigationNode headingNode = null;
+            if (!String.IsNullOrEmpty(heading))
+            {
+                foreach (SPNavigationNode node in nodes)
+                {
+                    if (node.Title == heading)
+                    {
+                        headingNode = node;
+                        feedback.Checked("Found quick launch nav heading: " + heading);
+                        break;
+                    }
+                }
+
+                if (headingNode == null)
+                {
+                    // OK we're going to add the heading:
+                    String headingURL = "";
+
+                    // Just to restore some of the classic headings if that is what is being asked for here:
+                    if (heading == "Libraries") headingURL = "/_layouts/viewlsts.aspx?BaseType=1";
+
+                    if (heading == "Lists") headingURL = "/_layouts/viewlsts.aspx?BaseType=0";
+
+                    if (heading == "Discussions") headingURL = "/_layouts/viewlsts.aspx?BaseType=0&ListTemplate=108";
+
+                    headingNode = new SPNavigationNode(heading, headingURL);
+
+                    nodes.AddAsLast(headingNode);
+                    webNeedsUpdating = true;
+                    feedback.Created("Created new header in quick nav: " + heading);
+                }
+
+                nodes = headingNode.Children;
+            }
+
+            foreach (SPNavigationNode node in nodes)
+            {
+                if (node.Title == navLinkTitle)
+                {
+                    feedback.Checked("Found quick launch nav link: " + navLinkTitle);
+                    if (webNeedsUpdating) web.Update();
+                    return;
+                }
+            }
+
+            // So if we're here then we need to create the nav link:
+            SPNavigationNode newNode = new SPNavigationNode(navLinkTitle, navLinkURL);
+            nodes.AddAsLast(newNode);
+            web.Update();
+        }
+
+        public static void AddColumnsToView(WBConfigStepFeedback feedback, SPView view, IEnumerable<WBColumn> columns)
+        {
+            foreach (WBColumn column in columns) {
+                if (!view.ViewFields.Exists(column.DisplayName))
+                {
+                    view.ViewFields.Add(column.DisplayName);
+                    feedback.Created("Added column " + column.DisplayName + " to view " + view.Title);
+                }
+                else
+                {
+                    feedback.Checked("Found column " + column.DisplayName + " already in view " + view.Title);
+                }
+            }
+            view.Update();
+        }
 
         public static String JoinUpToLimit(String joinString, IEnumerable<String> strings, int characterLimit)
         {

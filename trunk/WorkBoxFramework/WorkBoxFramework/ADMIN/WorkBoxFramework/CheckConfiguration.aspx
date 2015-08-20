@@ -9,6 +9,38 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <SharePoint:CssRegistration ID="WBFCssRegistration"
+      name="WorkBoxFramework/css/WBF.css" 
+      After="corev4.css"
+      runat="server"
+    />
+
+    <SharePoint:ScriptLink ID="WBFjQueryScriptRegistration"
+        name="WorkBoxFramework/jquery-1.7.2.min.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
+    <SharePoint:ScriptLink ID="WBFScriptRegistration"
+        name="WorkBoxFramework/WorkBoxFramework.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
+<script type="text/javascript">
+
+    var wbf__id_of_hidden_submit_link = "<%= HiddenSubmitLink.ClientID %>";
+
+    function WorkBoxFramework_triggerNextConfigurationStep() {
+        var link = document.getElementById(wbf__id_of_hidden_submit_link);
+        link.click();
+    }
+
+</script>
+
+
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
@@ -26,6 +58,32 @@ td.wbf-create-new-title { padding: 6px; }
 div.wbf-create-new-title { font-weight: bold; font-size: 16px; vertical-align: top; padding-bottom: 4px; }
 table.wbf-title-table { padding: 6px 0px 12px 10px; }
 .wbf-admin-page { padding: 10px }
+
+
+td.wbf-configuation-step-image-table-cell 
+{
+    width: 32px;
+    height: 32px;
+}
+
+td.wbf-configuation-step-name-table-cell 
+{
+    width: 150px !important;    
+    font-weight: bold;  
+}
+
+td.wbf-configuation-step-status-table-cell 
+{
+    width: 150px !important;  
+    font-weight: bold;  
+}
+
+td.wbf-configuation-step-feedback-table-cell 
+{
+    font-weight: normal;  
+}
+
+
 </style>
 
 <div class="wbf-admin-page">
@@ -188,11 +246,42 @@ Edit the names for the key document content types used in work boxes and in the 
 </tr>
 
 
+<tr>
+<td class="wbf-metadata-title-panel">
+<div class="wbf-metadata-title">Configuration Steps</div>
+<div>
+<p>
+These are the key configuration steps that will be checked.
+</p>
+</div>
+</td>
+<td class="wbf-metadata-value-panel">
+
+<asp:LinkButton ID="HiddenSubmitLink" Text="Reload" OnClick="DoNextConfigStep" runat="server" style="display:none;" />
+
+<asp:UpdatePanel ID="ConfigurationStepsPanel" runat="server" UpdateMode="Always">
+
+    <Triggers>
+        <asp:AsyncPostBackTrigger ControlID="DoInitialConfigStep" EventName="Click" />
+        <asp:AsyncPostBackTrigger ControlID="HiddenSubmitLink" EventName="Click" />
+    </Triggers>
+
+    <ContentTemplate>
+
+<asp:HiddenField ID="NextConfigurationStep" runat="server" />
+
+<asp:PlaceHolder ID="ConfigurationSteps" runat="server" />
+
+</ContentTemplate>
+</asp:UpdatePanel>
+
+</td>
+</tr>
 
 
 <tr>
 <td colspan="2" align="center" valign="top">
-    <asp:Button ID="DoInitialSetup" runat="server" Text="Do Initial Setup"  OnClick="DoInitialSetup_OnClick"/>
+    <asp:Button ID="DoInitialConfigStep" runat="server" Text="Do Initial Setup" OnClick="DoInitialConfigStep_OnClick"/>
 &nbsp;
     <asp:Button ID="CancelButton" runat="server" Text="Cancel" CausesValidation="False" OnClick="CancelButton_OnClick"/>
 

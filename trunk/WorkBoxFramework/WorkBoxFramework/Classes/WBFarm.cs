@@ -50,6 +50,7 @@ namespace WorkBoxFramework
 
         private const string FARM_PROPERTY__TEAM_SITES_SITE_COLLECTION_URL = "wbf__farm__team_sites_site_collection_url";
 
+        private const string FARM_PROPERTY__SYSTEM_ADMIN_TEAM_SITE_URL = "wbf__farm__system_admin_team_site_url";
         private const string FARM_PROPERTY__SYSTEM_ADMIN_TEAM_GUID = "wbf__farm__system_admin_team_guid";
 
         private const string FARM_PROPERTY__OPEN_WORK_BOXES_CACHED_DETAILS_LIST_URL = "wbf__farm__open_work_boxes_cached_details_list_url";
@@ -217,7 +218,13 @@ namespace WorkBoxFramework
             get { return _farm.WBxGetProperty(FARM_PROPERTY__TEAM_SITES_SITE_COLLECTION_URL); }
             set { _farm.WBxSetProperty(FARM_PROPERTY__TEAM_SITES_SITE_COLLECTION_URL, value); }
         }
-        
+
+        public String SystemAdminTeamSiteUrl
+        {
+            get { return _farm.WBxGetProperty(FARM_PROPERTY__SYSTEM_ADMIN_TEAM_SITE_URL); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__SYSTEM_ADMIN_TEAM_SITE_URL, value); }
+        }
+
         public String SystemAdminTeamGUIDString
         {
             get { return _farm.WBxGetProperty(FARM_PROPERTY__SYSTEM_ADMIN_TEAM_GUID); }
@@ -464,37 +471,147 @@ namespace WorkBoxFramework
             return sysadminTeam.IsCurrentUserTeamMember();
         }
 
+        #endregion
+
+        #region Configuration Steps
+
+        private const String CONFIG_STEP__TERM_SETS = "Term Sets";
+        private const String CONFIG_STEP__USER_PROFILE_PROPERTIES = "User Profile Properties";
+        private const String CONFIG_STEP__SITE_COLUMNS = "Site Columns";
+        private const String CONFIG_STEP__TEAM_SITES_CONTENT_TYPES = "Team Sites Content Types";
+        private const String CONFIG_STEP__CACHED_DETAILS_LIST = "Cached Details List";
+        private const String CONFIG_STEP__TIMER_TASKS_LISTS = "Timer Tasks Lists";
+        private const String CONFIG_STEP__FARM_SETTINGS = "Farm Settings (refactor!)";
+        private const String CONFIG_STEP__REGISTER_TIMER_JOBS = "Register Timer Jobs";
+
+        internal static String[] ConfigurationStepsNames = { 
+                                                  CONFIG_STEP__TERM_SETS, 
+                                                  CONFIG_STEP__USER_PROFILE_PROPERTIES, 
+                                                  CONFIG_STEP__SITE_COLUMNS, 
+                                                  CONFIG_STEP__TEAM_SITES_CONTENT_TYPES, 
+                                                  CONFIG_STEP__CACHED_DETAILS_LIST, 
+                                                  CONFIG_STEP__TIMER_TASKS_LISTS,
+                                                  CONFIG_STEP__FARM_SETTINGS,
+                                                  CONFIG_STEP__REGISTER_TIMER_JOBS
+                                              };
+
+        internal WBConfigStepFeedback DoConfigurationStep(String stepName)
+        {
+            WBConfigStepFeedback feedback = new WBConfigStepFeedback(stepName);
+
+            WBLogging.Config.Unexpected("farm.SystemAdminTeamSiteUrl = " + this.SystemAdminTeamSiteUrl); 
+
+            using (SPSite adminSite = new SPSite(this.SystemAdminTeamSiteUrl))
+            using (SPWeb adminWeb = adminSite.OpenWeb())
+            {
+                SPWeb rootTeamSiteWeb = adminSite.RootWeb;
+
+                switch (stepName)
+                {
+                    case CONFIG_STEP__TERM_SETS:
+                        {
+                            CheckSetupOfTermSets(feedback, SPContext.Current.Site);
+                            break;
+                        }
+                    case CONFIG_STEP__USER_PROFILE_PROPERTIES:
+                        {
+                            CheckSetupOfUserProfileProperties(feedback, SPContext.Current.Site);
+                            break;
+                        }
+                    case CONFIG_STEP__SITE_COLUMNS:
+                        {
+                            CreateOrCheckWBFSiteColumns(feedback, adminSite, rootTeamSiteWeb);
+                            break;
+                        }
+                    case CONFIG_STEP__TEAM_SITES_CONTENT_TYPES:
+                        {
+                            CreateOrCheckTeamSitesContentTypes(feedback, adminSite, rootTeamSiteWeb);
+                            break;
+                        }
+                    case CONFIG_STEP__CACHED_DETAILS_LIST:
+                        {
+                            CreateOrCheckCachedDetailsList(feedback, rootTeamSiteWeb);
+                            break;
+                        }
+                    case CONFIG_STEP__TIMER_TASKS_LISTS:
+                        {
+                            CreateOrCheckTimerTasksLists(feedback, rootTeamSiteWeb, adminWeb);
+                            break;
+                        }
+                    case CONFIG_STEP__FARM_SETTINGS:
+                        {
+                            this.TeamSitesSiteCollectionUrl = adminSite.Url;
+                            //this.TimerJobsManagementSiteUrl = adminTeamSiteURL;
+                            this.OpenWorkBoxesCachedDetailsListUrl = adminSite.Url + "/Lists/CachedWorkBoxDetails";
+                            //this.TimerJobsServerName = serverForTimerJobs;
+
+                            this.Update();
+                            break;
+                        }
+                    case CONFIG_STEP__REGISTER_TIMER_JOBS:
+                        {
+                            RegisterTimerJobs(feedback, adminSite);
+                            break;
+                        }
+                }
+
+                if (rootTeamSiteWeb != adminWeb && (SPContext.Current == null || rootTeamSiteWeb != SPContext.Current.Web))
+                {
+                    rootTeamSiteWeb.Dispose();
+                }
+            }
+
+            int thisStep = Array.IndexOf(ConfigurationStepsNames, stepName);
+
+            if (thisStep >= 0 && thisStep < ConfigurationStepsNames.Length - 1)
+            {
+                feedback.NextStepName = ConfigurationStepsNames[thisStep + 1];
+            }
+            else
+            {
+                feedback.NextStepName = "";
+            }
+
+            return feedback;
+        }
 
         public void InitialFarmSetup(SPSite site, String adminTeamSiteURL, String serverForTimerJobs)
         {
             WBLogging.Generic.Monitorable("Running WBFarm.InitialFarmSetup()");
 
-            InitialSetupOfTermSets(site);
+            //Moved
+            CheckSetupOfTermSets(null, site);
 
-            InitialSetupOfUserProfileProperties(site);
+            //Moved
+            CheckSetupOfUserProfileProperties(null, site);
 
             using (SPSite adminSite = new SPSite(adminTeamSiteURL))
             using (SPWeb adminWeb = adminSite.OpenWeb())
             {
                 SPWeb rootTeamSiteWeb = adminSite.RootWeb;
 
-                CreateOrCheckWBFSiteColumns(adminSite, rootTeamSiteWeb);
+                //Moved
+                CreateOrCheckWBFSiteColumns(null, adminSite, rootTeamSiteWeb);
 
-                CreateOrCheckTeamSitesContentTypes(adminSite, rootTeamSiteWeb);
+                //Moved
+                CreateOrCheckTeamSitesContentTypes(null, adminSite, rootTeamSiteWeb);
 
-                CreateOrCheckCachedDetailsList(rootTeamSiteWeb);
+                //Moved
+                CreateOrCheckCachedDetailsList(null, rootTeamSiteWeb);
 
-                CreateOrCheckTimerTasksLists(rootTeamSiteWeb, adminWeb);
+                //Moved
+                CreateOrCheckTimerTasksLists(null, rootTeamSiteWeb, adminWeb);
 
+                // Moved these update statements
                 this.TeamSitesSiteCollectionUrl = adminSite.Url;
                 this.TimerJobsManagementSiteUrl = adminTeamSiteURL;
                 this.OpenWorkBoxesCachedDetailsListUrl = adminSite.Url + "/Lists/CachedWorkBoxDetails";
-
                 this.TimerJobsServerName = serverForTimerJobs;
 
                 this.Update();
 
-                RegisterTimerJobs(adminSite);
+                //Moved
+                RegisterTimerJobs(null, adminSite);
 
                 if (rootTeamSiteWeb != adminWeb && (SPContext.Current == null || rootTeamSiteWeb != SPContext.Current.Web))
                 {
@@ -506,27 +623,27 @@ namespace WorkBoxFramework
         }
 
         internal void InitialWBCollectionSetup(SPSite site)
-        {
-            WBLogging.Generic.Monitorable("Running WBFarm.InitialWBCollectionSetup()");
+        {            
+            WBLogging.Config.Monitorable("Running WBFarm.InitialWBCollectionSetup()");
 
             SPWeb rootWeb = site.RootWeb;
 
-            CreateOrCheckWBFSiteColumns(site, rootWeb);
+            CreateOrCheckWBFSiteColumns(new WBConfigStepFeedback("WBF Site Columns"), site, rootWeb);
 
-            CreateOrCheckWBCSiteContentTypes(site, rootWeb);
+            CreateOrCheckWBCSiteContentTypes(new WBConfigStepFeedback("WBF Site Content Types"), site, rootWeb);
 
             if (SPContext.Current == null || rootWeb != SPContext.Current.Web)
             {
                 rootWeb.Dispose();
             }
 
-            WBLogging.Generic.Monitorable("Completed WBFarm.InitialWBCollectionSetup()");
+            WBLogging.Config.Monitorable("Completed WBFarm.InitialWBCollectionSetup()");
         }
 
 
-        private void InitialSetupOfTermSets(SPSite site)
+        internal WBConfigStepFeedback CheckSetupOfTermSets(WBConfigStepFeedback feedback, SPSite site)
         {
-            WBLogging.Generic.Monitorable("Started term set initial setup.");
+            feedback.JustLog("Started term set initial setup.");
 
             TaxonomySession session = new TaxonomySession(site);
             WBFarm farm = WBFarm.Local;
@@ -535,13 +652,13 @@ namespace WorkBoxFramework
             try
             {
                 termStore = session.TermStores[farm.TermStoreName];
+                feedback.Checked("Found term store: " + farm.TermStoreName);
             }
             catch (Exception exception)
             {
-                WBLogging.Generic.Unexpected("Couldn't find the term store with name: " + farm.TermStoreName, exception);
-                return;
+                feedback.Failed("Couldn't find the term store with name: " + farm.TermStoreName, exception);
+                return feedback;
             }
-            WBLogging.Generic.Unexpected("Found term store: " + termStore.Name);
 
             Group group = null;
 
@@ -551,14 +668,14 @@ namespace WorkBoxFramework
             }
             catch (Exception exception)
             {
-                WBLogging.Generic.Unexpected("Couldn't find the term store group with name: " + farm.TermStoreGroupName, exception);
+                feedback.LogFeedback("Couldn't find the term store group with name: " + farm.TermStoreGroupName, exception);
             }
 
             bool needsCommitting = false;
 
             if (group == null)
             {
-                WBLogging.Generic.Unexpected("Trying to create term store group with name: " + farm.TermStoreGroupName);
+                feedback.JustLog("Trying to create term store group with name: " + farm.TermStoreGroupName);
 
                 try
                 {
@@ -567,45 +684,55 @@ namespace WorkBoxFramework
                 }
                 catch (Exception exception)
                 {
-                    WBLogging.Generic.Unexpected("Couldn't create a term store group with name: " + farm.TermStoreGroupName, exception);
-                    return;
+                    feedback.Failed("Couldn't create term store group: " + farm.TermStoreGroupName, exception);
+                    return feedback;
                 }
-            }
 
-            WBLogging.Generic.Unexpected("Created the term store group with name: " + farm.TermStoreGroupName);
+                feedback.Created("Created term store group: " + farm.TermStoreGroupName);
+            }
+            else
+            {
+                feedback.Checked("Found term store group: " + farm.TermStoreGroupName);
+            }
 
 
             TermSet recordsTypes = null;
             try
             {
                 recordsTypes = group.TermSets[WorkBox.TERM_SET_NAME__RECORDS_TYPES];
+                feedback.Checked("Found term set: " + WorkBox.TERM_SET_NAME__RECORDS_TYPES);
             }
             catch (Exception e)
             {
                 group.CreateTermSet(WorkBox.TERM_SET_NAME__RECORDS_TYPES);
                 needsCommitting = true;
+                feedback.Created("Created term set: " + WorkBox.TERM_SET_NAME__RECORDS_TYPES);
             }
 
             TermSet functionalAreas = null;
             try
             {
                 functionalAreas = group.TermSets[WorkBox.TERM_SET_NAME__FUNCTIONAL_AREAS];
+                feedback.Checked("Found term set: " + WorkBox.TERM_SET_NAME__FUNCTIONAL_AREAS);
             }
             catch (Exception e)
             {
                 group.CreateTermSet(WorkBox.TERM_SET_NAME__FUNCTIONAL_AREAS);
                 needsCommitting = true;
+                feedback.Created("Created term set: " + WorkBox.TERM_SET_NAME__FUNCTIONAL_AREAS);
             }
 
             TermSet teams = null;
             try
             {
                 teams = group.TermSets[WorkBox.TERM_SET_NAME__TEAMS];
+                feedback.Checked("Found term set: " + WorkBox.TERM_SET_NAME__TEAMS);
             }
             catch (Exception e)
             {
                 group.CreateTermSet(WorkBox.TERM_SET_NAME__TEAMS);
                 needsCommitting = true;
+                feedback.Created("Created term set: " + WorkBox.TERM_SET_NAME__TEAMS);
             }
 
 
@@ -613,34 +740,40 @@ namespace WorkBoxFramework
             try
             {
                 subjectTags = group.TermSets[WorkBox.TERM_SET_NAME__SUBJECT_TAGS];
+                feedback.Checked("Found term set: " + WorkBox.TERM_SET_NAME__SUBJECT_TAGS);
             }
             catch (Exception e)
             {
                 group.CreateTermSet(WorkBox.TERM_SET_NAME__SUBJECT_TAGS);
                 needsCommitting = true;
+                feedback.Created("Created term set: " + WorkBox.TERM_SET_NAME__SUBJECT_TAGS);
             }
 
             TermSet seriesTags = null;
             try
             {
                 seriesTags = group.TermSets[WorkBox.TERM_SET_NAME__SERIES_TAGS];
+                feedback.Checked("Found term set: " + WorkBox.TERM_SET_NAME__SERIES_TAGS);
             }
             catch (Exception e)
             {
                 group.CreateTermSet(WorkBox.TERM_SET_NAME__SERIES_TAGS);
                 needsCommitting = true;
+                feedback.Created("Created term set: " + WorkBox.TERM_SET_NAME__SERIES_TAGS);
             }
 
 
-            if (needsCommitting)
+            if (needsCommitting) 
                 termStore.CommitAll();
 
             WBLogging.Generic.Monitorable("Finished term set initial setup.");
+
+            return feedback;
         }
 
 
 
-        internal void CreateOrCheckCachedDetailsList(SPWeb rootWeb)
+        internal void CreateOrCheckCachedDetailsList(WBConfigStepFeedback feedback, SPWeb rootWeb)
         {
             WBColumn[] columns = 
             {             
@@ -660,14 +793,16 @@ namespace WorkBoxFramework
                 WBColumn.SeriesTag,
                 WBColumn.OwningTeam,
                 WBColumn.InvolvedTeams,
-                WBColumn.VisitingTeams
+                WBColumn.VisitingTeams,
+                WBColumn.InvolvedIndividuals,
+                WBColumn.VisitingIndividuals
             };
 
-            WBUtils.CreateOrCheckCustomList(rootWeb, rootWeb, "CachedWorkBoxDetails", columns);
+            WBUtils.CreateOrCheckCustomList(feedback, rootWeb, rootWeb, "CachedWorkBoxDetails", columns);
 
         }
 
-        internal void CreateOrCheckTimerTasksLists(SPWeb rootweb, SPWeb web)
+        internal void CreateOrCheckTimerTasksLists(WBConfigStepFeedback feedback, SPWeb rootweb, SPWeb web)
         {
             WBColumn[] columns = 
             {             
@@ -677,7 +812,7 @@ namespace WorkBoxFramework
                 WBColumn.Argument1
             };
 
-            SPList dailyList = WBUtils.CreateOrCheckCustomList(rootweb, web, WBTimerTasksJob.DAILY_TIMER_TASKS__LIST_NAME, columns);
+            SPList dailyList = WBUtils.CreateOrCheckCustomList(feedback, rootweb, web, WBTimerTasksJob.DAILY_TIMER_TASKS__LIST_NAME, columns);
 
             SPViewCollection dailyViews = dailyList.Views;
 
@@ -695,7 +830,7 @@ namespace WorkBoxFramework
             dailyList.Update();
             web.Update();
 
-            SPList frequentList = WBUtils.CreateOrCheckCustomList(rootweb, web, WBTimerTasksJob.FREQUENT_TIMER_TASKS__LIST_NAME, columns);
+            SPList frequentList = WBUtils.CreateOrCheckCustomList(feedback, rootweb, web, WBTimerTasksJob.FREQUENT_TIMER_TASKS__LIST_NAME, columns);
 
             SPViewCollection frequentViews = frequentList.Views;
 
@@ -706,9 +841,9 @@ namespace WorkBoxFramework
         }
 
 
-        internal void CreateOrCheckWBFSiteColumns(SPSite site, SPWeb rootWeb)
+        internal void CreateOrCheckWBFSiteColumns(WBConfigStepFeedback feedback, SPSite site, SPWeb rootWeb)
         {
-            WBLogging.Generic.Monitorable("Starting CreateOrCheckWBFSiteColumns");
+            feedback.JustLog("Starting CreateOrCheckWBFSiteColumns");
 
             WBColumn[] columnsToCreate = 
             {
@@ -777,46 +912,41 @@ namespace WorkBoxFramework
 
             foreach (WBColumn column in columnsToCreate)
             {
-                column.CreateOrCheck(site, rootWeb);
+                column.CreateOrCheck(feedback, site, rootWeb);
             }
 
             WBLogging.Generic.Monitorable("Finished CreateOrCheckWBFSiteColumns");
         }
 
-        internal void CreateOrCheckWBCSiteContentTypes(SPSite site, SPWeb rootWeb)
+        internal void CreateOrCheckWBCSiteContentTypes(WBConfigStepFeedback feedback, SPSite site, SPWeb rootWeb)
         {
             WBLogging.Generic.Monitorable("Starting CreateOrCheckWBCSiteContentTypes");
 
-            CreateOrCheckWorkBoxMetadataItemContentType(rootWeb);
+            CreateOrCheckWorkBoxMetadataItemContentType(feedback, rootWeb);
 
-            CreateOrCheckWorkBoxTemplatesItemContentType(rootWeb);
+            CreateOrCheckWorkBoxTemplatesItemContentType(feedback, rootWeb);
 
-            CreateOrCheckWorkBoxDocumentContentType(rootWeb);
+            CreateOrCheckWorkBoxDocumentContentType(feedback, rootWeb);
 
             // Not really the right place to be creating this content type:
-            CreateOrCheckWorkBoxRecordContentType(rootWeb);
+            CreateOrCheckWorkBoxRecordContentType(feedback, rootWeb);
 
             WBLogging.Generic.Monitorable("Completed CreateOrCheckWBCSiteContentTypes");
         }
 
-        internal void CreateOrCheckTeamSitesContentTypes(SPSite site, SPWeb rootWeb)
+        internal void CreateOrCheckTeamSitesContentTypes(WBConfigStepFeedback feedback, SPSite site, SPWeb rootWeb)
         {
             WBLogging.Generic.Monitorable("Starting CreateOrCheckTeamSitesContentTypes");
 
-            CreateOrCheckWorkBoxDocumentContentType(rootWeb);
+            CreateOrCheckWorkBoxDocumentContentType(feedback, rootWeb);
 
             // Not really the right place to be creating this content type:
-            CreateOrCheckWorkBoxRecordContentType(rootWeb);
+            CreateOrCheckWorkBoxRecordContentType(feedback, rootWeb);
 
             WBLogging.Generic.Monitorable("Completed CreateOrCheckTeamSitesContentTypes");
         }
 
-
-        private void CreateOrCheckWorkBoxMetadataItemContentType(SPWeb web)
-        {
-            WBColumn[] requiredFields = {};
-
-            WBColumn[] optionalFields = 
+        internal static WBColumn[] WBCMetadataItemFields = 
             {
                 WBColumn.WorkBoxStatus,
                 WBColumn.WorkBoxStatusChangeRequest,
@@ -851,10 +981,16 @@ namespace WorkBoxFramework
                 WBColumn.VisitingIndividuals
             };
 
-            WBUtils.CreateOrCheckContentType(web, WorkBox.CONTENT_TYPE__WORK_BOX_METADATA_ITEM, "Item", WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, optionalFields);
+
+        private void CreateOrCheckWorkBoxMetadataItemContentType(WBConfigStepFeedback feedback, SPWeb web)
+        {
+            WBColumn[] requiredFields = {};
+
+
+            WBUtils.CreateOrCheckContentType(feedback, web, WorkBox.CONTENT_TYPE__WORK_BOX_METADATA_ITEM, "Item", WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, WBCMetadataItemFields);
         }
 
-        private void CreateOrCheckWorkBoxTemplatesItemContentType(SPWeb web)
+        private void CreateOrCheckWorkBoxTemplatesItemContentType(WBConfigStepFeedback feedback, SPWeb web)
         {
             WBColumn[] requiredFields = 
             { 
@@ -878,10 +1014,10 @@ namespace WorkBoxFramework
                 WBColumn.WorkBoxTemplateName
             };
 
-            WBUtils.CreateOrCheckContentType(web, WorkBox.CONTENT_TYPE__WORK_BOX_TEMPLATES_ITEM, "Item", WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, optionalFields);
+            WBUtils.CreateOrCheckContentType(feedback, web, WorkBox.CONTENT_TYPE__WORK_BOX_TEMPLATES_ITEM, "Item", WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, optionalFields);
         }
 
-        private void CreateOrCheckWorkBoxDocumentContentType(SPWeb web)
+        private void CreateOrCheckWorkBoxDocumentContentType(WBConfigStepFeedback feedback, SPWeb web)
         {
             WBColumn[] requiredFields = 
             { 
@@ -909,10 +1045,10 @@ namespace WorkBoxFramework
                 WBColumn.LiveOrArchived
             };
 
-            WBUtils.CreateOrCheckContentType(web, WBFarm.Local.WorkBoxDocumentContentTypeName, "Document", WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, optionalFields);
+            WBUtils.CreateOrCheckContentType(feedback, web, WBFarm.Local.WorkBoxDocumentContentTypeName, "Document", WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, optionalFields);
         }
 
-        private void CreateOrCheckWorkBoxRecordContentType(SPWeb web)
+        private void CreateOrCheckWorkBoxRecordContentType(WBConfigStepFeedback feedback, SPWeb web)
         {
             WBColumn[] requiredFields = 
             { 
@@ -925,7 +1061,7 @@ namespace WorkBoxFramework
             };
 
 
-            SPContentType recordContentType = WBUtils.CreateOrCheckContentType(web, WBFarm.Local.WorkBoxRecordContentTypeName, WBFarm.Local.WorkBoxDocumentContentTypeName, WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, optionalFields);
+            SPContentType recordContentType = WBUtils.CreateOrCheckContentType(feedback, web, WBFarm.Local.WorkBoxRecordContentTypeName, WBFarm.Local.WorkBoxDocumentContentTypeName, WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, optionalFields);
 
         }
 
@@ -937,9 +1073,9 @@ namespace WorkBoxFramework
         // http://www.woaychee.com/sharepoint-2010-create-custom-user-profile-properties-programmatically-part-1/
         // http://www.woaychee.com/sharepoint-2010-create-custom-user-profile-properties-programmatically-part-2/
         // 
-        private void InitialSetupOfUserProfileProperties(SPSite site)
+        private void CheckSetupOfUserProfileProperties(WBConfigStepFeedback feedback, SPSite site)
         {
-            WBLogging.Generic.Monitorable("Starting process of setting up the user profile properties");
+            feedback.JustLog("Starting process of setting up the user profile properties");
 
             SPServiceContext serviceContext = SPServiceContext.GetContext(site);
             UserProfileManager profileManager = new UserProfileManager(serviceContext);
@@ -953,6 +1089,11 @@ namespace WorkBoxFramework
                 wbfSection.Name = "WorkBoxFrameworkPropertySection";
                 wbfSection.DisplayName = "Work Box Framework Property Section";
                 corePropertyManager.Add(wbfSection);
+                feedback.Created("Created Work Box Framework Property Section");
+            }
+            else
+            {
+                feedback.Checked("Found Work Box Framework Property Section");
             }
 
             ProfilePropertyManager propertyManager = profileConfigManager.ProfilePropertyManager;
@@ -965,25 +1106,26 @@ namespace WorkBoxFramework
             ProfileSubtypePropertyManager profileSubtypePropertyManager = profileSubtype.Properties;
 
             // Now to try to create the various user profile properties:
-            MaybeCreateNewUserProfileStringProperty(corePropertyManager, profileTypePropertyManager, profileSubtypePropertyManager,
+            MaybeCreateNewUserProfileStringProperty(feedback, corePropertyManager, profileTypePropertyManager, profileSubtypePropertyManager,
                 WorkBox.USER_PROFILE_PROPERTY__WORK_BOX_LAST_VISITED_GUID, "Work Box Last Visited GUID", "A Work Box Framework system property that holds the GUID of the work box that the user last visited.", 100);
 
-            MaybeCreateNewUserProfileStringProperty(corePropertyManager, profileTypePropertyManager, profileSubtypePropertyManager,
+            MaybeCreateNewUserProfileStringProperty(feedback, corePropertyManager, profileTypePropertyManager, profileSubtypePropertyManager,
                 WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES, "My Recently Visited Work Boxes", "A Work Box Framework system property that holds the information about the work boxes that a user has recently visited.", 3600);
 
-            MaybeCreateNewUserProfileStringProperty(corePropertyManager, profileTypePropertyManager, profileSubtypePropertyManager,
+            MaybeCreateNewUserProfileStringProperty(feedback, corePropertyManager, profileTypePropertyManager, profileSubtypePropertyManager,
                 WorkBox.USER_PROFILE_PROPERTY__MY_FAVOURITE_WORK_BOXES, "My Favourite Work Boxes", "A Work Box Framework system property that holds the information about a user's favourite work boxes.", 3600);
 
-            MaybeCreateNewUserProfileStringProperty(corePropertyManager, profileTypePropertyManager, profileSubtypePropertyManager,
+            MaybeCreateNewUserProfileStringProperty(feedback, corePropertyManager, profileTypePropertyManager, profileSubtypePropertyManager,
                 WorkBox.USER_PROFILE_PROPERTY__MY_WORK_BOX_CLIPBOARD, "My Work Box Clipboard", "A Work Box Framework system property that holds the information about what a user has on their work box clipboard.", 3600);
 
-            MaybeCreateNewUserProfileStringProperty(corePropertyManager, profileTypePropertyManager, profileSubtypePropertyManager,
+            MaybeCreateNewUserProfileStringProperty(feedback, corePropertyManager, profileTypePropertyManager, profileSubtypePropertyManager,
                 WorkBox.USER_PROFILE_PROPERTY__MY_UNPROTECTED_WORK_BOX_URL, "My Unprotected Work Box URL", "A Work Box Framework system property that holds the URL for the user's unprotected work box.", 100);
 
-            WBLogging.Generic.Monitorable("Finished process of setting up the user profile properties");
+            feedback.JustLog("Finished process of setting up the user profile properties");
         }
 
         private void MaybeCreateNewUserProfileStringProperty(
+            WBConfigStepFeedback feedback, 
             CorePropertyManager corePropertyManager,
             ProfileTypePropertyManager profileTypePropertyManager, 
             ProfileSubtypePropertyManager profileSubtypePropertyManager,
@@ -1014,7 +1156,7 @@ namespace WorkBoxFramework
 
                 if (corePropertyManager.GetPropertyByName(propertyName) == null)
                 {
-                    WBLogging.Generic.Monitorable("Trying to create user profile property: " + propertyName);
+                    feedback.JustLog("Trying to create user profile property: " + propertyName);
 
                     // First add the property as a 'core property'
                     CoreProperty propertyInstance = corePropertyManager.Create(false);
@@ -1029,7 +1171,7 @@ namespace WorkBoxFramework
 
                     //corePropertyManager.Add(propertyInstance);
 
-                    WBLogging.Generic.Monitorable("Added as a core property: " + propertyName);
+                    feedback.JustLog("Added as a core property: " + propertyName);
 
 
                     // Next add the property as a profileTypeProperty:
@@ -1041,7 +1183,7 @@ namespace WorkBoxFramework
                     //profileTypePropertyManager.Add(profileTypeProperty);
 
 
-                    WBLogging.Generic.Monitorable("Added as a profileTypePropertyManager: " + propertyName);
+                    feedback.JustLog("Added as a profileTypePropertyManager: " + propertyName);
 
 
                     // Finally add the property as a profileSubtypePropery: 
@@ -1054,23 +1196,22 @@ namespace WorkBoxFramework
 
                     //profileSubtypePropertyManager.Add(profileSubtypeProperty);
 
-                    WBLogging.Generic.Monitorable("Created user profile property: " + propertyName);
+                    feedback.Created("Created user profile property: " + propertyName);
                 }
                 else
                 {
-                    WBLogging.Generic.Monitorable("User profile property already exists: " + propertyName);
+                    feedback.Checked("Found user profile property: " + propertyName);
                 }
 
             }
-            catch (DuplicateEntryException exception)
+            catch (Exception exception)
             {
-                WBLogging.Generic.Unexpected("An error occurred while trying to create the user profile property with name: " + propertyName);
-                WBLogging.Generic.Unexpected(exception);
+                feedback.Failed("An error occurred while trying to check or create the user profile property with name: " + propertyName, exception);
             }
         }
 
 
-        internal void RegisterTimerJobs(SPSite site)
+        internal void RegisterTimerJobs(WBConfigStepFeedback feedback, SPSite site)
         {
             SPWebApplication webApplication = site.WebApplication;
 
@@ -1124,6 +1265,8 @@ namespace WorkBoxFramework
 
                     timerJob.Update();
 
+                    feedback.Created("Created daily timer job");
+
                     /* */
                     /* Now adding the Frequent Timer Job  */
                     /* */
@@ -1148,15 +1291,16 @@ namespace WorkBoxFramework
 
                     frequentTimerJob.Update();
 
+                    feedback.Created("Created frequent timer job");
                 }
                 else
                 {
-                    WBLogging.Generic.Unexpected("WBFarm.RegisterTimerJobs(): Couldn't find the server with the name: " + farm.TimerJobsServerName);
+                    feedback.Failed("WBFarm.RegisterTimerJobs(): Couldn't find the server with the name: " + farm.TimerJobsServerName);
                 }
             }
             else
             {
-                WBLogging.Generic.Unexpected("WBFarm.RegisterTimerJobs(): The WBF farm wide setting of which server to use for the timer job has not been set.");
+                feedback.Failed("WBFarm.RegisterTimerJobs(): The WBF farm wide setting of which server to use for the timer job has not been set.");
             }
 
         }
