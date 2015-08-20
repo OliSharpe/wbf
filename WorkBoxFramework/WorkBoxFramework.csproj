@@ -161,6 +161,13 @@
       <DependentUpon>ConfigureLinkedCalendar.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\WBLinkedCalendarUpdatesEventReceiver.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\ConfigureWorkBoxCollection.aspx.cs">
+      <DependentUpon>ConfigureWorkBoxCollection.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ConfigureWorkBoxCollection.aspx.designer.cs">
+      <DependentUpon>ConfigureWorkBoxCollection.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\WorkBoxFramework\EditLinkedCalendarSettings.aspx.cs">
       <DependentUpon>EditLinkedCalendarSettings.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -189,7 +196,19 @@
     <Compile Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx.designer.cs">
       <DependentUpon>GoToWBCollectionSettings.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="WBLink.cs" />
+    <Compile Include="Classes\WBConfigStepFeedback.cs" />
+    <Compile Include="Classes\WBDynamicFormattedIconTemplateField.cs" />
+    <Compile Include="Classes\WBDynamicIconTemplateField.cs" />
+    <Compile Include="Classes\WBStatusIconTemplateField.cs" />
+    <Compile Include="WebParts\TeamSiteWorkBoxExplorer\TeamSiteWorkBoxExplorer.cs" />
+    <Compile Include="WebParts\TeamSiteWorkBoxExplorer\TeamSiteWorkBoxExplorerUserControl.ascx.cs">
+      <DependentUpon>TeamSiteWorkBoxExplorerUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\TeamSiteWorkBoxExplorer\TeamSiteWorkBoxExplorerUserControl.ascx.designer.cs">
+      <DependentUpon>TeamSiteWorkBoxExplorerUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\WBLink.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
@@ -763,6 +782,10 @@
     <None Include="STYLES\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{1ca521ef-acba-48d0-9e8b-c059e038e1ac}</SharePointProjectItemId>
     </None>
+    <None Include="WebParts\TeamSiteWorkBoxExplorer\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{ed936a3e-6277-4c23-8fd4-c9402fff1eb3}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\TeamSiteWorkBoxExplorer\TeamSiteWorkBoxExplorer.webpart" />
     <None Include="WebParts\ConfigurationStatus\ConfigurationStatus.webpart" />
     <None Include="WebParts\ConfigurationStatus\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{15e0ce8c-93d9-4277-8d9e-649b36a80214}</SharePointProjectItemId>
@@ -972,6 +995,32 @@
     <Content Include="Features\TeamSiteCalendarUpdates\TeamSiteCalendarUpdates.Template.xml">
       <DependentUpon>TeamSiteCalendarUpdates.feature</DependentUpon>
     </Content>
+    <Content Include="Images\WorkBoxFramework\columns-icon-32.png" />
+    <Content Include="Images\WorkBoxFramework\details-view-32.png" />
+    <Content Include="Images\WorkBoxFramework\green-tick-32.png" />
+    <Content Include="Images\WorkBoxFramework\icons-view-32.png" />
+    <Content Include="Images\WorkBoxFramework\list-item-32.png" />
+    <Content Include="Images\WorkBoxFramework\menu-icon-32.png" />
+    <Content Include="Images\WorkBoxFramework\order-by-icon-32.png" />
+    <Content Include="Images\WorkBoxFramework\plus-icon-32.png" />
+    <Content Include="Images\WorkBoxFramework\red-cross-32.png" />
+    <Content Include="Images\WorkBoxFramework\search-icon-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-closed-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-closed-24.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-closed-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-closed-64.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-deleted-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-deleted-24.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-deleted-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-deleted-64.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-error-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-error-24.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-error-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-error-64.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-open-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-open-24.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-open-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-open-64.png" />
     <Content Include="Layouts\WorkBoxFramework\AddAllManagersReports.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -986,6 +1035,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\ConfigureLinkedCalendar.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ConfigureWorkBoxCollection.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\EditLinkedCalendarSettings.aspx">
@@ -1005,8 +1057,13 @@
     <Content Include="Layouts\WorkBoxFramework\MailToLinkReplacement.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
+    <Content Include="order-by-icon-32.png" />
     <Content Include="STYLES\WorkBoxFramework\css\SubjectTags.css" />
     <Content Include="STYLES\WorkBoxFramework\css\WBF.css" />
+    <Content Include="WebParts\TeamSiteWorkBoxExplorer\Elements.xml" />
+    <Content Include="WebParts\TeamSiteWorkBoxExplorer\TeamSiteWorkBoxExplorerUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1276,7 +1333,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\InviteTeams.aspx" />
-    <Content Include="Layouts\WorkBoxFramework\NewWorkBox.aspx" />
+    <Content Include="Layouts\WorkBoxFramework\NewWorkBox.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\RemoveWorkBoxFromFavourites.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

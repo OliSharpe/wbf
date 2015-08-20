@@ -510,18 +510,18 @@ namespace WorkBoxFramework
         }
 
 
-        public bool CreateOrCheck(SPSite site)
+        public bool CreateOrCheck(WBConfigStepFeedback feedback, SPSite site)
         {
             using (SPWeb rootWeb = site.RootWeb)
             {
-                return CreateOrCheck(site, rootWeb);
+                return CreateOrCheck(feedback, site, rootWeb);
             }        
         }
 
 
-        public bool CreateOrCheck(SPSite site, SPWeb web)
+        public bool CreateOrCheck(WBConfigStepFeedback feedback, SPSite site, SPWeb web)
         {
-            return CreateOrCheck(site, web, WorkBox.SITE_COLUMNS_GROUP_NAME);
+            return CreateOrCheck(feedback, site, web, WorkBox.SITE_COLUMNS_GROUP_NAME);
         }
 
         
@@ -537,211 +537,226 @@ namespace WorkBoxFramework
         /// <param name="site"></param>
         /// <param name="web"></param>
         /// <returns></returns>
-        public bool CreateOrCheck(SPSite site, SPWeb web, String siteColumnsGroupName)
+        public bool CreateOrCheck(WBConfigStepFeedback feedback, SPSite site, SPWeb web, String siteColumnsGroupName)
         {
             if (String.IsNullOrEmpty(InternalName)) throw new NotImplementedException("Cannot create a column that doesn't have an internal name set!");
             if (String.IsNullOrEmpty(DisplayName)) throw new NotImplementedException("Cannot create a column that doesn't have a display name set!");
 
-            if (web.Fields.ContainsField(InternalName) || web.Fields.ContainsField(DisplayName))
+            if (web.Fields.ContainsField(InternalName))
             {
-                WBLogging.Generic.Monitorable("The SPWeb already has a column with either the internal name: " + InternalName + " or the display name: " + DisplayName);
+                feedback.Checked("On " + web.Url + " Found column with internal name: " + InternalName);
                 return false;
             }
 
-            WBLogging.Generic.Monitorable("Creating a column with the internal name: " + InternalName + " and the display name: " + DisplayName);
-
-
-            switch (DataType)
+            if (web.Fields.ContainsField(DisplayName))
             {
-                case DataTypes.Text:
-                    {
-                        SPFieldText textField = web.Fields.CreateNewField(SPFieldType.Text.ToString(), InternalName) as SPFieldText;
-                        textField.Title = DisplayName;
-                        textField.StaticName = InternalName;
-                        textField.Group = siteColumnsGroupName;
+                feedback.Checked("On " + web.Url + " Found column with display name: " + DisplayName);
+                return false;
+            }
 
-                        web.Fields.Add(textField);
-                        web.Update();
+            feedback.JustLog("Creating a column with the internal name: " + InternalName + " and the display name: " + DisplayName);
 
-                        break;
-                    }
-
-                case DataTypes.MultiLineText:
-                    {
-                        SPFieldMultiLineText multiLineTextField = web.Fields.CreateNewField(SPFieldType.Note.ToString(), InternalName) as SPFieldMultiLineText;
-
-                        multiLineTextField.Title = DisplayName;
-                        multiLineTextField.StaticName = InternalName;
-                        multiLineTextField.Group = siteColumnsGroupName;
-                        multiLineTextField.RichText = false;
-
-                        web.Fields.Add(multiLineTextField);
-                        web.Update();
-
-                        break;
-                    }
-
-                case DataTypes.Counter:
-                    {
-                        SPFieldNumber numberField = web.Fields.CreateNewField(SPFieldType.Number.ToString(), InternalName) as SPFieldNumber;
-                        numberField.Title = DisplayName;
-                        numberField.StaticName = InternalName;
-                        numberField.Group = siteColumnsGroupName;
-
-                        numberField.EnforceUniqueValues = true;
-                        numberField.Indexed = true;
-                        numberField.DisplayFormat = SPNumberFormatTypes.NoDecimal;
-
-                        web.Fields.Add(numberField);
-                        web.Update();
-
-                        break;
-                    }
-
-                case DataTypes.Integer:
-                    {
-                        SPFieldNumber numberField = web.Fields.CreateNewField(SPFieldType.Number.ToString(), InternalName) as SPFieldNumber;
-                        numberField.Title = DisplayName;
-                        numberField.StaticName = InternalName;
-                        numberField.Group = siteColumnsGroupName;
-
-                        numberField.DisplayFormat = SPNumberFormatTypes.NoDecimal;
-
-                        web.Fields.Add(numberField);
-                        web.Update();
-
-                        break;
-                    }
-
-                case DataTypes.DateTime:
-                    {
-                        SPFieldDateTime dateTimeField = web.Fields.CreateNewField(SPFieldType.DateTime.ToString(), InternalName) as SPFieldDateTime;
-                        dateTimeField.Title = DisplayName;
-                        dateTimeField.StaticName = InternalName;
-                        dateTimeField.Group = siteColumnsGroupName;
-
-                        if (UseDateAndTime)
+            try
+            {
+                switch (DataType)
+                {
+                    case DataTypes.Text:
                         {
-                            dateTimeField.DisplayFormat = SPDateTimeFieldFormatType.DateTime;
-                        }
-                        else
-                        {
-                            dateTimeField.DisplayFormat = SPDateTimeFieldFormatType.DateOnly;
+                            SPFieldText textField = web.Fields.CreateNewField(SPFieldType.Text.ToString(), InternalName) as SPFieldText;
+                            textField.Title = DisplayName;
+                            textField.StaticName = InternalName;
+                            textField.Group = siteColumnsGroupName;
+
+                            web.Fields.Add(textField);
+                            web.Update();
+
+                            break;
                         }
 
-                        web.Fields.Add(dateTimeField);
-                        web.Update();
-
-                        break;
-                    }
-
-
-                case DataTypes.ManagedMetadata:
-                    {
-                        TaxonomySession session = new TaxonomySession(site);
-                        WBFarm farm = WBFarm.Local;
-                        TermStore termStore = session.TermStores[farm.TermStoreName];
-                        Group group = termStore.Groups[farm.TermStoreGroupName];
-                        TermSet termSet = group.TermSets[TermSetName];
-
-                        TaxonomyField taxonomyField = web.Fields.CreateNewField("TaxonomyFieldType", InternalName) as TaxonomyField;
-                        taxonomyField.Title = DisplayName;
-                        taxonomyField.StaticName = InternalName;
-                        taxonomyField.Group = siteColumnsGroupName;
-
-                        taxonomyField.SspId = termStore.Id;
-                        taxonomyField.TermSetId = termSet.Id;
-
-                        taxonomyField.AllowMultipleValues = AllowMultipleValues;
-
-                        taxonomyField.TargetTemplate = string.Empty;
-                        taxonomyField.CreateValuesInEditForm = true;
-                        taxonomyField.Open = false;
-                        taxonomyField.AnchorId = Guid.Empty;
-
-                        web.Fields.Add(taxonomyField);
-                        web.Update();
-
-                        break;
-                    }
-
-        //        case DataTypes.Lookup: return "Lookup";
-
-                case DataTypes.Boolean:
-                    {
-                        SPFieldBoolean booleanField = web.Fields.CreateNewField(SPFieldType.Boolean.ToString(), InternalName) as SPFieldBoolean;
-                        booleanField.Title = DisplayName;
-                        booleanField.StaticName = InternalName;
-                        booleanField.Group = siteColumnsGroupName;
-                        booleanField.DefaultValue = "0";
-
-                        web.Fields.Add(booleanField);
-                        web.Update();
-
-                        break;
-                    }
-
-                case DataTypes.Choice:
-                    {
-                        SPFieldChoice choiceField = web.Fields.CreateNewField(SPFieldType.Choice.ToString(), InternalName) as SPFieldChoice;
-
-                        SetStandardFieldSettings(choiceField, siteColumnsGroupName);
-
-                        choiceField.FillInChoice = AllowFillInValues;
-
-                        web.Fields.Add(choiceField);
-                        web.Update();
-
-
-                        choiceField = web.Fields[DisplayName] as SPFieldChoice;
-                        foreach (String choice in Choices)
+                    case DataTypes.MultiLineText:
                         {
-                            if (!String.IsNullOrEmpty(choice))
+                            SPFieldMultiLineText multiLineTextField = web.Fields.CreateNewField(SPFieldType.Note.ToString(), InternalName) as SPFieldMultiLineText;
+
+                            multiLineTextField.Title = DisplayName;
+                            multiLineTextField.StaticName = InternalName;
+                            multiLineTextField.Group = siteColumnsGroupName;
+                            multiLineTextField.RichText = false;
+
+                            web.Fields.Add(multiLineTextField);
+                            web.Update();
+
+                            break;
+                        }
+
+                    case DataTypes.Counter:
+                        {
+                            SPFieldNumber numberField = web.Fields.CreateNewField(SPFieldType.Number.ToString(), InternalName) as SPFieldNumber;
+                            numberField.Title = DisplayName;
+                            numberField.StaticName = InternalName;
+                            numberField.Group = siteColumnsGroupName;
+
+                            numberField.EnforceUniqueValues = true;
+                            numberField.Indexed = true;
+                            numberField.DisplayFormat = SPNumberFormatTypes.NoDecimal;
+
+                            web.Fields.Add(numberField);
+                            web.Update();
+
+                            break;
+                        }
+
+                    case DataTypes.Integer:
+                        {
+                            SPFieldNumber numberField = web.Fields.CreateNewField(SPFieldType.Number.ToString(), InternalName) as SPFieldNumber;
+                            numberField.Title = DisplayName;
+                            numberField.StaticName = InternalName;
+                            numberField.Group = siteColumnsGroupName;
+
+                            numberField.DisplayFormat = SPNumberFormatTypes.NoDecimal;
+
+                            web.Fields.Add(numberField);
+                            web.Update();
+
+                            break;
+                        }
+
+                    case DataTypes.DateTime:
+                        {
+                            SPFieldDateTime dateTimeField = web.Fields.CreateNewField(SPFieldType.DateTime.ToString(), InternalName) as SPFieldDateTime;
+                            dateTimeField.Title = DisplayName;
+                            dateTimeField.StaticName = InternalName;
+                            dateTimeField.Group = siteColumnsGroupName;
+
+                            if (UseDateAndTime)
                             {
-                                WBLogging.Generic.Monitorable(DisplayName + ": Adding choice: " + choice);
-                                choiceField.Choices.Add(choice);
+                                dateTimeField.DisplayFormat = SPDateTimeFieldFormatType.DateTime;
                             }
+                            else
+                            {
+                                dateTimeField.DisplayFormat = SPDateTimeFieldFormatType.DateOnly;
+                            }
+
+                            web.Fields.Add(dateTimeField);
+                            web.Update();
+
+                            break;
                         }
-                        choiceField.Update();
-                        web.Update();
-
-                        break;
-                    }
-
-                case DataTypes.URL:
-                    {
-                        SPFieldUrl urlField = web.Fields.CreateNewField(SPFieldType.URL.ToString(), InternalName) as SPFieldUrl;
-                        urlField.Title = DisplayName;
-                        urlField.StaticName = InternalName;
-                        urlField.Group = siteColumnsGroupName;
-
-                        web.Fields.Add(urlField);
-                        web.Update();
-
-                        break;
-                    }
-
-                case DataTypes.User:
-                    {
-                        SPFieldUser userField = web.Fields.CreateNewField(SPFieldType.User.ToString(), InternalName) as SPFieldUser;
-                        userField.Title = DisplayName;
-                        userField.StaticName = InternalName;
-                        userField.Group = siteColumnsGroupName;
-
-                        userField.AllowMultipleValues = AllowMultipleValues;
-                        userField.SelectionMode = SPFieldUserSelectionMode.PeopleOnly;
-
-                        web.Fields.Add(userField);
-                        web.Update();
-
-                        break;
-                    }
 
 
-                default:
-                    {
-                        throw new NotImplementedException("There is currently no implementation to create WBColumns of type: " + DataTypeName);                        
-                    }
+                    case DataTypes.ManagedMetadata:
+                        {
+                            TaxonomySession session = new TaxonomySession(site);
+                            WBFarm farm = WBFarm.Local;
+                            TermStore termStore = session.TermStores[farm.TermStoreName];
+                            Group group = termStore.Groups[farm.TermStoreGroupName];
+                            TermSet termSet = group.TermSets[TermSetName];
+
+                            TaxonomyField taxonomyField = web.Fields.CreateNewField("TaxonomyFieldType", InternalName) as TaxonomyField;
+                            taxonomyField.Title = DisplayName;
+                            taxonomyField.StaticName = InternalName;
+                            taxonomyField.Group = siteColumnsGroupName;
+
+                            taxonomyField.SspId = termStore.Id;
+                            taxonomyField.TermSetId = termSet.Id;
+
+                            taxonomyField.AllowMultipleValues = AllowMultipleValues;
+
+                            taxonomyField.TargetTemplate = string.Empty;
+                            taxonomyField.CreateValuesInEditForm = true;
+                            taxonomyField.Open = false;
+                            taxonomyField.AnchorId = Guid.Empty;
+
+                            web.Fields.Add(taxonomyField);
+                            web.Update();
+
+                            break;
+                        }
+
+                    //        case DataTypes.Lookup: return "Lookup";
+
+                    case DataTypes.Boolean:
+                        {
+                            SPFieldBoolean booleanField = web.Fields.CreateNewField(SPFieldType.Boolean.ToString(), InternalName) as SPFieldBoolean;
+                            booleanField.Title = DisplayName;
+                            booleanField.StaticName = InternalName;
+                            booleanField.Group = siteColumnsGroupName;
+                            booleanField.DefaultValue = "0";
+
+                            web.Fields.Add(booleanField);
+                            web.Update();
+
+                            break;
+                        }
+
+                    case DataTypes.Choice:
+                        {
+                            SPFieldChoice choiceField = web.Fields.CreateNewField(SPFieldType.Choice.ToString(), InternalName) as SPFieldChoice;
+
+                            SetStandardFieldSettings(choiceField, siteColumnsGroupName);
+
+                            choiceField.FillInChoice = AllowFillInValues;
+
+                            web.Fields.Add(choiceField);
+                            web.Update();
+
+
+                            choiceField = web.Fields[DisplayName] as SPFieldChoice;
+                            foreach (String choice in Choices)
+                            {
+                                if (!String.IsNullOrEmpty(choice))
+                                {
+                                    WBLogging.Generic.Monitorable(DisplayName + ": Adding choice: " + choice);
+                                    choiceField.Choices.Add(choice);
+                                }
+                            }
+                            choiceField.Update();
+                            web.Update();
+
+                            break;
+                        }
+
+                    case DataTypes.URL:
+                        {
+                            SPFieldUrl urlField = web.Fields.CreateNewField(SPFieldType.URL.ToString(), InternalName) as SPFieldUrl;
+                            urlField.Title = DisplayName;
+                            urlField.StaticName = InternalName;
+                            urlField.Group = siteColumnsGroupName;
+
+                            web.Fields.Add(urlField);
+                            web.Update();
+
+                            break;
+                        }
+
+                    case DataTypes.User:
+                        {
+                            SPFieldUser userField = web.Fields.CreateNewField(SPFieldType.User.ToString(), InternalName) as SPFieldUser;
+                            userField.Title = DisplayName;
+                            userField.StaticName = InternalName;
+                            userField.Group = siteColumnsGroupName;
+
+                            userField.AllowMultipleValues = AllowMultipleValues;
+                            userField.SelectionMode = SPFieldUserSelectionMode.PeopleOnly;
+
+                            web.Fields.Add(userField);
+                            web.Update();
+
+                            break;
+                        }
+
+
+                    default:
+                        {
+                            throw new NotImplementedException("There is currently no implementation to create WBColumns of type: " + DataTypeName);
+                        }
+                }
+
+                feedback.Created("On " + web.Url + " Created column with internal name: " + InternalName + " and display name: " + DisplayName);
+
+            }
+            catch (Exception exception)
+            {
+                feedback.Failed("On " + web.Url + " Failed to create column with internal name: " + InternalName + " and display name: " + DisplayName, exception);
             }
 
             return true;
@@ -843,6 +858,7 @@ namespace WorkBoxFramework
         public static readonly WBColumn SourceID = WBColumn.TextColumn("Source ID");
         public static readonly WBColumn RecordID = WBColumn.IntegerColumn("Record ID");
 
+        public static readonly WBColumn WorkBoxTemplate = WBColumn.LookupColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE, false, WorkBox.LIST_NAME__WORK_BOX_TEMPLATES);
 
         public static readonly WBColumn WorkBoxTemplateTitle = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE_TITLE);
 

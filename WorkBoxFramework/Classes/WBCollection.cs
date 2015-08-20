@@ -189,6 +189,230 @@ namespace WorkBoxFramework
 
         #endregion
 
+
+        #region Configuration Steps
+
+        private const String CONFIG_STEP__SITE_COLUMNS = "Site Columns";
+        private const String CONFIG_STEP__CONTENT_TYPES = "Content Types";
+        private const String CONFIG_STEP__PERMISSIONS_LEVELS = "Permissions Levels";
+        private const String CONFIG_STEP__WORK_BOXES_LIST = "Work Boxes List";
+        private const String CONFIG_STEP__TEMPLATES_LIST = "Templates List";
+        private const String CONFIG_STEP__ADD_TEMPLATES_LOOKUP_COLUMN = "Add Templates Lookup Column";
+        private const String CONFIG_STEP__ATTACH_EVENT_RECEIVERS = "Attach Event Receivers";
+        private const String CONFIG_STEP__SETUP_DEFAULT_RECORDS_TYPE = "Setup Default Records Type";
+        private const String CONFIG_STEP__SETUP_DEFAULT_TEMPLATE = "Setup Default Template";
+        private const String CONFIG_STEP__SYNC_TEAMS_TIMER_TASK = "Sync Teams Timer Task";
+
+        internal static String[] ConfigurationStepsNames = { 
+                                                  CONFIG_STEP__SITE_COLUMNS, 
+                                                  CONFIG_STEP__CONTENT_TYPES, 
+                                                  CONFIG_STEP__PERMISSIONS_LEVELS,
+                                                  CONFIG_STEP__WORK_BOXES_LIST, 
+                                                  CONFIG_STEP__TEMPLATES_LIST,
+                                                  CONFIG_STEP__ADD_TEMPLATES_LOOKUP_COLUMN,
+                                                  CONFIG_STEP__ATTACH_EVENT_RECEIVERS,
+                                                  CONFIG_STEP__SETUP_DEFAULT_RECORDS_TYPE,
+                                                  CONFIG_STEP__SETUP_DEFAULT_TEMPLATE,
+                                                  CONFIG_STEP__SYNC_TEAMS_TIMER_TASK
+                                              };
+
+        internal WBConfigStepFeedback DoConfigurationStep(String stepName)
+        {
+            WBConfigStepFeedback feedback = new WBConfigStepFeedback(stepName);
+
+            SPWeb siteCollectionRootWeb = Site.RootWeb;
+            try
+            {
+                switch (stepName)
+                {
+                    case CONFIG_STEP__SITE_COLUMNS:
+                        {
+                            WBFarm.Local.CreateOrCheckWBFSiteColumns(feedback, Site, siteCollectionRootWeb);
+                            break;
+                        }
+                    case CONFIG_STEP__CONTENT_TYPES:
+                        {
+                            WBFarm.Local.CreateOrCheckWBCSiteContentTypes(feedback, Site, siteCollectionRootWeb);
+                            break;
+                        }
+                    case CONFIG_STEP__PERMISSIONS_LEVELS:
+                        {
+                            CreateOrCheckWBCPermissionLevels(feedback);
+                            break;
+                        }
+                    case CONFIG_STEP__WORK_BOXES_LIST:
+                        {
+                            CreateOrCheckWorkBoxesList(feedback, Site, siteCollectionRootWeb, Web);
+                            break;
+                        }
+                    case CONFIG_STEP__TEMPLATES_LIST:
+                        {
+                            CreateOrCheckTemplatesList(feedback, Site, siteCollectionRootWeb, Web);
+                            break;
+                        }
+                    case CONFIG_STEP__ADD_TEMPLATES_LOOKUP_COLUMN:
+                        {
+                            CreateOrCheckLookupColumn(feedback);
+                            break;
+                        }
+                    case CONFIG_STEP__ATTACH_EVENT_RECEIVERS:
+                        {
+                            if (AttachEventReceivers())
+                            {
+                                feedback.Created("Attached event receivers");
+                            }
+                            else
+                            {
+                                feedback.Failed("Failed to attach event receivers");
+                            }
+                            break;
+                        }
+                }
+            }
+            catch (Exception exception)
+            {
+                feedback.Failed("Something went wrong with step: " + stepName, exception);
+            }
+
+            if (siteCollectionRootWeb != Web && (SPContext.Current == null || siteCollectionRootWeb != SPContext.Current.Web))
+            {
+                siteCollectionRootWeb.Dispose();
+            }
+
+
+            int thisStep = Array.IndexOf(ConfigurationStepsNames, stepName);
+
+            if (thisStep >= 0 && thisStep < ConfigurationStepsNames.Length - 1)
+            {
+                feedback.NextStepName = ConfigurationStepsNames[thisStep + 1];
+            }
+            else
+            {
+                feedback.NextStepName = "";
+            }
+
+            return feedback;
+        }
+
+        internal void CreateOrCheckWBCPermissionLevels(WBConfigStepFeedback feedback)
+        {
+
+            WBUtils.CreateOrCheckPermissionLevel(feedback, Site, "Test", "This is a test",
+                SPBasePermissions.ManageLists |
+                SPBasePermissions.EditListItems |
+                SPBasePermissions.ViewListItems |
+                SPBasePermissions.ViewPages);
+
+        }
+
+        internal void CreateOrCheckWorkBoxesList(WBConfigStepFeedback feedback, SPSite site, SPWeb rootWeb, SPWeb web)
+        {
+            bool createdList = WBUtils.CreateOrCheckListUsingContentType(feedback, rootWeb, web, ListName, WorkBox.CONTENT_TYPE__WORK_BOX_METADATA_ITEM);
+
+            if (!createdList)
+            {
+                // OK so we're not creating the list - but let's check that it has all of the columns that it ought to have:
+                WBUtils.CreateOrCheckCustomList(feedback, rootWeb, web, ListName, WBFarm.WBCMetadataItemFields);
+            }
+            else
+            {
+                // If we did create the list then let's also add it to the quick launch nav area:
+                WBUtils.CheckOrCreateQuickLaunchNav(feedback, web, "Lists", ListName, List.DefaultViewUrl);
+
+                // Let's also add some columns to the default view:
+                WBColumn[] wbcListDefaultViewColumns = { 
+                                                            // WBColumn.Title,
+                                                            WBColumn.WorkBoxStatus,
+                                                            WBColumn.WorkBoxStatusChangeRequest,
+                                                            WBColumn.WorkBoxLink,
+                                                            WBColumn.RecordsType
+                                                        };
+
+                SPView view = List.Views[0];
+                WBUtils.AddColumnsToView(feedback, view, wbcListDefaultViewColumns);
+            }
+
+        }
+
+        internal void CreateOrCheckTemplatesList(WBConfigStepFeedback feedback, SPSite site, SPWeb rootWeb, SPWeb web)
+        {
+            bool createdList = WBUtils.CreateOrCheckListUsingContentType(feedback, rootWeb, web, WorkBox.LIST_NAME__WORK_BOX_TEMPLATES, WorkBox.CONTENT_TYPE__WORK_BOX_TEMPLATES_ITEM);
+
+            if (createdList)
+            {
+                // If we did create the list then let's also add it to the quick launch nav area:
+                WBUtils.CheckOrCreateQuickLaunchNav(feedback, web, "Lists", TemplatesList.Title, TemplatesList.DefaultViewUrl);
+
+                // Let's also add some columns to the default view:
+                WBColumn[] templatesListDefaultViewColumns = { 
+                                                                  // WBColumn.Title,
+                                                                  WBColumn.RecordsType,
+                                                                  WBColumn.WorkBoxTemplateStatus,
+                                                                  WBColumn.WorkBoxTemplateTitle,
+                                                                  WBColumn.WorkBoxTemplateName
+                                                              };
+
+                SPView view = TemplatesList.Views[0];
+                WBUtils.AddColumnsToView(feedback, view, templatesListDefaultViewColumns);
+            }
+
+        }
+
+        internal void CreateOrCheckLookupColumn(WBConfigStepFeedback feedback)
+        {
+            SPFieldLookup lookupField = null;
+
+            if (TemplatesList == null)
+            {
+                feedback.Failed("You can't add the CreateOrCheckLookupColumn method without first creating the templates list");
+                return;
+            }
+
+            if (List == null)
+            {
+                feedback.Failed("You can't add the CreateOrCheckLookupColumn method without first creating the WBC list");
+                return;
+            }
+
+            if (List.Fields.ContainsField(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE))
+            {
+                feedback.Checked("Found Work Box Template field in WBC list: " + List.Title);
+                return;
+            }
+
+            if (Web.Fields.ContainsField(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE))
+            {
+                feedback.Checked("Found site level column called: " + WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE);
+                lookupField = Web.Fields[WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE] as SPFieldLookup;
+            }
+            else
+            {
+                Web.Fields.AddLookup(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE, TemplatesList.ID, Web.ID, false);
+                lookupField = Web.Fields[WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE] as SPFieldLookup;
+                lookupField.AllowMultipleValues = false;
+                lookupField.LookupField = WBColumn.Title.DisplayName;
+                lookupField.Group = WorkBox.SITE_COLUMNS_GROUP_NAME;
+                lookupField.Update();
+                feedback.Created("Created site level column called: " + lookupField.Title);
+            }
+
+            SPContentType defaultContentType = List.ContentTypes[0];
+            SPFieldLink fieldLink = new SPFieldLink(lookupField);
+            defaultContentType.FieldLinks.Add(fieldLink);
+            defaultContentType.Update();
+            List.Update();
+
+            feedback.Created("Added site level column called: " + lookupField.Title + " to content type " + defaultContentType.Name + " in list called: " + List.Title);
+            
+            // And finally try to add the new lookup column to the default view:
+            WBColumn[] lookupColumnAsList = { WBColumn.WorkBoxTemplate };
+            SPView view = List.Views[0];
+            WBUtils.AddColumnsToView(feedback, view, lookupColumnAsList);
+        }
+
+
+        #endregion
+
         #region Object Properties
 
         private SPWeb _web = null;
@@ -244,16 +468,15 @@ namespace WorkBoxFramework
 
                     if (listName == "")
                     {
-                        WBUtils.logMessage("Error finding: listName = " + listName);
+                        WBLogging.WorkBoxCollections.Unexpected("Error finding: listName = " + listName);
                     }
                     else
                     {
-                        _list = this.Web.Lists[listName];
+                        _list = this.Web.Lists.TryGetList(listName);
                         if (_list == null)
                         {
-                            WBUtils.logMessage("Couldn't find the list with Name = " + listName);
+                            WBLogging.WorkBoxCollections.Unexpected("Couldn't find the list with Name = " + listName);
                         }
-
                     }
                 }
 
@@ -330,8 +553,6 @@ namespace WorkBoxFramework
             }
         }
 
-
-
         public String ListName
         {
             get { return Web.WBxGetProperty(COLLECTION_PROPERTY__WORK_BOXES_LIST_NAME); }
@@ -349,17 +570,20 @@ namespace WorkBoxFramework
                     {
                                 
                         // OK so we have an out of date event receiver to remove first:
-                        SPList oldList = Web.Lists[oldListName];
-                                
-                        for (int i = 0; i < oldList.EventReceivers.Count; i++)                                
-                        {
-                            if (oldList.EventReceivers[i].Name != null)
-                            {
-                                if (oldList.EventReceivers[i].Name == WorkBox.WORK_BOXES_LIST_EVENT_RECEIVER__ITEM_ADDED || oldList.EventReceivers[i].Name == WorkBox.WORK_BOXES_LIST_EVENT_RECEIVER__ITEM_UPDATED)
-                                {
-                                    oldList.EventReceivers[i].Delete();
+                        SPList oldList = Web.Lists.TryGetList(oldListName);
 
-                                    i = -1;
+                        if (oldList != null)
+                        {
+                            for (int i = 0; i < oldList.EventReceivers.Count; i++)
+                            {
+                                if (oldList.EventReceivers[i].Name != null)
+                                {
+                                    if (oldList.EventReceivers[i].Name == WorkBox.WORK_BOXES_LIST_EVENT_RECEIVER__ITEM_ADDED || oldList.EventReceivers[i].Name == WorkBox.WORK_BOXES_LIST_EVENT_RECEIVER__ITEM_UPDATED)
+                                    {
+                                        oldList.EventReceivers[i].Delete();
+
+                                        i = -1;
+                                    }
                                 }
                             }
                         }
@@ -369,34 +593,43 @@ namespace WorkBoxFramework
                             
                     if (!newListName.Equals(""))                            
                     {
-                        // At the moment not catching specifically the situation where the named list doesn't exist.
-                        List = Web.Lists[newListName];
-
-                                string assemblyName = "WorkBoxFramework, Version=1.0.0.0, Culture=Neutral, PublicKeyToken=4554acfc19d83350";
-                                string className = "WorkBoxFramework.WorkBoxMetaDataItemChangeEventReceiver";
-
-                                SPEventReceiverDefinition itemAddedEventReceiver = List.EventReceivers.Add();
-                                itemAddedEventReceiver.Name = WorkBox.WORK_BOXES_LIST_EVENT_RECEIVER__ITEM_ADDED;
-                                itemAddedEventReceiver.Type = SPEventReceiverType.ItemAdded;
-                                itemAddedEventReceiver.SequenceNumber = 1000;
-                                itemAddedEventReceiver.Assembly = assemblyName;
-                                itemAddedEventReceiver.Class = className;
-                                itemAddedEventReceiver.Update();
-
-                                SPEventReceiverDefinition itemUpdatedEventReceiver = List.EventReceivers.Add();
-                                itemUpdatedEventReceiver.Name = WorkBox.WORK_BOXES_LIST_EVENT_RECEIVER__ITEM_UPDATED;
-                                itemUpdatedEventReceiver.Type = SPEventReceiverType.ItemUpdated;
-                                itemUpdatedEventReceiver.SequenceNumber = 1000;
-                                itemUpdatedEventReceiver.Assembly = assemblyName;
-                                itemUpdatedEventReceiver.Class = className;
-                                itemUpdatedEventReceiver.Update();
-
-                                EventReceiversAdded = true;
-
-                            
+                        AttachEventReceivers();
                     }
                 }
             }
+        }
+
+        internal bool AttachEventReceivers()
+        {
+            if (List != null)
+            {
+                string assemblyName = "WorkBoxFramework, Version=1.0.0.0, Culture=Neutral, PublicKeyToken=4554acfc19d83350";
+                string className = "WorkBoxFramework.WorkBoxMetaDataItemChangeEventReceiver";
+
+                SPEventReceiverDefinition itemAddedEventReceiver = List.EventReceivers.Add();
+                itemAddedEventReceiver.Name = WorkBox.WORK_BOXES_LIST_EVENT_RECEIVER__ITEM_ADDED;
+                itemAddedEventReceiver.Type = SPEventReceiverType.ItemAdded;
+                itemAddedEventReceiver.SequenceNumber = 1000;
+                itemAddedEventReceiver.Assembly = assemblyName;
+                itemAddedEventReceiver.Class = className;
+                itemAddedEventReceiver.Update();
+
+                SPEventReceiverDefinition itemUpdatedEventReceiver = List.EventReceivers.Add();
+                itemUpdatedEventReceiver.Name = WorkBox.WORK_BOXES_LIST_EVENT_RECEIVER__ITEM_UPDATED;
+                itemUpdatedEventReceiver.Type = SPEventReceiverType.ItemUpdated;
+                itemUpdatedEventReceiver.SequenceNumber = 1000;
+                itemUpdatedEventReceiver.Assembly = assemblyName;
+                itemUpdatedEventReceiver.Class = className;
+                itemUpdatedEventReceiver.Update();
+
+                EventReceiversAdded = true;
+            }
+            else
+            {
+                EventReceiversAdded = false;
+            }
+
+            return EventReceiversAdded;
         }
 
         public bool EventReceiversAdded
