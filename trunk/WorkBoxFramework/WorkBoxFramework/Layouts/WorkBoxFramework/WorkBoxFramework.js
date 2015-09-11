@@ -521,6 +521,31 @@ function WorkBoxFramework_triggerWebPartUpdate(guid) {
 
 }
 
+// The following two functions are extended versions of the LBI izzi functions originally written by Leigh Hogan and modified by Steve Clements
+function WorkBoxFramework__search__KeyDown(e, searchURL, keywordsID, refinement) {
+            if (e.keyCode == 13 || e.keyCode == 10) {
+                e.returnValue = false;
+                WorkBoxFramework__doRefinedSearch(searchURL, keywordsID, refinement);
+                return false;
+            }
+            else
+                return true;
+}
+
+function WorkBoxFramework__doRefinedSearch(searchURL, keywordsID, refinement)
+{
+    var searchString = document.all[keywordsID].value;
+    searchString = searchString.replace("'", "%22");
+
+    var newSearchURL = searchURL + "?k=" + searchString + "&r=" + refinement;
+
+    window.location = newSearchURL;
+}
+
+
+
+
+
 // The function below is to fix the annoying issue where peopleeditors controls don't clear after a post back:
 // The function is derived from the function described here.
 // http: //www.sharemuch.com/2011/12/04/how-to-address-sharepoint-2010-people-editor-issue-not-clearing/

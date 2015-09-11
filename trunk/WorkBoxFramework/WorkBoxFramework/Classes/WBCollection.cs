@@ -92,19 +92,159 @@ namespace WorkBoxFramework
         private const bool DEFAULT__CAN_OWNER_CLOSE = true;
         private const bool DEFAULT__CAN_OWNER_REOPEN = true;
 
-        private const string DEFAULT__OPEN_PERMISION_LEVEL_FOR_SYSTEM_ADMIN = "Full Control";
-        private const string DEFAULT__OPEN_PERMISION_LEVEL_FOR_BUSINESS_ADMIN = "Contribute";
-        private const string DEFAULT__OPEN_PERMISION_LEVEL_FOR_OWNER = "Contribute";
-        private const string DEFAULT__OPEN_PERMISION_LEVEL_FOR_INVOLVED = "Contribute";
-        private const string DEFAULT__OPEN_PERMISION_LEVEL_FOR_VISITORS = "Read";
+        internal const string PERMISSION_LEVEL__WORK_BOX_SYSTEM_ADMIN = "Work Box System Admin";
+        internal const string PERMISSION_LEVEL__WORK_BOX_BUSINESS_ADMIN = "Work Box Business Admin";
+        internal const string PERMISSION_LEVEL__WORK_BOX_OWNER = "Work Box Owner";
+        internal const string PERMISSION_LEVEL__WORK_BOX_INVOLVED = "Work Box Involved";
+        internal const string PERMISSION_LEVEL__WORK_BOX_VISITOR = "Work Box Visitor";
+        internal const string PERMISSION_LEVEL__WORK_BOX_CLOSED = "Work Box Closed";
+        internal const string PERMISSION_LEVEL__WORK_BOX_METADATA_EDITOR = "Work Box Metadata Editor";
+
+        private const string DEFAULT__OPEN_PERMISION_LEVEL_FOR_SYSTEM_ADMIN = PERMISSION_LEVEL__WORK_BOX_SYSTEM_ADMIN;
+        private const string DEFAULT__OPEN_PERMISION_LEVEL_FOR_BUSINESS_ADMIN = PERMISSION_LEVEL__WORK_BOX_BUSINESS_ADMIN;
+        private const string DEFAULT__OPEN_PERMISION_LEVEL_FOR_OWNER = PERMISSION_LEVEL__WORK_BOX_OWNER;
+        private const string DEFAULT__OPEN_PERMISION_LEVEL_FOR_INVOLVED = PERMISSION_LEVEL__WORK_BOX_INVOLVED;
+        private const string DEFAULT__OPEN_PERMISION_LEVEL_FOR_VISITORS = PERMISSION_LEVEL__WORK_BOX_VISITOR;
         private const string DEFAULT__OPEN_PERMISION_LEVEL_FOR_EVERYONE = "";
 
-        private const string DEFAULT__CLOSED_PERMISION_LEVEL_FOR_SYSTEM_ADMIN = "Read";
-        private const string DEFAULT__CLOSED_PERMISION_LEVEL_FOR_BUSINESS_ADMIN = "Read";
-        private const string DEFAULT__CLOSED_PERMISION_LEVEL_FOR_OWNER = "Read";
-        private const string DEFAULT__CLOSED_PERMISION_LEVEL_FOR_INVOLVED = "Read";
-        private const string DEFAULT__CLOSED_PERMISION_LEVEL_FOR_VISITORS = "Read";
+        private const string DEFAULT__CLOSED_PERMISION_LEVEL_FOR_SYSTEM_ADMIN = PERMISSION_LEVEL__WORK_BOX_CLOSED;
+        private const string DEFAULT__CLOSED_PERMISION_LEVEL_FOR_BUSINESS_ADMIN = PERMISSION_LEVEL__WORK_BOX_CLOSED;
+        private const string DEFAULT__CLOSED_PERMISION_LEVEL_FOR_OWNER = PERMISSION_LEVEL__WORK_BOX_CLOSED;
+        private const string DEFAULT__CLOSED_PERMISION_LEVEL_FOR_INVOLVED = PERMISSION_LEVEL__WORK_BOX_CLOSED;
+        private const string DEFAULT__CLOSED_PERMISION_LEVEL_FOR_VISITORS = PERMISSION_LEVEL__WORK_BOX_CLOSED;
         private const string DEFAULT__CLOSED_PERMISION_LEVEL_FOR_EVERYONE = "";
+
+        internal const SPBasePermissions BASE_PERMISSIONS__WORK_BOX_SYSTEM_ADMIN =
+                                                                SPBasePermissions.ViewListItems |
+                                                                SPBasePermissions.AddListItems |
+                                                                SPBasePermissions.EditListItems |
+                                                                SPBasePermissions.DeleteListItems |
+                                                                SPBasePermissions.ApproveItems |
+                                                                SPBasePermissions.OpenItems |
+                                                                SPBasePermissions.ViewVersions |
+                                                                SPBasePermissions.DeleteVersions |
+                                                                SPBasePermissions.CancelCheckout |
+                                                                SPBasePermissions.ManagePersonalViews |
+                                                                SPBasePermissions.ManageLists |
+                                                                SPBasePermissions.ViewFormPages |
+                                                                SPBasePermissions.Open |
+                                                                SPBasePermissions.ViewPages |
+                                                                SPBasePermissions.AddAndCustomizePages |
+                                                                SPBasePermissions.ApplyThemeAndBorder |
+                                                                SPBasePermissions.ApplyStyleSheets |
+                                                                SPBasePermissions.ViewUsageData |
+                                                                SPBasePermissions.ManagePermissions |
+                                                                SPBasePermissions.BrowseDirectories |
+                                                                SPBasePermissions.BrowseUserInfo |
+                                                                SPBasePermissions.ManageWeb |
+                                                                SPBasePermissions.UseClientIntegration |
+                                                                SPBasePermissions.UseRemoteAPIs |
+                                                                SPBasePermissions.ManageAlerts |
+                                                                SPBasePermissions.CreateAlerts |
+                                                                SPBasePermissions.EditMyUserInfo |
+                                                                SPBasePermissions.EnumeratePermissions;
+
+
+        internal const SPBasePermissions BASE_PERMISSIONS__WORK_BOX_BUSINESS_ADMIN =
+                                                                SPBasePermissions.ViewListItems |
+                                                                SPBasePermissions.AddListItems |
+                                                                SPBasePermissions.EditListItems |
+                                                                SPBasePermissions.DeleteListItems |
+                                                                SPBasePermissions.ApproveItems |
+                                                                SPBasePermissions.OpenItems |
+                                                                SPBasePermissions.ViewVersions |
+                                                                SPBasePermissions.DeleteVersions |
+                                                                SPBasePermissions.CancelCheckout |
+                                                                SPBasePermissions.ManagePersonalViews |
+                                                                SPBasePermissions.ManageLists |
+                                                                SPBasePermissions.ViewFormPages |
+                                                                SPBasePermissions.Open |
+                                                                SPBasePermissions.ViewPages |
+                                                                SPBasePermissions.AddAndCustomizePages |
+                                                                SPBasePermissions.ViewUsageData |
+                                                                SPBasePermissions.BrowseDirectories |
+                                                                SPBasePermissions.BrowseUserInfo |
+                                                                SPBasePermissions.UseClientIntegration |
+                                                                SPBasePermissions.UseRemoteAPIs |
+                                                                SPBasePermissions.ManageAlerts |
+                                                                SPBasePermissions.CreateAlerts |
+                                                                SPBasePermissions.EditMyUserInfo |
+                                                                SPBasePermissions.EnumeratePermissions;
+
+        internal const SPBasePermissions BASE_PERMISSIONS__WORK_BOX_OWNER =
+                                                                SPBasePermissions.ViewListItems |
+                                                                SPBasePermissions.AddListItems |
+                                                                SPBasePermissions.EditListItems |
+                                                                SPBasePermissions.DeleteListItems |
+                                                                SPBasePermissions.ApproveItems |
+                                                                SPBasePermissions.OpenItems |
+                                                                SPBasePermissions.ViewVersions |
+                                                                SPBasePermissions.DeleteVersions |
+                                                                SPBasePermissions.CancelCheckout |
+                                                                SPBasePermissions.ManagePersonalViews |
+                                                                SPBasePermissions.ManageLists |
+                                                                SPBasePermissions.ViewFormPages |
+                                                                SPBasePermissions.Open |
+                                                                SPBasePermissions.ViewPages |
+                                                                SPBasePermissions.AddAndCustomizePages |
+                                                                SPBasePermissions.ViewUsageData |
+                                                                SPBasePermissions.BrowseDirectories |
+                                                                SPBasePermissions.BrowseUserInfo |
+                                                                SPBasePermissions.UseClientIntegration |
+                                                                SPBasePermissions.UseRemoteAPIs |
+                                                                SPBasePermissions.ManageAlerts |
+                                                                SPBasePermissions.CreateAlerts |
+                                                                SPBasePermissions.EditMyUserInfo |
+                                                                SPBasePermissions.EnumeratePermissions;
+
+        internal const SPBasePermissions BASE_PERMISSIONS__WORK_BOX_INVOLVED =
+                                                                SPBasePermissions.ViewListItems |
+                                                                SPBasePermissions.AddListItems |
+                                                                SPBasePermissions.EditListItems |
+                                                                SPBasePermissions.OpenItems |
+                                                                SPBasePermissions.ViewVersions |
+                                                                SPBasePermissions.ViewFormPages |
+                                                                SPBasePermissions.Open |
+                                                                SPBasePermissions.ViewPages |
+                                                                SPBasePermissions.BrowseDirectories |
+                                                                SPBasePermissions.BrowseUserInfo |
+                                                                SPBasePermissions.UseClientIntegration |
+                                                                SPBasePermissions.UseRemoteAPIs |
+                                                                SPBasePermissions.CreateAlerts |
+                                                                SPBasePermissions.EditMyUserInfo;
+
+        internal const SPBasePermissions BASE_PERMISSIONS__WORK_BOX_VISITOR =
+                                                                SPBasePermissions.ViewListItems |
+                                                                SPBasePermissions.OpenItems |
+                                                                SPBasePermissions.ViewFormPages |
+                                                                SPBasePermissions.Open |
+                                                                SPBasePermissions.ViewPages |
+                                                                SPBasePermissions.BrowseDirectories |
+                                                                SPBasePermissions.BrowseUserInfo |
+                                                                SPBasePermissions.UseClientIntegration |
+                                                                SPBasePermissions.UseRemoteAPIs |
+                                                                SPBasePermissions.CreateAlerts;
+
+
+        internal const SPBasePermissions BASE_PERMISSIONS__WORK_BOX_CLOSED =
+                                                                SPBasePermissions.ViewListItems |
+                                                                SPBasePermissions.OpenItems |
+                                                                SPBasePermissions.ViewFormPages |
+                                                                SPBasePermissions.Open |
+                                                                SPBasePermissions.ViewPages |
+                                                                SPBasePermissions.BrowseDirectories |
+                                                                SPBasePermissions.BrowseUserInfo |
+                                                                SPBasePermissions.UseClientIntegration |
+                                                                SPBasePermissions.UseRemoteAPIs |
+                                                                SPBasePermissions.CreateAlerts;
+
+
+        internal const SPBasePermissions BASE_PERMISSIONS__WORK_BOX_METADATA_EDITOR =
+                                                                SPBasePermissions.ViewListItems |
+                                                                SPBasePermissions.AddListItems |
+                                                                SPBasePermissions.EditListItems |
+                                                                SPBasePermissions.Open;
+                                                                                    
 
 
         private const string DEFAULT_URL__NEW_WORK_BOX_DIALOG = "/_layouts/WorkBoxFramework/NewWorkBox.aspx?workBoxCollectionUrl=[CollectionURL]&recordsTypeGUID=[RecordsTypeGUID]&owningTeamGUID=[TeamGUID]&relatedWorkBoxURL=[RelatedWorkBoxURL]&relationType=[RelationType]";
@@ -297,11 +437,13 @@ namespace WorkBoxFramework
         internal void CreateOrCheckWBCPermissionLevels(WBConfigStepFeedback feedback)
         {
 
-            WBUtils.CreateOrCheckPermissionLevel(feedback, Site, "Test", "This is a test",
-                SPBasePermissions.ManageLists |
-                SPBasePermissions.EditListItems |
-                SPBasePermissions.ViewListItems |
-                SPBasePermissions.ViewPages);
+            WBUtils.CreateOrCheckPermissionLevel(feedback, Site, PERMISSION_LEVEL__WORK_BOX_SYSTEM_ADMIN, "For system admins of the whole work box collection.", BASE_PERMISSIONS__WORK_BOX_SYSTEM_ADMIN);
+            WBUtils.CreateOrCheckPermissionLevel(feedback, Site, PERMISSION_LEVEL__WORK_BOX_BUSINESS_ADMIN, "For business admins of the whole work box collection.", BASE_PERMISSIONS__WORK_BOX_BUSINESS_ADMIN);
+            WBUtils.CreateOrCheckPermissionLevel(feedback, Site, PERMISSION_LEVEL__WORK_BOX_OWNER, "For owners of particular work boxes.", BASE_PERMISSIONS__WORK_BOX_OWNER);
+            WBUtils.CreateOrCheckPermissionLevel(feedback, Site, PERMISSION_LEVEL__WORK_BOX_INVOLVED, "For those involved with particular work boxes.", BASE_PERMISSIONS__WORK_BOX_INVOLVED);
+            WBUtils.CreateOrCheckPermissionLevel(feedback, Site, PERMISSION_LEVEL__WORK_BOX_VISITOR, "For those visiting particular work boxes.", BASE_PERMISSIONS__WORK_BOX_VISITOR);
+            WBUtils.CreateOrCheckPermissionLevel(feedback, Site, PERMISSION_LEVEL__WORK_BOX_CLOSED, "For closed work boxes.", BASE_PERMISSIONS__WORK_BOX_CLOSED);
+            WBUtils.CreateOrCheckPermissionLevel(feedback, Site, PERMISSION_LEVEL__WORK_BOX_METADATA_EDITOR, "To enable users to edit work box metadata.", BASE_PERMISSIONS__WORK_BOX_METADATA_EDITOR);
 
         }
 

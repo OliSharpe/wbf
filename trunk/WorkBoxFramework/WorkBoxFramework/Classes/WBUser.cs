@@ -571,6 +571,56 @@ namespace WorkBoxFramework
             return html;
         }
 
+        public static List<String> GetWorkBoxURLsVisitedSinceTickTime(UserProfile profile, long ticksAtLastUpdate)
+        {
+            WBLogging.TimerTasks.Verbose("In GetWorkBoxURLsModidifiedSinceTickTime(): Looking at work boxes recently visited by: " + profile.DisplayName);                
+
+            List<String> listOfWorkBoxURLs = new List<string>();
+
+            UserProfileValueCollection workBoxesRecentlyVisited = profile[WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES];
+            String recentlyVisitedDetails = workBoxesRecentlyVisited.Value.WBxToString();
+            if (!String.IsNullOrEmpty(recentlyVisitedDetails))
+            {
+                string[] recentWorkBoxes = recentlyVisitedDetails.Split(';');
+
+                if (recentWorkBoxes.Length > 0)
+                {
+                    WBLogging.TimerTasks.Verbose("In GetWorkBoxURLsModidifiedSinceTickTime(): Found recently visited work boxes: " + recentWorkBoxes.Length);
+
+                    List<String> updatedRecentWorkBoxes = new List<String>();
+
+                    foreach (string recentWorkBoxLinkDetails in recentWorkBoxes)
+                    {
+                        WBLink workBoxLink = new WBLink(recentWorkBoxLinkDetails);
+                        if (!workBoxLink.IsOK) continue;
+
+                        try
+                        {
+                            long ticksWhenVisited = 0;
+                            if (workBoxLink.UsingTicksWhenVisited)
+                            {
+                                string ticksWhenVisitedString = workBoxLink.TicksWhenVisitedString;
+                                ticksWhenVisited = Convert.ToInt64(workBoxLink.TicksWhenVisitedString);
+
+                                if (ticksWhenVisited > ticksAtLastUpdate)
+                                {
+                                    listOfWorkBoxURLs.Add(workBoxLink.URL);
+                                }
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            WBLogging.Teams.Unexpected("In GetWorkBoxURLsModidifiedSinceTickTime(): Something went wrong when looking for recently changed work boxes", exception);
+                        }
+                    }
+                }
+
+            }
+
+            return listOfWorkBoxURLs;
+        }
+
+
         public static void CheckLastModifiedDatesAndTitlesOfRecentWorkBoxes(SPSite cacheSite, SPList cacheList, UserProfile profile, long ticksAtLastUpdate)
         {
             WBLogging.TimerTasks.Verbose("Looking at work boxes recently visited by: " + profile.DisplayName);                

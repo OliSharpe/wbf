@@ -892,6 +892,7 @@ namespace WorkBoxFramework
             WBTimerTask.COMMAND__WORK_BOX_STATUS_UPDATES,
             WBTimerTask.COMMAND__CACHE_WORK_BOX_DETAILS,
             WBTimerTask.COMMAND__UPDATE_RECENTLY_VISITED_WORK_BOXES,
+            WBTimerTask.COMMAND__UPDATE_WORK_BOX_DOCUMENTS_METADATA,
             WBTimerTask.COMMAND__PRECREATE_WORK_BOXES
         };
 

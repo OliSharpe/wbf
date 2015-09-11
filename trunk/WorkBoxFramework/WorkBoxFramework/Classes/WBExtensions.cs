@@ -1125,6 +1125,10 @@ namespace WorkBoxFramework
             taxonomyField.SetFieldValue(item, taxonomyFieldValue);
         }
 
+        public static void WBxSetSingleTermColumn(this SPListItem item, WBColumn column, WBTerm term)
+        {
+            WBxSetSingleTermColumn(item, column.DisplayName, term);
+        }
 
         public static void WBxSetSingleTermColumn(this SPListItem item, String columnName, WBTerm term)
         {
@@ -1151,6 +1155,10 @@ namespace WorkBoxFramework
             taxonomyField.SetFieldValue(item, taxonomyFieldValueCollection);
         }
 
+        public static void WBxSetMultiTermColumn<T>(this SPListItem item, WBColumn column, WBTermCollection<T> terms) where T : WBTerm, new()
+        {
+            WBxSetMultiTermColumn(item, column.DisplayName, terms.UIControlValue);
+        }
 
         public static void WBxSetMultiTermColumn<T>(this SPListItem item, String columnName, WBTermCollection<T> terms) where T : WBTerm, new()
         {
@@ -1380,10 +1388,13 @@ namespace WorkBoxFramework
                 view = list.Views[viewName];
 
                 // First update the fields:
-                view.ViewFields.DeleteAll();
+                // view.ViewFields.DeleteAll();
                 foreach (String fieldName in query.JustViewFields())
                 {
-                    view.ViewFields.Add(fieldName);
+                    if (!view.ViewFields.Exists(fieldName))
+                    {
+                        view.ViewFields.Add(fieldName);
+                    }
                 }
                 view.Update();
 
@@ -1412,7 +1423,27 @@ namespace WorkBoxFramework
             }
         }
 
+        public static bool WBxExists(this SPList list, WBColumn column)
+        {
+            return (list.Fields.ContainsField(column.DisplayName));
+        }
 
+        public static bool WBxAddContentType(this SPList list, SPWeb web, String contentTypeName)
+        {
+            SPContentType itemContentType = web.ContentTypes.Cast<SPContentType>()
+                .FirstOrDefault(c => c.Name == contentTypeName);
+
+            if (itemContentType == null) {
+                WBLogging.Config.Unexpected("Could not find the content type " + contentTypeName + " in SPWeb " + web.Url);
+                return false;
+            }
+
+            list.ContentTypesEnabled = true;
+            list.ContentTypes.Add(itemContentType);
+            list.Update();
+
+            return true;
+        }
 
         #endregion
 

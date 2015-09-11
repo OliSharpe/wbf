@@ -45,7 +45,9 @@ namespace WorkBoxFramework
         internal const string COMMAND__WORK_BOX_STATUS_UPDATES = "Work Box Status Updates (Work Box Collection | [Current Status])";
         internal const string COMMAND__CACHE_WORK_BOX_DETAILS = "Cache Work Box Details (Work Box Collection | [Current Status])";
         internal const string COMMAND__UPDATE_RECENTLY_VISITED_WORK_BOXES = "Update Recently Visited Work Boxes ([] | [All])";
+        internal const string COMMAND__UPDATE_WORK_BOX_DOCUMENTS_METADATA = "Update Work Box Documents Metadata ([] | [All])";
         internal const string COMMAND__PRECREATE_WORK_BOXES = "Precreate Work Boxes (Work Box Collection)";
+
 
         private const string DEFAULT_LIST_NAME__COMPOSITE_TEAMS = "Composite Teams";
         private const string DEFAULT_LIST_NAME__FOLDER_GROUPS_MAPPING = "Folder Groups Mapping";
@@ -102,6 +104,12 @@ namespace WorkBoxFramework
                         doUpdateRecentlyVisitedWorkBoxes(targetUrl, argument1);
                         break;
                     }
+
+                case COMMAND__UPDATE_WORK_BOX_DOCUMENTS_METADATA:
+                    {
+                        doUpdateWorkBoxDocumentsMetadata(targetUrl, argument1);
+                        break;
+                    }                    
 
                 case COMMAND__PRECREATE_WORK_BOXES:
                     {
@@ -468,6 +476,129 @@ namespace WorkBoxFramework
 
 
         }
+
+
+        private static void doUpdateWorkBoxDocumentsMetadata(String targetURL, String flag)
+        {
+            WBLogging.TimerTasks.Monitorable("Running doUpdateWorkBoxDocumentsMetadata command");
+            WBFarm farm = WBFarm.Local;
+
+            long ticksAtLastUpdate = 0;
+            if (flag != "All")
+            {
+                ticksAtLastUpdate = farm.TicksWhenLastUpdatedWorkBoxDocumentsMetadata;
+            }
+
+            farm.TicksWhenLastUpdatedWorkBoxDocumentsMetadata = DateTime.Now.Ticks;
+            farm.Update();
+
+            List<String> workBoxURLsToCheck = new List<String>();
+
+            using (SPSite teamsSite = new SPSite(farm.TeamSitesSiteCollectionUrl))
+            {
+                SPServiceContext serviceContext = SPServiceContext.GetContext(teamsSite);
+                UserProfileManager profileManager = new UserProfileManager(serviceContext);
+
+
+                foreach (UserProfile profile in profileManager)
+                {
+                    try
+                    {
+                        List<String> moreWorkBoxURLsToCheck = WBUser.GetWorkBoxURLsVisitedSinceTickTime(profile, ticksAtLastUpdate);
+
+                        foreach (String workBoxURL in moreWorkBoxURLsToCheck)
+                        {
+                            if (!workBoxURLsToCheck.Contains(workBoxURL))
+                            {
+                                workBoxURLsToCheck.Add(workBoxURL);
+                            }
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        WBLogging.TimerTasks.Unexpected("Exception happened when looking at user profile: " + profile.DisplayName);
+                        WBLogging.TimerTasks.Unexpected(exception);
+                    }
+                }
+            }
+
+            // Sort the work boxes so that work boxes from the same site collection should be nearby to each other:
+            workBoxURLsToCheck.Sort();
+
+            WBLogging.TimerTasks.Verbose("In doUpdateWorkBoxDocumentsMetadata(): Work Boxes to check: " + String.Join("; ", workBoxURLsToCheck.ToArray()));
+
+            SPSite site = null;
+            WBTaxonomy teams = null;
+            SPWeb web = null;
+
+            foreach (String workBoxURL in workBoxURLsToCheck)
+            {
+                WBLogging.TimerTasks.Verbose("In doUpdateWorkBoxDocumentsMetadata(): About to look at: " + workBoxURL);
+
+                try
+                {
+                    if (site == null)
+                    {
+                        site = new SPSite(workBoxURL);
+                        teams = WBTaxonomy.GetTeams(site);
+                    }
+
+                    WBLogging.TimerTasks.Verbose("In doUpdateWorkBoxDocumentsMetadata(): Opened SPSite for: " + workBoxURL);
+
+                    web = null;
+                    //String workBoxURLWithinSite = WBUtils.GetURLWithoutHostHeader(workBoxURL);
+
+                    //WBLogging.TimerTasks.Verbose("In doUpdateWorkBoxDocumentsMetadata(): workBoxURLWithinSite: " + workBoxURLWithinSite);
+                    web = site.OpenWeb(workBoxURL);
+                    if (!web.Exists)
+                    {
+                        web = null;
+                        WBLogging.TimerTasks.Verbose("Couldn't find " + workBoxURL + " in " + site.Url);
+                    }
+
+                    if (web == null)
+                    {
+                        WBLogging.TimerTasks.Verbose("In doUpdateWorkBoxDocumentsMetadata(): Couldn't find SPWeb in current SPSite: " + workBoxURL);
+
+                        // OK so if we're here then this suggests that the current workBoxURL is for an SPWeb from a different SPSite so:
+                        if (site != null) { site.Dispose(); site = null; }
+
+                        site = new SPSite(workBoxURL);
+                        teams = WBTaxonomy.GetTeams(site);
+                        web = site.OpenWeb();  // this should work as the SPWebs URL was used to create the SPSite object
+                    }
+
+                    if (site == null || web == null)
+                    {
+                        WBLogging.TimerTasks.Unexpected("Should not have a null site (" + site + ") or web (" + web + ") object at this point!");
+                        throw new Exception("Should not have a null site (" + site + ") or web (" + web + ") object at this point!");
+                    }
+
+                    if (web.LastItemModifiedDate.Ticks > ticksAtLastUpdate)
+                    {
+                        // OK so this SPWeb has been modified since we last looked to update the documents metadata
+                        WorkBox workBox = new WorkBox(site, web);
+                        workBox.UpdateDocumentsMetadata(teams);
+                    }
+
+                    web.Dispose();
+                }
+                catch (Exception e)
+                {
+                    WBLogging.TimerTasks.Unexpected("In doUpdateWorkBoxDocumentsMetadata(): Exception occurred for: " + workBoxURL, e);
+                }
+                finally
+                {
+                    if (web != null) web.Dispose();
+                }
+
+            }
+
+            if (site != null) site.Dispose();
+
+            WBLogging.TimerTasks.Monitorable("Finished doUpdateWorkBoxDocumentsMetadata command");
+        }
+
 
         private static void doPrecreateWorkBoxes(String workBoxCollectionURL, String flag)
         {

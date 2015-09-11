@@ -63,6 +63,7 @@ td.wbf-configuation-step-image-table-cell
 {
     width: 32px;
     height: 32px;
+    vertical-align: top;
 }
 
 td.wbf-configuation-step-name-table-cell 

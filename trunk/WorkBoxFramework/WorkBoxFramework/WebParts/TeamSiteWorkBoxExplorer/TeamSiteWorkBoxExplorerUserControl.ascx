@@ -40,8 +40,8 @@
     }
 
     function showDetailsView() {
-        $("#wbf-team-explorer-icon-view").hide();
-        $("#wbf-team-explorer-details-view").show();
+        $("#wbf-wb-explorer-icon-view").hide();
+        $("#wbf-wb-explorer-details-view").show();
         $("#wbf-image-for-changing-view-style").attr("src", "/_layouts/images/WorkBoxFramework/icons-view-32.png");
         $("#wbf-image-for-changing-view-style").attr("title", "Change to icons view");
         $("#wbf-columns-icon-list-item").show();
@@ -50,8 +50,8 @@
     }
 
     function showIconsView() {
-        $("#wbf-team-explorer-details-view").hide();
-        $("#wbf-team-explorer-icon-view").show();
+        $("#wbf-wb-explorer-details-view").hide();
+        $("#wbf-wb-explorer-icon-view").show();
         $("#wbf-image-for-changing-view-style").attr("src", "/_layouts/images/WorkBoxFramework/details-view-32.png");
         $("#wbf-image-for-changing-view-style").attr("title", "Change to details view");
         $("#wbf-columns-icon-list-item").hide();
@@ -81,6 +81,13 @@
 
         $(".ui-tabs img").tooltip().click(function() {
             $(this).tooltip( "close");
+        });
+
+
+        $("#teamSearch").blur(function () {
+            if ($(this).val() == "") { $(this).val("Search this team's work boxes"); }
+        }).focus(function () {
+            if ($(this).val() == "Search this team's work boxes") { $(this).val(""); }
         });
 
 
@@ -156,6 +163,7 @@ td.ms-vb2 img {
 .ms-rte-layoutszone-inner 
 {
     padding: 0px;
+    overflow: visible;
 }
 
 h3.lbi-council-wide-business {
@@ -164,6 +172,17 @@ h3.lbi-council-wide-business {
 
 h3.lbi-team-admin {
     background-color: #009ACF;
+}
+
+div.wbf-wb-explorer-update-panel
+{
+   font-size: 10pt !important;
+}
+
+div#wbf-wb-explorer-tabs 
+{
+   position: relative;
+   top: -68px;
 }
 
 #wbf-wb-explorer-tabs .ms-rte-wpbox 
@@ -188,7 +207,7 @@ div.wbf-records-type-tree-nav
     padding: 6px;
 }
 
-.wbf-tree-selection-gridview 
+.wbf-wb-explorer-gridview 
 {
     font-size: 10pt !important;
 }
@@ -225,6 +244,17 @@ h4.wbf-tab-dialog-sub-header
     border: 1px solid grey;
 }
 
+#wbf-add-new div h3.wbf-leftpanel-header 
+{
+    font-size: 1.1em;
+}
+
+#teamSearch 
+{
+    color: #999;
+    width: 200px;
+}
+
 </style>
 
 <div style="display: none;" class="wbf-hidden-submit-button">
@@ -235,7 +265,7 @@ h4.wbf-tab-dialog-sub-header
 
 </div>
 
-<div class="wbf-tree-selection-update-panel">
+<div class="wbf-wb-explorer-update-panel">
 <asp:UpdatePanel ID="ShowSelectionPanel" runat="server" UpdateMode="Always">
 
     <Triggers>
@@ -243,17 +273,17 @@ h4.wbf-tab-dialog-sub-header
     </Triggers>
 
     <ContentTemplate>
-<div class="wbf-tree-selection-updating-panel">
+<div class="wbf-wb-explorer-updating-panel">
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 <tr>
 <td valign="top">
 
-<div id="wbf-team-explorer-details-view" style="display: none;" >
-<div class="wbf-tree-selection-gridview">
+<div id="wbf-wb-explorer-details-view" style="display: none;" >
+<div class="wbf-wb-explorer-gridview">
     <SharePoint:SPGridView runat="server" ID="SelectedWorkBoxes" AutoGenerateColumns="false">
         <EmptyDataTemplate>
-            <span class="wbf-tree-selection-no-work-boxes"><%= NoWorkBoxesText %></span>                                    
+            <span class="wbf-wb-explorer-no-work-boxes"><%= NoWorkBoxesText %></span>                                    
         </EmptyDataTemplate>
     </SharePoint:SPGridView>        
 
@@ -261,7 +291,7 @@ h4.wbf-tab-dialog-sub-header
 </div>
 
 
-<div id="wbf-team-explorer-icon-view" style="display: none;" >
+<div id="wbf-wb-explorer-icon-view" style="display: none;" >
 
 <asp:Literal ID="IconViewLiteral" runat="server" />
 
@@ -274,7 +304,7 @@ h4.wbf-tab-dialog-sub-header
 <div id="wbf-wb-explorer-tabs">
   <ul>
     <li><a href="#" onclick="toggleViewStyle();" id="wbf-anchor-for-changing-view-style"><img id="wbf-image-for-changing-view-style" src="/_layouts/images/WorkBoxFramework/details-view-32.png" title="Change to details view" alt="Change to details view"/></a></li>
-    <li><a href="#wbf-order-by"><img src="/_layouts/images/WorkBoxFramework/order-by-icon-32.png" title="Ordering and filtering of view" alt="Ordering and filtering of view"/></a></li>
+    <li><a href="#wbf-order-by"><img src="/_layouts/images/WorkBoxFramework/filter-icon-32.png" title="Ordering and filtering of view" alt="Ordering and filtering of view"/></a></li>
     <li id="wbf-columns-icon-list-item"><a href="#wbf-columns"><img src="/_layouts/images/WorkBoxFramework/columns-icon-32.png" title="Choose which columns to display" alt="Choose which columns to display"/></a></li>
     <li><a href="#wbf-search-work-boxes"><img src="/_layouts/images/WorkBoxFramework/search-icon-32.png" title="Search team's work boxes" alt="Search team's work boxes"/></a></li>
     <li><a href="#wbf-add-new"><img src="/_layouts/images/WorkBoxFramework/plus-icon-32.png" title="Create a new work box" alt="Create a new work box"/></a></li>
@@ -695,9 +725,11 @@ h4.wbf-tab-dialog-sub-header
 
 <tr>
 <td class="wbf-field-name-panel" colspan="2">
-  <p>
-  <i>Feature coming soon!</i>
-  </p>
+
+<input class="searchBox" type="text" name="teamSearch" id="teamSearch" value="Search this team's work boxes" accesskey="T"
+            onkeydown="WorkBoxFramework__search__KeyDown(event, '/search/pages/documents.aspx', 'teamSearch', '<%=RefinementByOwningTeam %>')" />
+<input class="submitSearch" type="button" value="Search" onclick="WorkBoxFramework__doRefinedSearch('/search/pages/documents.aspx', 'teamSearch', '<%=RefinementByOwningTeam %>')" /><br />
+
 </td>
 </tr>
 </table>
@@ -812,7 +844,7 @@ h4.wbf-tab-dialog-sub-header
 </table>
 
 <script type="text/javascript">
-    aspPanelHasUpdated(); 
+    aspPanelHasUpdated();
 </script>
 
 
