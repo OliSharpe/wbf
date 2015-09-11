@@ -37,6 +37,8 @@ namespace WorkBoxFramework.TeamSiteWorkBoxExplorer
     public partial class TeamSiteWorkBoxExplorerUserControl : UserControl
     {
         public String NoWorkBoxesText = "Your team have no work boxes of the selected type.";
+
+        public String RefinementByOwningTeam = "";
         private WBColumn sortColumn = null;
         private bool ascending = false;
 
@@ -77,6 +79,8 @@ namespace WorkBoxFramework.TeamSiteWorkBoxExplorer
             string teamGUIDString = "";
             Team = WBTeam.GetFromTeamSite(SPContext.Current);
             if (Team == null) return;
+
+            RefinementByOwningTeam = "owningteam%3D%22%23" + (Team.Id.ToString().Replace(" ", "%20").Replace("#", "%23").Replace("-", "%2D")) + "%22";
 
             teamGUIDString = WBExtensions.WBxToString(Team.Id);
             string recordsTypesListUrl = Team.RecordsTypesListUrl;

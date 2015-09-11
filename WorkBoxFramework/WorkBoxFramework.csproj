@@ -997,6 +997,7 @@
     </Content>
     <Content Include="Images\WorkBoxFramework\columns-icon-32.png" />
     <Content Include="Images\WorkBoxFramework\details-view-32.png" />
+    <Content Include="Images\WorkBoxFramework\filter-icon-32.png" />
     <Content Include="Images\WorkBoxFramework\green-tick-32.png" />
     <Content Include="Images\WorkBoxFramework\icons-view-32.png" />
     <Content Include="Images\WorkBoxFramework\list-item-32.png" />

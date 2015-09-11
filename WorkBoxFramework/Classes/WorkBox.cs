@@ -367,8 +367,6 @@ namespace WorkBoxFramework
                 {
                     if (_item == null) WBUtils.shouldThrowError("(From WorkBox.Web) _web and _item shouldn't both be null!!");
 
-                    WBLogging.WorkBoxes.Verbose("In WorkBox.Web : getting Web where _web == null - so loading a new SPWeb");
-
                     if (WebExists)
                     {
                         string guidString = _item.WBxGetColumnAsString(WorkBox.COLUMN_NAME__WORK_BOX_GUID);
@@ -1225,6 +1223,53 @@ namespace WorkBoxFramework
             }
         }
 
+        public void UpdateDocumentsMetadata(WBTaxonomy teams)
+        {
+            WBLogging.WorkBoxes.Verbose("In UpdateDocumentsMetadata(): Starting");
+
+            if (_teams == null) _teams = teams;
+
+            SPDocumentLibrary library = DocumentLibrary;
+
+            if (library == null)
+            {
+                WBLogging.WorkBoxes.Unexpected("Couldn't find the documents library so cannot update the metadata of the documents");
+                return;
+            }
+
+            if (!library.WBxExists(WBColumn.OwningTeam))
+            {
+                library.WBxAddContentType(Site.RootWeb, WBFarm.Local.WorkBoxDocumentContentTypeName);
+            }
+
+            foreach (SPListItem item in library.Items)
+            {
+                SPFile file = item.File;
+                if (file != null)
+                {
+                    WBLogging.WorkBoxes.Verbose("In UpdateDocumentsMetadata(): Looking at document: " + file.Url);
+
+                    WBTeam setOwningTeam = item.WBxGetSingleTermColumn<WBTeam>(teams, WBColumn.OwningTeam);
+
+                    if (setOwningTeam != OwningTeam)
+                    {
+                        try
+                        {
+                            item.WBxSetSingleTermColumn(WBColumn.OwningTeam, OwningTeam);
+                            item.SystemUpdate(false);
+                            WBLogging.WorkBoxes.Verbose("In UpdateDocumentsMetadata(): Updated owner of document: " + file.ServerRelativeUrl);
+                        }
+                        catch (Exception e)
+                        {
+                            WBLogging.WorkBoxes.Unexpected("In UpdateDocumentsMetadata(): Failed to update owner of document: " + file.ServerRelativeUrl, e);
+                        }
+                    }
+                }
+            }
+
+            WBLogging.WorkBoxes.Verbose("In UpdateDocumentsMetadata(): Finished");
+        }
+
         public void Dispose()
         {
             if (_web != null && _webNeedsDisposing) _web.Dispose();
@@ -1704,19 +1749,11 @@ namespace WorkBoxFramework
 
                                     SPDocumentLibrary documentLibrary = null;
 
-                                    try
-                                    {
-                                        documentLibrary = (SPDocumentLibrary)Web.Lists["Documents"];
-                                    }
-                                    catch (Exception e) { }
+                                    documentLibrary = (SPDocumentLibrary)Web.Lists.TryGetList("Documents");
 
                                     if (documentLibrary == null)
                                     {
-                                        try
-                                        {
-                                            documentLibrary = (SPDocumentLibrary)Web.Lists["Shared Documents"];
-                                        }
-                                        catch (Exception e) { }
+                                        documentLibrary = (SPDocumentLibrary)Web.Lists.TryGetList("Shared Documents");
                                     }
 
                                     if (documentLibrary != null)

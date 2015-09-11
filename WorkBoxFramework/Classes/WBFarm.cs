@@ -55,7 +55,7 @@ namespace WorkBoxFramework
 
         private const string FARM_PROPERTY__OPEN_WORK_BOXES_CACHED_DETAILS_LIST_URL = "wbf__farm__open_work_boxes_cached_details_list_url";
         private const string FARM_PROPERTY__TICKS_WHEN_LAST_UPDATED_RECENTLY_VISITED = "wbf__farm__ticks_when_last_updated_recently_visited";
-
+        private const string FARM_PROPERTY__TICKS_WHEN_LAST_UPDATED_WORK_BOX_DOCUMENTS_METADATA = "wbf__farm__ticks_when_last_updated_work_box_documents_metadata";
 
         private const string FARM_PROPERTY__RECORDS_MANAGERS_GROUP_NAME = "wbf__farm__records_managers_group_name";
         private const string FARM_PROPERTY__RECORDS_SYSTEM_ADMIN_GROUP_NAME = "wbf__farm__records_system_admin_group_name";
@@ -200,6 +200,20 @@ namespace WorkBoxFramework
             set 
             { 
                 _farm.WBxSetProperty(FARM_PROPERTY__TICKS_WHEN_LAST_UPDATED_RECENTLY_VISITED, value); 
+            }
+        }
+
+        public long TicksWhenLastUpdatedWorkBoxDocumentsMetadata
+        {
+            get
+            {
+                string ticksString = _farm.WBxGetProperty(FARM_PROPERTY__TICKS_WHEN_LAST_UPDATED_WORK_BOX_DOCUMENTS_METADATA);
+                if (String.IsNullOrEmpty(ticksString)) return 0;
+                return Convert.ToInt64(ticksString);
+            }
+            set
+            {
+                _farm.WBxSetProperty(FARM_PROPERTY__TICKS_WHEN_LAST_UPDATED_WORK_BOX_DOCUMENTS_METADATA, value);
             }
         }
 
@@ -535,7 +549,7 @@ namespace WorkBoxFramework
                         }
                     case CONFIG_STEP__TIMER_TASKS_LISTS:
                         {
-                            CreateOrCheckTimerTasksLists(feedback, rootTeamSiteWeb, adminWeb);
+                            CreateOrCheckTimerTasksLists(feedback, adminSite, rootTeamSiteWeb, adminWeb);
                             break;
                         }
                     case CONFIG_STEP__FARM_SETTINGS:
@@ -600,7 +614,7 @@ namespace WorkBoxFramework
                 CreateOrCheckCachedDetailsList(null, rootTeamSiteWeb);
 
                 //Moved
-                CreateOrCheckTimerTasksLists(null, rootTeamSiteWeb, adminWeb);
+                CreateOrCheckTimerTasksLists(null, adminSite, rootTeamSiteWeb, adminWeb);
 
                 // Moved these update statements
                 this.TeamSitesSiteCollectionUrl = adminSite.Url;
@@ -802,7 +816,7 @@ namespace WorkBoxFramework
 
         }
 
-        internal void CreateOrCheckTimerTasksLists(WBConfigStepFeedback feedback, SPWeb rootweb, SPWeb web)
+        internal void CreateOrCheckTimerTasksLists(WBConfigStepFeedback feedback, SPSite site, SPWeb rootweb, SPWeb web)
         {
             WBColumn[] columns = 
             {             
@@ -812,29 +826,27 @@ namespace WorkBoxFramework
                 WBColumn.Argument1
             };
 
+
+            WBQuery viewQuery = new WBQuery();
+            viewQuery.AddViewColumn(WBColumn.ExecutionOrder);
+            viewQuery.AddViewColumn(WBColumn.Title);
+            viewQuery.AddViewColumn(WBColumn.Command);
+            viewQuery.AddViewColumn(WBColumn.TargetURL);
+            viewQuery.AddViewColumn(WBColumn.Argument1);
+
+            viewQuery.OrderBy(WBColumn.ExecutionOrder, true);
+            viewQuery.AddFilter(WBColumn.ExecutionOrder, WBQueryClause.Comparators.GreaterThan, 0);
+
             SPList dailyList = WBUtils.CreateOrCheckCustomList(feedback, rootweb, web, WBTimerTasksJob.DAILY_TIMER_TASKS__LIST_NAME, columns);
 
-            SPViewCollection dailyViews = dailyList.Views;
-
-            StringCollection viewFields = new StringCollection();
-
-            viewFields.Add(WBColumn.ExecutionOrder.DisplayName); 
-            viewFields.Add(WBColumn.Title.DisplayName); 
-            viewFields.Add(WBColumn.Command.DisplayName);
-            viewFields.Add(WBColumn.TargetURL.DisplayName);
-            viewFields.Add(WBColumn.Argument1.DisplayName);
-          
-            string orderByCAML = "<OrderBy><FieldRef Name=\"ExecutionOrder\" Ascending=\"TRUE\" /></OrderBy>";
-
-            dailyViews.Add(WBTimerTasksJob.DAILY_TIMER_TASKS__ORDERED_VIEW_NAME, viewFields, orderByCAML, 500, true, true);
+            dailyList.WBxCreateOrUpdateView(site, WBTimerTasksJob.DAILY_TIMER_TASKS__ORDERED_VIEW_NAME, viewQuery, 500, true, true);
+            
             dailyList.Update();
             web.Update();
 
             SPList frequentList = WBUtils.CreateOrCheckCustomList(feedback, rootweb, web, WBTimerTasksJob.FREQUENT_TIMER_TASKS__LIST_NAME, columns);
 
-            SPViewCollection frequentViews = frequentList.Views;
-
-            frequentViews.Add(WBTimerTasksJob.FREQUENT_TIMER_TASKS__ORDERED_VIEW_NAME, viewFields, orderByCAML, 500, true, true);
+            frequentList.WBxCreateOrUpdateView(site, WBTimerTasksJob.FREQUENT_TIMER_TASKS__ORDERED_VIEW_NAME, viewQuery, 500, true, true);
             frequentList.Update();
             web.Update();
 
