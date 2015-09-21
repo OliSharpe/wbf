@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <Module Name="StyleLibrary" Url="Style Library/WBF" Path="StyleLibrary" RootWebOnly="TRUE">
+    <File Path="wb-explorer-search-results.xslt" Url="wb-explorer-search-results.xslt" Type="GhostableInLibrary" />
+  </Module>
+</Elements>

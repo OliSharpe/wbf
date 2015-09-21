@@ -7,10 +7,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WorkBoxFramework.TeamSiteWorkBoxExplorer {
+namespace WorkBoxFramework.WorkBoxExplorer {
     
     
-    public partial class TeamSiteWorkBoxExplorerUserControl {
+    public partial class WorkBoxExplorerUserControl {
         
         /// <summary>
         /// WBFCssRegistration control.

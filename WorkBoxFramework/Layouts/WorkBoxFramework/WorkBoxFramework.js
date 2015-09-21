@@ -532,8 +532,12 @@ function WorkBoxFramework__search__KeyDown(e, searchURL, keywordsID, refinement)
                 return true;
 }
 
-function WorkBoxFramework__doRefinedSearch(searchURL, keywordsID, refinement)
-{
+function WorkBoxFramework__doRefinedSearch(searchURL, keywordsID, refinement) {
+
+    if (searchURL == '' || searchURL == null) {
+        searchURL = window.location.href.split('?')[0];
+    }
+
     var searchString = document.all[keywordsID].value;
     searchString = searchString.replace("'", "%22");
 

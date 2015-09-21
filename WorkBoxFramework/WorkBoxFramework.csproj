@@ -67,6 +67,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.Office.Policy, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Office.Server, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Office.Server.Search, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=AMD64" />
     <Reference Include="Microsoft.Office.Server.UserProfiles, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.SharePoint.Publishing, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.SharePoint.Taxonomy, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
@@ -764,6 +765,14 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Classes\WorkBoxMetaDataItemChangeEventReceiver.cs" />
+    <Compile Include="WebParts\WorkBoxExplorer\WorkBoxExplorer.cs" />
+    <Compile Include="WebParts\WorkBoxExplorer\WorkBoxExplorerUserControl.ascx.cs">
+      <DependentUpon>WorkBoxExplorerUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\WorkBoxExplorer\WorkBoxExplorerUserControl.ascx.designer.cs">
+      <DependentUpon>WorkBoxExplorerUserControl.ascx.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="1033\SharePointProjectItem.spdata">
@@ -779,6 +788,9 @@
       <SharePointProjectItemId>{1e23a6c4-0355-4468-ae40-72b4eceaa13f}</SharePointProjectItemId>
     </None>
     <None Include="SharePointProjectItem.spdata" />
+    <None Include="StyleLibrary\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{d7fb0eea-3b09-4265-85f2-56014fc263e2}</SharePointProjectItemId>
+    </None>
     <None Include="STYLES\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{1ca521ef-acba-48d0-9e8b-c059e038e1ac}</SharePointProjectItemId>
     </None>
@@ -964,6 +976,10 @@
     <None Include="CustomActions\WorkBoxCustomActions\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{6a509b17-754b-4926-86bf-a5c128b095f3}</SharePointProjectItemId>
     </None>
+    <None Include="WebParts\WorkBoxExplorer\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{fe09818f-f37c-4610-aa6c-cba75c37e0c2}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\WorkBoxExplorer\WorkBoxExplorer.webpart" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -1059,6 +1075,8 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="order-by-icon-32.png" />
+    <Content Include="StyleLibrary\Elements.xml" />
+    <Content Include="StyleLibrary\wb-explorer-search-results.xslt" />
     <Content Include="STYLES\WorkBoxFramework\css\SubjectTags.css" />
     <Content Include="STYLES\WorkBoxFramework\css\WBF.css" />
     <Content Include="WebParts\TeamSiteWorkBoxExplorer\Elements.xml" />
@@ -1368,6 +1386,10 @@
     </Content>
     <Content Include="CustomActions\WorkBoxCustomActions\Elements.xml">
       <SubType>Designer</SubType>
+    </Content>
+    <Content Include="WebParts\WorkBoxExplorer\Elements.xml" />
+    <Content Include="WebParts\WorkBoxExplorer\WorkBoxExplorerUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

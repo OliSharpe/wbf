@@ -32,11 +32,11 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Taxonomy;
 
-namespace WorkBoxFramework.TeamSiteWorkBoxExplorer
+namespace WorkBoxFramework.WorkBoxExplorer
 {
-    public partial class TeamSiteWorkBoxExplorerUserControl : UserControl
+    public partial class WorkBoxExplorerUserControl : UserControl
     {
-        public String NoWorkBoxesText = "Your team have no work boxes of the selected type.";
+        public String NoWorkBoxesText = "There are no work boxes of the selected type.";
 
         public String RefinementByOwningTeam = "";
         private WBColumn sortColumn = null;
@@ -50,11 +50,11 @@ namespace WorkBoxFramework.TeamSiteWorkBoxExplorer
 
         public WBTeam Team;
 
-        protected TeamSiteWorkBoxExplorer webPart = default(TeamSiteWorkBoxExplorer);
+        protected WorkBoxExplorer webPart = default(WorkBoxExplorer);
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            webPart = this.Parent as TeamSiteWorkBoxExplorer;
+            webPart = this.Parent as WorkBoxExplorer;
 
             SelectedWorkBoxes.AllowSorting = true;
             SelectedWorkBoxes.Sorting += new GridViewSortEventHandler(SelectedWorkBoxes_Sorting);
@@ -103,7 +103,8 @@ namespace WorkBoxFramework.TeamSiteWorkBoxExplorer
 
             // urm ... this is a real mess - a hidden field and a view state - it's a mashup mess!!
             String selectedRecordsTypeGUID = Request.QueryString["recordsTypeGUID"];
-            if (String.IsNullOrEmpty(selectedRecordsTypeGUID)) {
+            if (String.IsNullOrEmpty(selectedRecordsTypeGUID))
+            {
                 String guidString = HiddenRecordsTypeGUIDField.Value;
                 if (guidString != null && guidString != "")
                 {
@@ -397,7 +398,8 @@ namespace WorkBoxFramework.TeamSiteWorkBoxExplorer
             {
                 return InvolvementFilter.SelectedValue;
             }
-            set {
+            set
+            {
                 InvolvementFilter.WBxSafeSetSelectedValue(value);
             }
         }
@@ -420,7 +422,7 @@ namespace WorkBoxFramework.TeamSiteWorkBoxExplorer
             }
             set
             {
-                HiddenViewStyleField.Value = value; 
+                HiddenViewStyleField.Value = value;
             }
         }
 
