@@ -6,7 +6,7 @@
 <%@ Import Namespace="Microsoft.SharePoint" %> 
 <%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register Tagprefix="Search" Namespace="Microsoft.Office.Server.Search.WebControls" Assembly="Microsoft.Office.Server.Search, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="TeamSiteWorkBoxExplorerUserControl.ascx.cs" Inherits="WorkBoxFramework.TeamSiteWorkBoxExplorer.TeamSiteWorkBoxExplorerUserControl" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="WorkBoxExplorerUserControl.ascx.cs" Inherits="WorkBoxFramework.WorkBoxExplorer.WorkBoxExplorerUserControl" %>
 
     <SharePoint:CssRegistration ID="WBFCssRegistration"
       name="WorkBoxFramework/css/WBF.css" 
@@ -50,8 +50,11 @@
       }
     });
 
+    var wbf__request_has_query_keywords = ($.getUrlVar("k") != null);
+
+
     function showResultsIfDoingQuery() {
-        if ($.getUrlVar("k") != null) {
+        if (wbf__request_has_query_keywords) {
             // OK so a query is being done on this request so let's show the results div:
             showSearchResultsView();
         }   
@@ -99,8 +102,6 @@
         $("#wbf-wb-explorer-refinement-panel").show();
         $("#wbf-filter-icon-list-item").hide();
         $("#wbf-columns-icon-list-item").hide();
-        $("#wbf-wb-explorer-tabs" ).tabs( { active: 3 } );
-        $("#wbf-wb-explorer-refinement-panel").show();
     }
 
 
@@ -294,11 +295,17 @@ h4.wbf-tab-dialog-sub-header
     font-size: 1.1em;
 }
 
-#teamSearch 
+#teamSearch, #searchAgain 
 {
-    color: #999;
+    color: #555;
     width: 200px;
 }
+
+#wbf-wb-explorer-refinement-panel .ms-searchref-main 
+{
+    background-image: none !important;
+}
+
 
 </style>
 
@@ -345,10 +352,10 @@ h4.wbf-tab-dialog-sub-header
 
 <div id="wbf-wb-explorer-search-results" style="display: none;" >
 
-  <table class="wbf-dialog-form" style="margin:0px; padding:0px;">
+  <table style="margin:0px; padding:0px;">
 
 <tr>
-<td class="wbf-field-name-panel" colspan="2">
+<td colspan="2">
 
 <input class="searchBox" type="text" name="searchAgain" id="searchAgain" value="Search this team's work boxes" accesskey="T"
             onkeydown="WorkBoxFramework__search__KeyDown(event, '', 'searchAgain', '<%=RefinementByOwningTeam %>')" />
@@ -377,7 +384,7 @@ h4.wbf-tab-dialog-sub-header
     <li><a href="#" onclick="toggleViewStyle();" id="wbf-anchor-for-changing-view-style"><img id="wbf-image-for-changing-view-style" src="/_layouts/images/WorkBoxFramework/details-view-32.png" title="Change to details view" alt="Change to details view"/></a></li>
     <li id="wbf-filter-icon-list-item"><a href="#wbf-filter-by"><img src="/_layouts/images/WorkBoxFramework/filter-icon-32.png" title="Ordering and filtering of view" alt="Ordering and filtering of view"/></a></li>
     <li id="wbf-columns-icon-list-item"><a href="#wbf-columns"><img src="/_layouts/images/WorkBoxFramework/columns-icon-32.png" title="Choose which columns to display" alt="Choose which columns to display"/></a></li>
-    <li><a href="#wbf-search-work-boxes"><img src="/_layouts/images/WorkBoxFramework/search-icon-32.png" title="Search team's work boxes" alt="Search team's work boxes"/></a></li>
+    <li><a href="#wbf-search-work-boxes" onclick="showResultsIfDoingQuery();"><img src="/_layouts/images/WorkBoxFramework/search-icon-32.png" title="Search team's work boxes" alt="Search team's work boxes"/></a></li>
     <li><a href="#wbf-add-new"><img src="/_layouts/images/WorkBoxFramework/plus-icon-32.png" title="Create a new work box" alt="Create a new work box"/></a></li>
   </ul>
 
@@ -927,7 +934,14 @@ h4.wbf-tab-dialog-sub-header
 
 <script type="text/javascript">
     aspPanelHasUpdated();
-    showResultsIfDoingQuery();
+
+    if (wbf__request_has_query_keywords) {
+        $("#searchAgain").val($.getUrlVar("k"));
+        $("#teamSearch").val($.getUrlVar("k"));
+        $("#wbf-wb-explorer-tabs").tabs({ active: 3 });
+        showSearchResultsView();
+    }
+
 </script>
 
 </div>
