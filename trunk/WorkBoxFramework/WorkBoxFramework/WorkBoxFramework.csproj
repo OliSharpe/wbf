@@ -201,6 +201,7 @@
     <Compile Include="Classes\WBDynamicFormattedIconTemplateField.cs" />
     <Compile Include="Classes\WBDynamicIconTemplateField.cs" />
     <Compile Include="Classes\WBStatusIconTemplateField.cs" />
+    <Compile Include="Classes\WBLink.cs" />
     <Compile Include="WebParts\TeamSiteWorkBoxExplorer\TeamSiteWorkBoxExplorer.cs" />
     <Compile Include="WebParts\TeamSiteWorkBoxExplorer\TeamSiteWorkBoxExplorerUserControl.ascx.cs">
       <DependentUpon>TeamSiteWorkBoxExplorerUserControl.ascx</DependentUpon>
@@ -209,7 +210,6 @@
     <Compile Include="WebParts\TeamSiteWorkBoxExplorer\TeamSiteWorkBoxExplorerUserControl.ascx.designer.cs">
       <DependentUpon>TeamSiteWorkBoxExplorerUserControl.ascx.cs</DependentUpon>
     </Compile>
-    <Compile Include="Classes\WBLink.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
@@ -1074,7 +1074,6 @@
     <Content Include="Layouts\WorkBoxFramework\MailToLinkReplacement.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="order-by-icon-32.png" />
     <Content Include="StyleLibrary\Elements.xml" />
     <Content Include="StyleLibrary\wb-explorer-search-results.xslt" />
     <Content Include="STYLES\WorkBoxFramework\css\SubjectTags.css" />
