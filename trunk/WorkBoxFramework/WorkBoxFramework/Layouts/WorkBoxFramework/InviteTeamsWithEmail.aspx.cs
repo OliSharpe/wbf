@@ -177,7 +177,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             DisposeWorkBox();
 
-            returnFromDialogOK("Individual users have been invited.");
+            CloseDialogAndRefresh("?panel=TeamDetails");
         }
 
 
@@ -185,7 +185,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             DisposeWorkBox();
 
-            returnFromDialogCancel("Inviting of teams was cancelled");
+            CloseDialogWithCancel("Inviting of teams was cancelled");
         }
     }
 }

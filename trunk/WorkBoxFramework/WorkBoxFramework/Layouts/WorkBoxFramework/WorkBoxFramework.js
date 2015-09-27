@@ -16,7 +16,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the WBF.  If not, see <http://www.gnu.org/licenses/>.
 
-
 // Copied the following from:
 // http://stackoverflow.com/questions/901115/get-query-string-values-in-javascript
 //
@@ -28,8 +27,9 @@ function WorkBoxFramework_getParameterByName(name) {
     if (results == null) 
         return "";
     else 
-        return decodeURIComponent(results[1].replace(/\+/g, " ")); 
-} 
+        return decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
 
 // 1 = OK
 // 2 = Refresh

@@ -32,26 +32,7 @@
 
     var wbf__is_details_view_style = <%= IsDetailsViewStyle %>;
 
-    // From: http://stackoverflow.com/questions/6001839/check-whether-a-url-variable-is-set-using-jquery
-    $.extend({
-      getUrlVars: function(){
-        var vars = [], hash;
-        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-        for(var i = 0; i < hashes.length; i++)
-        {
-            hash = hashes[i].split('=');
-            vars.push(hash[0]);
-            vars[hash[0]] = hash[1];
-        }
-        return vars;
-      },
-      getUrlVar: function(name){
-        return $.getUrlVars()[name];
-      }
-    });
-
-    var wbf__request_has_query_keywords = ($.getUrlVar("k") != null);
-
+    var wbf__request_has_query_keywords = (WorkBoxFramework_getParameterByName("k") != "");
 
     function showResultsIfDoingQuery() {
         if (wbf__request_has_query_keywords) {
@@ -60,6 +41,31 @@
         }   
     }
 
+    function repositionWBExplorerTabs() {
+        var top = $("#wbf-site-title").offset().top;
+        var left = $("#wbf-wb-explorer-tabs-column").offset().left;
+        
+        $("#wbf-wb-explorer-tabs").offset({ top: top, left: left });
+    }
+
+    // From: http://stackoverflow.com/questions/6001839/check-whether-a-url-variable-is-set-using-jquery
+/*
+$.extend({
+    getUrlVars: function () {
+        var vars = [], hash;
+        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        for (var i = 0; i < hashes.length; i++) {
+            hash = hashes[i].split('=');
+            vars.push(hash[0]);
+            vars[hash[0]] = hash[1];
+        }
+        return vars;
+    },
+    getUrlVar: function (name) {
+        return $.getUrlVars()[name];
+    }
+});
+*/
 
     function toggleViewStyle() {
         if (wbf__is_details_view_style) {
@@ -125,7 +131,8 @@
             showIconsView();
         }
 
-        $(".ui-tabs").tooltip().click(function() {
+        $(".ui-tabs").tooltip();
+        $(".ui-tabs").click(function() {
             $(this).tooltip( "close");
         });
 
@@ -377,7 +384,7 @@ h4.wbf-tab-dialog-sub-header
 
 </td>
 
-<td width="305px" valign="top">
+<td id="wbf-wb-explorer-tabs-column" width="305px" valign="top">
   
 <div id="wbf-wb-explorer-tabs">
   <ul>
@@ -936,11 +943,19 @@ h4.wbf-tab-dialog-sub-header
     aspPanelHasUpdated();
 
     if (wbf__request_has_query_keywords) {
-        $("#searchAgain").val($.getUrlVar("k"));
-        $("#teamSearch").val($.getUrlVar("k"));
+        $("#searchAgain").val(WorkBoxFramework_getParameterByName("k"));
+        $("#teamSearch").val(WorkBoxFramework_getParameterByName("k"));
         $("#wbf-wb-explorer-tabs").tabs({ active: 3 });
         showSearchResultsView();
     }
+
+    $(function () {
+        repositionWBExplorerTabs();
+    });
+
+    $(window).resize(function () {
+        repositionWBExplorerTabs();
+    });
 
 </script>
 
