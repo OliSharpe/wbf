@@ -75,9 +75,10 @@
 
   <!-- When empty result set is returned from search -->
   <xsl:template name="dvt_1.empty">
-    <div class="srch-results">
+
+    <!-- Unfortunately hiding here as I had problems trying to disable via code: (dvt_1.empty)
+     <div class="srch-results">
       <xsl:if test="$AlertMeLink and $ShowActionLinks">
-        <!-- Unfortunately hiding here as I had problems trying to disable via code: (dvt_1.empty)
         <span class="srch-alertme" >
           <a href ="{$AlertMeLink}" id="CSR_AM1" title="{$AlertMeText}">
             <img style="vertical-align: middle;" src="/_layouts/images/bell.gif" alt="" border="0"/>
@@ -85,31 +86,27 @@
             <xsl:value-of select="$AlertMeText" />
           </a>
         </span>
-        -->
       </xsl:if>
 
       <xsl:if test="string-length($SrchRSSLink) &gt; 0 and $ShowActionLinks">
-        <xsl:if test="$AlertMeLink">
+       <xsl:if test="$AlertMeLink">
           |
-        </xsl:if>
+        </xsl:if> 
         <a type="application/rss+xml" href ="{$SrchRSSLink}" title="{$SrchRSSText}" id="SRCHRSSL">
           <img style="vertical-align: middle;" border="0" src="/_layouts/images/rss.gif" alt=""/>
           <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
           <xsl:value-of select="$SrchRSSText"/>
         </a>
-        <xsl:if test="string-length($SearchProviderLink) &gt; 0">
-          <!-- Unfortunately hiding here as I had problems trying to disable via code:
-
-|
+        <xsl:if test="string-length($SearchProviderLink) &gt; 0">|
           <a href ="{$SearchProviderLink}" title="{$SearchProviderText}" >
             <img style="vertical-align: middle;" border="0" src="/_layouts/images/searchfolder.png" alt=""/>
             <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
             <xsl:value-of select="$SearchProviderText"/>
           </a>
-          -->
         </xsl:if>
       </xsl:if>
     </div>
+          -->
 
     <div class="srch-results" accesskey="W">
       <span class="srch-description2" id="CSR_NO_RESULTS">
@@ -240,9 +237,11 @@ name="selected">selected</xsl:attribute>
         </xsl:if>
         <xsl:if test="string-length($SrchRSSLink) &gt; 0">
 
+          <!-- Unfortunately hiding here as I had problems trying to disable via code:          
           <a type="application/rss+xml" href ="{$SrchRSSLink}" title="{$SrchRSSText}" id="SRCHRSSL">
             <img style="vertical-align: middle;" border="0" src="/_layouts/images/rss.gif" alt=""/>
           </a>
+          -->
           <xsl:text disable-output-escaping="yes">&#8195;</xsl:text>
         </xsl:if>
         <xsl:if test="string-length($SearchProviderLink) &gt; 0">
