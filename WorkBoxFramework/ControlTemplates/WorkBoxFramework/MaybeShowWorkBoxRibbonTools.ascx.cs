@@ -79,7 +79,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
                     // http://patrickboom.wordpress.com/2010/05/25/adding-a-custom-company-menu-tab-with-dynamic-menu-on-the-ribbon/
                     // http://www.wictorwilen.se/Post/Creating-a-SharePoint-2010-Ribbon-extension-part-2.aspx
 
-                    WBLogging.Generic.Monitorable("About to do various for Tasks flyout menu:");
+                    WBLogging.DEBUG.Monitorable("About to do various for Tasks flyout menu:");
 
                     ScriptLink.RegisterScriptAfterUI(this.Page, "SP.Core.js", false, false);
                     ScriptLink.RegisterScriptAfterUI(this.Page, "CUI.js", false, false);
@@ -92,8 +92,8 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
                     var commands = new List<IRibbonCommand>();
 
                     // register the command at the ribbon. Include the callback to the server to generate the xml
-                    commands.Add(new SPRibbonCommand("WorkBoxFramework.Command.PopulateDynamicTasks", "if (wbf_callCount==0) WorkBoxFramework_getDynamicTasksMenu('',''); wbf_callCount++; if (wbf_callCount > 100) wbf_menuXml = WorkBoxFramework_errorMenuXml('Timeout'); if (wbf_menuXml != '') properties.PopulationXML = wbf_menuXml;"));
-                    commands.Add(new SPRibbonCommand("WorkBoxFramework.Command.PopulateDynamicTemplates", "if (wbf_callCount==0) WorkBoxFramework_getDynamicTasksMenu('',''); wbf_callCount++; if (wbf_callCount > 100) wbf_menu2Xml = WorkBoxFramework_errorMenuXml('Timeout'); if (wbf_menu2Xml != '') properties.PopulationXML = wbf_menu2Xml;"));
+                    commands.Add(new SPRibbonCommand("WorkBoxFramework.Command.PopulateDynamicTasks", "if (wbf_callCount==0) WorkBoxFramework_getDynamicTasksMenu('',''); wbf_callCount++; if (wbf_callCount > 1000) wbf_menuXml = WorkBoxFramework_errorMenuXml('Timeout'); if (wbf_menuXml != '') properties.PopulationXML = wbf_menuXml;"));
+                    commands.Add(new SPRibbonCommand("WorkBoxFramework.Command.PopulateDynamicTemplates", "if (wbf_callCount==0) WorkBoxFramework_getDynamicTasksMenu('',''); wbf_callCount++; if (wbf_callCount > 1000) wbf_menu2Xml = WorkBoxFramework_errorMenuXml('Timeout'); if (wbf_menu2Xml != '') properties.PopulationXML = wbf_menu2Xml;"));
 
                     //                commands.Add(new SPRibbonCommand("PopulateDynamicTasksCommand", "properties.PopulationXML = errorMenuXml();"));
                     //commands.Add(new SPRibbonCommand("PopulateDynamicTasksCommand", "alert('Callaa to Popdyn'); if (menuXml == '') { CreateServerMenu('',''); } else { properties.PopulationXML = menuXml; }"));
@@ -107,7 +107,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
                     manager.RegisterCommandEnabledFunction(Page, "commandEnabled", commands);
                     manager.RegisterHandleCommandFunction(Page, "handleCommand", commands);
 
-                    WBLogging.Generic.Monitorable("Registered ribbon scripts");
+                    WBLogging.DEBUG.Monitorable("Registered ribbon scripts");
 
 
                     //Register initialize function
@@ -120,7 +120,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
 
                     String cbReference = cm.GetCallbackEventReference(this, "arg", "WorkBoxFramework_receiveTasksMenu", "", "WorkBoxFramework_processCallBackError", false);
                     String callbackScript = "function WorkBoxFramework_getDynamicTasksMenu(arg, context) {" + cbReference + "; }";
-                    WBLogging.Generic.Verbose("Creating the call back function WorkBoxFramework_getDynamicTasksMenu to call: \n" + callbackScript);
+                    WBLogging.DEBUG.Monitorable("Creating the call back function WorkBoxFramework_getDynamicTasksMenu to call: \n" + callbackScript);
                     cm.RegisterClientScriptBlock(this.GetType(), "WorkBoxFramework_getDynamicTasksMenu", callbackScript, true);
 
 
@@ -157,13 +157,13 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
                         lastVisitedGuidUserProfileValueCollection.Add(currentGuidString);
 
                         // OK now we're going to make sure that this work box is the latest on the list of recently visited work boxes:
-                        WBUtils.logMessage("Updating the list of recently visited work boxes - as we've just come to this work box");
+                        WBLogging.WorkBoxes.Verbose("Updating the list of recently visited work boxes - as we've just come to this work box");
                         UserProfileValueCollection workBoxesRecentlyVisited = profile[WorkBox.USER_PROFILE_PROPERTY__MY_RECENTLY_VISITED_WORK_BOXES];
 
 
                         //string mostRecentWorkBoxDetails = workBoxWeb.Title + "|" + workBoxWeb.Url + "|" + workBox.UniqueID + "|" + workBoxWeb.ID.ToString() + "|" + DateTime.Now.Ticks;
                         WBLink mostRecentWorkBoxDetails = new WBLink(workBox, true);
-                        WBUtils.logMessage("The most recent work box details are: " + mostRecentWorkBoxDetails);
+                        WBLogging.WorkBoxes.Verbose("The most recent work box details are: " + mostRecentWorkBoxDetails);
 
                         List<String> newList = new List<String>();
                         newList.Add(mostRecentWorkBoxDetails.ToString());
@@ -271,7 +271,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
             Random random = new Random();
             int items = random.Next(3) + 1;
 
-            WBLogging.Generic.Monitorable("In call to GetCallbackResult() for the flyout menu");
+            WBLogging.DEBUG.Monitorable("In call to GetCallbackResult() for the flyout menu");
 
 
   string dynamicMenuXml = "<Menu Id='WorkBoxFramework.Menu.Menu'>"
@@ -295,7 +295,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
   dynamicMenuXml += "</Controls>" + "</MenuSection>" + "</Menu>";
 
 
-  WBLogging.Debug("The dynamic XML = \n" + dynamicMenuXml);
+  WBLogging.DEBUG.Monitorable("The dynamic XML = \n" + dynamicMenuXml);
 
 
   return dynamicMenuXml + "|" + makeTemplatesMenu();
@@ -311,7 +311,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
 
         private string makeTemplatesMenu()
         {
-            WBLogging.Debug("In makeTemplatesMenu(): Start");
+            WBLogging.DEBUG.Monitorable("In makeTemplatesMenu(): Start");
 
             // OK so a first simple attempt to build up the correct info into this dynamic menu:
 
@@ -319,7 +319,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
 
             if (workBox == null)
             {
-                WBLogging.Debug("In makeTemplatesMenu(): workBox was null!");
+                WBLogging.DEBUG.Monitorable("In makeTemplatesMenu(): workBox was null!");
                 return makeNoTemplatesMenu("workBox was null");
             }
 
@@ -327,7 +327,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
 
             if (templatesLibrary == null)
             {
-                WBLogging.Debug("In makeTemplatesMenu(): templatesLibrary was null!");
+                WBLogging.DEBUG.Monitorable("In makeTemplatesMenu(): templatesLibrary was null!");
                 return makeNoTemplatesMenu("templatesLibrary was null");
             }
 
@@ -342,18 +342,18 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
             dynamicMenuXml.Append("</Controls> </MenuSection> </Menu>");
 
             string finalXML = dynamicMenuXml.ToString();
-            WBLogging.Debug("In makeTemplatesMenu(): Finished creating XML: " + finalXML);
+            WBLogging.DEBUG.Monitorable("In makeTemplatesMenu(): Finished creating XML: " + finalXML);
 
             return finalXML;
         }
 
         private void addFolderContents(StringBuilder dynamicMenuXml, SPFolder folder, bool includeNextLevel)
         {
-            WBLogging.Debug("In addFolderContents(): " + folder.Name + "   URL: " + folder.Url);
+            WBLogging.DEBUG.Monitorable("In addFolderContents(): " + folder.Name + "   URL: " + folder.Url);
 
             if (includeNextLevel)
             {
-                WBLogging.Debug("In addFolderContents(): including sub folders");
+                WBLogging.DEBUG.Monitorable("In addFolderContents(): including sub folders");
                 foreach (SPFolder subFolder in folder.SubFolders)
                 {
                     if (subFolder.Name.ToString() != "Forms")
@@ -364,7 +364,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
             }
             else
             {
-                WBLogging.Debug("In addFolderContents(): NOT including sub folders");
+                WBLogging.DEBUG.Monitorable("In addFolderContents(): NOT including sub folders");
             }
            
             foreach (SPFile file in folder.Files)
@@ -382,8 +382,8 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
                 description = description.Replace("'", " ").Replace("\"", " ");
 
 
-                WBLogging.Debug("In addFolderContents(): adding a file: " + file.Name);
-                WBLogging.Debug("In addFolderContents(): description = " + description);
+                WBLogging.DEBUG.Monitorable("In addFolderContents(): adding a file: " + file.Name);
+                WBLogging.DEBUG.Monitorable("In addFolderContents(): description = " + description);
 
                 dynamicMenuXml.Append(String.Format(
                   "<Button Id='DynamicButton{0}' "

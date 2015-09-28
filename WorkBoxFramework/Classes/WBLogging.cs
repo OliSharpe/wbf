@@ -50,6 +50,7 @@ namespace WorkBoxFramework
         public const string CATEGORY__MIGRATION = "Migration";
         public const string CATEGORY__QUERIES = "Queries";
         public const string CATEGORY__CONFIG = "Config";
+        public const string CATEGORY__DEBUG = "Debug";
         public const string CATEGORY__GENERIC = "Generic";
 
         public WBLogging()
@@ -76,6 +77,7 @@ namespace WorkBoxFramework
                     new SPDiagnosticsCategory(CATEGORY__MIGRATION, TraceSeverity.Monitorable, EventSeverity.Information),
                     new SPDiagnosticsCategory(CATEGORY__QUERIES, TraceSeverity.Monitorable, EventSeverity.Information),
                     new SPDiagnosticsCategory(CATEGORY__CONFIG, TraceSeverity.Monitorable, EventSeverity.Information),
+                    new SPDiagnosticsCategory(CATEGORY__DEBUG, TraceSeverity.None, EventSeverity.Information),
                     new SPDiagnosticsCategory(CATEGORY__GENERIC, TraceSeverity.Monitorable, EventSeverity.Information)
             })
             };
@@ -106,11 +108,11 @@ namespace WorkBoxFramework
         {
             if (WBFarm.Local.FarmInstance == WBFarm.FARM_INSTANCE__DEVELOPMENT_FARM)
             {
-                WriteTrace(CATEGORY__GENERIC, TraceSeverity.High, "DEBUG: " + message);
+                WriteTrace(CATEGORY__DEBUG, TraceSeverity.High, message);
             }
             else
             {
-                WriteTrace(CATEGORY__GENERIC, TraceSeverity.Verbose, "DEBUG: " + message);
+                WriteTrace(CATEGORY__DEBUG, TraceSeverity.Verbose, message);
             }
 
         }
@@ -162,6 +164,52 @@ namespace WorkBoxFramework
             public static void Verbose(String message)
             {
                 WriteTrace(CATEGORY__GENERIC, TraceSeverity.Verbose, message);
+            }
+        }
+
+        public static class DEBUG
+        {
+            public static void Unexpected(Exception exception)
+            {
+                Unexpected(null, exception);
+            }
+
+            public static void Unexpected(String message, Exception exception)
+            {
+                if (!String.IsNullOrEmpty(message))
+                {
+                    WriteTrace(CATEGORY__DEBUG, TraceSeverity.Unexpected, message);
+                }
+
+                WriteTrace(CATEGORY__DEBUG, TraceSeverity.Unexpected, "An exception occurred: " + exception.Message);
+                WriteTrace(CATEGORY__DEBUG, TraceSeverity.Unexpected, "Stack trace: " + exception.StackTrace);
+
+                if (exception.InnerException != null)
+                {
+                    WriteTrace(CATEGORY__DEBUG, TraceSeverity.Unexpected, "Has nested inner exception: ");
+                    Unexpected(exception.InnerException);
+                }
+            }
+
+
+            public static void Unexpected(String message)
+            {
+                WriteTrace(CATEGORY__DEBUG, TraceSeverity.Unexpected, message);
+            }
+
+            public static void Monitorable(String message)
+            {
+                WriteTrace(CATEGORY__DEBUG, TraceSeverity.Monitorable, message);
+            }
+
+            public static void HighLevel(String message)
+            {
+                WriteTrace(CATEGORY__DEBUG, TraceSeverity.High, message);
+            }
+
+            public static void Verbose(String message)
+            {
+                WriteTrace(CATEGORY__DEBUG, TraceSeverity.Verbose, message);
             }
         }
 
