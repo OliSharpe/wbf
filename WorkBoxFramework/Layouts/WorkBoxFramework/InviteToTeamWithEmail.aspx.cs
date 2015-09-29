@@ -174,7 +174,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             }
 
-            CloseDialogAndRefresh();
+            CloseDialogAndRefresh("?panel=TeamDetails");
         }
 
 

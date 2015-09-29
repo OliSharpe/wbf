@@ -156,7 +156,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             DisposeWorkBox();
 
-            CloseDialogAndRefresh("?panel=TeamDetails");
+            CloseDialogAndRefresh();
         }
 
 

@@ -1696,5 +1696,11 @@ namespace WorkBoxFramework
 
             return currentCount;
         }
+
+        public static String UrlDataEncode(String value)
+        {
+            if (String.IsNullOrEmpty(value)) return "";
+            return Uri.EscapeDataString(value);
+        }
     }
 }
