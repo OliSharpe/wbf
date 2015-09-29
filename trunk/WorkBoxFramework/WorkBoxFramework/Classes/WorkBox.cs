@@ -2508,7 +2508,13 @@ namespace WorkBoxFramework
                                 {
                                     SPFolder folder = rootFolder.WBxGetOrCreateSubFolder(folderName);
 
-                                    folder.Item.ResetRoleInheritance();
+                                    string groupName = Collection.FolderAccessGroupsPrefix + " - " + folderName;
+                                    string allFoldersGroupName = Collection.FolderAccessGroupsPrefix + " - All Folders";
+
+                                    folder.Item.BreakRoleInheritance(true);
+                                    folder.Item.WBxRemoveAllPermissionBindings();
+                                    folder.Item.WBxAssignGroupWithRole(elevatedWeb, groupName, Collection.ClosedPermissionLevelForInvolved);
+                                    folder.Item.WBxAssignGroupWithRole(elevatedWeb, allFoldersGroupName, Collection.ClosedPermissionLevelForInvolved);
                                 }
                             }
 

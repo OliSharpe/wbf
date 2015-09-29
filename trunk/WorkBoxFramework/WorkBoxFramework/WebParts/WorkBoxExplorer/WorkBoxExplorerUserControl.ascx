@@ -48,25 +48,6 @@
         $("#wbf-wb-explorer-tabs").offset({ top: top, left: left });
     }
 
-    // From: http://stackoverflow.com/questions/6001839/check-whether-a-url-variable-is-set-using-jquery
-/*
-$.extend({
-    getUrlVars: function () {
-        var vars = [], hash;
-        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-        for (var i = 0; i < hashes.length; i++) {
-            hash = hashes[i].split('=');
-            vars.push(hash[0]);
-            vars[hash[0]] = hash[1];
-        }
-        return vars;
-    },
-    getUrlVar: function (name) {
-        return $.getUrlVars()[name];
-    }
-});
-*/
-
     function toggleViewStyle() {
         if (wbf__is_details_view_style) {
             showIconsView();
@@ -110,18 +91,10 @@ $.extend({
         $("#wbf-columns-icon-list-item").hide();
     }
 
-
-    function handleTabsActivatedEvent(event, ui) {
-        if (ui.newPanel.is("#wbf-change-view")) {
-            alert("shouldn't really be used!");
-        }
-    }
-
     function aspPanelHasUpdated() {
         $("#wbf-wb-explorer-tabs").tabs({
             collapsible: true,
-            active: false,
-            activate: handleTabsActivatedEvent
+            active: false
         });
 
         // Make sure that the right view is showing:
@@ -131,28 +104,18 @@ $.extend({
             showIconsView();
         }
 
-        $(".ui-tabs").tooltip();
-        $(".ui-tabs").click(function() {
-            $(this).tooltip( "close");
-        });
+        repositionWBExplorerTabs();
 
+        $("#wbf-wb-explorer-tabs > ul > li > a > img").tooltip();
+        $("#wbf-wb-explorer-tabs > ul > li > a > img").click(function() {
+            $(this).tooltip("close");
+        });
 
         $("#teamSearch").blur(function () {
             if ($(this).val() == "") { $(this).val("Search this team's work boxes"); }
         }).focus(function () {
             if ($(this).val() == "Search this team's work boxes") { $(this).val(""); }
         });
-
-
-//        $("#wbf-wb-explorer-tabs").tabs("disable", 0);
-
-  //      $("#wbf-anchor-for-changing-view-style").click(function() {
-    //        toggleViewStyle();
-      //  });
-
-       // alert('In the update function');
-
-        //        $(".wbf-drop-down").selectmenu();
 
     }
 
@@ -313,6 +276,11 @@ h4.wbf-tab-dialog-sub-header
     background-image: none !important;
 }
 
+p.srch-Metadata1 
+{
+    margin: 0px 0px 20px 24px !important;
+}
+
 
 </style>
 
@@ -365,8 +333,8 @@ h4.wbf-tab-dialog-sub-header
 <td colspan="2">
 
 <input class="searchBox" type="text" name="searchAgain" id="searchAgain" value="Search this team's work boxes" accesskey="T"
-            onkeydown="WorkBoxFramework__search__KeyDown(event, '', 'searchAgain', '<%=RefinementByOwningTeam %>')" />
-<input class="submitSearch" type="button" value="Search" onclick="WorkBoxFramework__doRefinedSearch('', 'searchAgain', '<%=RefinementByOwningTeam %>')" /><br />
+            onkeydown="WorkBoxFramework__search__KeyDown(event, '', 'searchAgain', '<%=RefinementByOwningTeam %>', '<%=SearchScope %>')" />
+<input class="submitSearch" type="button" value="Search" onclick="WorkBoxFramework__doRefinedSearch('', 'searchAgain', '<%=RefinementByOwningTeam %>', '<%=SearchScope %>')" /><br />
 
 </td>
 </tr>
@@ -386,6 +354,9 @@ h4.wbf-tab-dialog-sub-header
 
 <td id="wbf-wb-explorer-tabs-column" width="305px" valign="top">
   
+<% if (!InEditMode)
+   { %>
+
 <div id="wbf-wb-explorer-tabs">
   <ul>
     <li><a href="#" onclick="toggleViewStyle();" id="wbf-anchor-for-changing-view-style"><img id="wbf-image-for-changing-view-style" src="/_layouts/images/WorkBoxFramework/details-view-32.png" title="Change to details view" alt="Change to details view"/></a></li>
@@ -529,8 +500,9 @@ h4.wbf-tab-dialog-sub-header
         SkipLinkText=""
         NodeIndent="20"/>
 
-        <% if (NotSetupText != null & NotSetupText != "") { %>
-<p><%=NotSetupText %></p>           
+        <% if (NotSetupText != null & NotSetupText != "")
+           { %>
+<p><%=NotSetupText%></p>           
 <% } %>
 
     </div>
@@ -555,8 +527,9 @@ h4.wbf-tab-dialog-sub-header
         SkipLinkText=""
         NodeIndent="20"/>
 
-        <% if (NotSetupText != null & NotSetupText != "") { %>
-<p><%=NotSetupText %></p>           
+        <% if (NotSetupText != null & NotSetupText != "")
+           { %>
+<p><%=NotSetupText%></p>           
 <% } %>
 
     </div>
@@ -582,8 +555,9 @@ h4.wbf-tab-dialog-sub-header
         SkipLinkText=""
         NodeIndent="20"/>
 
-        <% if (NotSetupText != null & NotSetupText != "") { %>
-<p><%=NotSetupText %></p>           
+        <% if (NotSetupText != null & NotSetupText != "")
+           { %>
+<p><%=NotSetupText%></p>           
 <% } %>
 
     </div>
@@ -812,8 +786,8 @@ h4.wbf-tab-dialog-sub-header
 <td class="wbf-field-name-panel" colspan="2">
 
 <input class="searchBox" type="text" name="teamSearch" id="teamSearch" value="Search this team's work boxes" accesskey="T"
-            onkeydown="WorkBoxFramework__search__KeyDown(event, '', 'teamSearch', '<%=RefinementByOwningTeam %>')" />
-<input class="submitSearch" type="button" value="Search" onclick="WorkBoxFramework__doRefinedSearch('', 'teamSearch', '<%=RefinementByOwningTeam %>')" /><br />
+            onkeydown="WorkBoxFramework__search__KeyDown(event, '', 'teamSearch', '<%=RefinementByOwningTeam %>', '<%=SearchScope %>')" />
+<input class="submitSearch" type="button" value="Search" onclick="WorkBoxFramework__doRefinedSearch('', 'teamSearch', '<%=RefinementByOwningTeam %>', '<%=SearchScope %>')" /><br />
 
 </td>
 </tr>
@@ -863,8 +837,9 @@ h4.wbf-tab-dialog-sub-header
         SkipLinkText=""
         NodeIndent="20"/>
 
-        <% if (NotSetupText != null & NotSetupText != "") { %>
-<p><%=NotSetupText %></p>           
+        <% if (NotSetupText != null & NotSetupText != "")
+           { %>
+<p><%=NotSetupText%></p>           
 <% } %>
 
     </div>
@@ -889,8 +864,9 @@ h4.wbf-tab-dialog-sub-header
         SkipLinkText=""
         NodeIndent="20"/>
 
-        <% if (NotSetupText != null & NotSetupText != "") { %>
-<p><%=NotSetupText %></p>           
+        <% if (NotSetupText != null & NotSetupText != "")
+           { %>
+<p><%=NotSetupText%></p>           
 <% } %>
 
     </div>
@@ -916,8 +892,9 @@ h4.wbf-tab-dialog-sub-header
         SkipLinkText=""
         NodeIndent="20"/>
 
-        <% if (NotSetupText != null & NotSetupText != "") { %>
-<p><%=NotSetupText %></p>           
+        <% if (NotSetupText != null & NotSetupText != "")
+           { %>
+<p><%=NotSetupText%></p>           
 <% } %>
 
     </div>
@@ -928,6 +905,9 @@ h4.wbf-tab-dialog-sub-header
   </div>
 
 </div>
+
+<!-- Closing bracket for the 'if not in edit mode' conditional -->
+<% } %>
 
 </td>
 </tr>

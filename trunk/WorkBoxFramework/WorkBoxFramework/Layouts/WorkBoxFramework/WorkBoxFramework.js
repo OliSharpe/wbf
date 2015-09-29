@@ -522,17 +522,17 @@ function WorkBoxFramework_triggerWebPartUpdate(guid) {
 }
 
 // The following two functions are extended versions of the LBI izzi functions originally written by Leigh Hogan and modified by Steve Clements
-function WorkBoxFramework__search__KeyDown(e, searchURL, keywordsID, refinement) {
+function WorkBoxFramework__search__KeyDown(e, searchURL, keywordsID, refinement, scope) {
             if (e.keyCode == 13 || e.keyCode == 10) {
                 e.returnValue = false;
-                WorkBoxFramework__doRefinedSearch(searchURL, keywordsID, refinement);
+                WorkBoxFramework__doRefinedSearch(searchURL, keywordsID, refinement, scope);
                 return false;
             }
             else
                 return true;
 }
 
-function WorkBoxFramework__doRefinedSearch(searchURL, keywordsID, refinement) {
+function WorkBoxFramework__doRefinedSearch(searchURL, keywordsID, refinement, scope) {
 
     if (searchURL == '' || searchURL == null) {
         searchURL = window.location.href.split('?')[0];
@@ -541,7 +541,7 @@ function WorkBoxFramework__doRefinedSearch(searchURL, keywordsID, refinement) {
     var searchString = document.all[keywordsID].value;
     searchString = searchString.replace("'", "%22");
 
-    var newSearchURL = searchURL + "?k=" + searchString + "&r=" + refinement;
+    var newSearchURL = searchURL + "?k=" + searchString + "&r=" + refinement + "&s=" + scope;
 
     window.location = newSearchURL;
 }

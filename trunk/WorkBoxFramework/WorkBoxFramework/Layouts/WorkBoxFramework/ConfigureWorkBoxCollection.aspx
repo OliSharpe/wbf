@@ -100,7 +100,6 @@ This admin page will help do the initial configuration of a work box collection.
 <div class="wbf-metadata-title">Name of 'Work Boxes In Collection' list</div>
 <div>
 <p>
-(NOT IMPLEMENTED!!)
 This is the list that holds all of the metadata for each of the work boxes in this list. If you pick an existing list then the required WBF columns will be added to this list.</p>
 </div>
 </td>
@@ -115,7 +114,7 @@ This is the list that holds all of the metadata for each of the work boxes in th
 </td>
 </tr>
 
-
+<!--
 <tr>
 <td class="wbf-metadata-title-panel">
 <div class="wbf-metadata-title">Default Records Type</div>
@@ -130,12 +129,13 @@ To do the initial setup please give the first, or default, records type for work
 
 <div class="wbf-metadata-read-only-value">
 <asp:TextBox ID="DefaultRecordsType" Columns="50" runat="server" />
-<asp:RequiredFieldValidator ID="RequiredFieldValidator2" ControlToValidate="DefaultRecordsType" ErrorMessage="You must provide a default records type" runat="server"/>
 
 </div>
 
 </td>
 </tr>
+-->
+
 
 <tr>
 <td class="wbf-metadata-title-panel">

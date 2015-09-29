@@ -12,6 +12,13 @@ namespace WorkBoxFramework.WorkBoxExplorer
     [ToolboxItemAttribute(false)]
     public class WorkBoxExplorer : WebPart
     {
+        [WebBrowsable(true)]
+        [Personalizable(PersonalizationScope.Shared)]
+        [WebDisplayName("Search Scope")]
+        [WebDescription("The scope to use when performing searches")]
+        [System.ComponentModel.Category("Configuration")]
+        public String SearchScope { get; set; }
+
         // Visual Studio might automatically update this path when you change the Visual Web Part project item.
         private const string _ascxPath = @"~/_CONTROLTEMPLATES/WorkBoxFramework/WorkBoxExplorer/WorkBoxExplorerUserControl.ascx";
 

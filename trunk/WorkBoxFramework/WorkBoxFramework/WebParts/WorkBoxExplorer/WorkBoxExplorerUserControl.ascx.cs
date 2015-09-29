@@ -23,6 +23,7 @@
 using System;
 using System.Text;
 using System.Data;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
@@ -30,6 +31,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using Microsoft.SharePoint.WebPartPages;
 using Microsoft.SharePoint.Taxonomy;
 
 namespace WorkBoxFramework.WorkBoxExplorer
@@ -37,8 +39,10 @@ namespace WorkBoxFramework.WorkBoxExplorer
     public partial class WorkBoxExplorerUserControl : UserControl
     {
         public String NoWorkBoxesText = "There are no work boxes of the selected type.";
-
         public String RefinementByOwningTeam = "";
+        public String SearchScope = "Work%20Box%20Explorer";
+        public bool InEditMode = false;
+
         private WBColumn sortColumn = null;
         private bool ascending = false;
 
@@ -55,6 +59,15 @@ namespace WorkBoxFramework.WorkBoxExplorer
         protected void Page_Load(object sender, EventArgs e)
         {
             webPart = this.Parent as WorkBoxExplorer;
+
+            SPWebPartManager webPartManager = (SPWebPartManager)WebPartManager.GetCurrentWebPartManager(this.Page);
+            if ((SPContext.Current.FormContext.FormMode == SPControlMode.Edit)
+                || (webPartManager.DisplayMode == WebPartManager.EditDisplayMode))
+            {
+                InEditMode = true;
+            }
+
+            SearchScope = WBUtils.UrlDataEncode(webPart.SearchScope);
 
             SelectedWorkBoxes.AllowSorting = true;
             SelectedWorkBoxes.Sorting += new GridViewSortEventHandler(SelectedWorkBoxes_Sorting);
@@ -89,7 +102,8 @@ namespace WorkBoxFramework.WorkBoxExplorer
             if (Team == null) return;
 
             // RefinementByOwningTeam = "owningteam%3D%22%23" + (Team.Id.ToString().Replace(" ", "%20").Replace("#", "%23").Replace("-", "%2D")) + "%22";
-            RefinementByOwningTeam = "owningteam%3D%22" + (Team.Name.ToString().Replace(" ", "%20").Replace("#", "%23").Replace("-", "%2D")) + "%22";
+            // RefinementByOwningTeam = "owningteam%3D%22" + (Team.Name.ToString().Replace(" ", "%20").Replace("#", "%23").Replace("-", "%2D")) + "%22";
+            RefinementByOwningTeam = WBUtils.UrlDataEncode("owningteam=\"" + Team.Name + "\"");
 
             teamGUIDString = WBExtensions.WBxToString(Team.Id);
             string recordsTypesListUrl = Team.RecordsTypesListUrl;
@@ -218,7 +232,6 @@ namespace WorkBoxFramework.WorkBoxExplorer
                 involvementOptions.Add(FILTER_INVOLVEMENT__OWNS);
                 involvementOptions.Add(FILTER_INVOLVEMENT__INVOLVED);
                 involvementOptions.Add(FILTER_INVOLVEMENT__VISITING);
-                involvementOptions.Add("Any involvement");
 
                 InvolvementFilter.DataSource = involvementOptions;
                 InvolvementFilter.DataBind();
@@ -632,17 +645,25 @@ namespace WorkBoxFramework.WorkBoxExplorer
 
                 SPListItemCollection items = cacheList.WBxGetItems(SPContext.Current.Site, query);
 
-                StringBuilder html = new StringBuilder();
-                foreach (SPListItem item in items)
+
+                if (items.Count > 0)
                 {
-                    String status = item.WBxGetAsString(WBColumn.WorkBoxStatus);
+                    StringBuilder html = new StringBuilder();
+                    foreach (SPListItem item in items)
+                    {
+                        String status = item.WBxGetAsString(WBColumn.WorkBoxStatus);
 
-                    html.Append("<div class='wbf-icons-view-icon-panel'><div class='wbf-icons-view-icon'><a href='");
-                    html.Append(item.WBxGetAsString(WBColumn.WorkBoxURL)).Append("'>").Append("<img src='").Append(WBUtils.StatusIconImageURL(status, "64")).Append("' alt='Work box icon for: ").Append(item.WBxGetAsString(WBColumn.Title).Replace('\'', ' ')).Append("' />").Append("</a></div><div class='wbf-icons-view-label'><a href='");
-                    html.Append(item.WBxGetAsString(WBColumn.WorkBoxURL)).Append("'>").Append(item.WBxGetAsString(WBColumn.Title)).Append("</a></div></div>\n\n");
+                        html.Append("<div class='wbf-icons-view-icon-panel'><div class='wbf-icons-view-icon'><a href='");
+                        html.Append(item.WBxGetAsString(WBColumn.WorkBoxURL)).Append("'>").Append("<img src='").Append(WBUtils.StatusIconImageURL(status, "64")).Append("' alt='Work box icon for: ").Append(item.WBxGetAsString(WBColumn.Title).Replace('\'', ' ')).Append("' />").Append("</a></div><div class='wbf-icons-view-label'><a href='");
+                        html.Append(item.WBxGetAsString(WBColumn.WorkBoxURL)).Append("'>").Append(item.WBxGetAsString(WBColumn.Title)).Append("</a></div></div>\n\n");
+                    }
+
+                    IconViewLiteral.Text = html.ToString();
                 }
-
-                IconViewLiteral.Text = html.ToString();
+                else
+                {
+                    IconViewLiteral.Text = "<p>" + NoWorkBoxesText + "</p>";
+                }
 
                 DataTable dataTable = cacheList.WBxGetDataTable(SPContext.Current.Site, query);
 

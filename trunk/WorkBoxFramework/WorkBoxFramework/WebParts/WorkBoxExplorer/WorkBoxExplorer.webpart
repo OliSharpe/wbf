@@ -10,6 +10,7 @@
         <property name="Title" type="string">Work Box Explorer</property>
         <property name="Description" type="string">Web part to explore the work boxes belonging to a particular context, such as a team or a work box collection.</property>
         <property name="ChromeType" type="chrometype">None</property>
+        <property name="SearchScope" type="string">Work Box Explorer</property>
       </properties>
     </data>
   </webPart>
