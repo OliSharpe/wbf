@@ -46,6 +46,8 @@ namespace WorkBoxFramework.WorkBoxExplorer
         private WBColumn sortColumn = null;
         private bool ascending = false;
 
+        public bool canSaveDefaultView = false;
+
         public String RecordsGroup;
         public String AdditionalCSSStyle;
         public String NotSetupText = "";
@@ -100,6 +102,10 @@ namespace WorkBoxFramework.WorkBoxExplorer
             string teamGUIDString = "";
             Team = WBTeam.GetFromTeamSite(SPContext.Current);
             if (Team == null) return;
+
+            if (Team.IsCurrentUserTeamOwnerOrSystemAdmin()) {
+                canSaveDefaultView = true;
+            }
 
             // RefinementByOwningTeam = "owningteam%3D%22%23" + (Team.Id.ToString().Replace(" ", "%20").Replace("#", "%23").Replace("-", "%2D")) + "%22";
             // RefinementByOwningTeam = "owningteam%3D%22" + (Team.Name.ToString().Replace(" ", "%20").Replace("#", "%23").Replace("-", "%2D")) + "%22";
@@ -207,16 +213,6 @@ namespace WorkBoxFramework.WorkBoxExplorer
                 AscendingDescendingChoice.DataSource = ascendingDescendingOptions;
                 AscendingDescendingChoice.DataBind();
 
-                SetSortColumn(WBColumn.WorkBoxDateLastModified);
-                GridViewSortDirection = SortDirection.Descending;
-
-                SelectedViewStyle = VIEW_STYLE__ICONS;
-                StatusCheckBox.Checked = false;
-                RecordsTypeCheckBox.Checked = true;
-                LastModifiedCheckBox.Checked = true;
-                DateCreatedCheckBox.Checked = true;
-
-
                 List<String> statusOptions = new List<String>();
                 statusOptions.Add("Open");
                 statusOptions.Add("Closed");
@@ -226,7 +222,6 @@ namespace WorkBoxFramework.WorkBoxExplorer
                 StatusFilter.DataSource = statusOptions;
                 StatusFilter.DataBind();
 
-                StatusFilter.WBxSafeSetSelectedValue("Any");
 
                 List<String> involvementOptions = new List<String>();
                 involvementOptions.Add(FILTER_INVOLVEMENT__OWNS);
@@ -235,6 +230,19 @@ namespace WorkBoxFramework.WorkBoxExplorer
 
                 InvolvementFilter.DataSource = involvementOptions;
                 InvolvementFilter.DataBind();
+
+                if (!LoadDefaultView())
+                {
+                    SetSortColumn(WBColumn.WorkBoxDateLastModified);
+                    GridViewSortDirection = SortDirection.Descending;
+                    SelectedViewStyle = VIEW_STYLE__ICONS;
+                    StatusCheckBox.Checked = false;
+                    RecordsTypeCheckBox.Checked = true;
+                    LastModifiedCheckBox.Checked = true;
+                    DateCreatedCheckBox.Checked = true;
+
+                    StatusFilter.WBxSafeSetSelectedValue("Any");
+                }
 
 
                 WBLogging.Debug("Not in post back so setting guid value to be: " + SelectedRecordsTypeGUID);
@@ -353,6 +361,16 @@ namespace WorkBoxFramework.WorkBoxExplorer
             RefreshBoundData();
         }
 
+        protected void SaveAsDefaultView_OnClick(object sender, EventArgs e)
+        {
+            CaptureFormData();
+
+            checkSortState();
+
+            SaveDefaultView();
+
+            RefreshBoundData();
+        }
 
         protected void OrderBy_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -440,6 +458,79 @@ namespace WorkBoxFramework.WorkBoxExplorer
         }
 
         public String IsDetailsViewStyle { get { return VIEW_STYLE__DETAILS.Equals(SelectedViewStyle).ToString().ToLower(); } }
+
+        private void SaveDefaultView() 
+        {
+            SPWeb web = SPContext.Current.Web;
+
+            web.WBxSetProperty("wbf-wbexplorer-view-style", SelectedViewStyle);
+            
+            web.WBxSetProperty("wbf-wbexplorer-sort-column", sortColumn.InternalName);
+            web.WBxSetBoolProperty("wbf-wbexplorer-sort-ascending", ascending);
+
+            web.WBxSetProperty("wbf-wbexplorer-status-filter", SelectedWorkBoxStatusFilter);
+            web.WBxSetProperty("wbf-wbexplorer-involvement-filter", SelectedInvolvementFilter);
+            web.WBxSetProperty("wbf-wbexplorer-records-type-guid", SelectedRecordsTypeGUID);
+
+            web.WBxSetBoolProperty("wbf-wbexplorer-status-check-box", StatusCheckBox.Checked);
+            web.WBxSetBoolProperty("wbf-wbexplorer-records-type-check-box", RecordsTypeCheckBox.Checked);
+            web.WBxSetBoolProperty("wbf-wbexplorer-last-modified-check-box", LastModifiedCheckBox.Checked);
+            web.WBxSetBoolProperty("wbf-wbexplorer-last-visited-check-box", LastVisitedCheckBox.Checked);
+            web.WBxSetBoolProperty("wbf-wbexplorer-date-created-check-box", DateCreatedCheckBox.Checked);
+            web.WBxSetBoolProperty("wbf-wbexplorer-reference-date-check-box", ReferenceDateCheckBox.Checked);
+            web.WBxSetBoolProperty("wbf-wbexplorer-reference-id-check-box", ReferenceIDCheckBox.Checked);
+            web.WBxSetBoolProperty("wbf-wbexplorer-owning-team-check-box", OwningTeamCheckBox.Checked);
+            web.WBxSetBoolProperty("wbf-wbexplorer-involved-teams-check-box", InvolvedTeamsCheckBox.Checked);
+            web.WBxSetBoolProperty("wbf-wbexplorer-visiting-teams-check-box", VisitingTeamsCheckBox.Checked);
+            web.WBxSetBoolProperty("wbf-wbexplorer-involved-individuals-check-box", InvolvedIndividualsCheckBox.Checked);
+            web.WBxSetBoolProperty("wbf-wbexplorer-visiting-individuals-check-box", VisitingIndividualsCheckBox.Checked);
+
+            web.Update();                    
+        }
+
+
+        private bool LoadDefaultView() 
+        {
+            SPWeb web = SPContext.Current.Web;
+
+            String selectedViewStyle = web.WBxGetProperty("wbf-wbexplorer-view-style");
+            if (String.IsNullOrEmpty(selectedViewStyle)) return false;
+
+            SelectedViewStyle = selectedViewStyle;
+            SetSortColumn(WBColumn.GetKnownColumnByInternalName(web.WBxGetProperty("wbf-wbexplorer-sort-column")));
+            ascending = web.WBxGetBoolProperty("wbf-wbexplorer-sort-ascending");
+
+            if (ascending)
+            {
+                GridViewSortDirection = SortDirection.Ascending;
+            }
+            else
+            {
+                GridViewSortDirection = SortDirection.Descending;
+            }
+
+
+            SelectedWorkBoxStatusFilter = web.WBxGetProperty("wbf-wbexplorer-status-filter");
+
+            SelectedInvolvementFilter = web.WBxGetProperty("wbf-wbexplorer-involvement-filter");
+            SelectedRecordsTypeGUID = web.WBxGetProperty("wbf-wbexplorer-records-type-guid");
+
+
+            StatusCheckBox.Checked = web.WBxGetBoolProperty("wbf-wbexplorer-status-check-box");
+            RecordsTypeCheckBox.Checked = web.WBxGetBoolProperty("wbf-wbexplorer-records-type-check-box");
+            LastModifiedCheckBox.Checked = web.WBxGetBoolProperty("wbf-wbexplorer-last-modified-check-box");
+            LastVisitedCheckBox.Checked = web.WBxGetBoolProperty("wbf-wbexplorer-last-visited-check-box");
+            DateCreatedCheckBox.Checked = web.WBxGetBoolProperty("wbf-wbexplorer-date-created-check-box");
+            ReferenceDateCheckBox.Checked = web.WBxGetBoolProperty("wbf-wbexplorer-reference-date-check-box");
+            ReferenceIDCheckBox.Checked = web.WBxGetBoolProperty("wbf-wbexplorer-reference-id-check-box");
+            OwningTeamCheckBox.Checked = web.WBxGetBoolProperty("wbf-wbexplorer-owning-team-check-box");
+            InvolvedTeamsCheckBox.Checked = web.WBxGetBoolProperty("wbf-wbexplorer-involved-teams-check-box");
+            VisitingTeamsCheckBox.Checked = web.WBxGetBoolProperty("wbf-wbexplorer-visiting-teams-check-box");
+            InvolvedIndividualsCheckBox.Checked = web.WBxGetBoolProperty("wbf-wbexplorer-involved-individuals-check-box");
+            VisitingIndividualsCheckBox.Checked = web.WBxGetBoolProperty("wbf-wbexplorer-visiting-individuals-check-box");
+
+            return true;
+        }
 
 
         private void RefreshBoundData()

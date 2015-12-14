@@ -572,6 +572,13 @@ p.srch-Metadata1
 <tr>
 <td colspan="2" class="wbf-buttons-panel">
     <asp:Button ID="UpdateViewFromFilters" runat="server" Text="Update View"  OnClick="UpdateView_OnClick"/>
+
+<% if (canSaveDefaultView)
+   { %>
+&nbsp;
+    <asp:Button ID="SaveDefaultViewFromFilters" runat="server" Text="Save As Default"  OnClick="SaveAsDefaultView_OnClick"/>
+
+<% } %>
 </td>
 </tr>
 
@@ -768,6 +775,12 @@ p.srch-Metadata1
 <tr>
 <td colspan="2" class="wbf-buttons-panel">
     <asp:Button ID="UpdateViewFromColumns" runat="server" Text="Update View"  OnClick="UpdateView_OnClick"/>
+    <% if (canSaveDefaultView)
+   { %>
+&nbsp;
+    <asp:Button ID="SaveDefaultViewFromColumns" runat="server" Text="Save As Default"  OnClick="SaveAsDefaultView_OnClick"/>
+<% } %>
+
 </td>
 </tr>
 

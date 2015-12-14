@@ -160,28 +160,31 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     RecordsType.Text = newRecordsType.Name;
                     pageRenderingRequired = true;
 
-                    sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__RECORDS_TYPE, NewRecordsTypeUIControlValue.Value);
-                    sourceDocAsItem.WBxSet(WBColumn.Title, this.TitleField.Text);
+                    // These are now being done in CaptureAsDocument()
+                    // sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__RECORDS_TYPE, NewRecordsTypeUIControlValue.Value);
+                    // sourceDocAsItem.WBxSet(WBColumn.Title, this.TitleField.Text);
 
-                    //if (generatingFilename)
-                    //{
-                    WorkBox.GenerateFilename(newRecordsType, sourceDocAsItem);
-                    //}
+                    // This is now being done in CaptureAsDocument()
+                    // WorkBox.GenerateFilename(newRecordsType, sourceDocAsItem);
 
                     // If either the old or new records type have an uneditable functional area, then we'll update it to the new default area.
                     if (!oldRecordsType.IsFunctionalAreaEditable || !newRecordsType.IsFunctionalAreaEditable)
                     {
                         WBLogging.Debug("Setting the functional area as it's not editable: " + newRecordsType.DefaultFunctionalAreaUIControlValue);
-                        sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, newRecordsType.DefaultFunctionalAreaUIControlValue);
+                        this.FunctionalAreaField.Text = newRecordsType.DefaultFunctionalAreaUIControlValue;
+
+                        // sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, newRecordsType.DefaultFunctionalAreaUIControlValue);
                     }
+/* This is now being done in CaptureAsDocument()
                     else
                     {
                         WBLogging.Debug("Saving the current functional area selection: " + this.FunctionalAreaField.Text);
                         sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, this.FunctionalAreaField.Text);
                     }
+*/
 
-
-                    sourceDocAsItem.Update();
+                    WBDocument document = CaptureAsDocument(sourceDocAsItem, newRecordsType);
+                    document.Update();
 
                     // Let's now re-load the item as it's name may have changed:
                     sourceDocAsItem = null;
@@ -527,6 +530,101 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             return metadataProblems;
         }
 
+        protected WBDocument CaptureAsDocument(SPListItem sourceDocAsItem, WBRecordsType documentRecordsType)
+        {
+            WBDocument document = new WBDocument(sourceDocAsItem);
+
+            //document.Name = 
+
+            //                if (!generatingFilename)
+            //              {
+            //                sourceDocAsItem["Name"] = NameField.Text;
+            //          }
+
+
+
+            document.Title = TitleField.Text;
+            //sourceDocAsItem["Title"] = TitleField.Text;
+
+            if (documentRecordsType.IsFunctionalAreaEditable)
+            {
+                document[WBColumn.FunctionalArea] = FunctionalAreaField.Text;
+                sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, FunctionalAreaField.Text);
+            }
+
+            //document.FunctionalArea = sourceDocAsItem.WBxGetMultiTermColumn<WBTerm>(functionalAreasTaxonomy, WBColumn.FunctionalArea.DisplayName);
+
+
+            String protectiveZone = ProtectiveZone.SelectedValue;
+            document.ProtectiveZone = protectiveZone;
+            //sourceDocAsItem.WBxSetColumnAsString(WorkBox.COLUMN_NAME__PROTECTIVE_ZONE, protectiveZone);
+
+            // Now to save the current value of the Records Type field:
+            document[WBColumn.RecordsType] = RecordsTypeUIControlValue.Value;
+            //sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__RECORDS_TYPE, RecordsTypeUIControlValue.Value);
+
+            if (showSubjectTags)
+            {
+                WBLogging.Debug("Setting subject tags to be: " + SubjectTagsField.Text);
+                document[WBColumn.SubjectTags] = SubjectTagsField.Text;
+            }
+            else
+            {
+                WBLogging.Debug("NOT !!! Setting subject tags to be: " + SubjectTagsField.Text);
+            }
+
+
+            if (showReferenceID)
+            {
+                document.ReferenceID = ReferenceID.Text;
+                //sourceDocAsItem.WBxSetColumnAsString(WorkBox.COLUMN_NAME__REFERENCE_ID, ReferenceID.Text);
+            }
+
+            if (showReferenceDate)
+            {
+                document.ReferenceDate = ReferenceDate.SelectedDate;
+                // sourceDocAsItem[WorkBox.COLUMN_NAME__REFERENCE_DATE] = ReferenceDate.SelectedDate;
+            }
+
+            if (showSeriesTag)
+            {
+                document[WBColumn.SeriesTag] = SeriesTagDropDownList.SelectedValue;
+                //sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__SERIES_TAG, SeriesTagDropDownList.SelectedValue);
+            }
+
+            if (showScanDate)
+            {
+                document.ScanDate = ScanDate.SelectedDate;
+                //sourceDocAsItem[WorkBox.COLUMN_NAME__SCAN_DATE] = ScanDate.SelectedDate;
+            }
+
+
+            //sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__OWNING_TEAM, OwningTeamField.Text);
+            //sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__INVOLVED_TEAMS, InvolvedTeamsField.Text);
+
+            document[WBColumn.OwningTeam] = OwningTeamField.Text;
+            document[WBColumn.InvolvedTeams] = InvolvedTeamsField.Text;
+            document.CheckOwningTeamIsAlsoInvolved();
+
+            if (String.IsNullOrEmpty(document.OriginalFilename))
+            {
+                document.OriginalFilename = sourceDocAsItem.Name;
+            }
+
+            WorkBox.GenerateFilename(documentRecordsType, sourceDocAsItem);
+
+            /*
+            if (WorkBox.RecordsType.GeneratePublishOutFilenames)
+            {
+                WorkBox.GenerateFilename(documentRecordsType, sourceDocAsItem);
+            }
+
+            sourceDocAsItem.Update();
+             */
+
+            return document;
+        }
+
         protected void publishButton_OnClick(object sender, EventArgs e)
         {
             Hashtable metadataProblems = checkMetadataState();
@@ -541,7 +639,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 FunctionalAreaFieldMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__FUNCTIONAL_AREA].WBxToString();
                 ProtectiveZoneMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__PROTECTIVE_ZONE].WBxToString();
 
- //               SubjectTagsMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__SERIES_TAG].WBxToString();
+ //               SubjectTagsMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__SUBJECT_TAGS].WBxToString();
                 ReferenceIDMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__REFERENCE_ID].WBxToString(); ;
                 ReferenceDateMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__REFERENCE_DATE].WBxToString(); ;
                 SeriesTagFieldMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__SERIES_TAG].WBxToString();
@@ -569,95 +667,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 SPDocumentLibrary sourceDocLib = (SPDocumentLibrary)SPContext.Current.Web.Lists[new Guid(ListGUID.Value)];
                 SPListItem sourceDocAsItem = sourceDocLib.GetItemById(int.Parse(ItemID.Value));
 
-                WBDocument document = new WBDocument(sourceDocAsItem);
-
-                //document.Name = 
-
-//                if (!generatingFilename)
-  //              {
-    //                sourceDocAsItem["Name"] = NameField.Text;
-      //          }
-
-
-
-                document.Title = TitleField.Text;
-                //sourceDocAsItem["Title"] = TitleField.Text;
-
-                if (documentRecordsType.IsFunctionalAreaEditable)
-                {     
-                    document[WBColumn.FunctionalArea] = FunctionalAreaField.Text;
-                    sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, FunctionalAreaField.Text);
-                }
-
-                //document.FunctionalArea = sourceDocAsItem.WBxGetMultiTermColumn<WBTerm>(functionalAreasTaxonomy, WBColumn.FunctionalArea.DisplayName);
-
-
-                protectiveZone = ProtectiveZone.SelectedValue;
-                document.ProtectiveZone = protectiveZone;
-                //sourceDocAsItem.WBxSetColumnAsString(WorkBox.COLUMN_NAME__PROTECTIVE_ZONE, protectiveZone);
-
-                // Now to save the current value of the Records Type field:
-                document[WBColumn.RecordsType] = RecordsTypeUIControlValue.Value;
-                //sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__RECORDS_TYPE, RecordsTypeUIControlValue.Value);
-
-                if (showSubjectTags)
-                {
-                    WBLogging.Debug("Setting subject tags to be: " + SubjectTagsField.Text);
-                    document[WBColumn.SubjectTags] = SubjectTagsField.Text;
-                }
-                else
-                {
-                    WBLogging.Debug("NOT !!! Setting subject tags to be: " + SubjectTagsField.Text);
-                }
-
-
-                if (showReferenceID)
-                {
-                    document.ReferenceID = ReferenceID.Text;
-                    //sourceDocAsItem.WBxSetColumnAsString(WorkBox.COLUMN_NAME__REFERENCE_ID, ReferenceID.Text);
-                }
-
-                if (showReferenceDate)
-                {
-                    document.ReferenceDate = ReferenceDate.SelectedDate;
-                    // sourceDocAsItem[WorkBox.COLUMN_NAME__REFERENCE_DATE] = ReferenceDate.SelectedDate;
-                }
-
-                if (showSeriesTag)
-                {
-                    document[WBColumn.SeriesTag] = SeriesTagDropDownList.SelectedValue;
-                    //sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__SERIES_TAG, SeriesTagDropDownList.SelectedValue);
-                }
-
-                if (showScanDate)
-                {
-                    document.ScanDate = ScanDate.SelectedDate;
-                    //sourceDocAsItem[WorkBox.COLUMN_NAME__SCAN_DATE] = ScanDate.SelectedDate;
-                }
-
-
-                //sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__OWNING_TEAM, OwningTeamField.Text);
-                //sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__INVOLVED_TEAMS, InvolvedTeamsField.Text);
-
-                document[WBColumn.OwningTeam] = OwningTeamField.Text;
-                document[WBColumn.InvolvedTeams] = InvolvedTeamsField.Text;
-                document.CheckOwningTeamIsAlsoInvolved();
-
-                if (String.IsNullOrEmpty(document.OriginalFilename))
-                {
-                    document.OriginalFilename = sourceDocAsItem.Name;                         
-                }
-
-                WorkBox.GenerateFilename(documentRecordsType, sourceDocAsItem);
-
-                /*
-                if (WorkBox.RecordsType.GeneratePublishOutFilenames)
-                {
-                    WorkBox.GenerateFilename(documentRecordsType, sourceDocAsItem);
-                }
-
-                sourceDocAsItem.Update();
-                 */
+                WBDocument document = CaptureAsDocument(sourceDocAsItem, documentRecordsType);
 
                 document.Update();
 

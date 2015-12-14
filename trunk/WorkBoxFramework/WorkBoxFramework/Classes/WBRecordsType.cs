@@ -1163,52 +1163,64 @@ namespace WorkBoxFramework
 
         #endregion
 
-        internal List<String> FilingPathForItem(SPListItem item)
+        internal List<String> FilingPathForDocument(WBDocument document)
         {
-
             List<String> path = new List<String>();
 
-            path.Add(this.Name);
-            WBRecordsType parent = this.Parent;
-            while (parent != null)
+            // Build up the records type path from this records type up the parental chain:
+            WBRecordsType recordTypeInPath = this;
+            while (recordTypeInPath != null)
             {
-                path.Insert(0, parent.Name);
-                parent = parent.Parent;
+                path.Insert(0, recordTypeInPath.Name);
+                recordTypeInPath = recordTypeInPath.Parent;
             }
+
+            // Then put the functional area at the start:
+            WBTermCollection<WBTerm> functionalAreas = document.FunctionalArea;
+            if (functionalAreas != null && functionalAreas.Count > 0)
+            {
+                path.Insert(0, functionalAreas[0].Name);
+            }
+
 
             if (this.FilingRuleLevel1 != "")
             {
-                path.Add(FilingRuleValue(FilingRuleLevel1, item));
+                path.Add(FilingRuleValue(FilingRuleLevel1, document));
 
                 if (this.FilingRuleLevel2 != "")
                 {
-                    path.Add(FilingRuleValue(FilingRuleLevel2, item));
+                    path.Add(FilingRuleValue(FilingRuleLevel2, document));
 
                     if (this.FilingRuleLevel3 != "")
                     {
-                        path.Add(FilingRuleValue(FilingRuleLevel3, item));
+                        path.Add(FilingRuleValue(FilingRuleLevel3, document));
 
                         if (this.FilingRuleLevel4 != "")
                         {
-                            path.Add(FilingRuleValue(FilingRuleLevel4, item));
+                            path.Add(FilingRuleValue(FilingRuleLevel4, document));
                         }
                     }
                 }
             }
+            else
+            {
+                // This is the default filing rule to be used if not rules are set on the records type:
+                path.Add(FilingRuleValue(FILING_RULE__BY_FINANCIAL_YEAR, document));
+            }
 
-            WBUtils.logMessage("For item: " + item.Name + " created path: " + string.Join("/", path.ToArray()));
+            WBUtils.logMessage("For item: " + document.Name + " created path: " + string.Join("/", path.ToArray()));
 
             return path;
         }
 
-        private string FilingRuleValue(string filingRule, SPListItem item)
+        private string FilingRuleValue(string filingRule, WBDocument document)
         {
             switch (filingRule)
             {
                 case FILING_RULE__BY_FINANCIAL_YEAR: 
                     {
-                        if (item[WorkBox.COLUMN_NAME__REFERENCE_DATE] == null) return "NO DATE SET";
-                        DateTime referenceDate = (DateTime)item[WorkBox.COLUMN_NAME__REFERENCE_DATE];
+                        if (!document.HasReferenceDate) return "NO DATE SET";
+                        DateTime referenceDate = document.ReferenceDate;
 
                         int year = referenceDate.Year;
                         int month = referenceDate.Month;
@@ -1219,29 +1231,29 @@ namespace WorkBoxFramework
 
                 case FILING_RULE__BY_CALENDAR_YEAR:
                     {
-                        if (item[WorkBox.COLUMN_NAME__REFERENCE_DATE] == null) return "NO DATE SET";
-                        DateTime referenceDate = (DateTime)item[WorkBox.COLUMN_NAME__REFERENCE_DATE];
+                        if (!document.HasReferenceDate) return "NO DATE SET";
+                        DateTime referenceDate = document.ReferenceDate;
 
                         return referenceDate.Year.ToString("D4");
                     }
                 case FILING_RULE__BY_MONTH:
                     {
-                        if (item[WorkBox.COLUMN_NAME__REFERENCE_DATE] == null) return "NO DATE SET";
-                        DateTime referenceDate = (DateTime)item[WorkBox.COLUMN_NAME__REFERENCE_DATE];
+                        if (!document.HasReferenceDate) return "NO DATE SET";
+                        DateTime referenceDate = document.ReferenceDate;
 
                         return referenceDate.Month.ToString("D2");
                     }
                 case FILING_RULE__BY_DAY_OF_MONTH:
                     {
-                        if (item[WorkBox.COLUMN_NAME__REFERENCE_DATE] == null) return "NO DATE SET";
-                        DateTime referenceDate = (DateTime)item[WorkBox.COLUMN_NAME__REFERENCE_DATE];
+                        if (!document.HasReferenceDate) return "NO DATE SET";
+                        DateTime referenceDate = document.ReferenceDate;
 
                         return referenceDate.Day.ToString("D2");
                     }
                 case FILING_RULE__BY_FULL_DATE:
                     {
-                        if (item[WorkBox.COLUMN_NAME__REFERENCE_DATE] == null) return "NO DATE SET";
-                        DateTime referenceDate = (DateTime)item[WorkBox.COLUMN_NAME__REFERENCE_DATE];
+                        if (!document.HasReferenceDate) return "NO DATE SET";
+                        DateTime referenceDate = document.ReferenceDate;
 
                         return string.Format("{0}-{1}-{2}",
                             referenceDate.Year.ToString("D4"),
@@ -1250,35 +1262,25 @@ namespace WorkBoxFramework
                     }
                 case FILING_RULE__BY_FUNCTIONAL_AREA:
                     {
-                        if (!item.WBxColumnHasValue(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA)) return "NO FUNCTIONAL AREA SET";
+                        WBTermCollection<WBTerm> functionalArea = document.FunctionalArea;
+                        if (functionalArea == null || functionalArea.Count == 0) return "NO FUNCTIONAL AREA SET";
 
-                        // We can pass in null because we're only going to use the name from the UIControlValue
-                        WBTerm functionalArea = item.WBxGetSingleTermColumn<WBTerm>(null, WorkBox.COLUMN_NAME__FUNCTIONAL_AREA);
-
-                        return functionalArea.Name;
+                        return functionalArea[0].Name;
                     }
                 case FILING_RULE__BY_REFERENCE_ID:
                     {
-                        if (!item.WBxColumnHasValue(WorkBox.COLUMN_NAME__REFERENCE_ID)) return "NO REFERENCE ID SET";
-                        return item.WBxGetColumnAsString(WorkBox.COLUMN_NAME__REFERENCE_ID);
+                        if (String.IsNullOrEmpty(document.ReferenceID)) return "NO REFERENCE ID SET";
+                        return document.ReferenceID;
                     }
                 case FILING_RULE__BY_SERIES_TAG:
                     {
-                        if (!item.WBxColumnHasValue(WorkBox.COLUMN_NAME__SERIES_TAG)) return "NO RECORD SERIES SET";
-
-                        WBTaxonomy seriesTagsTaxonomy = WBTaxonomy.GetSeriesTags(this.Taxonomy);
-                        WBTerm seriesTag = item.WBxGetSingleTermColumn<WBTerm>(seriesTagsTaxonomy, WorkBox.COLUMN_NAME__SERIES_TAG);
-
-                        return seriesTag.Name;
+                        if (document.SeriesTag == null) return "NO RECORD SERIES SET";
+                        return document.SeriesTag.Name;
                     }
                 case FILING_RULE__BY_OWNING_TEAM:
                     {
-                        if (!item.WBxColumnHasValue(WorkBox.COLUMN_NAME__OWNING_TEAM)) return "NO OWNING TEAM SET";
-
-                        WBTaxonomy teamsTaxonomy = WBTaxonomy.GetTeams(this.Taxonomy);
-                        WBTeam team = item.WBxGetSingleTermColumn<WBTeam>(teamsTaxonomy, WorkBox.COLUMN_NAME__OWNING_TEAM);
-
-                        return team.Name;
+                        if (document.OwningTeam == null) return "NO OWNING TEAM SET";
+                        return document.OwningTeam.Name;
                     }
                 case FILING_RULE__BY_WORK_BOX_ID:
                     {
@@ -1599,7 +1601,6 @@ namespace WorkBoxFramework
 
 
             WBTerm functionalArea = document.FunctionalArea[0];
-
             string fullClassPath = WBUtils.NormalisePath(functionalArea.Name + "/" + this.FullPath);
 
             WBLogging.RecordsTypes.HighLevel("Declaring a document to the library with path: " + fullClassPath);
@@ -1637,7 +1638,7 @@ namespace WorkBoxFramework
                         referenceDate.Day.ToString("D2"));
 
 
-            string fullFilingPath = fullClassPath + "/" + datePath;
+            string fullFilingPath = String.Join("/", FilingPathForDocument(document).ToArray());
 
             WBLogging.Debug("The original filename is set as: " + document.OriginalFilename);
 
