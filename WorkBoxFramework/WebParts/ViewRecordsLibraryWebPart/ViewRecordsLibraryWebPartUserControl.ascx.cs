@@ -41,13 +41,13 @@ namespace WorkBoxFramework.ViewRecordsLibraryWebPart
 
         private const String VIEW_BY_FUNCTION_THEN_TYPE = "By Function then Type";
         private const String VIEW_BY_SUBJECT = "By Subject";
-        private const String VIEW_BY_FILING_PATH = "By Filing Path";
+        private const String VIEW_BY_FOLDER_PATH = "By Folder Path";
 
         
         private WBColumn sortColumn = null;
         private bool ascending = false;
 
-        public String[] LibraryViews = {VIEW_BY_FUNCTION_THEN_TYPE,  VIEW_BY_RECORDS_TYPE, VIEW_BY_SUBJECT, VIEW_BY_FILING_PATH };
+        public String[] LibraryViews = {VIEW_BY_FUNCTION_THEN_TYPE,  VIEW_BY_RECORDS_TYPE, VIEW_BY_SUBJECT, VIEW_BY_FOLDER_PATH };
         public List<String> ProtectiveZoneFilterOptions;
 
         public WBTaxonomy recordsTypesTaxonomy = null;
@@ -83,12 +83,20 @@ namespace WorkBoxFramework.ViewRecordsLibraryWebPart
                 FilterByProtectiveZone.DataBind();
 
                 string selectedView = webPart.RecordsLibraryView;
+
+                if (!String.IsNullOrEmpty(Request.QueryString["FolderPath"])) {
+                    selectedView = VIEW_BY_FOLDER_PATH;
+                    SelectedNodePath = Request.QueryString["FolderPath"];
+                }
+
+
                 if (String.IsNullOrEmpty(selectedView))
                     selectedView = VIEW_BY_RECORDS_TYPE;
 
                 SelectedViewTitle.Text = selectedView; 
                 SelectedView = selectedView; 
             }
+
 
             RefreshBrowsableTreeView();
 
@@ -106,9 +114,12 @@ namespace WorkBoxFramework.ViewRecordsLibraryWebPart
             // this odd statement is required in order to get the pagination to work with an SPGridView!
             ShowResults.PagerTemplate = null;
 
-
-
+            if (SelectedView == VIEW_BY_FOLDER_PATH)
+            {
+                RefreshBoundData();
+            }
         }
+
 
         private void RefreshBrowsableTreeView()
         {
@@ -168,22 +179,44 @@ namespace WorkBoxFramework.ViewRecordsLibraryWebPart
                         break;
                     }
 
+                case VIEW_BY_FOLDER_PATH:
+                    {
+                        String recordsLibraryURL = WBFarm.Local.ProtectedRecordsLibraryUrl;
+                        List<String> pathParts = new List<String>(SelectedNodePath.Split('/'));
+
+                        using (SPSite site = new SPSite(recordsLibraryURL))
+                        {
+                            using (SPWeb web = site.OpenWeb())
+                            {
+                                SPList recordsLibrary = web.GetList(recordsLibraryURL); //"Documents"]; //farm.RecordsCenterRecordsLibraryName];
+
+                                Dictionary<String, TreeNode> newNodes = new Dictionary<String, TreeNode>();
+
+                                foreach (SPFolder functionFolder in recordsLibrary.RootFolder.SubFolders)
+                                {
+                                    //Term foundTerm = functionalAreaTaxonomy.GetSelectedTermByPath(functionFolder.Name);
+                                    //if (foundTerm != null && foundTerm.IsAvailableForTagging)
+                                    if (functionFolder.Name != "Forms")
+                                    {
+                                        TreeNode newNode = AddFunctionFolderBranch(functionFolder, pathParts);
+
+                                        newNodes.Add(newNode.Text, newNode);
+                                    }
+                                }
+
+                                List<String> allNames = new List<String>(newNodes.Keys);
+                                allNames.Sort();
+
+                                foreach (String name in allNames)
+                                {
+                                    BrowsableTreeView.Nodes.Add(newNodes[name]);
+                                }
+
+                            }
+                        }
+                        break;
+                    }
             }
-
-
-            
-            /*
-            TreeNode rootNode = new TreeNode("Test", "Test", "/_layouts/Images/EMMTerm.png");
-
-            rootNode.ChildNodes.Add(new TreeNode("Child", "Child", "/_layouts/Images/FOLDER.GIF"));
-            rootNode.ChildNodes.Add(new TreeNode("Child2", "Child2", "/_layouts/Images/FOLDER.GIF"));
-            rootNode.ChildNodes.Add(new TreeNode("Child3", "Child3", "/_layouts/Images/EMMTerm.png"));
-
-            PickRecordsTypeTreeView.Nodes.Add(rootNode);
-            */
-
-
-
 
         }
 
@@ -250,6 +283,11 @@ namespace WorkBoxFramework.ViewRecordsLibraryWebPart
             return recordsTypeNode;
         }
 
+        private String FolderPath
+        {
+            get { return ViewState["WBF_FolderPath"].WBxToString(); }
+            set { ViewState["WBF_FolderPath"] = value; }
+        }
 
         private String SelectedNodePath
         {
@@ -356,8 +394,6 @@ namespace WorkBoxFramework.ViewRecordsLibraryWebPart
                     WBLogging.Debug("Could not find the RM Managers group called: " + WBFarm.Local.RecordsManagersGroupName);
                 }
 
-
-
                 SelectedRecordsType.Text = SelectedNodePath.Replace("Records Types/", "").Replace("/", " / ");
 
                 WBRecordsType recordsType = null;
@@ -411,6 +447,27 @@ namespace WorkBoxFramework.ViewRecordsLibraryWebPart
                             break;
                         }
 
+                    case VIEW_BY_FOLDER_PATH:
+                        {
+                            string[] parts = SelectedNodePath.Split('/');
+                            if (parts.Length < 3) break;
+
+                            string functionPath = parts[0];
+                            List<String> recordsTypePartsList = new List<String>();
+                            recordsTypePartsList.Add(parts[1]);
+                            recordsTypePartsList.Add(parts[2]);
+                            string recordsTypePath = String.Join("/", recordsTypePartsList.ToArray());
+
+                            Term functionalAreaTerm = functionalAreaTaxonomy.GetSelectedTermByPath(functionPath);
+                            if (functionalAreaTerm != null)
+                            {
+                                functionalArea = new WBTerm(functionalAreaTaxonomy, functionalAreaTerm);
+                            }
+
+                            recordsType = recordsTypesTaxonomy.GetSelectedRecordsType(recordsTypePath);
+                            SelectedRecordsTypeDescription.Text = recordsType.Description;
+                            break;
+                        }
 
                     default: return;
 
@@ -435,8 +492,9 @@ namespace WorkBoxFramework.ViewRecordsLibraryWebPart
                         else
                         {
 
-                            if (SelectedView == VIEW_BY_FUNCTION_THEN_TYPE)
+                            if (SelectedView == VIEW_BY_FUNCTION_THEN_TYPE || SelectedView == VIEW_BY_FOLDER_PATH)
                             {
+                                WBLogging.Generic.Unexpected("Setting FilterByFolderPath = " + SelectedNodePath);
                                 query.FilterByFolderPath = SelectedNodePath;
                             }
                             else
@@ -457,7 +515,6 @@ namespace WorkBoxFramework.ViewRecordsLibraryWebPart
                             }
 
                             query.AddClause(new WBQueryClause(WBColumn.ContentType, WBQueryClause.Comparators.Equals, farm.WorkBoxRecordContentTypeName));
-
 
                             if (subjectTag != null)
                             {
@@ -730,5 +787,181 @@ namespace WorkBoxFramework.ViewRecordsLibraryWebPart
             set { ViewState["WBF_SelectedLiveOrArchivedStatusFilter"] = value; }
         }
 
+
+        private TreeNode AddFunctionFolderBranch(SPFolder functionFolder, List<String> pathParts)
+        {
+            // This bit is here from the web version of this web part which has to worry about spaces having been replaced by hyphens
+            String termName = functionFolder.Name; // .Replace("-", " ");
+            WBLogging.Generic.Unexpected("In AddFunctionFolderBranch termName = " + termName);
+            if (pathParts != null && pathParts.Count > 0)
+            {
+                WBLogging.Generic.Unexpected("In AddFunctionFolderBranch pathParts.Count = " + pathParts.Count);
+                WBLogging.Generic.Unexpected("In AddFunctionFolderBranch pathParts[0] = " + pathParts[0]);
+            }
+
+            bool partOfPath = false;
+            if (pathParts != null && pathParts.Count > 0 && pathParts[0].Equals(termName))
+            {
+                pathParts.RemoveAt(0);
+                partOfPath = true;
+            }
+            else
+            {
+                pathParts = null;
+            }
+
+            TreeNode functionNode = new TreeNode(termName, termName, "/_layouts/Images/FOLDER.GIF");
+            if (partOfPath) functionNode.Expand();
+
+            Dictionary<String, TreeNode> newNodes = new Dictionary<String, TreeNode>();
+            foreach (SPFolder recordsGroupingFolder in functionFolder.SubFolders)
+            {
+                TreeNode newNode = AddRecordsGroupFolderBranch(recordsGroupingFolder, pathParts);
+
+                newNodes.Add(newNode.Text, newNode);
+            }
+
+            List<String> allNames = new List<String>(newNodes.Keys);
+            allNames.Sort();
+
+            foreach (String name in allNames)
+            {
+                functionNode.ChildNodes.Add(newNodes[name]);
+            }
+
+            return functionNode;
+        }
+
+        private TreeNode AddRecordsGroupFolderBranch(SPFolder recordsGroupFolder, List<String> pathParts)
+        {
+            // This bit is here from the web version of this web part which has to worry about spaces having been replaced by hyphens
+            String termName = recordsGroupFolder.Name; // .Replace("-", " ");
+            WBLogging.Generic.Unexpected("In AddRecordsGroupFolderBranch termName = " + termName);
+            if (pathParts != null && pathParts.Count > 0)
+            {
+                WBLogging.Generic.Unexpected("In AddRecordsGroupFolderBranch pathParts.Count = " + pathParts.Count);
+                WBLogging.Generic.Unexpected("In AddRecordsGroupFolderBranch pathParts[0] = " + pathParts[0]);
+            }
+
+            bool partOfPath = false;
+            if (pathParts != null && pathParts.Count > 0 && pathParts[0].Equals(termName))
+            {
+                pathParts.RemoveAt(0);
+                partOfPath = true;
+            }
+            else
+            {
+                pathParts = null;
+            }
+
+
+            TreeNode recordsGroupNode = new TreeNode(termName, termName, "/_layouts/Images/EMMTerm.png");
+            if (partOfPath) recordsGroupNode.Expand();
+
+            Dictionary<String, TreeNode> newNodes = new Dictionary<String, TreeNode>();
+
+            foreach (SPFolder recordsTypeFolder in recordsGroupFolder.SubFolders)
+            {
+                TreeNode newNode = AddRecordsTypeFolderBranch(recordsTypeFolder, pathParts);
+
+                newNodes.Add(newNode.Text, newNode);
+            }
+
+            List<String> allNames = new List<String>(newNodes.Keys);
+            allNames.Sort();
+
+            foreach (String name in allNames)
+            {
+                recordsGroupNode.ChildNodes.Add(newNodes[name]);
+            }
+
+            return recordsGroupNode;
+        }
+
+        private TreeNode AddRecordsTypeFolderBranch(SPFolder recordsTypeFolder, List<String> pathParts)
+        {
+            // This bit is here from the web version of this web part which has to worry about spaces having been replaced by hyphens
+            String termName = recordsTypeFolder.Name; //.Replace("-", " ");
+            WBLogging.Generic.Unexpected("In AddRecordsTypeFolderBranch termName = " + termName);
+            if (pathParts != null && pathParts.Count > 0)
+            {
+                WBLogging.Generic.Unexpected("In AddRecordsTypeFolderBranch pathParts.Count = " + pathParts.Count);
+                WBLogging.Generic.Unexpected("In AddRecordsTypeFolderBranch pathParts[0] = " + pathParts[0]);
+            }
+
+            bool partOfPath = false;
+            if (pathParts != null && pathParts.Count > 0 && pathParts[0].Equals(termName))
+            {                
+                pathParts.RemoveAt(0);
+                partOfPath = true;
+            }
+            else
+            {
+                pathParts = null;
+            }
+
+            TreeNode recordsTypeNode = new TreeNode(termName, termName, "/_layouts/Images/EMMTerm.png");
+            if (partOfPath) recordsTypeNode.Expand();
+
+            if (pathParts != null && pathParts.Count > 0)
+            {
+                WBLogging.Generic.Unexpected("In AddRecordsTypeFolderBranch pathParts.Count = " + pathParts.Count);
+                WBLogging.Generic.Unexpected("In AddRecordsTypeFolderBranch pathParts[0] = " + pathParts[0]);
+
+                WBLogging.Generic.Unexpected("In AddRecordsTypeFolderBranch recordsTypeFolder.SubFolders.Count = " + recordsTypeFolder.SubFolders.Count);
+
+                foreach (SPFolder folderPartFolder in recordsTypeFolder.SubFolders)
+                {
+                    WBLogging.Generic.Unexpected("In AddRecordsTypeFolderBranch foreach: folderPartFolder = " + folderPartFolder);
+                    recordsTypeNode.ChildNodes.Add(AddFolderPartsBranch(folderPartFolder, pathParts));
+                }
+
+            }
+
+            return recordsTypeNode;
+        }
+
+        private TreeNode AddFolderPartsBranch(SPFolder folder, List<String> pathParts)
+        {
+            // This bit is here from the web version of this web part which has to worry about spaces having been replaced by hyphens
+            String folderName = folder.Name; //.Replace("-", " ");
+
+            bool partOfPath = false;
+            if (pathParts != null && pathParts.Count > 0)
+            {
+                WBLogging.Generic.Unexpected("In AddFolderPartsBranch: The pathParts[0] = " + pathParts[0]);
+            } 
+            
+            if (pathParts != null && pathParts.Count > 0 && pathParts[0].Equals(folderName))
+            {
+                pathParts.RemoveAt(0);
+                partOfPath = true;
+            }
+            else
+            {
+                pathParts = null;
+            }
+
+            TreeNode folderNode = new TreeNode(folderName, folderName, "/_layouts/Images/FOLDER.GIF");
+            if (partOfPath)
+            {
+                folderNode.Expand();
+                if (pathParts != null && pathParts.Count == 0)
+                {
+                    folderNode.Selected = true;
+                }
+            }
+
+            if (pathParts != null && pathParts.Count > 0)
+            {
+                foreach (SPFolder subFolder in folder.SubFolders)
+                {
+                    folderNode.ChildNodes.Add(AddFolderPartsBranch(subFolder, pathParts));
+                }
+
+            }
+
+            return folderNode;
+        }
     }
 }
