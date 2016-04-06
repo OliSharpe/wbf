@@ -5,7 +5,7 @@
             GroupId="WorkBoxFramework.SiteSettingsGroup"
             Location="Microsoft.SharePoint.SiteSettings"
             Sequence="5100"
-            Title="WBF Web Parts Configuration"
+            Title="Web Parts Configuration"
             RequireSiteAdministrator="TRUE">
     <UrlAction Url="_layouts/WBFWebParts/WBFWebPartsConfig.aspx"/>
   </CustomAction>

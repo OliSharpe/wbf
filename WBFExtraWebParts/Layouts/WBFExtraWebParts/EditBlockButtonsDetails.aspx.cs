@@ -32,7 +32,7 @@ namespace WBFExtraWebParts.Layouts.WBFExtraWebParts
                 if (details.Length != 5)
                 {
                     WBLogging.Debug("The details sent to this page have the wrong structure: " + allDetails);
-                    ErrorMessage.Text = "There was a problem with the data sent to this page.";
+                    ErrorMessage.Text = "There was a problem with the data sent to this page: " + allDetails;
                     return;
                 }
 
@@ -351,6 +351,7 @@ namespace WBFExtraWebParts.Layouts.WBFExtraWebParts
             string textHiddenFieldClientID = hiddenField.ClientID;
 
             /* Now we're going to add the scripts for all three colour choices */
+            /* This is the most ugly spagetti of code I can imagine!!! ... hopefully I'll have time to re-factor sensibly into a javascript object model!!! - Oli Sharpe - 23/2/2015 */
             script += "var buttonColor_" + index + " = '" + buttonColorHex + "'; \n";
             script += "var borderColorChained_" + index + " = " + (buttonBorderColorIsChained ? "true" : "false") + "; \n";
             script += "var borderColor_" + index + " = " + (buttonBorderColorIsChained ? "WBF_buttonColorToBorderColor(buttonColor_" + index + ")" : "'" + buttonBorderColorHex + "'") + "; \n";
@@ -396,9 +397,9 @@ namespace WBFExtraWebParts.Layouts.WBFExtraWebParts
             script += "        }  \n";
 
             script += "        if (textColorChained_" + index + ") {  \n";
-            script += "            textColor_" + index + " = WBF_buttonColorToTextColor(buttonColor); \n";
+            script += "            textColor_" + index + " = WBF_buttonColorToTextColor(buttonColor_" + index + "); \n";
             script += "            $('#ctl00_PlaceHolderMain_" + textPanelClientID + "').css('background-color', '#' + textColor_" + index + ").colpickSetColor('#' + textColor_" + index + ", true); \n";
-            script += "            $('#ctl00_PlaceHolderMain_" + textHiddenFieldClientID + "').val(textColor); \n";
+            script += "            $('#ctl00_PlaceHolderMain_" + textHiddenFieldClientID + "').val(textColor_" + index + "); \n";
             script += "        }  \n";
 
             script += "        $('#wbf-block-button-preview-" + index + "').css( { 'background-color': '#' + buttonColor_" + index + ", 'border-color': '#' + borderColor_" + index + ", 'color': '#' + textColor_" + index + " } ); \n";
@@ -479,8 +480,8 @@ namespace WBFExtraWebParts.Layouts.WBFExtraWebParts
             script += "        hiddenField.val(\"c\"); \n";
             script += "        " + chainedFlag + "_" + index + " = true; \n";
             script += "         hiddenField.data('unchained-color', $('#ctl00_PlaceHolderMain_" + hiddenInputClientID + "').val()); \n";
-            
-            script += "        var hex = " + chainedColorFunction + "(buttonColor); \n";
+
+            script += "        var hex = " + chainedColorFunction + "(buttonColor_" + index + "); \n";
             script += "        $('#ctl00_PlaceHolderMain_" + panelClientID + "').css('background-color', '#' + hex); \n";
             script += "        $('#ctl00_PlaceHolderMain_" + hiddenInputClientID + "').val(hex); \n";
             script += "        $('#" + previewButtonID + "').css('" + colourProperty + "', '#' + hex); \n";

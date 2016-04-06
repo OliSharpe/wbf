@@ -884,6 +884,9 @@ namespace WorkBoxFramework
         public static readonly WBColumn RequestPrecreatedWorkBoxList = WBColumn.TextColumn(WorkBox.COLUMN_NAME__REQUEST_PRECREATED_WORK_BOX_LIST);
         public static readonly WBColumn WorkBoxListID = WBColumn.IntegerColumn(WorkBox.COLUMN_NAME__WORK_BOX_LIST_ID);
 
+        public static readonly WBColumn WorkBoxLastTotalNumberOfDocuments = WBColumn.IntegerColumn(WorkBox.COLUMN_NAME__WORK_BOX_LAST_TOTAL_NUMBER_OF_DOCUMENTS);
+        public static readonly WBColumn WorkBoxLastTotalSizeOfDocuments = WBColumn.IntegerColumn(WorkBox.COLUMN_NAME__WORK_BOX_LAST_TOTAL_SIZE_OF_DOCUMENTS);
+
         private static string[] commands = 
         {
             WBTimerTask.COMMAND__COMPOSITE_TEAMS,

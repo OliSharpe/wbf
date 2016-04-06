@@ -9,6 +9,13 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <SharePoint:ScriptLink ID="WBFjQueryScriptRegistration"
+        name="WorkBoxFramework/jquery-1.11.3.min.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
    <SharePoint:ScriptLink ID="WBFExtraWebPartsScriptRegistration"
         name="WBFExtraWebParts/WBFExtraWebParts.js"
         language="javascript"

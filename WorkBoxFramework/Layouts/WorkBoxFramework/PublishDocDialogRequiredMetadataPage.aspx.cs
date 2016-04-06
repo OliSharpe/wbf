@@ -172,8 +172,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     {
                         WBLogging.Debug("Setting the functional area as it's not editable: " + newRecordsType.DefaultFunctionalAreaUIControlValue);
                         this.FunctionalAreaField.Text = newRecordsType.DefaultFunctionalAreaUIControlValue;
-
-                        // sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, newRecordsType.DefaultFunctionalAreaUIControlValue);
+                        sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, newRecordsType.DefaultFunctionalAreaUIControlValue);
                     }
 /* This is now being done in CaptureAsDocument()
                     else
@@ -533,6 +532,14 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         protected WBDocument CaptureAsDocument(SPListItem sourceDocAsItem, WBRecordsType documentRecordsType)
         {
             WBDocument document = new WBDocument(sourceDocAsItem);
+
+            // Which of the metadata fields are being used by the active records type?
+            showReferenceID = documentRecordsType.DocumentReferenceIDRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
+            showReferenceDate = documentRecordsType.DocumentReferenceDateRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
+            showSubjectTags = true; // documentRecordsType.DocumentSubjectTagsRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
+            showSeriesTag = documentRecordsType.DocumentSeriesTagRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
+            showScanDate = documentRecordsType.DocumentScanDateRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
+
 
             //document.Name = 
 

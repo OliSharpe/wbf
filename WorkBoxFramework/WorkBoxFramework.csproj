@@ -1032,7 +1032,9 @@
     <Content Include="Layouts\WorkBoxFramework\AddManagersDirectReports.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\WorkBoxFramework\AddSubjectTag.aspx" />
+    <Content Include="Layouts\WorkBoxFramework\AddSubjectTag.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\ChangeTeamManager.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1058,6 +1060,7 @@
     <Content Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
+    <Content Include="Layouts\WorkBoxFramework\jquery-1.11.3.min.js" />
     <Content Include="Layouts\WorkBoxFramework\SubjectTags.js" />
     <Content Include="Layouts\WorkBoxFramework\MailToLinkReplacement.aspx">
       <SubType>ASPXCodeBehind</SubType>
@@ -1196,7 +1199,9 @@
     <Content Include="Layouts\WorkBoxFramework\RecordsTypePicker.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\WorkBoxFramework\SubjectTagsManagement.aspx" />
+    <Content Include="Layouts\WorkBoxFramework\SubjectTagsManagement.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\TestDocumentPicker.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1218,7 +1223,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="WebParts\TeamSiteTreeNavWebPart\Elements.xml" />
-    <Content Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPartUserControl.ascx" />
+    <Content Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPartUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="WebParts\TeamSiteWorkBoxes\Elements.xml" />
     <Content Include="WebParts\TeamSiteWorkBoxes\TeamSiteWorkBoxesUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
