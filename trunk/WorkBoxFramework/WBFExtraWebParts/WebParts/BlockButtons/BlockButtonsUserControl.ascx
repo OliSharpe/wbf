@@ -7,6 +7,13 @@
 <%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="BlockButtonsUserControl.ascx.cs" Inherits="WBFExtraWebParts.BlockButtons.BlockButtonsUserControl" %>
 
+    <SharePoint:ScriptLink ID="WBFjQueryScriptRegistration"
+        name="WorkBoxFramework/jquery-1.11.3.min.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
    <SharePoint:ScriptLink ID="WBFExtraWebPartsScriptRegistration"
         name="WBFExtraWebParts/WBFExtraWebParts.js"
         language="javascript"

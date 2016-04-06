@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="122d1e78-156a-4d31-adc1-66fee258b162" solutionId="122d1e78-156a-4d31-adc1-66fee258b162" resetWebServer="false" name="WorkBoxFramework v0.9.7c.u1" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="122d1e78-156a-4d31-adc1-66fee258b162" solutionId="122d1e78-156a-4d31-adc1-66fee258b162" resetWebServer="false" name="WorkBoxFramework v0.9.8u" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
   <assemblies>
     <customAssembly location="Newtonsoft.Json.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="Include\Newtonsoft.Json.dll" />
   </assemblies>

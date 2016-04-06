@@ -21,7 +21,7 @@
     />
 
     <SharePoint:ScriptLink ID="WBFjQueryScriptRegistration"
-        name="WorkBoxFramework/jquery-1.7.2.min.js"
+        name="WorkBoxFramework/jquery-1.11.3.min.js"
         language="javascript"
         localizable="false"
         runat="server"

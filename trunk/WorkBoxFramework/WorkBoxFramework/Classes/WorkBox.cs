@@ -78,6 +78,9 @@ namespace WorkBoxFramework
         public const string COLUMN_NAME__WORK_BOX_RETENTION_END_DATE = "WorkBoxRetentionEndDate";
         public const string COLUMN_NAME__WORK_BOX_AUDIT_LOG = "WorkBoxAuditLog";
 
+        public const string COLUMN_NAME__WORK_BOX_LAST_TOTAL_NUMBER_OF_DOCUMENTS = "WorkBoxLastTotalNumberOfDocuments";
+        public const string COLUMN_NAME__WORK_BOX_LAST_TOTAL_SIZE_OF_DOCUMENTS = "WorkBoxLastTotalSizeOfDocuments";
+
         public const string COLUMN_NAME__WORK_BOX_CACHED_LIST_ITEM_ID = "WorkBoxCachedListItemID";
         public const string COLUMN_NAME__WORK_BOX_DATE_LAST_VISITED = "WorkBoxDateLastVisited";
 
@@ -1223,6 +1226,35 @@ namespace WorkBoxFramework
             }
         }
 
+        public void UpdateStatistics()
+        {
+            int totalNumberOfDocuments = 0;
+            int totalSizeOfDocuments = 0;
+            bool foundDocumentLibrary = false;
+
+            SPDocumentLibrary documents = this.DocumentLibrary;
+            if (documents != null)
+            {
+                foundDocumentLibrary = true;
+
+                foreach (SPListItem fileItem in documents.Items)
+                {
+                    if (fileItem.Folder == null && fileItem.File != null)
+                    {
+                        totalNumberOfDocuments++;
+                        totalSizeOfDocuments += fileItem.WBxGetColumnAsInt(WBColumn.FileSize.InternalName, 0);
+                    }
+                }
+            }
+
+            if (foundDocumentLibrary)
+            {
+                Item.WBxSet(WBColumn.WorkBoxLastTotalNumberOfDocuments, totalNumberOfDocuments);
+                Item.WBxSet(WBColumn.WorkBoxLastTotalSizeOfDocuments, totalSizeOfDocuments);
+            }
+        }
+
+
         public void UpdateDocumentsMetadata(WBTaxonomy teams)
         {
             WBLogging.WorkBoxes.Verbose("In UpdateDocumentsMetadata(): Starting");
@@ -1242,21 +1274,32 @@ namespace WorkBoxFramework
                 library.WBxAddContentType(Site.RootWeb, WBFarm.Local.WorkBoxDocumentContentTypeName);
             }
 
-            foreach (SPListItem item in library.Items)
+            // Might as well update the stats while we're enumerating the documents anyway!
+            int totalNumberOfDocuments = 0;
+            int totalSizeOfDocuments = 0;
+
+            foreach (SPListItem documentItem in library.Items)
             {
-                SPFile file = item.File;
+                SPFile file = documentItem.File;
                 if (file != null)
                 {
                     WBLogging.WorkBoxes.Verbose("In UpdateDocumentsMetadata(): Looking at document: " + file.Url);
 
-                    WBTeam setOwningTeam = item.WBxGetSingleTermColumn<WBTeam>(teams, WBColumn.OwningTeam);
+                    if (documentItem.Folder == null)
+                    {
+                        totalNumberOfDocuments++;
+                        totalSizeOfDocuments += documentItem.WBxGetColumnAsInt(WBColumn.FileSize.InternalName, 0);
+                    }
+
+
+                    WBTeam setOwningTeam = documentItem.WBxGetSingleTermColumn<WBTeam>(teams, WBColumn.OwningTeam);
 
                     if (setOwningTeam != OwningTeam)
                     {
                         try
                         {
-                            item.WBxSetSingleTermColumn(WBColumn.OwningTeam, OwningTeam);
-                            item.SystemUpdate(false);
+                            documentItem.WBxSetSingleTermColumn(WBColumn.OwningTeam, OwningTeam);
+                            documentItem.SystemUpdate(false);
                             WBLogging.WorkBoxes.Verbose("In UpdateDocumentsMetadata(): Updated owner of document: " + file.ServerRelativeUrl);
                         }
                         catch (Exception e)
@@ -1266,6 +1309,10 @@ namespace WorkBoxFramework
                     }
                 }
             }
+
+            Item.WBxSet(WBColumn.WorkBoxLastTotalNumberOfDocuments, totalNumberOfDocuments);
+            Item.WBxSet(WBColumn.WorkBoxLastTotalSizeOfDocuments, totalSizeOfDocuments);
+            this.JustUpdate();
 
             WBLogging.WorkBoxes.Verbose("In UpdateDocumentsMetadata(): Finished");
         }
@@ -2354,6 +2401,8 @@ namespace WorkBoxFramework
                 AuditLogEntry("Work Box Closed", auditComment);
             }
 
+            UpdateStatistics();
+
             Update();
 
             return IsInErrorStatus;
@@ -2588,6 +2637,9 @@ namespace WorkBoxFramework
                 SetStatusNow(WORK_BOX_STATUS__DELETING);
 
                 WBLogging.WorkBoxes.Verbose("Trying to delete a work box: " + Title);
+
+                UpdateStatistics();
+                JustUpdate();
 
                 try
                 {

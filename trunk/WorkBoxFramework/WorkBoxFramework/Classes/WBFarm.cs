@@ -879,6 +879,8 @@ namespace WorkBoxFramework
                 WBColumn.WorkBoxDateLastClosed,
                 WBColumn.WorkBoxDateLastOpened,
                 WBColumn.WorkBoxRetentionEndDate,
+                WBColumn.WorkBoxLastTotalNumberOfDocuments,
+                WBColumn.WorkBoxLastTotalSizeOfDocuments,
 
                 WBColumn.WorkBoxLinkedCalendars,
 
@@ -980,6 +982,8 @@ namespace WorkBoxFramework
                 WBColumn.WorkBoxDateLastClosed,
                 WBColumn.WorkBoxDateLastOpened,
                 WBColumn.WorkBoxRetentionEndDate,
+                WBColumn.WorkBoxLastTotalNumberOfDocuments,
+                WBColumn.WorkBoxLastTotalSizeOfDocuments,
 
                 WBColumn.FunctionalArea,
                 WBColumn.RecordsType,

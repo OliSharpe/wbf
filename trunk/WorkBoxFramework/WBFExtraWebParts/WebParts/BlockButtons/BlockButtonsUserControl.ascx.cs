@@ -114,7 +114,7 @@ namespace WBFExtraWebParts.BlockButtons
 
                 String currentDetails = String.Join(",", detailsToEdit);
 
-                // currentDetails = HttpUtility.UrlEncode(currentDetails);
+                currentDetails = HttpUtility.UrlEncode(currentDetails);
 
                 BlockButtonsDetails.Value = currentDetails;
 

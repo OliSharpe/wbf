@@ -48,7 +48,7 @@
 </table>
 
 <!-- Loading in jQuery in case it's not loaded already -->
-<script type="text/javascript" src="/_layouts/workboxframework/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/_layouts/workboxframework/jquery-1.11.3.min.js"></script>
 
 <script type="text/javascript">
     var searched = 0;

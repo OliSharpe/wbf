@@ -10,9 +10,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WBFWebParts", "WBFWebParts\
 		{0E53B68A-6901-49B0-B614-7C859A434430} = {0E53B68A-6901-49B0-B614-7C859A434430}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WBFExtraWebParts", "WBFExtraWebParts\WBFExtraWebParts.csproj", "{692AF2FA-B02E-47C9-9F63-EA03D0C8742F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WBFAnalysisTool", "WBFAnalysisTool\WBFAnalysisTool.csproj", "{4AF6F50D-90DE-4746-AE37-48AC2DE5016D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WBFPublicFarmAdmin", "WBFPublicFarmAdmin\WBFPublicFarmAdmin.csproj", "{F7540B58-D1DC-4093-8707-9D3BC42F99BE}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
+		SccNumberOfProjects = 7
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs35
 		SccLocalPath0 = .
@@ -25,6 +31,15 @@ Global
 		SccProjectUniqueName3 = WorkBoxFramework\\WorkBoxFramework.csproj
 		SccProjectName3 = WorkBoxFramework
 		SccLocalPath3 = WorkBoxFramework
+		SccProjectUniqueName4 = WBFExtraWebParts\\WBFExtraWebParts.csproj
+		SccProjectName4 = WBFExtraWebParts
+		SccLocalPath4 = WBFExtraWebParts
+		SccProjectUniqueName5 = WBFAnalysisTool\\WBFAnalysisTool.csproj
+		SccProjectName5 = WBFAnalysisTool
+		SccLocalPath5 = WBFAnalysisTool
+		SccProjectUniqueName6 = WBFPublicFarmAdmin\\WBFPublicFarmAdmin.csproj
+		SccProjectName6 = WBFPublicFarmAdmin
+		SccLocalPath6 = WBFPublicFarmAdmin
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +70,30 @@ Global
 		{F5A04E6D-21D4-4CA9-A67D-8F0BFFC5A36A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5A04E6D-21D4-4CA9-A67D-8F0BFFC5A36A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F5A04E6D-21D4-4CA9-A67D-8F0BFFC5A36A}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{692AF2FA-B02E-47C9-9F63-EA03D0C8742F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{692AF2FA-B02E-47C9-9F63-EA03D0C8742F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{692AF2FA-B02E-47C9-9F63-EA03D0C8742F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{692AF2FA-B02E-47C9-9F63-EA03D0C8742F}.Documentation|Any CPU.ActiveCfg = Debug|Any CPU
+		{692AF2FA-B02E-47C9-9F63-EA03D0C8742F}.Documentation|Any CPU.Build.0 = Debug|Any CPU
+		{692AF2FA-B02E-47C9-9F63-EA03D0C8742F}.Documentation|Any CPU.Deploy.0 = Debug|Any CPU
+		{692AF2FA-B02E-47C9-9F63-EA03D0C8742F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{692AF2FA-B02E-47C9-9F63-EA03D0C8742F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{692AF2FA-B02E-47C9-9F63-EA03D0C8742F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{4AF6F50D-90DE-4746-AE37-48AC2DE5016D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AF6F50D-90DE-4746-AE37-48AC2DE5016D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AF6F50D-90DE-4746-AE37-48AC2DE5016D}.Documentation|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AF6F50D-90DE-4746-AE37-48AC2DE5016D}.Documentation|Any CPU.Build.0 = Debug|Any CPU
+		{4AF6F50D-90DE-4746-AE37-48AC2DE5016D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AF6F50D-90DE-4746-AE37-48AC2DE5016D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Documentation|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Documentation|Any CPU.Build.0 = Debug|Any CPU
+		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Documentation|Any CPU.Deploy.0 = Debug|Any CPU
+		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

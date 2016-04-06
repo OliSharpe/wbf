@@ -118,6 +118,15 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>WBFAnalysisTool_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>B694B4B6E74354BE9D7A3B9E4DAC7DE89A8DBBE4</ManifestCertificateThumbprint>
+  </PropertyGroup>
   <!--
     This section specifies references for the project.
   -->
@@ -222,6 +231,7 @@
       <DependentUpon>ThisAddIn.Designer.xml</DependentUpon>
     </Compile>
     <AppDesigner Include="Properties\" />
+    <None Include="WBFAnalysisTool_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup />
   <!-- Include the build rules for a C# project. -->

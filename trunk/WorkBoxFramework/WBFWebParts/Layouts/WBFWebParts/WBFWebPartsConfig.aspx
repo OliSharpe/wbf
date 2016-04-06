@@ -16,10 +16,12 @@
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-<div class="wbf-admin-page" style="padding: 10px; ">
+<div class="wbf-admin-page" style="padding: 5px; ">
 
 <h1>WBF Web Parts Configuration</h1>
+<p>
 Configure the features of the <b>Related Documents</b> and <b>Documents Group</b> web parts.
+</p>
 
 	<table class="ms-propertysheet" border="0" width="100%" cellspacing="0" cellpadding="0">
 

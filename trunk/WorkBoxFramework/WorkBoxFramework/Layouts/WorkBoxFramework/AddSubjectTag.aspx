@@ -10,7 +10,7 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
     <SharePoint:CssRegistration ID="wbfCssSectionTags" Name="WorkBoxFramework/css/SubjectTags.css" After="corev4.css" runat="server" />
-    <script src="jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script src="jquery-1.11.3.min.js" type="text/javascript"></script>
     <SharePoint:ScriptLink ID="subjectTagsScriptLink" Name="/_layouts/WorkBoxFramework/SubjectTags.js" runat="server" OnDemand="false" Localizable="false" />
 </asp:Content>
 

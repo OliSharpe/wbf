@@ -19,6 +19,7 @@ function WBF_editBlockButtons(callbackFunction, currentBlockButtonsDetailsHidden
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
+
 function WBF_UpdateOneBlockButton(idPrefix, webPartUniqueID, index, width, height, title, link, extraText, buttonColor, borderColor, textColor) {
 
     var titleDiv = $("#" + idPrefix + "-title-" + webPartUniqueID + "-" + index).text(title);
