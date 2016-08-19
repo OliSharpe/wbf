@@ -746,7 +746,7 @@ namespace WorkBoxFramework
                     savedNamingConvention = DOCUMENT_NAMING_CONVENTION__DATE_TITLE;
                 }
 
-                WBLogging.RecordsTypes.Unexpected("All documents are being forced to have naming convention: " + DOCUMENT_NAMING_CONVENTION__DATE_TITLE);
+                WBLogging.RecordsTypes.HighLevel("Document is using naming convention: " + savedNamingConvention);
                 return savedNamingConvention;
             }
             set { Term.WBxSetProperty(RECORDS_TYPE_TERM_PROPERTY__DOCUMENT_NAMING_CONVENTION, value); }
@@ -1552,39 +1552,13 @@ namespace WorkBoxFramework
             using (SPWeb protectedLibraryWeb = protectedLibrarySite.OpenWeb())
             {
                 protectedLibrarySite.AllowUnsafeUpdates = true;
-                protectedLibraryWeb.AllowUnsafeUpdates = true; 
+                protectedLibraryWeb.AllowUnsafeUpdates = true;
 
-                SPSite publicLibrarySite = null;
-                SPWeb publicLibraryWeb = null;
-                SPFolder publicLibraryRootFolder = null;
-
-                if (document.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
-                {
-                    publicLibrarySite = new SPSite(farm.PublicRecordsLibraryUrl);
-                    publicLibraryWeb = publicLibrarySite.OpenWeb();
-                    publicLibraryRootFolder = publicLibraryWeb.GetFolder(farm.PublicRecordsLibraryUrl);
-
-                    publicLibrarySite.AllowUnsafeUpdates = true;
-                    publicLibraryWeb.AllowUnsafeUpdates = true; 
-
-                }
-
-                try
-                {
-                    return PublishDocument(
-                        protectedLibraryWeb,
-                        protectedLibraryWeb.GetFolder(farm.ProtectedRecordsLibraryUrl),
-                        publicLibraryWeb,
-                        publicLibraryRootFolder,
-                        document,
-                        binaryStream);
-                }
-                finally
-                {
-                    if (publicLibraryWeb != null) publicLibraryWeb.Dispose();
-                    if (publicLibrarySite != null) publicLibrarySite.Dispose();
-                }
-
+                return PublishDocument(
+                    protectedLibraryWeb,
+                    protectedLibraryWeb.GetFolder(farm.ProtectedRecordsLibraryUrl),
+                    document,
+                    binaryStream);
             }
 
 
@@ -1594,8 +1568,6 @@ namespace WorkBoxFramework
         public SPListItem PublishDocument(
             SPWeb protectedLibraryWeb,
             SPFolder protectedLibraryRootFolder,
-            SPWeb publicLibraryWeb,
-            SPFolder publicLibraryRootFolder,
             WBDocument document, Stream binaryStream)
         {
 
@@ -1772,25 +1744,49 @@ namespace WorkBoxFramework
             }
 
 
-            if (uploadedItem.WBxGetAsString(WBColumn.ProtectiveZone) == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
-            {
-                // OK so we're goijng to copy this item to the public library:
+            String protectiveZone = uploadedItem.WBxGetAsString(WBColumn.ProtectiveZone);
+            if (protectiveZone != WBRecordsType.PROTECTIVE_ZONE__PROTECTED) {
+                WBTaxonomy subjectTags = WBTaxonomy.GetSubjectTags(protectedLibraryWeb.Site);
                 WBFarm farm = WBFarm.Local;
+                WBSubjectTagsRecordsRoutings routings = farm.SubjectTagsRecordsRoutings(subjectTags);
+                WBTermCollection<WBSubjectTag> subjectTagsApplied = uploadedItem.WBxGetMultiTermColumn<WBSubjectTag>(subjectTags, WBColumn.SubjectTags.DisplayName);
 
+                if (protectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
+                {
+                    // OK so we're goijng to copy this item to all relevant public library:
 
-                string errorMessagePublic = uploadedFile.WBxCopyTo(farm.PublicRecordsLibraryUrl, fullFilingPath, true);
+                    List<String> publicLibraries = routings.PublicLibrariesToRouteTo(subjectTagsApplied);
+                    if (!String.IsNullOrEmpty(farm.PublicRecordsLibraryUrl))
+                    {
+                        publicLibraries.Add(farm.PublicRecordsLibraryUrl);
+                    }
+
+                    foreach (String publicLibraryURL in publicLibraries) {
+                        uploadedFile.WBxCopyTo(publicLibraryURL, fullFilingPath, true);
+                    }
+
+                }
+
+                if (protectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
+                {
+                    // OK so we're goijng to copy this item to all relevant public library:
+
+                    List<String> extranetLibraries = routings.ExtranetLibrariesToRouteTo(subjectTagsApplied);
+
+                    if (!String.IsNullOrEmpty(farm.PublicExtranetRecordsLibraryUrl))
+                    {
+                        extranetLibraries.Add(farm.PublicExtranetRecordsLibraryUrl);
+                    }
+
+                    foreach (String publicLibraryURL in extranetLibraries)
+                    {
+                        uploadedFile.WBxCopyTo(publicLibraryURL, fullFilingPath, true);
+                    }
+
+                }
 
             }
 
-            if (uploadedItem.WBxGetAsString(WBColumn.ProtectiveZone) == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
-            {
-                // OK so we're going to copy this item to the public library:
-                WBFarm farm = WBFarm.Local;
-
-
-                string errorMessagePublicExtranet = uploadedFile.WBxCopyTo(farm.PublicExtranetRecordsLibraryUrl, fullFilingPath, true);
-
-            }
 
 
             return uploadedItem;

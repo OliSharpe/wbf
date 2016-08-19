@@ -14,30 +14,38 @@ namespace WBFWebParts.Layouts.WBFWebParts
             {
                 WBFarm farm = WBFarm.Local;
 
+                SPSite site = SPContext.Current.Site;
+
                 RecordsLibraryToUse.DataSource = WBFWebPartsUtils.GetRecordsLibraryOptions();
                 RecordsLibraryToUse.DataBind();
-                RecordsLibraryToUse.WBxSafeSetSelectedValue(WBFWebPartsUtils.GetRecordsLibraryToUse(SPContext.Current.Site));
+                RecordsLibraryToUse.WBxSafeSetSelectedValue(WBFWebPartsUtils.GetRecordsLibraryToUse(site));
+                LocalPublicLibraryURL.Text = WBFWebPartsUtils.GetLocalPublicLibraryURL(site);
 
-                UseExtranetLibrary.Checked = WBFWebPartsUtils.UseExtranetLibrary(SPContext.Current.Site);
+                UseExtranetLibrary.Checked = WBFWebPartsUtils.UseExtranetLibrary(site);
+                LocalExtranetLibraryURL.Text = WBFWebPartsUtils.GetLocalExtranetLibraryURL(site);
 
-                ShowFileIcons.Checked = WBFWebPartsUtils.ShowFileIcons(SPContext.Current.Site);
-                ShowKBFileSize.Checked = WBFWebPartsUtils.ShowKBFileSize(SPContext.Current.Site);
-                ShowDescription.Checked = WBFWebPartsUtils.ShowDescription(SPContext.Current.Site);
+                ShowFileIcons.Checked = WBFWebPartsUtils.ShowFileIcons(site);
+                ShowKBFileSize.Checked = WBFWebPartsUtils.ShowKBFileSize(site);
+                ShowDescription.Checked = WBFWebPartsUtils.ShowDescription(site);
             }
         }
 
 
         protected void okButton_OnClick(object sender, EventArgs e)
         {
-            WBFWebPartsUtils.SetRecordsLibraryToUse(SPContext.Current.Site, RecordsLibraryToUse.SelectedValue);
+            SPSite site = SPContext.Current.Site;
 
-            WBFWebPartsUtils.SetUseExtranetLibrary(SPContext.Current.Site, UseExtranetLibrary.Checked);
+            WBFWebPartsUtils.SetRecordsLibraryToUse(site, RecordsLibraryToUse.SelectedValue);
+            WBFWebPartsUtils.SetLocalPublicLibraryURL(site, LocalPublicLibraryURL.Text);
 
-            WBFWebPartsUtils.SetShowFileIcons(SPContext.Current.Site, ShowFileIcons.Checked);
-            WBFWebPartsUtils.SetShowKBFileSize(SPContext.Current.Site, ShowKBFileSize.Checked);
-            WBFWebPartsUtils.SetShowDescription(SPContext.Current.Site, ShowDescription.Checked);
+            WBFWebPartsUtils.SetUseExtranetLibrary(site, UseExtranetLibrary.Checked);
+            WBFWebPartsUtils.SetLocalExtranetLibraryURL(site, LocalExtranetLibraryURL.Text);
 
-            SPContext.Current.Site.RootWeb.Update();
+            WBFWebPartsUtils.SetShowFileIcons(site, ShowFileIcons.Checked);
+            WBFWebPartsUtils.SetShowKBFileSize(site, ShowKBFileSize.Checked);
+            WBFWebPartsUtils.SetShowDescription(site, ShowDescription.Checked);
+
+            site.RootWeb.Update();
 
             SPUtility.Redirect("settings.aspx", SPRedirectFlags.RelativeToLayoutsPage, Context);
         }

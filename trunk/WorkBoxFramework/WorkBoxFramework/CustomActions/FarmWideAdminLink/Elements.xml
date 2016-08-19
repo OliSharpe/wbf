@@ -24,16 +24,23 @@
     <UrlAction Url="_admin/WorkBoxFramework/DefaultInviteEmailTemplates.aspx" />
   </CustomAction>
 
+  <CustomAction Id="WorkBoxFramework.RecordsManagementAdmin" GroupId="WorkBoxFrameworkAdmin"
+    Location="Microsoft.SharePoint.Administration.Applications"
+    Sequence="30"
+    Title="Records Management Admin" Description="">
+    <UrlAction Url="_admin/WorkBoxFramework/RecordsManagementAdmin.aspx" />
+  </CustomAction>
+
   <CustomAction Id="WorkBoxFramework.CheckConfiguration" GroupId="WorkBoxFrameworkAdmin"
   Location="Microsoft.SharePoint.Administration.Applications"
-  Sequence="30"
+  Sequence="40"
   Title="Check Configuration" Description="">
     <UrlAction Url="_admin/WorkBoxFramework/CheckConfiguration.aspx" />
   </CustomAction>
 
   <CustomAction Id="WorkBoxFramework.FarmWideAdmin" GroupId="WorkBoxFrameworkAdmin"
   Location="Microsoft.SharePoint.Administration.Applications"
-  Sequence="40"
+  Sequence="50"
   Title="Core WBF Configuration" Description="">
     <UrlAction Url="_admin/WorkBoxFramework/CoreWBFConfiguration.aspx" />
   </CustomAction>

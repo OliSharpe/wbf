@@ -26,11 +26,10 @@ Configure the features of the <b>Related Documents</b> and <b>Documents Group</b
 	<table class="ms-propertysheet" border="0" width="100%" cellspacing="0" cellpadding="0">
 
 
-<!-- Farm Instance Section -->
 <wssuc:InputFormSection
 	id="UsePublicOrProtectedLibrarySection"
-	title="Use Public Or Protected Library"
-	description="On public facing websites you must use the public library"
+	title="Use Which Records Library?"
+	description="On public facing websites you must use a public library"
 	runat="server"
 	>
 	<Template_InputFormControls>
@@ -49,6 +48,27 @@ Configure the features of the <b>Related Documents</b> and <b>Documents Group</b
 	</Template_InputFormControls>
 </wssuc:InputFormSection>
 
+<wssuc:InputFormSection
+	id="LocalPublicLibrarySection"
+	title="Local Public Library URL"
+	description="If there is a local copy of the public library, what is its URL?"
+	runat="server"
+	>
+	<Template_InputFormControls>
+		<wssuc:InputFormControl runat="server">
+			<Template_Control>
+				<table border="0" width="100%" cellspacing="0" cellpadding="2">
+					<tr>
+						<td class="ms-authoringcontrols" valign="top" align="left">
+                            <asp:TextBox ID="LocalPublicLibraryURL" runat="server" columns="50"/>
+                        </td>
+                    </tr>
+
+				</table>
+			</Template_Control>
+		</wssuc:InputFormControl>
+	</Template_InputFormControls>
+</wssuc:InputFormSection>
 
 
 <!-- Records Center Section -->
@@ -68,6 +88,28 @@ Configure the features of the <b>Related Documents</b> and <b>Documents Group</b
                         </td>
 						<td class="ms-authoringcontrols" valign="top" align="left">
                             <asp:CheckBox ID="UseExtranetLibrary" runat="server" columns="50"/>
+                        </td>
+                    </tr>
+
+				</table>
+			</Template_Control>
+		</wssuc:InputFormControl>
+	</Template_InputFormControls>
+</wssuc:InputFormSection>
+
+<wssuc:InputFormSection
+	id="LocalExtranetLibrarySection"
+	title="Local Extranet Library URL"
+	description="If there is a local copy of the extranet library, what is its URL?"
+	runat="server"
+	>
+	<Template_InputFormControls>
+		<wssuc:InputFormControl runat="server">
+			<Template_Control>
+				<table border="0" width="100%" cellspacing="0" cellpadding="2">
+					<tr>
+						<td class="ms-authoringcontrols" valign="top" align="left">
+                            <asp:TextBox ID="LocalExtranetLibraryURL" runat="server" columns="50"/>
                         </td>
                     </tr>
 

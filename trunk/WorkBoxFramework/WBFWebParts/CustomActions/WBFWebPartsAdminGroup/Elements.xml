@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+
+  <CustomActionGroup
+    Description = "Site Settings group for the Work Box Framework"
+    Id = "WorkBoxFramework.SiteSettingsGroup"
+    Location = "Microsoft.SharePoint.SiteSettings"
+    Sequence = "1123"
+    Title = "Work Box Framework"
+    ImageUrl="/_layouts/images/WBFWebParts/work-box-48.png"
+  >
+  </CustomActionGroup>
+
+</Elements>

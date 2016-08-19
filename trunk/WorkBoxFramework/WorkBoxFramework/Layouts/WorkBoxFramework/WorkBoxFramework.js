@@ -126,6 +126,11 @@ function WorkBoxFramework_relativeCommandAction(relativePageName, width, height)
     WorkBoxFramework_commandAction(urlValue, width, height);
 }
 
+// Calling the command action function with zero height and width should mean these are dynamically set
+function WorkBoxFramework_callDialog(urlValue) {
+    WorkBoxFramework_commandAction(urlValue, 0, 0);
+}
+
 function WorkBoxFramework_commandAction(urlValue, width, height) {
     
     // This was the default name but it looks wrong in certain contexts.

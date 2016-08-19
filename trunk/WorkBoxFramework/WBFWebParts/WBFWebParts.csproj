@@ -74,11 +74,6 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.SharePoint" />
     <Reference Include="Microsoft.SharePoint.Security" />
-    <Reference Include="WorkBoxFramework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4554acfc19d83350, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\WorkBoxFramework\bin\Release\WorkBoxFramework.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControlTemplates\WBFWebParts\FindWhereRecordIsBeingUsed.ascx.cs">
@@ -168,8 +163,17 @@
     <None Include="CustomActions\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{26b0455b-a541-4030-824c-b296337f028a}</SharePointProjectItemId>
     </None>
+    <None Include="CustomActions\WBFWebPartsAdminGroup\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{a5feb75c-0378-4eec-876c-64dfdd510385}</SharePointProjectItemId>
+    </None>
+    <None Include="Features\WBFWebPartsAdmin\WBFWebPartsAdmin.feature">
+      <FeatureId>{21cc6075-b136-42a4-9691-0f91ae71a1fa}</FeatureId>
+    </None>
     <None Include="Features\FindWhereRecordIsUsed\FindWhereRecordIsUsed.feature">
       <FeatureId>{2cc6f326-8b92-41ee-b29d-d7c0dc4a51f4}</FeatureId>
+    </None>
+    <None Include="Images\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{67cd90ac-9fa7-4324-baa3-42baa2157d2b}</SharePointProjectItemId>
     </None>
     <None Include="Releases\v0.9.5i-final-2014.03.11\WBFWebParts v0.9.5i.wsp" />
     <None Include="Releases\v0.9.5i-final-2014.03.11\WBFWebParts v0.9.5i - Public.wsp" />
@@ -237,9 +241,14 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="CustomActions\FindWhereIsThisRecordBeingUsed\Elements.xml" />
+    <Content Include="CustomActions\WBFWebPartsAdminGroup\Elements.xml" />
+    <Content Include="Features\WBFWebPartsAdmin\WBFWebPartsAdmin.Template.xml">
+      <DependentUpon>WBFWebPartsAdmin.feature</DependentUpon>
+    </Content>
     <Content Include="Features\FindWhereRecordIsUsed\FindWhereRecordIsUsed.Template.xml">
       <DependentUpon>FindWhereRecordIsUsed.feature</DependentUpon>
     </Content>
+    <Content Include="Images\WBFWebParts\work-box-48.png" />
     <Content Include="Layouts\WBFWebParts\WBFWebPartsConfig.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -282,6 +291,12 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="WebParts\PickRelatedDocuments\PickRelatedDocumentsUserControl.ascx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WorkBoxFramework\WorkBoxFramework.csproj">
+      <Project>{0E53B68A-6901-49B0-B614-7C859A434430}</Project>
+      <Name>WorkBoxFramework</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" />

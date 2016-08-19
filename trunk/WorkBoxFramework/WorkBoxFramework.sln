@@ -14,11 +14,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WBFExtraWebParts", "WBFExtr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WBFAnalysisTool", "WBFAnalysisTool\WBFAnalysisTool.csproj", "{4AF6F50D-90DE-4746-AE37-48AC2DE5016D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WBFPublicFarmAdmin", "WBFPublicFarmAdmin\WBFPublicFarmAdmin.csproj", "{F7540B58-D1DC-4093-8707-9D3BC42F99BE}"
-EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 7
+		SccNumberOfProjects = 6
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs35
 		SccLocalPath0 = .
@@ -37,9 +35,6 @@ Global
 		SccProjectUniqueName5 = WBFAnalysisTool\\WBFAnalysisTool.csproj
 		SccProjectName5 = WBFAnalysisTool
 		SccLocalPath5 = WBFAnalysisTool
-		SccProjectUniqueName6 = WBFPublicFarmAdmin\\WBFPublicFarmAdmin.csproj
-		SccProjectName6 = WBFPublicFarmAdmin
-		SccLocalPath6 = WBFPublicFarmAdmin
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,15 +80,6 @@ Global
 		{4AF6F50D-90DE-4746-AE37-48AC2DE5016D}.Documentation|Any CPU.Build.0 = Debug|Any CPU
 		{4AF6F50D-90DE-4746-AE37-48AC2DE5016D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AF6F50D-90DE-4746-AE37-48AC2DE5016D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Documentation|Any CPU.ActiveCfg = Debug|Any CPU
-		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Documentation|Any CPU.Build.0 = Debug|Any CPU
-		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Documentation|Any CPU.Deploy.0 = Debug|Any CPU
-		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F7540B58-D1DC-4093-8707-9D3BC42F99BE}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

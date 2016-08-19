@@ -33,9 +33,12 @@ namespace WBFWebParts
     {
         internal const String WBF_WEB_PARTS__RECORDS_LIBRARY__PUBLIC = "Public Library";
         internal const String WBF_WEB_PARTS__RECORDS_LIBRARY__PROTECTED = "Protected Library";
+        internal const String WBF_WEB_PARTS__RECORDS_LIBRARY__LOCAL = "Local Public Library";
 
         internal const String SP_SITE_PROPERTY__RECORDS_LIBRARY_TO_USE = "wbf__sp_site__wbf_web_parts__records_library_to_use";
+        internal const String SP_SITE_PROPERTY__LOCAL_PUBLIC_LIBRARY_URL = "wbf__sp_site__wbf_web_parts__local_public_library_url";
         internal const String SP_SITE_PROPERTY__USE_EXTRANET_LIBRARY = "wbf__sp_site__wbf_web_parts__use_extranet_library";
+        internal const String SP_SITE_PROPERTY__LOCAL_EXTRANET_LIBRARY_URL = "wbf__sp_site__wbf_web_parts__local_extranet_library_url";
         internal const String SP_SITE_PROPERTY__SHOW_FILE_ICONS = "wbf__sp_site__wbf_web_parts__show_file_icons";
         internal const String SP_SITE_PROPERTY__SHOW_KB_FILE_SIZE = "wbf__sp_site__wbf_web_parts__show_kb_file_size";
         internal const String SP_SITE_PROPERTY__SHOW_DESCRIPTION = "wbf__sp_site__wbf_web_parts__show_description";
@@ -53,6 +56,8 @@ namespace WBFWebParts
                 options.Add(WBF_WEB_PARTS__RECORDS_LIBRARY__PROTECTED);
             }
 
+            options.Add(WBF_WEB_PARTS__RECORDS_LIBRARY__LOCAL);
+
             return options;
         }
 
@@ -65,13 +70,15 @@ namespace WBFWebParts
             }
             else
             {
-                if (site.RootWeb.WBxGetProperty(SP_SITE_PROPERTY__RECORDS_LIBRARY_TO_USE) == WBF_WEB_PARTS__RECORDS_LIBRARY__PROTECTED)
-                {
-                    return WBF_WEB_PARTS__RECORDS_LIBRARY__PROTECTED;
-                }
-                else
+                String libraryToUse = site.RootWeb.WBxGetProperty(SP_SITE_PROPERTY__RECORDS_LIBRARY_TO_USE);
+
+                if (String.IsNullOrEmpty(libraryToUse))
                 {
                     return WBF_WEB_PARTS__RECORDS_LIBRARY__PUBLIC;
+                }
+                else 
+                {
+                    return libraryToUse;
                 }
             }
         }
@@ -88,22 +95,37 @@ namespace WBFWebParts
             site.RootWeb.WBxSetProperty(SP_SITE_PROPERTY__RECORDS_LIBRARY_TO_USE, recordsLibraryToUse);
         }
 
+        internal static void SetLocalPublicLibraryURL(SPSite site, String localPublicURL)
+        {
+            site.RootWeb.WBxSetProperty(SP_SITE_PROPERTY__LOCAL_PUBLIC_LIBRARY_URL, localPublicURL);
+        }
+
+        internal static String GetLocalPublicLibraryURL(SPSite site)
+        {
+            return site.RootWeb.WBxGetProperty(SP_SITE_PROPERTY__LOCAL_PUBLIC_LIBRARY_URL);
+        }       
+
+
         internal static String GetRecordsLibraryURL(SPSite site)
         {
             WBFarm farm = WBFarm.Local;
 
-            if (GetRecordsLibraryToUse(site) == WBF_WEB_PARTS__RECORDS_LIBRARY__PROTECTED)
+            String libraryToUse = GetRecordsLibraryToUse(site);
+            String localLibraryURL = site.RootWeb.WBxGetProperty(SP_SITE_PROPERTY__LOCAL_PUBLIC_LIBRARY_URL);
+
+            if (libraryToUse == WBF_WEB_PARTS__RECORDS_LIBRARY__PROTECTED)
             {
                 return farm.ProtectedRecordsLibraryUrl;
             }
-            else
+            else if (libraryToUse == WBF_WEB_PARTS__RECORDS_LIBRARY__LOCAL && !String.IsNullOrEmpty(localLibraryURL))
             {
-                return farm.PublicRecordsLibraryUrl;
+                return localLibraryURL;
+            } 
+            else 
+            {
+                return farm.PublicRecordsLibraryUrl; 
             }
-        }
-
-        
-
+        }       
 
         internal static bool UseExtranetLibrary(SPSite site)
         {
@@ -112,8 +134,34 @@ namespace WBFWebParts
 
         internal static void SetUseExtranetLibrary(SPSite site, bool value)
         {
-            site.RootWeb.WBxSetBoolProperty(SP_SITE_PROPERTY__USE_EXTRANET_LIBRARY, value);         
+            site.RootWeb.WBxSetBoolProperty(SP_SITE_PROPERTY__USE_EXTRANET_LIBRARY, value);
         }
+
+        internal static String GetExtranetLibraryURL(SPSite site)
+        {
+            WBFarm farm = WBFarm.Local;
+
+            String localExtranetURL = site.RootWeb.WBxGetProperty(SP_SITE_PROPERTY__LOCAL_EXTRANET_LIBRARY_URL);
+
+            if (String.IsNullOrEmpty(localExtranetURL))
+            {
+                return farm.PublicExtranetRecordsLibraryUrl;
+            }
+            else
+            {
+                return localExtranetURL;
+            }
+        }
+
+        internal static void SetLocalExtranetLibraryURL(SPSite site, String localExtranetURL)
+        {
+            site.RootWeb.WBxSetProperty(SP_SITE_PROPERTY__LOCAL_EXTRANET_LIBRARY_URL, localExtranetURL);
+        }
+
+        internal static String GetLocalExtranetLibraryURL(SPSite site)
+        {
+            return site.RootWeb.WBxGetProperty(SP_SITE_PROPERTY__LOCAL_EXTRANET_LIBRARY_URL);
+        }       
 
 
         internal static bool ShowKBFileSize(SPSite site)

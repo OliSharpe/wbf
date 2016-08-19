@@ -31,6 +31,24 @@ namespace WBFWebParts.Layouts.WBFWebParts {
         protected global::System.Web.UI.WebControls.DropDownList RecordsLibraryToUse;
         
         /// <summary>
+        /// LocalPublicLibrarySection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl LocalPublicLibrarySection;
+        
+        /// <summary>
+        /// LocalPublicLibraryURL control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox LocalPublicLibraryURL;
+        
+        /// <summary>
         /// UseExtranetLibrarySection control.
         /// </summary>
         /// <remarks>
@@ -47,6 +65,24 @@ namespace WBFWebParts.Layouts.WBFWebParts {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox UseExtranetLibrary;
+        
+        /// <summary>
+        /// LocalExtranetLibrarySection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl LocalExtranetLibrarySection;
+        
+        /// <summary>
+        /// LocalExtranetLibraryURL control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox LocalExtranetLibraryURL;
         
         /// <summary>
         /// FeaturesToShowSection control.
