@@ -46,6 +46,13 @@ namespace WorkBoxFramework
 
         #region Constructors
 
+        public WBSubjectTag() : base() { } 
+
+        public WBSubjectTag(WBTaxonomy taxonomy, String UIControlValue)
+            : base(taxonomy, UIControlValue)
+        {
+        }
+
         public WBSubjectTag(WBTaxonomy taxonomy, Term subjectTagTerm)
             : base(taxonomy, subjectTagTerm)
         {

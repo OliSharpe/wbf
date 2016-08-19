@@ -210,7 +210,7 @@ namespace WBFWebParts.Layouts.WBFWebParts
             {
                 if (extranetRecordsLibrary == null)
                 {
-                    string extranetRecordsLibraryURL = WBFarm.Local.PublicExtranetRecordsLibraryUrl;
+                    string extranetRecordsLibraryURL = WBFWebPartsUtils.GetExtranetLibraryURL(SPContext.Current.Site);
                     extranetRecordsSite = new SPSite(extranetRecordsLibraryURL);
                     extranetRecordsWeb = extranetRecordsSite.OpenWeb();
                     extranetRecordsLibrary = extranetRecordsWeb.GetList(extranetRecordsLibraryURL);

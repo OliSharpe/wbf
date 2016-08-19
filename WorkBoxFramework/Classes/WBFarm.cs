@@ -47,6 +47,11 @@ namespace WorkBoxFramework
         private const string FARM_PROPERTY__PUBLIC_RECORDS_LIBRARY_URL = "wbf__farm__public_records_library_url";
         private const string FARM_PROPERTY__PUBLIC_EXTRANET_RECORDS_LIBRARY_URL = "wbf__farm__public_extranet_records_library_url";
 
+        private const string FARM_PROPERTY__SUBJECT_TAGS_RECORDS_ROUTINGS = "wbf__farm__subject_tags_records_routings";
+
+        private const string FARM_PROPERTY__RECORDS_MANAGERS_GROUP_NAME = "wbf__farm__records_managers_group_name";
+        private const string FARM_PROPERTY__RECORDS_SYSTEM_ADMIN_GROUP_NAME = "wbf__farm__records_system_admin_group_name";
+
 
         private const string FARM_PROPERTY__TEAM_SITES_SITE_COLLECTION_URL = "wbf__farm__team_sites_site_collection_url";
 
@@ -57,8 +62,6 @@ namespace WorkBoxFramework
         private const string FARM_PROPERTY__TICKS_WHEN_LAST_UPDATED_RECENTLY_VISITED = "wbf__farm__ticks_when_last_updated_recently_visited";
         private const string FARM_PROPERTY__TICKS_WHEN_LAST_UPDATED_WORK_BOX_DOCUMENTS_METADATA = "wbf__farm__ticks_when_last_updated_work_box_documents_metadata";
 
-        private const string FARM_PROPERTY__RECORDS_MANAGERS_GROUP_NAME = "wbf__farm__records_managers_group_name";
-        private const string FARM_PROPERTY__RECORDS_SYSTEM_ADMIN_GROUP_NAME = "wbf__farm__records_system_admin_group_name";
 
 
 //        private const string FARM_PROPERTY__TIMER_JOB_WEB_APPLICATION = "wbf__farm__timer_job_web_application";
@@ -184,6 +187,30 @@ namespace WorkBoxFramework
             set { _farm.WBxSetProperty(FARM_PROPERTY__PUBLIC_EXTRANET_RECORDS_LIBRARY_URL, value); }
         }
 
+        public String RecordsManagersGroupName
+        {
+            get { return _farm.WBxGetProperty(FARM_PROPERTY__RECORDS_MANAGERS_GROUP_NAME); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__RECORDS_MANAGERS_GROUP_NAME, value); }
+        }
+
+        public String RecordsSystemAdminGroupName
+        {
+            get { return _farm.WBxGetProperty(FARM_PROPERTY__RECORDS_SYSTEM_ADMIN_GROUP_NAME); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__RECORDS_SYSTEM_ADMIN_GROUP_NAME, value); }
+        }
+
+        public String SubjectTagsRecordsRoutingsString
+        {
+            get { return _farm.WBxGetProperty(FARM_PROPERTY__SUBJECT_TAGS_RECORDS_ROUTINGS); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__SUBJECT_TAGS_RECORDS_ROUTINGS, value); }
+        }
+
+        public WBSubjectTagsRecordsRoutings SubjectTagsRecordsRoutings(WBTaxonomy subjectTags)
+        {
+            return new WBSubjectTagsRecordsRoutings(subjectTags, SubjectTagsRecordsRoutingsString);
+        }
+
+
         public String OpenWorkBoxesCachedDetailsListUrl
         {
             get { return _farm.WBxGetProperty(FARM_PROPERTY__OPEN_WORK_BOXES_CACHED_DETAILS_LIST_URL); }
@@ -245,18 +272,6 @@ namespace WorkBoxFramework
             set { _farm.WBxSetProperty(FARM_PROPERTY__SYSTEM_ADMIN_TEAM_GUID, value); }
         }
         
-        public String RecordsManagersGroupName
-        {
-            get { return _farm.WBxGetProperty(FARM_PROPERTY__RECORDS_MANAGERS_GROUP_NAME); }
-            set { _farm.WBxSetProperty(FARM_PROPERTY__RECORDS_MANAGERS_GROUP_NAME, value); }
-        }
-
-        public String RecordsSystemAdminGroupName
-        {
-            get { return _farm.WBxGetProperty(FARM_PROPERTY__RECORDS_SYSTEM_ADMIN_GROUP_NAME); }
-            set { _farm.WBxSetProperty(FARM_PROPERTY__RECORDS_SYSTEM_ADMIN_GROUP_NAME, value); }
-        }
-
 
         /// <summary>
         /// This is the URL for the site on which the various daily timer jobs details are managed and reported on.

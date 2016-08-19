@@ -95,6 +95,8 @@
     <Compile Include="Classes\WBIconItemTemplateField.cs" />
     <Compile Include="Classes\WBQueryClause.cs" />
     <Compile Include="Classes\WBSubjectTag.cs" />
+    <Compile Include="Classes\WBSubjectTagRecordsRoutings.cs" />
+    <Compile Include="Classes\WBSubjectTagsRecordsRoutings.cs" />
     <Compile Include="ControlTemplates\WorkBoxFramework\WBFUser.ascx.cs">
       <DependentUpon>WBFUser.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -183,6 +185,13 @@
     <Compile Include="ADMIN\WorkBoxFramework\FarmWideSettings.aspx.designer.cs">
       <DependentUpon>FarmWideSettings.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\EditSubjectTagRouting.aspx.cs">
+      <DependentUpon>EditSubjectTagRouting.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\EditSubjectTagRouting.aspx.designer.cs">
+      <DependentUpon>EditSubjectTagRouting.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx.cs">
       <DependentUpon>GoToTeamManagement.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -202,6 +211,13 @@
     <Compile Include="Classes\WBDynamicIconTemplateField.cs" />
     <Compile Include="Classes\WBStatusIconTemplateField.cs" />
     <Compile Include="Classes\WBLink.cs" />
+    <Compile Include="ADMIN\WorkBoxFramework\RecordsManagementAdmin.aspx.cs">
+      <DependentUpon>RecordsManagementAdmin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\RecordsManagementAdmin.aspx.designer.cs">
+      <DependentUpon>RecordsManagementAdmin.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
@@ -1053,6 +1069,9 @@
     <Content Include="ADMIN\WorkBoxFramework\FarmWideSettings.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
+    <Content Include="ADMIN\WorkBoxFramework\EditSubjectTagRouting.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1061,6 +1080,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\jquery-1.11.3.min.js" />
+    <Content Include="ADMIN\WorkBoxFramework\RecordsManagementAdmin.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\SubjectTags.js" />
     <Content Include="Layouts\WorkBoxFramework\MailToLinkReplacement.aspx">
       <SubType>ASPXCodeBehind</SubType>

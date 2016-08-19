@@ -2706,10 +2706,19 @@ namespace WorkBoxFramework
 
                 literal.Text = html.ToString();
             }
-            
+
+        }
+
+        #region Other extensions
+
+        public static void WBxAddIfNotNullOrEmpty(this List<String> list, String value)
+        {
+            if (!String.IsNullOrEmpty(value)) list.Add(value);
         }
 
 
+
+        #endregion
 
 
 

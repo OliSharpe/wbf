@@ -822,7 +822,7 @@ namespace WorkBoxFramework
 
             try
             {
-                uploadedItem = recordsType.PublishDocument(destinationWeb, destinationRootFolder, null, null, document, fileStream);
+                uploadedItem = recordsType.PublishDocument(destinationWeb, destinationRootFolder, document, fileStream);
             }
             finally
             {

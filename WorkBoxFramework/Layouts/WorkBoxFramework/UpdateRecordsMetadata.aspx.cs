@@ -21,6 +21,7 @@
 #endregion
 
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using Microsoft.SharePoint;
@@ -203,32 +204,57 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     }
                 });
 
-                if (LiveOrArchived.SelectedValue == "Live")
+
+                WBFarm farm = WBFarm.Local;
+                WBSubjectTagsRecordsRoutings routings = farm.SubjectTagsRecordsRoutings(subjectTagsTaxonomy);
+                WBTermCollection<WBSubjectTag> subjectTagsApplied = new WBTermCollection<WBSubjectTag>(subjectTagsTaxonomy, SubjectTags.Text);
+
+                List<String> librariesRequiringCopy = new List<String>();
+                List<String> librariesMustNotHaveCopy = new List<String>();
+
+                if (LiveOrArchived.SelectedValue == "Live" || LiveOrArchived.SelectedValue == "Retired")
                 {
                     if (ProtectiveZone.SelectedValue == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
                     {
-                        UpdateCopyInLibrary(recordItem, WBFarm.Local.PublicRecordsLibraryUrl);
-                    }
-                    else
-                    {
-                        RemoveCopyFromLibrary(recordItem, WBFarm.Local.PublicRecordsLibraryUrl);
+                        librariesRequiringCopy.WBxAddIfNotNullOrEmpty(farm.PublicRecordsLibraryUrl);
+
+                        librariesRequiringCopy.AddRange(routings.PublicLibrariesToRouteTo(subjectTagsApplied));
+                        librariesMustNotHaveCopy.AddRange(routings.AllPublicLibraries().Except(librariesRequiringCopy));
+
+                        librariesMustNotHaveCopy.AddRange(routings.AllExtranetLibraries());
+                        librariesMustNotHaveCopy.WBxAddIfNotNullOrEmpty(farm.PublicExtranetRecordsLibraryUrl);
+
                     }
 
                     if (ProtectiveZone.SelectedValue == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
                     {
-                        UpdateCopyInLibrary(recordItem, WBFarm.Local.PublicExtranetRecordsLibraryUrl);
-                    }
-                    else
-                    {
-                        RemoveCopyFromLibrary(recordItem, WBFarm.Local.PublicExtranetRecordsLibraryUrl);
-                    }
+                        librariesRequiringCopy.WBxAddIfNotNullOrEmpty(farm.PublicExtranetRecordsLibraryUrl);
+
+                        librariesRequiringCopy.AddRange(routings.ExtranetLibrariesToRouteTo(subjectTagsApplied));
+                        librariesMustNotHaveCopy.AddRange(routings.AllExtranetLibraries().Except(librariesRequiringCopy));
+
+                        librariesMustNotHaveCopy.AddRange(routings.AllPublicLibraries());
+                        librariesMustNotHaveCopy.WBxAddIfNotNullOrEmpty(farm.PublicRecordsLibraryUrl);
+                    }                
                 }
                 else
                 {
-                    RemoveCopyFromLibrary(recordItem, WBFarm.Local.PublicRecordsLibraryUrl);
-                    RemoveCopyFromLibrary(recordItem, WBFarm.Local.PublicExtranetRecordsLibraryUrl);
+                    librariesMustNotHaveCopy.WBxAddIfNotNullOrEmpty(farm.PublicRecordsLibraryUrl);
+                    librariesMustNotHaveCopy.WBxAddIfNotNullOrEmpty(farm.PublicExtranetRecordsLibraryUrl);
+
+                    librariesMustNotHaveCopy.AddRange(routings.AllPublicLibraries());
+                    librariesMustNotHaveCopy.AddRange(routings.AllExtranetLibraries());
                 }
 
+                foreach (String library in librariesRequiringCopy)
+                {
+                    UpdateCopyInLibrary(recordItem, library);
+                }
+
+                foreach (String library in librariesMustNotHaveCopy)
+                {
+                    RemoveCopyFromLibrary(recordItem, library);
+                }
 
                 CloseDialogAndRefresh();                
             }
