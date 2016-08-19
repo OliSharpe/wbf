@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<webParts>
+  <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
+    <metaData>
+      <type name="WorkBoxFramework.ListWorkBoxesWebPart.ListWorkBoxesWebPart, $SharePoint.Project.AssemblyFullName$" />
+      <importErrorMessage>$Resources:core,ImportErrorMessage;</importErrorMessage>
+    </metaData>
+    <data>
+      <properties>
+        <property name="Title" type="string">List Work Boxes Web Part</property>
+        <property name="Description" type="string">Shows work boxes of a configured type. Results will be filtered for a particular team when this web part is used on their team site.</property>
+        <property name="ChromeType" type="chrometype">TitleOnly</property>
+        <property name="GroupByWorkBoxTemplate" type="bool">True</property>
+        <property name="ShowEmptyWorkBoxTemplates" type="bool">True</property>
+        <property name="ShowClosedWorkBoxes" type="bool">False</property>
+        <property name="ShowDeletedWorkBoxes" type="bool">False</property>
+        <property name="ShowCreateNewLink" type="bool">True</property>
+        <property name="CreateNewLinkText" type="string">Create New Work Box</property>
+      </properties>
+    </data>
+  </webPart>
+</webParts>

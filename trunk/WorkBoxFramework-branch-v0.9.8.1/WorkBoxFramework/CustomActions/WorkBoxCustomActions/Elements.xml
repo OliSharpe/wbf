@@ -1,0 +1,564 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+
+  <!-- -->
+  <!-- -->
+  <!-- Custom Action for the Work Box tab -->
+  <!-- -->
+  <!-- -->
+
+  <CustomAction
+    Id="WorkBoxFramework.Ribbon"
+    Location="CommandUI.Ribbon"
+    Sequence="607">
+    <CommandUIExtension>
+      <CommandUIDefinitions>
+        <CommandUIDefinition Location="Ribbon.Tabs._children">
+          <Tab Id="WorkBoxFramework.Ribbon.WorkBox"
+           Title="Work Box"
+           Description="Manage the work box"
+           Sequence="1031">
+            <Scaling Id="WorkBoxFramework.Ribbon.WorkBox.Scaling">
+              <MaxSize Id="WorkBoxFramework.Ribbon.WorkBox.Properties.MaxSize"
+                       GroupId="WorkBoxFramework.Ribbon.WorkBox.Properties"
+                       Sequence="19"
+                       Size="ThreeLarge"/>
+              <MaxSize Id="WorkBoxFramework.Ribbon.WorkBox.Users.MaxSize"
+                       GroupId="WorkBoxFramework.Ribbon.WorkBox.Users"
+                       Sequence="21"
+                       Size="FourLarge"/>
+              <MaxSize Id="WorkBoxFramework.Ribbon.WorkBox.Status.MaxSize"
+                       GroupId="WorkBoxFramework.Ribbon.WorkBox.Status"
+                       Sequence="22"
+                       Size="TwoLarge"/>
+              <MaxSize Id="WorkBoxFramework.Ribbon.WorkBox.Subscriptions.MaxSize"
+                       GroupId="WorkBoxFramework.Ribbon.WorkBox.Subscriptions"
+                       Sequence="23"
+                       Size="TwoLarge"/>
+              <MaxSize Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.MaxSize"
+                       GroupId="WorkBoxFramework.Ribbon.WorkBox.Clipboard"
+                       Sequence="24"
+                       Size="ThreeMediumOneLarge"/>
+              <MaxSize Id="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup.MaxSize"
+                       GroupId="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup"
+                       Sequence="25"
+                       Size="ThreeLarge"/>
+              <Scale Id="WorkBoxFramework.Ribbon.WorkBox.Properties.Scaling.CustomTabScaling"
+                     GroupId="WorkBoxFramework.Ribbon.WorkBox.Properties"
+                     Sequence="25"
+                     Size="ThreeMedium" />
+              <Scale Id="WorkBoxFramework.Ribbon.WorkBox.Users.Scaling.CustomTabScaling"
+                     GroupId="WorkBoxFramework.Ribbon.WorkBox.Users"
+                     Sequence="26"
+                     Size="FourLarge" />
+              <Scale Id="WorkBoxFramework.Ribbon.WorkBox.Status.Scaling.CustomTabScaling"
+                     GroupId="WorkBoxFramework.Ribbon.WorkBox.Status"
+                     Sequence="27"
+                     Size="TwoLarge" />
+              <Scale Id="WorkBoxFramework.Ribbon.WorkBox.Status.Subscriptions.CustomTabScaling"
+                     GroupId="WorkBoxFramework.Ribbon.WorkBox.Subscriptions"
+                     Sequence="28"
+                     Size="TwoLarge" />
+              <Scale Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.CustomTabScaling"
+                     GroupId="WorkBoxFramework.Ribbon.WorkBox.Clipboard"
+                     Sequence="29"
+                     Size="ThreeMediumOneLarge" />
+              <Scale Id="WorkBoxFramework.Ribbon.WorkBox.Status.Tasks.CustomTabScaling"
+                     GroupId="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup"
+                     Sequence="30"
+                     Size="ThreeMedium" />
+            </Scaling>
+            <Groups Id="WorkBoxFramework.Ribbon.WorkBox.Groups">
+              <Group
+                Id="WorkBoxFramework.Ribbon.WorkBox.Properties"
+                Description="View or Edit Work Box Properties"
+                Title="Work Box Properties"
+                Sequence="5"
+                Template="WorkBoxFramework.Ribbon.Templates.ThreeLarge">
+                <Controls Id="WorkBoxFramework.Ribbon.WorkBox.Properties.Controls">
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Properties.View"
+                    Command="WorkBoxFramework.Command.ViewProperties"
+                    Sequence="10"
+                    Image16by16="/_layouts/$Resources:core,Language;/images/formatmap16x16.png" Image16by16Top="-32" Image16by16Left="-80"
+                    Image32by32="/_layouts/$Resources:core,Language;/images/formatmap32x32.png" Image32by32Top="-96" Image32by32Left="-448"
+                    Description="View the properties of this work box"
+                    LabelText="View Properties"
+                    ToolTipTitle="View properties"
+                    ToolTipDescription="View the metadata properties of the work box."
+                    TemplateAlias="control1"/>
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Properties.Edit"
+                    Command="WorkBoxFramework.Command.EditProperties"
+                    Sequence="20"
+                    Image16by16="/_layouts/$Resources:core,Language;/images/formatmap16x16.png" Image16by16Top="-128" Image16by16Left="-224"
+                    Image32by32="/_layouts/$Resources:core,Language;/images/formatmap32x32.png" Image32by32Top="-128" Image32by32Left="-96"
+                    Description="Edit properties of this work box"
+                    LabelText="Edit Properties"
+                    ToolTipTitle="Edit properties"
+                    ToolTipDescription="Edit the metadata properties of the work box."
+                    TemplateAlias="control2"/>
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Properties.ViewAuditLog"
+                    Command="WorkBoxFramework.Command.ViewAuditLog"
+                    Sequence="30"
+                    Image16by16="/_layouts/$Resources:core,Language;/images/formatmap16x16.png" Image16by16Top="-32" Image16by16Left="-80"
+                    Image32by32="/_layouts/$Resources:core,Language;/images/formatmap32x32.png" Image32by32Top="-96" Image32by32Left="-448"
+                    Description="View the audit log for this work box"
+                    LabelText="View Audit Log"
+                    ToolTipTitle="View audit log"
+                    ToolTipDescription="View the audit log of the major events in the lifecycle of this work box."
+                    TemplateAlias="control3"/>
+                </Controls>
+              </Group>
+              <Group
+                Id="WorkBoxFramework.Ribbon.WorkBox.Users"
+                Description="Manage Work Box Users"
+                Title="Work Box Users"
+                Sequence="10"
+                Template="WorkBoxFramework.Ribbon.Templates.FourLarge">
+                <Controls Id="WorkBoxFramework.Ribbon.WorkBox.Users.Controls">
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Users.ViewAllInvolved"
+                    Command="WorkBoxFramework.Command.ViewAllInvolved"
+                    Sequence="10"
+                    Image16by16="/_layouts/images/NoteBoard_16x16.png"
+                    Image32by32="/_layouts/images/WorkBoxFramework/view-teams-involved-32.png"
+                    Description="View all users or teams involved with this work box"
+                    LabelText="View All Involved"
+                    ToolTipTitle="View all involved"
+                    ToolTipDescription="View a list of all of the teams and users involved with this work box."
+                    TemplateAlias="control1"/>
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Users.InviteTeams"
+                    Command="WorkBoxFramework.Command.InviteTeams"
+                    Sequence="20"
+                    Image16by16="/_layouts/images/NoteBoard_16x16.png"
+                    Image32by32="/_layouts/images/WorkBoxFramework/invite-teams-32.png"
+                    Description="Invite one or more teams to be involved with this work box"
+                    ToolTipTitle="Invite Teams"
+                    ToolTipDescription="Invite one or more teams to be involved with this work box"
+                    LabelText="Invite Teams"
+                    TemplateAlias="control2"/>
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Users.InviteIndividuals"
+                    Command="WorkBoxFramework.Command.InviteIndividuals"
+                    Sequence="30"
+                    Image16by16="/_layouts/images/NoteBoard_16x16.png"
+                    Image32by32="/_layouts/images/WorkBoxFramework/invite-individuals-32.png"
+                    Description="Invite one or more individuals to be involved with this work box"
+                    LabelText="Invite Individuals"
+                    ToolTipTitle="Invite Individuals"
+                    ToolTipDescription="Invite one or more individuals to be involved with this work box"
+                    TemplateAlias="control3"/>
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Users.ChangeOwner"
+                    Command="WorkBoxFramework.Command.ChangeOwner"
+                    Sequence="40"
+                    Image16by16="/_layouts/images/NoteBoard_16x16.png"
+                    Image32by32="/_layouts/images/WorkBoxFramework/change-owner-32.png"
+                    Description="Change the owning team or individual."
+                    LabelText="Change Owner"
+                    ToolTipTitle="Change owning team"
+                    ToolTipDescription="The owners of the work box can invite other teams or individuals to be involved with or to visit the work box."
+                    TemplateAlias="control4"/>
+                </Controls>
+              </Group>
+              <Group
+                Id="WorkBoxFramework.Ribbon.WorkBox.Status"
+                Description="Manage the Work Box status"
+                Title="Work Box Status"
+                Sequence="20"
+                Template="WorkBoxFramework.Ribbon.Templates.TwoLarge">
+                <Controls Id="WorkBoxFramework.Ribbon.WorkBox.Status.Controls">
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Status.CloseBox"
+                    Command="WorkBoxFramework.Command.CloseBox"
+                    Sequence="10"
+                    Image16by16="/_layouts/images/WorkBoxFramework/work-box-tick-16.png"
+                    Image32by32="/_layouts/images/WorkBoxFramework/work-box-tick-32.png"
+                    Description="Close the work box."
+                    LabelText="Close"
+                    ToolTipTitle="Close the work box"
+                    ToolTipDescription="Close the work box when you are finished with it. This marks all of the content as read only and starts the retention period for the work box."
+                    TemplateAlias="control1"/>
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Status.ReOpen"
+                    Command="WorkBoxFramework.Command.ReOpenBox"
+                    Sequence="20"
+                    Image16by16="/_layouts/images/WorkBoxFramework/work-box-16.png"
+                    Image32by32="/_layouts/images/WorkBoxFramework/work-box-32.png"
+                    Description="Re-open the work box."
+                    LabelText="Re-Open"
+                    ToolTipTitle="Re-open the work box"
+                    ToolTipDescription="In certain circumstances it is possible to re-open a work box that has been closed."
+                    TemplateAlias="control2"/>
+                </Controls>
+              </Group>
+              <Group
+                Id="WorkBoxFramework.Ribbon.WorkBox.Subscriptions"
+                Description="Manage this work box's subscriptions"
+                Title="Manage Subscriptions"
+                Sequence="30"
+                Template="WorkBoxFramework.Ribbon.Templates.TwoLarge">
+                <Controls Id="WorkBoxFramework.Ribbon.WorkBox.Subscriptions.Controls">
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Subscriptions.AddToMyFavourites"
+                    Command="WorkBoxFramework.Command.AddToMyFavourites"
+                    Sequence="10"
+                    Image16by16="/_layouts/images/WorkBoxFramework/work-box-fav-16.png"
+                    Image32by32="/_layouts/images/WorkBoxFramework/work-box-fav-32.png"
+                    Description="Add this work box to your list of favourites work boxes."
+                    LabelText="Add to My Favourites"
+                    ToolTipTitle="Add to My Favourites"
+                    ToolTipDescription="Add this work box to your list of favourites that you can see in the Me section."
+                    TemplateAlias="control1"/>
+                  <Button
+                   Id="WorkBoxFramework.Ribbon.WorkBox.Subscriptions.ConnectToClient"
+                   Sequence="20"
+                   Command="ConnectToClient"
+                   Image16by16="/_layouts/$Resources:core,Language;/images/formatmap16x16.png" Image16by16Top="0" Image16by16Left="-168"
+                   Image32by32="/_layouts/$Resources:core,Language;/images/formatmap32x32.png" Image32by32Top="-128" Image32by32Left="-352"
+                   LabelText="$Resources:core,cui_ButConnectToClient;"
+                   ToolTipTitle="$Resources:core,cui_ButConnectToClient;"
+                   ToolTipDescription="$Resources:core,cui_STT_ButConnectToClient;"
+                   TemplateAlias="control2"/>
+                </Controls>
+              </Group>
+              <Group
+                Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard"
+                Description="Manange your Work Box clipboard"
+                Title="Work Box Clipboard"
+                Sequence="35"
+                Template="WorkBoxFramework.Ribbon.Templates.ThreeMediumOneLarge">
+                <Controls Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.Controls">
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.Cut"
+                    Sequence="10"
+                    Command="WorkBoxFramework.Command.Clipboard.Cut"
+                    Image16by16="/_layouts/images/cuths.png"
+                    Image32by32="/_layouts/images/cut.gif"
+                    Description="Cut the details of these documents to your work box clipboard."
+                    LabelText="Cut"
+                    ToolTipTitle="Cut to Clipboard"
+                    ToolTipDescription="Cut the details of these documents to your work box clipboard."
+                    TemplateAlias="control1"/>
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.Copy"
+                    Sequence="20"
+                    Command="WorkBoxFramework.Command.Clipboard.Copy"
+                    Image16by16="/_layouts/images/copy16.gif"
+                    Image32by32="/_layouts/images/copy.gif"
+                    Description="Copy the details of these documents to your work box clipboard."
+                    LabelText="Copy"
+                    ToolTipTitle="Copy to Clipboard"
+                    ToolTipDescription="Copy the details of these documents to your work box clipboard."
+                    TemplateAlias="control2"/>
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.Paste"
+                    Sequence="30"
+                    Command="WorkBoxFramework.Command.Clipboard.Paste"
+                    Image16by16="/_layouts/images/paste.gif"
+                    Image32by32="/_layouts/images/pastehh.png"
+                    LabelText="Paste"
+                    ToolTipTitle="Paste"
+                    ToolTipDescription="Paste documents on the clipboard."
+                    TemplateAlias="control3"/>
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.Clipboard.View"
+                    Sequence="40"
+                    Command="WorkBoxFramework.Command.Clipboard.View"
+                    Image16by16="/_layouts/images/paste.gif"
+                    Image32by32="/_layouts/images/pastehh.png"
+                    LabelText="View Clipboard"
+                    ToolTipTitle="View Clipboard"
+                    ToolTipDescription="View the list of documents on your clipboard."
+                    TemplateAlias="control4"/>
+                </Controls>
+              </Group>
+              <Group
+                Id="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup"
+                Title="Actions"
+                Sequence="40"
+                Template="WorkBoxFramework.Ribbon.Templates.ThreeLarge">
+                <Controls Id="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup.Controls">
+                  <Button
+                    Id="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup.PublishDocButton"
+                    Alt="Publish Document"
+                    Sequence="10"
+                    Command="WorkBoxFramework.Command.PublishDoc"
+                    Image32by32="/_layouts/images/WorkBoxFramework/work-box-out-32.png"
+                    Image16by16="/_layouts/images/WorkBoxFramework/work-box-out-16.png"
+                    LabelText="Publish Document"
+                    ToolTipTitle="Publish out a document"
+                    ToolTipDescription="Use this button to publish a document out of this work box to another location. The original document will remain in the work box."
+                    TemplateAlias="control1" />
+                  <FlyoutAnchor
+                    Id="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup.Tasks"
+                    Command="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup.Tasks.Command"
+                    Sequence="20"
+                    Image16by16="/_layouts/images/WorkBoxFramework/TasksList_16x16.gif"
+                    Image32by32="/_layouts/images/WorkBoxFramework/TasksList_32x32.gif"
+                    LabelText="Tasks"
+                    TemplateAlias="control2"
+                    PopulateDynamically="true"
+                    PopulateOnlyOnce="false"
+                    PopulateQueryCommand="WorkBoxFramework.Command.PopulateDynamicTasks"
+                    ToolTipTitle="Your workflow tasks"
+                    ToolTipDescription="Your workflow tasks for this work box"/>
+                  <FlyoutAnchor
+                    Id="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup.Templates"
+                    Command="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup.Templates.Command"
+                    Sequence="30"
+                    Image16by16="/_layouts/images/icdot.png"
+                    Image32by32="/_layouts/images/lg_icdot.png"
+                    LabelText="Document Templates"
+                    TemplateAlias="control3"
+                    PopulateDynamically="true"
+                    PopulateOnlyOnce="false"
+                    PopulateQueryCommand="WorkBoxFramework.Command.PopulateDynamicTemplates"
+                    ToolTipTitle="Document Templates"
+                    ToolTipDescription="Create a new document based on a standard document template."/>
+                </Controls>
+              </Group>
+            </Groups>
+          </Tab>
+        </CommandUIDefinition>
+        <CommandUIDefinition Location="Ribbon.Templates._children">
+          <GroupTemplate Id="WorkBoxFramework.Ribbon.Templates.OneLarge">
+            <Layout Title="OneLarge" LayoutTitle="OneLarge">
+              <Section Alignment="Top" Type="OneRow">
+                <Row>
+                  <ControlRef DisplayMode="Large" TemplateAlias="control1" />
+                </Row>
+              </Section>
+            </Layout>
+          </GroupTemplate>
+        </CommandUIDefinition>
+        <CommandUIDefinition Location="Ribbon.Templates._children">
+          <GroupTemplate Id="WorkBoxFramework.Ribbon.Templates.TwoLarge">
+            <Layout Title="TwoLarge" LayoutTitle="TwoLarge">
+              <Section Alignment="Top" Type="OneRow">
+                <Row>
+                  <ControlRef DisplayMode="Large" TemplateAlias="control1" />
+                  <ControlRef DisplayMode="Large" TemplateAlias="control2" />
+                </Row>
+              </Section>
+            </Layout>
+          </GroupTemplate>
+        </CommandUIDefinition>
+        <CommandUIDefinition Location="Ribbon.Templates._children">
+          <GroupTemplate Id="WorkBoxFramework.Ribbon.Templates.ThreeLarge">
+            <Layout Title="ThreeLarge" LayoutTitle="ThreeLarge">
+              <Section Alignment="Top" Type="OneRow">
+                <Row>
+                  <ControlRef DisplayMode="Large" TemplateAlias="control1" />
+                  <ControlRef DisplayMode="Large" TemplateAlias="control2" />
+                  <ControlRef DisplayMode="Large" TemplateAlias="control3" />
+                </Row>
+              </Section>
+            </Layout>
+            <Layout Title="ThreeMedium" LayoutTitle="ThreeMedium">
+              <Section Alignment="Top" Type="ThreeRow">
+                <Row>
+                  <ControlRef DisplayMode="Medium" TemplateAlias="control1" />
+                </Row>
+                <Row>
+                  <ControlRef DisplayMode="Medium" TemplateAlias="control2" />
+                </Row>
+                <Row>
+                  <ControlRef DisplayMode="Medium" TemplateAlias="control3" />
+                </Row>
+              </Section>
+            </Layout>
+          </GroupTemplate>
+        </CommandUIDefinition>
+        <CommandUIDefinition Location="Ribbon.Templates._children">
+          <GroupTemplate Id="WorkBoxFramework.Ribbon.Templates.FourLarge">
+            <Layout Title="FourLarge" LayoutTitle="FourLarge">
+              <Section Alignment="Top" Type="OneRow">
+                <Row>
+                  <ControlRef DisplayMode="Large" TemplateAlias="control1" />
+                  <ControlRef DisplayMode="Large" TemplateAlias="control2" />
+                  <ControlRef DisplayMode="Large" TemplateAlias="control3" />
+                  <ControlRef DisplayMode="Large" TemplateAlias="control4" />
+                </Row>
+              </Section>
+            </Layout>
+          </GroupTemplate>
+        </CommandUIDefinition>
+        <CommandUIDefinition Location="Ribbon.Templates._children">
+            <GroupTemplate Id="WorkBoxFramework.Ribbon.Templates.ThreeMedium">
+            <Layout Title="ThreeMedium" LayoutTitle="ThreeMedium">
+              <Section Alignment="Top" Type="ThreeRow">
+                <Row>
+                  <ControlRef DisplayMode="Medium" TemplateAlias="control1" />  
+                </Row>  
+                <Row>
+                  <ControlRef DisplayMode="Medium" TemplateAlias="control2" />  
+                </Row>
+                <Row>
+                  <ControlRef DisplayMode="Medium" TemplateAlias="control3" />
+                </Row>
+              </Section> 
+            </Layout> 
+          </GroupTemplate>
+        </CommandUIDefinition>
+        <CommandUIDefinition Location="Ribbon.Templates._children">
+          <GroupTemplate Id="WorkBoxFramework.Ribbon.Templates.ThreeMediumOneLarge">
+            <Layout Title="ThreeMediumOneLarge" LayoutTitle="ThreeMediumOneLarge">
+              <Section Alignment="Top" Type="ThreeRow">
+                <Row>
+                  <ControlRef DisplayMode="Medium" TemplateAlias="control1" />
+                </Row>
+                <Row>
+                  <ControlRef DisplayMode="Medium" TemplateAlias="control2" />
+                </Row>
+                <Row>
+                  <ControlRef DisplayMode="Medium" TemplateAlias="control3" />
+                </Row>
+              </Section>
+              <Section Alignment="Top" Type="OneRow">
+                <Row>
+                  <ControlRef DisplayMode="Large" TemplateAlias="control4" />
+                </Row>
+              </Section>
+            </Layout>
+          </GroupTemplate>
+        </CommandUIDefinition>
+      </CommandUIDefinitions>
+      <CommandUIHandlers>
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.WorkBox"
+            CommandAction=""
+            EnabledScript="javascript: true;"/>
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.ViewProperties"
+            CommandAction="javascript: WorkBoxFramework_doAction('view_properties');"
+            EnabledScript="javascript: WorkBoxFramework_actionIsEnabled('view_properties');"/>
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.EditProperties"
+            CommandAction="javascript: WorkBoxFramework_doAction('edit_properties');"
+            EnabledScript="javascript: WorkBoxFramework_actionIsEnabled('edit_properties');"/>
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.ViewAuditLog"
+            CommandAction="javascript: WorkBoxFramework_doAction('view_audit_log');"
+            EnabledScript="javascript: WorkBoxFramework_actionIsEnabled('view_audit_log');"/>
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.ViewAllInvolved"
+            CommandAction="javascript: WorkBoxFramework_doAction('view_all_involved');"
+            EnabledScript="javascript: WorkBoxFramework_actionIsEnabled('view_all_involved');"/>
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.InviteTeams"
+            CommandAction="javascript: WorkBoxFramework_doAction('invite_teams');"
+            EnabledScript="javascript: WorkBoxFramework_actionIsEnabled('invite_teams');"/>
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.InviteIndividuals"
+            CommandAction="javascript: WorkBoxFramework_doAction('invite_individuals');"
+            EnabledScript="javascript: WorkBoxFramework_actionIsEnabled('invite_individuals');"/>
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.ChangeOwner"
+            CommandAction="javascript: WorkBoxFramework_doAction('change_owner');"
+            EnabledScript="javascript: WorkBoxFramework_actionIsEnabled('change_owner');"/>
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.CloseBox"
+            CommandAction="javascript: WorkBoxFramework_doAction('close');"
+            EnabledScript="javascript: WorkBoxFramework_actionIsEnabled('close');"/>
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.ReOpenBox"
+            CommandAction="javascript: WorkBoxFramework_doAction('reopen');"
+            EnabledScript="javascript: WorkBoxFramework_actionIsEnabled('reopen');"/>
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.AddToMyFavourites"
+            CommandAction="javascript: WorkBoxFramework_doAction('add_to_favourites');"
+            EnabledScript="javascript: WorkBoxFramework_actionIsEnabled('add_to_favourites');"/>
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.Clipboard.Cut"
+            CommandAction="javascript: WorkBoxFramework_AddToClipboard_commandAction('CUT');"
+            EnabledScript="javascript: WorkBoxFramework_AddToClipboard_enabled('CUT');" />
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.Clipboard.Copy"
+            CommandAction="javascript: WorkBoxFramework_AddToClipboard_commandAction('COPY');"
+            EnabledScript="javascript: WorkBoxFramework_AddToClipboard_enabled('COPY');" />
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.Clipboard.Paste"
+            CommandAction="javascript: WorkBoxFramework_PasteFromClipboard_commandAction();"
+            EnabledScript="javascript: WorkBoxFramework_PasteFromClipboard_enabled();" />
+        <CommandUIHandler
+            Command="WorkBoxFramework.Command.Clipboard.View"
+            CommandAction="javascript: WorkBoxFramework_doAction('view_clipboard');"
+            EnabledScript="javascript: WorkBoxFramework_ViewClipboard_enabled();" />
+        <CommandUIHandler
+            Command="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup.Tasks.Command"
+            CommandAction=""
+            EnabledScript="javascript: wbf__enable_tasks_button;" />
+        <CommandUIHandler
+            Command="WorkBoxFramework.Ribbon.WorkBox.ActionsGroup.Templates.Command"
+            CommandAction=""
+            EnabledScript="javascript: wbf__enable_document_templates_button;" />
+        <CommandUIHandler
+            Command="DoNothingCommand"
+            CommandAction="javascript:void(0);"
+            EnabledScript="javascript: true;" />
+        <CommandUIHandler
+            Command="DynamicButtonCommand"
+            CommandAction="JavaScript: WorkBoxFramework_createNewDocumentHere(arguments[2].MenuItemId);"
+            EnabledScript="javascript: true;" />
+
+      </CommandUIHandlers>
+    </CommandUIExtension>
+  </CustomAction>
+
+  <!-- -->
+  <!-- -->
+  <!-- Custom Action for the Document Publish Out button -->
+  <!-- -->
+  <!-- -->
+
+  <CustomAction
+
+  Id="PublishDocCustomRibbonButton"
+  RegistrationType="ContentType"
+  RegistrationId="0x01"
+  Location="CommandUI.Ribbon"
+  Sequence="5"
+  Title="Publish Document">
+
+    <CommandUIExtension>
+      <CommandUIDefinitions>
+        <CommandUIDefinition Location="Ribbon.Documents.Manage.Controls._children">
+          <Button
+            Id="Ribbon.Documents.New.PublishDocButton"
+            Alt="Publish Document"
+            Sequence="4"
+            Command="WorkBoxFramework.Command.PublishDoc"
+            Image32by32="/_layouts/images/WorkBoxFramework/work-box-out-32.png"
+            Image16by16="/_layouts/images/WorkBoxFramework/work-box-out-16.png"
+            LabelText="Publish Document"
+            ToolTipTitle="Publish out a document"
+            ToolTipDescription="Use this button to publish a document out of this work box to another location. The original document will remain in the work box."
+            TemplateAlias="o1" />
+
+        </CommandUIDefinition>
+      </CommandUIDefinitions>
+      <CommandUIHandlers>
+        <CommandUIHandler
+          Command="WorkBoxFramework.Command.PublishDoc"
+          CommandAction="javascript: WorkBoxFramework_PublishDoc_commandAction();"
+          EnabledScript="javascript:WorkBoxFramework_PublishDoc_enabled();" />
+      </CommandUIHandlers>
+    </CommandUIExtension>
+  </CustomAction>
+
+
+  <!-- -->
+  <!-- -->
+  <!-- Control that checks whether or not we are looking at a work box and adds the Work Box tab if we are -->
+  <!-- -->
+  <!-- -->
+
+  <Control Id="AdditionalPageHead" ControlSrc="~/_controltemplates/WorkBoxFramework/MaybeShowWorkBoxRibbonTools.ascx" Sequence="41"/>
+
+
+
+</Elements>

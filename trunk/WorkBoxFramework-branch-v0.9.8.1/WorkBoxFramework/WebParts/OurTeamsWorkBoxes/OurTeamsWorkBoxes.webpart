@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<webParts>
+  <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
+    <metaData>
+      <type name="WorkBoxFramework.OurTeamsWorkBoxes.OurTeamsWorkBoxes, $SharePoint.Project.AssemblyFullName$" />
+      <importErrorMessage>$Resources:core,ImportErrorMessage;</importErrorMessage>
+    </metaData>
+    <data>
+      <properties>
+        <property name="Title" type="string">Our Team's Work Boxes</property>
+        <property name="Description" type="string">Displays a list of a team's work boxes. Should only be used for teams with a small number of work boxes.</property>
+      </properties>
+    </data>
+  </webPart>
+</webParts>

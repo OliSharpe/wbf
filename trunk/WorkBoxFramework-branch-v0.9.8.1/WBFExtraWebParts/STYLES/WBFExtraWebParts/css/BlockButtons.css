@@ -1,0 +1,76 @@
+﻿/* These are the standard CSS styles for the WBF block buttons web part in the WBFExtraWebParts solution */
+/* See: http://wbf.codeplex.com/ for more information */
+
+table.block-button-table {
+    border-collapse: separate;
+}
+
+table.block-button-table tr td a.block-button-link:link {
+    text-decoration: none;
+}
+
+table.block-button-table tr td a.block-button-link:visited {
+    text-decoration: none;
+}
+
+table.block-button-table tr td a.block-button-link:hover {
+    text-decoration: none;
+}
+
+table.block-button-table tr td a.block-button-link:active {
+    text-decoration: none;
+}
+
+table.block-button-table tr td a div.block-button {
+    float: left;
+    margin: 15px;
+    display: table;    
+    border-width:5px;	
+    border-style:outset;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14pt;
+    text-align: center;
+    color: #ddd;
+}
+
+table.block-button-table tr td a div.block-button div.block-button-content {
+    display: table-cell;    
+    vertical-align: middle;
+    border-width: 0px;
+    border-style: none;
+}
+
+table.block-button-table tr td a div.block-button div.block-button-content div.block-button-title {
+    font-weight: bold;
+    padding: 5px;
+}
+
+table.block-button-table tr td a div.block-button div.block-button-content div.block-button-extra-text {
+    font-size: 12pt;
+    padding: 5px;
+}
+
+#wbf-dynamic-buttons-height 
+{
+    color: red;
+    font-weight: bold;
+}
+
+.block-button-color-box {
+	float:left;
+	width:60px;
+	height:30px;
+	margin:5px;
+	border: 1px solid black;
+}
+
+h2.block-buttons-edit-page-title 
+{
+    font-size: 18pt;
+}
+
+.block-buttons-help-text 
+{
+    color: #222;
+    padding-left: 50px;
+}

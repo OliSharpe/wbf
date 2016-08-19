@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/" >
+  <Module Name="MyWorkBoxes" List="113" Url="_catalogs/wp">
+    <File Path="MyWorkBoxes\MyWorkBoxes.webpart" Url="MyWorkBoxes.webpart" Type="GhostableInLibrary">
+      <Property Name="Group" Value="Work Box Framework" />
+    </File>
+  </Module>
+</Elements>

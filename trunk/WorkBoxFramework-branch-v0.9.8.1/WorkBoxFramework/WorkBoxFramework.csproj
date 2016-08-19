@@ -1,0 +1,1409 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0E53B68A-6901-49B0-B614-7C859A434430}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WorkBoxFramework</RootNamespace>
+    <AssemblyName>WorkBoxFramework</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SandboxedSolution>False</SandboxedSolution>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <AssemblyDeploymentTarget>GlobalAssemblyCache</AssemblyDeploymentTarget>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Debug\WorkBoxFramework.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <DocumentationFile>bin\Release\WorkBoxFramework.xml</DocumentationFile>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.Policy, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Office.Server, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Office.Server.Search, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=AMD64" />
+    <Reference Include="Microsoft.Office.Server.UserProfiles, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint.Publishing, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint.Taxonomy, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Include\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.SharePoint" />
+    <Reference Include="Microsoft.SharePoint.Security" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Classes\WBAuditLogEntry.cs" />
+    <Compile Include="Classes\WBColumn.cs" />
+    <Compile Include="Classes\WBConstant.cs" />
+    <Compile Include="Classes\WBIconItemTemplateField.cs" />
+    <Compile Include="Classes\WBQueryClause.cs" />
+    <Compile Include="Classes\WBSubjectTag.cs" />
+    <Compile Include="Classes\WBSubjectTagRecordsRoutings.cs" />
+    <Compile Include="Classes\WBSubjectTagsRecordsRoutings.cs" />
+    <Compile Include="ControlTemplates\WorkBoxFramework\WBFUser.ascx.cs">
+      <DependentUpon>WBFUser.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ControlTemplates\WorkBoxFramework\WBFUser.ascx.designer.cs">
+      <DependentUpon>WBFUser.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Features\LinkedCalendars\LinkedCalendars.EventReceiver.cs">
+      <DependentUpon>LinkedCalendars.feature</DependentUpon>
+    </Compile>
+    <Compile Include="Features\TeamSiteCalendarUpdates\TeamSiteCalendarUpdates.EventReceiver.cs">
+      <DependentUpon>TeamSiteCalendarUpdates.feature</DependentUpon>
+    </Compile>
+    <Compile Include="Features\WorkBoxCollections\WorkBoxCollections.EventReceiver.cs">
+      <DependentUpon>WorkBoxCollections.feature</DependentUpon>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\CheckConfiguration.aspx.cs">
+      <DependentUpon>CheckConfiguration.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\CheckConfiguration.aspx.designer.cs">
+      <DependentUpon>CheckConfiguration.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\AddAllManagersReports.aspx.cs">
+      <DependentUpon>AddAllManagersReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\AddAllManagersReports.aspx.designer.cs">
+      <DependentUpon>AddAllManagersReports.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\AddManagersDirectReports.aspx.cs">
+      <DependentUpon>AddManagersDirectReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\AddManagersDirectReports.aspx.designer.cs">
+      <DependentUpon>AddManagersDirectReports.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\AddSubjectTag.aspx.cs">
+      <DependentUpon>AddSubjectTag.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\AddSubjectTag.aspx.designer.cs">
+      <DependentUpon>AddSubjectTag.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ChangeTeamManager.aspx.cs">
+      <DependentUpon>ChangeTeamManager.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ChangeTeamManager.aspx.designer.cs">
+      <DependentUpon>ChangeTeamManager.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\WBTeamSiteCalendarChangeEventReceiver.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\CheckTeamSync.aspx.cs">
+      <DependentUpon>CheckTeamSync.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\CheckTeamSync.aspx.designer.cs">
+      <DependentUpon>CheckTeamSync.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ConfigureLinkedCalendar.aspx.cs">
+      <DependentUpon>ConfigureLinkedCalendar.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ConfigureLinkedCalendar.aspx.designer.cs">
+      <DependentUpon>ConfigureLinkedCalendar.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\WBLinkedCalendarUpdatesEventReceiver.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\ConfigureWorkBoxCollection.aspx.cs">
+      <DependentUpon>ConfigureWorkBoxCollection.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ConfigureWorkBoxCollection.aspx.designer.cs">
+      <DependentUpon>ConfigureWorkBoxCollection.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\EditLinkedCalendarSettings.aspx.cs">
+      <DependentUpon>EditLinkedCalendarSettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\EditLinkedCalendarSettings.aspx.designer.cs">
+      <DependentUpon>EditLinkedCalendarSettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\FarmWideSettings.aspx.cs">
+      <DependentUpon>FarmWideSettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\FarmWideSettings.aspx.designer.cs">
+      <DependentUpon>FarmWideSettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\EditSubjectTagRouting.aspx.cs">
+      <DependentUpon>EditSubjectTagRouting.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\EditSubjectTagRouting.aspx.designer.cs">
+      <DependentUpon>EditSubjectTagRouting.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx.cs">
+      <DependentUpon>GoToTeamManagement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx.designer.cs">
+      <DependentUpon>GoToTeamManagement.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx.cs">
+      <DependentUpon>GoToWBCollectionSettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx.designer.cs">
+      <DependentUpon>GoToWBCollectionSettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\WBConfigStepFeedback.cs" />
+    <Compile Include="Classes\WBDynamicFormattedIconTemplateField.cs" />
+    <Compile Include="Classes\WBDynamicIconTemplateField.cs" />
+    <Compile Include="Classes\WBStatusIconTemplateField.cs" />
+    <Compile Include="Classes\WBLink.cs" />
+    <Compile Include="ADMIN\WorkBoxFramework\RecordsManagementAdmin.aspx.cs">
+      <DependentUpon>RecordsManagementAdmin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\RecordsManagementAdmin.aspx.designer.cs">
+      <DependentUpon>RecordsManagementAdmin.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
+    <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
+      <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.designer.cs">
+      <DependentUpon>ConfigurationStatusUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlTemplates\WorkBoxFramework\LinkToWorkBoxHome.ascx.cs">
+      <DependentUpon>LinkToWorkBoxHome.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ControlTemplates\WorkBoxFramework\LinkToWorkBoxHome.ascx.designer.cs">
+      <DependentUpon>LinkToWorkBoxHome.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlTemplates\WorkBoxFramework\LinkToWorkBoxOwner.ascx.cs">
+      <DependentUpon>LinkToWorkBoxOwner.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ControlTemplates\WorkBoxFramework\LinkToWorkBoxOwner.ascx.designer.cs">
+      <DependentUpon>LinkToWorkBoxOwner.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlTemplates\WorkBoxFramework\MaybeShowWorkBoxRibbonTools.ascx.cs">
+      <DependentUpon>MaybeShowWorkBoxRibbonTools.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ControlTemplates\WorkBoxFramework\MaybeShowWorkBoxRibbonTools.ascx.designer.cs">
+      <DependentUpon>MaybeShowWorkBoxRibbonTools.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlTemplates\WorkBoxFramework\RecordsClassesListNavigation.ascx.cs">
+      <DependentUpon>RecordsClassesListNavigation.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ControlTemplates\WorkBoxFramework\RecordsClassesListNavigation.ascx.designer.cs">
+      <DependentUpon>RecordsClassesListNavigation.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\WBDialogPageBase.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Classes\EventsFiringDisabledScope.cs" />
+    <Compile Include="ControlTemplates\WorkBoxFramework\TeamSiteTreeNavigation.ascx.cs">
+      <DependentUpon>TeamSiteTreeNavigation.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ControlTemplates\WorkBoxFramework\TeamSiteTreeNavigation.ascx.designer.cs">
+      <DependentUpon>TeamSiteTreeNavigation.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Features\ErrorPages\ErrorPages.EventReceiver.cs">
+      <DependentUpon>ErrorPages.feature</DependentUpon>
+    </Compile>
+    <Compile Include="Features\FarmWideAdmin\FarmWideAdmin.EventReceiver.cs">
+      <DependentUpon>FarmWideAdmin.feature</DependentUpon>
+    </Compile>
+    <Compile Include="Features\TimerJobs\TimerJobs.EventReceiver.cs">
+      <DependentUpon>TimerJobs.feature</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\AddToClipboard.aspx.cs">
+      <DependentUpon>AddToClipboard.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\AddToClipboard.aspx.designer.cs">
+      <DependentUpon>AddToClipboard.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\CreateRecordsTypesDetailsCSV.aspx.cs">
+      <DependentUpon>CreateRecordsTypesDetailsCSV.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\CreateRecordsTypesDetailsCSV.aspx.designer.cs">
+      <DependentUpon>CreateRecordsTypesDetailsCSV.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\DefaultInviteEmailTemplates.aspx.cs">
+      <DependentUpon>DefaultInviteEmailTemplates.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\DefaultInviteEmailTemplates.aspx.designer.cs">
+      <DependentUpon>DefaultInviteEmailTemplates.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\EditRibbonButtonsSettings.aspx.cs">
+      <DependentUpon>EditRibbonButtonsSettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\EditRibbonButtonsSettings.aspx.designer.cs">
+      <DependentUpon>EditRibbonButtonsSettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\WBAction.cs" />
+    <Compile Include="Classes\WBTimerTasksJob.cs" />
+    <Compile Include="Classes\WBTimerTask.cs" />
+    <Compile Include="Classes\WBLogging.cs" />
+    <Compile Include="ADMIN\WorkBoxFramework\MigrationAdmin.aspx.cs">
+      <DependentUpon>MigrationAdmin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\MigrationAdmin.aspx.designer.cs">
+      <DependentUpon>MigrationAdmin.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\EditWorkBoxProperties.aspx.cs">
+      <DependentUpon>EditWorkBoxProperties.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\EditWorkBoxProperties.aspx.designer.cs">
+      <DependentUpon>EditWorkBoxProperties.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\InviteIndividualsWithEmail.aspx.cs">
+      <DependentUpon>InviteIndividualsWithEmail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\InviteIndividualsWithEmail.aspx.designer.cs">
+      <DependentUpon>InviteIndividualsWithEmail.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\InviteTeamsWithEmail.aspx.cs">
+      <DependentUpon>InviteTeamsWithEmail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\InviteTeamsWithEmail.aspx.designer.cs">
+      <DependentUpon>InviteTeamsWithEmail.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\InviteToTeamWithEmail.aspx.cs">
+      <DependentUpon>InviteToTeamWithEmail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\InviteToTeamWithEmail.aspx.designer.cs">
+      <DependentUpon>InviteToTeamWithEmail.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PasteFromClipboard.aspx.cs">
+      <DependentUpon>PasteFromClipboard.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PasteFromClipboard.aspx.designer.cs">
+      <DependentUpon>PasteFromClipboard.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogSuccessFailurePage.aspx.cs">
+      <DependentUpon>PublishDocDialogSuccessFailurePage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogSuccessFailurePage.aspx.designer.cs">
+      <DependentUpon>PublishDocDialogSuccessFailurePage.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocJustToCaseFile.aspx.cs">
+      <DependentUpon>PublishDocJustToCaseFile.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocJustToCaseFile.aspx.designer.cs">
+      <DependentUpon>PublishDocJustToCaseFile.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocPickWorkBoxFolder.aspx.cs">
+      <DependentUpon>PublishDocPickWorkBoxFolder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocPickWorkBoxFolder.aspx.designer.cs">
+      <DependentUpon>PublishDocPickWorkBoxFolder.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishedDocumentPicker.aspx.cs">
+      <DependentUpon>PublishedDocumentPicker.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishedDocumentPicker.aspx.designer.cs">
+      <DependentUpon>PublishedDocumentPicker.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\RecordsTypePicker.aspx.cs">
+      <DependentUpon>RecordsTypePicker.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\RecordsTypePicker.aspx.designer.cs">
+      <DependentUpon>RecordsTypePicker.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\WBQuery.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\RemoveFromTeam.aspx.cs">
+      <DependentUpon>RemoveFromTeam.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\RemoveFromTeam.aspx.designer.cs">
+      <DependentUpon>RemoveFromTeam.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\RemoveTeamOrIndividual.aspx.cs">
+      <DependentUpon>RemoveTeamOrIndividual.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\RemoveTeamOrIndividual.aspx.designer.cs">
+      <DependentUpon>RemoveTeamOrIndividual.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\SubjectTagsManagement.aspx.cs">
+      <DependentUpon>SubjectTagsManagement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\SubjectTagsManagement.aspx.designer.cs">
+      <DependentUpon>SubjectTagsManagement.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\TestDocumentPicker.aspx.cs">
+      <DependentUpon>TestDocumentPicker.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\TestDocumentPicker.aspx.designer.cs">
+      <DependentUpon>TestDocumentPicker.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\UpdateRecordsMetadata.aspx.cs">
+      <DependentUpon>UpdateRecordsMetadata.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\UpdateRecordsMetadata.aspx.designer.cs">
+      <DependentUpon>UpdateRecordsMetadata.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewClipboard.aspx.cs">
+      <DependentUpon>ViewClipboard.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewClipboard.aspx.designer.cs">
+      <DependentUpon>ViewClipboard.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewWorkBoxLibrary.aspx.cs">
+      <DependentUpon>ViewWorkBoxLibrary.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewWorkBoxLibrary.aspx.designer.cs">
+      <DependentUpon>ViewWorkBoxLibrary.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\WBMigrationTimerJob.cs" />
+    <Compile Include="Classes\TreeViewFolder.cs" />
+    <Compile Include="Classes\TreeViewFolderCollection.cs" />
+    <Compile Include="Classes\WBMappedPath.cs" />
+    <Compile Include="Classes\WBMigrationMapping.cs" />
+    <Compile Include="Classes\WBItem.cs" />
+    <Compile Include="Classes\WBFormatStringTemplateField.cs" />
+    <Compile Include="Classes\WBUser.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\ViewWorkBoxProperties.aspx.cs">
+      <DependentUpon>ViewWorkBoxProperties.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewWorkBoxProperties.aspx.designer.cs">
+      <DependentUpon>ViewWorkBoxProperties.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\RedirectToMyWorkBox\RedirectToMyWorkBox.cs" />
+    <Compile Include="WebParts\RedirectToMyWorkBox\RedirectToMyWorkBoxUserControl.ascx.cs">
+      <DependentUpon>RedirectToMyWorkBoxUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\RedirectToMyWorkBox\RedirectToMyWorkBoxUserControl.ascx.designer.cs">
+      <DependentUpon>RedirectToMyWorkBoxUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPart.cs" />
+    <Compile Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPartUserControl.ascx.cs">
+      <DependentUpon>TeamSiteTreeNavWebPartUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPartUserControl.ascx.designer.cs">
+      <DependentUpon>TeamSiteTreeNavWebPartUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\TeamSiteWorkBoxes\TeamSiteWorkBoxes.cs" />
+    <Compile Include="WebParts\TeamSiteWorkBoxes\TeamSiteWorkBoxesUserControl.ascx.cs">
+      <DependentUpon>TeamSiteWorkBoxesUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\TeamSiteWorkBoxes\TeamSiteWorkBoxesUserControl.ascx.designer.cs">
+      <DependentUpon>TeamSiteWorkBoxesUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\TeamDetails\TeamDetails.cs" />
+    <Compile Include="WebParts\TeamDetails\TeamDetailsUserControl.ascx.cs">
+      <DependentUpon>TeamDetailsUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\TeamDetails\TeamDetailsUserControl.ascx.designer.cs">
+      <DependentUpon>TeamDetailsUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\ViewWorkBoxLibraryWebPart\ViewWorkBoxLibraryWebPart.cs" />
+    <Compile Include="WebParts\ViewWorkBoxLibraryWebPart\ViewWorkBoxLibraryWebPartUserControl.ascx.cs">
+      <DependentUpon>ViewWorkBoxLibraryWebPartUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\ViewWorkBoxLibraryWebPart\ViewWorkBoxLibraryWebPartUserControl.ascx.designer.cs">
+      <DependentUpon>ViewWorkBoxLibraryWebPartUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\ViewTeamsPublishedDocuments\ViewTeamsPublishedDocuments.cs" />
+    <Compile Include="WebParts\ViewTeamsPublishedDocuments\ViewTeamsPublishedDocumentsUserControl.ascx.cs">
+      <DependentUpon>ViewTeamsPublishedDocumentsUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\ViewTeamsPublishedDocuments\ViewTeamsPublishedDocumentsUserControl.ascx.designer.cs">
+      <DependentUpon>ViewTeamsPublishedDocumentsUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\WBDocument.cs" />
+    <Compile Include="Classes\WBItemMessages.cs" />
+    <Compile Include="WebParts\ViewSubjectPages\ViewSubjectPages.cs" />
+    <Compile Include="WebParts\ViewSubjectPages\ViewSubjectPagesUserControl.ascx.cs">
+      <DependentUpon>ViewSubjectPagesUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\ViewSubjectPages\ViewSubjectPagesUserControl.ascx.designer.cs">
+      <DependentUpon>ViewSubjectPagesUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\ViewSeriesPages\ViewSeriesPages.cs" />
+    <Compile Include="WebParts\ViewSeriesPages\ViewSeriesPagesUserControl.ascx.cs">
+      <DependentUpon>ViewSeriesPagesUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\ViewSeriesPages\ViewSeriesPagesUserControl.ascx.designer.cs">
+      <DependentUpon>ViewSeriesPagesUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\ViewRecordsLibraryWebPart\ViewRecordsLibraryWebPart.cs" />
+    <Compile Include="WebParts\ViewRecordsLibraryWebPart\ViewRecordsLibraryWebPartUserControl.ascx.cs">
+      <DependentUpon>ViewRecordsLibraryWebPartUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\ViewRecordsLibraryWebPart\ViewRecordsLibraryWebPartUserControl.ascx.designer.cs">
+      <DependentUpon>ViewRecordsLibraryWebPartUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\RelatedMeetings\RelatedMeetings.cs" />
+    <Compile Include="WebParts\RelatedMeetings\RelatedMeetingsUserControl.ascx.cs">
+      <DependentUpon>RelatedMeetingsUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\RelatedMeetings\RelatedMeetingsUserControl.ascx.designer.cs">
+      <DependentUpon>RelatedMeetingsUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\ShowWorkBoxesFromSeries\ShowWorkBoxesFromSeries.cs" />
+    <Compile Include="WebParts\ShowPublishedDocumentsFromSeries\ShowPublishedDocumentsFromSeries.cs" />
+    <Compile Include="WebParts\TeamSiteTreeSelection\TeamSiteTreeSelection.cs" />
+    <Compile Include="WebParts\TeamSiteTreeSelection\TeamSiteTreeSelectionUserControl.ascx.cs">
+      <DependentUpon>TeamSiteTreeSelectionUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\TeamSiteTreeSelection\TeamSiteTreeSelectionUserControl.ascx.designer.cs">
+      <DependentUpon>TeamSiteTreeSelectionUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\ShowTimeToAutoClose\ShowTimeToAutoClose.cs" />
+    <Compile Include="WebParts\RelatedWorkBoxes\RelatedWorkBoxes.cs" />
+    <Compile Include="WebParts\RelatedWorkBoxes\RelatedWorkBoxesUserControl.ascx.cs">
+      <DependentUpon>RelatedWorkBoxesUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\RelatedWorkBoxes\RelatedWorkBoxesUserControl.ascx.designer.cs">
+      <DependentUpon>RelatedWorkBoxesUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\OurTeamsWorkBoxes\OurTeamsWorkBoxes.cs" />
+    <Compile Include="WebParts\FindWorkBoxByLocalID\FindWorkBoxByLocalID.cs" />
+    <Compile Include="WebParts\FindWorkBoxByLocalID\FindWorkBoxByLocalIDUserControl.ascx.cs">
+      <DependentUpon>FindWorkBoxByLocalIDUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\FindWorkBoxByLocalID\FindWorkBoxByLocalIDUserControl.ascx.designer.cs">
+      <DependentUpon>FindWorkBoxByLocalIDUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ChangeWorkBoxOwner.aspx.cs">
+      <DependentUpon>ChangeWorkBoxOwner.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ChangeWorkBoxOwner.aspx.designer.cs">
+      <DependentUpon>ChangeWorkBoxOwner.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\InviteIndividuals.aspx.cs">
+      <DependentUpon>InviteIndividuals.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\InviteIndividuals.aspx.designer.cs">
+      <DependentUpon>InviteIndividuals.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\RecordsTypeManagement.aspx.cs">
+      <DependentUpon>RecordsTypeManagement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\RecordsTypeManagement.aspx.designer.cs">
+      <DependentUpon>RecordsTypeManagement.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ReOpenWorkBox.aspx.cs">
+      <DependentUpon>ReOpenWorkBox.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ReOpenWorkBox.aspx.designer.cs">
+      <DependentUpon>ReOpenWorkBox.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\UploadAndCreate.aspx.cs">
+      <DependentUpon>UploadAndCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\UploadAndCreate.aspx.designer.cs">
+      <DependentUpon>UploadAndCreate.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\routing.aspx.cs">
+      <DependentUpon>routing.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\routing.aspx.designer.cs">
+      <DependentUpon>routing.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewAllInvolved.aspx.cs">
+      <DependentUpon>ViewAllInvolved.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewAllInvolved.aspx.designer.cs">
+      <DependentUpon>ViewAllInvolved.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewAllProperties.aspx.cs">
+      <DependentUpon>ViewAllProperties.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewAllProperties.aspx.designer.cs">
+      <DependentUpon>ViewAllProperties.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewAuditLog.aspx.cs">
+      <DependentUpon>ViewAuditLog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewAuditLog.aspx.designer.cs">
+      <DependentUpon>ViewAuditLog.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\WorkBoxPicker.aspx.cs">
+      <DependentUpon>WorkBoxPicker.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\WorkBoxPicker.aspx.designer.cs">
+      <DependentUpon>WorkBoxPicker.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\MyWorkBoxes\MyWorkBoxes.cs" />
+    <Compile Include="WebParts\MyTeams\MyTeams.cs" />
+    <Compile Include="WebParts\ViewTeamsMeetings\ViewTeamsMeetings.cs" />
+    <Compile Include="WebParts\ViewTeamsMeetings\ViewTeamsMeetingsUserControl.ascx.cs">
+      <DependentUpon>ViewTeamsMeetingsUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\ViewTeamsMeetings\ViewTeamsMeetingsUserControl.ascx.designer.cs">
+      <DependentUpon>ViewTeamsMeetingsUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\DisplaySelectedTeamRecords\DisplaySelectedTeamRecords.cs" />
+    <Compile Include="WebParts\DisplaySelectedTeamRecords\DisplaySelectedTeamRecordsUserControl.ascx.cs">
+      <DependentUpon>DisplaySelectedTeamRecordsUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\DisplaySelectedTeamRecords\DisplaySelectedTeamRecordsUserControl.ascx.designer.cs">
+      <DependentUpon>DisplaySelectedTeamRecordsUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\GoToInvolvedTeamsWebPart\GoToInvolvedTeamsWebPart.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\AddWorkBoxToFavourites.aspx.cs">
+      <DependentUpon>AddWorkBoxToFavourites.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\AddWorkBoxToFavourites.aspx.designer.cs">
+      <DependentUpon>AddWorkBoxToFavourites.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\CloseWorkBox.aspx.cs">
+      <DependentUpon>CloseWorkBox.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\CloseWorkBox.aspx.designer.cs">
+      <DependentUpon>CloseWorkBox.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\DisplayUserProfileInfo.aspx.cs">
+      <DependentUpon>DisplayUserProfileInfo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\DisplayUserProfileInfo.aspx.designer.cs">
+      <DependentUpon>DisplayUserProfileInfo.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\CoreWBFConfiguration.aspx.cs">
+      <DependentUpon>CoreWBFConfiguration.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ADMIN\WorkBoxFramework\CoreWBFConfiguration.aspx.designer.cs">
+      <DependentUpon>CoreWBFConfiguration.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\GenericOKPage.aspx.cs">
+      <DependentUpon>GenericOKPage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\GenericOKPage.aspx.designer.cs">
+      <DependentUpon>GenericOKPage.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\InviteTeams.aspx.cs">
+      <DependentUpon>InviteTeams.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\InviteTeams.aspx.designer.cs">
+      <DependentUpon>InviteTeams.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\NewWorkBox.aspx.cs">
+      <DependentUpon>NewWorkBox.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\NewWorkBox.aspx.designer.cs">
+      <DependentUpon>NewWorkBox.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogRequiredMetadataPage.aspx.cs">
+      <DependentUpon>PublishDocDialogRequiredMetadataPage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogRequiredMetadataPage.aspx.designer.cs">
+      <DependentUpon>PublishDocDialogRequiredMetadataPage.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogSelectDestinationPage.aspx.cs">
+      <DependentUpon>PublishDocDialogSelectDestinationPage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogSelectDestinationPage.aspx.designer.cs">
+      <DependentUpon>PublishDocDialogSelectDestinationPage.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\RemoveWorkBoxFromFavourites.aspx.cs">
+      <DependentUpon>RemoveWorkBoxFromFavourites.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\RemoveWorkBoxFromFavourites.aspx.designer.cs">
+      <DependentUpon>RemoveWorkBoxFromFavourites.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\TeamManagement.aspx.cs">
+      <DependentUpon>TeamManagement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\TeamManagement.aspx.designer.cs">
+      <DependentUpon>TeamManagement.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\TeamSiteSetup.aspx.cs">
+      <DependentUpon>TeamSiteSetup.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\TeamSiteSetup.aspx.designer.cs">
+      <DependentUpon>TeamSiteSetup.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewRecordsLibrary.aspx.cs">
+      <DependentUpon>ViewRecordsLibrary.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewRecordsLibrary.aspx.designer.cs">
+      <DependentUpon>ViewRecordsLibrary.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\WorkBoxCollectionSettingsPage.aspx.cs">
+      <DependentUpon>WorkBoxCollectionSettingsPage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\WorkBoxCollectionSettingsPage.aspx.designer.cs">
+      <DependentUpon>WorkBoxCollectionSettingsPage.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\MyFavouriteWorkBoxes\MyFavouriteWorkBoxes.cs" />
+    <Compile Include="WebParts\MyRecentWorkBoxes\MyRecentWorkBoxes.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebParts\ListWorkBoxesWebPart\ListWorkBoxesWebPart.cs" />
+    <Compile Include="WebParts\ListWorkBoxesWebPart\ListWorkBoxesWebPartUserControl.ascx.cs">
+      <DependentUpon>ListWorkBoxesWebPartUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\ListWorkBoxesWebPart\ListWorkBoxesWebPartUserControl.ascx.designer.cs">
+      <DependentUpon>ListWorkBoxesWebPartUserControl.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\TreeViewTerm.cs" />
+    <Compile Include="Classes\TreeViewTermCollection.cs" />
+    <Compile Include="Classes\WBCollection.cs" />
+    <Compile Include="Classes\WBFarm.cs" />
+    <Compile Include="Classes\WBRecordsType.cs" />
+    <Compile Include="Classes\WBTaxonomy.cs" />
+    <Compile Include="Classes\WBTeam.cs" />
+    <Compile Include="Classes\WBTerm.cs" />
+    <Compile Include="Classes\WBTermCollection.cs" />
+    <Compile Include="Classes\WBTemplate.cs" />
+    <Compile Include="Classes\WBExtensions.cs" />
+    <Compile Include="Classes\WBUtils.cs" />
+    <Compile Include="Classes\WorkBox.cs" />
+    <Compile Include="Classes\WorkBoxDialogPageBase.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Classes\WorkBoxMetaDataItemChangeEventReceiver.cs" />
+    <Compile Include="WebParts\WorkBoxExplorer\WorkBoxExplorer.cs" />
+    <Compile Include="WebParts\WorkBoxExplorer\WorkBoxExplorerUserControl.ascx.cs">
+      <DependentUpon>WorkBoxExplorerUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\WorkBoxExplorer\WorkBoxExplorerUserControl.ascx.designer.cs">
+      <DependentUpon>WorkBoxExplorerUserControl.ascx.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="1033\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{ad111b85-98d1-4df8-8f5f-ef3141011c5c}</SharePointProjectItemId>
+    </None>
+    <None Include="Features\LinkedCalendars\LinkedCalendars.feature">
+      <FeatureId>{c7babbed-affc-4dc1-bb7c-584343bfb6ff}</FeatureId>
+    </None>
+    <None Include="Features\TeamSiteCalendarUpdates\TeamSiteCalendarUpdates.feature">
+      <FeatureId>{f813dd17-fc0c-4c52-a710-d371b201a2cb}</FeatureId>
+    </None>
+    <None Include="CustomActions\LinkedCalendarSettingsCustomAction\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{1e23a6c4-0355-4468-ae40-72b4eceaa13f}</SharePointProjectItemId>
+    </None>
+    <None Include="SharePointProjectItem.spdata" />
+    <None Include="StyleLibrary\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{d7fb0eea-3b09-4265-85f2-56014fc263e2}</SharePointProjectItemId>
+    </None>
+    <None Include="STYLES\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{1ca521ef-acba-48d0-9e8b-c059e038e1ac}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ConfigurationStatus\ConfigurationStatus.webpart" />
+    <None Include="WebParts\ConfigurationStatus\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{15e0ce8c-93d9-4277-8d9e-649b36a80214}</SharePointProjectItemId>
+    </None>
+    <None Include="CustomActions\UpdateRecordsMetadataAction\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{c7bed9fe-2012-4593-978c-23fda3ffbba4}</SharePointProjectItemId>
+    </None>
+    <None Include="Features\ErrorPages\ErrorPages.feature">
+      <FeatureId>{9c028719-6c00-44bc-9773-dcccc9ff9374}</FeatureId>
+    </None>
+    <None Include="Features\UpdateRecordsMetadata\UpdateRecordsMetadata.feature">
+      <FeatureId>{393c4749-9940-4be0-bf37-54a9a940b836}</FeatureId>
+    </None>
+    <None Include="Features\TimerJobs\TimerJobs.feature">
+      <FeatureId>{74e762ae-b6db-41a8-b172-ba79a277fb4f}</FeatureId>
+    </None>
+    <None Include="Features\WorkBoxCollections\WorkBoxCollections.feature">
+      <FeatureId>{a75cfbd3-a45e-4a8f-b299-b54cd916259d}</FeatureId>
+    </None>
+    <None Include="CustomActions\CoreActions\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{33948016-f56f-4bc9-be24-e7d2a52c1703}</SharePointProjectItemId>
+    </None>
+    <None Include="CustomActions\WorkBoxCollectionAdminLinks\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{331b6e29-123b-4a82-9ce9-0fdbf89687b0}</SharePointProjectItemId>
+    </None>
+    <None Include="ADMIN\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{ab4dfa97-7233-44ec-b9d1-2ad3515f0a68}</SharePointProjectItemId>
+    </None>
+    <None Include="ControlTemplates\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{9517df5e-7212-4ae7-98a4-141ea4c73939}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\RedirectToMyWorkBox\RedirectToMyWorkBox.webpart" />
+    <None Include="WebParts\RedirectToMyWorkBox\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{cadbbcc3-f14b-4c9f-bbdf-dcf52ef24a9c}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\TeamSiteTreeNavWebPart\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{852b83e2-616c-4d29-b00d-e40dc15f3a3b}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPart.webpart" />
+    <None Include="WebParts\TeamSiteWorkBoxes\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{b03744bc-efc3-4f64-aa30-7743074db1a9}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\TeamSiteWorkBoxes\TeamSiteWorkBoxes.webpart" />
+    <None Include="WebParts\TeamDetails\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{a85ef4a0-9d06-49db-836a-0a0b4b261480}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\TeamDetails\TeamDetails.webpart" />
+    <None Include="WebParts\ViewWorkBoxLibraryWebPart\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{125367ca-a182-4482-a969-ed09b34e48ce}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ViewWorkBoxLibraryWebPart\ViewWorkBoxLibraryWebPart.webpart">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="WebParts\ViewTeamsPublishedDocuments\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{5a2585fa-4890-4f24-aad5-ec94c0386c62}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ViewTeamsPublishedDocuments\ViewTeamsPublishedDocuments.webpart">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="WebParts\ViewSubjectPages\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{4aeda600-ab46-426c-9874-1e144c5bf4e7}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ViewSubjectPages\ViewSubjectPages.webpart">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="WebParts\ViewSeriesPages\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{ed4eb9f8-8f48-40f0-ae39-43fffdd4f287}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ViewSeriesPages\ViewSeriesPages.webpart" />
+    <None Include="WebParts\ViewRecordsLibraryWebPart\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{f7e1acbf-3fd4-4cc5-aef4-b01d912ef675}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ViewRecordsLibraryWebPart\ViewRecordsLibraryWebPart.webpart">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="WebParts\RelatedMeetings\RelatedMeetings.webpart" />
+    <None Include="WebParts\RelatedMeetings\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{ce5d2601-b29d-4fcf-b9d0-4319aa9bca2a}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ShowWorkBoxesFromSeries\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{cb7e8d01-5c1e-4b74-acb2-5029674f881a}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ShowWorkBoxesFromSeries\ShowWorkBoxesFromSeries.webpart" />
+    <None Include="WebParts\ShowPublishedDocumentsFromSeries\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{0562b17e-a09f-448a-bea4-e52fdebee39f}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ShowPublishedDocumentsFromSeries\ShowPublishedDocumentsFromSeries.webpart" />
+    <None Include="WebParts\TeamSiteTreeSelection\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{48b929b8-1805-48c6-b52a-94e6cdcd8231}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\TeamSiteTreeSelection\TeamSiteTreeSelection.webpart">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="WebParts\ShowTimeToAutoClose\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{9aa94821-8de6-49dc-8849-c017d36bae36}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ShowTimeToAutoClose\ShowTimeToAutoClose.webpart" />
+    <None Include="WebParts\RelatedWorkBoxes\RelatedWorkBoxes.webpart" />
+    <None Include="WebParts\RelatedWorkBoxes\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{8738d088-3612-42db-baab-1759d0ea6cf5}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\OurTeamsWorkBoxes\OurTeamsWorkBoxes.webpart" />
+    <None Include="WebParts\OurTeamsWorkBoxes\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{e2b05c06-6187-4612-97f5-2da8ee392150}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\FindWorkBoxByLocalID\FindWorkBoxByLocalID.webpart" />
+    <None Include="WebParts\FindWorkBoxByLocalID\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{f361ac2e-22cb-4629-8cf6-38799f805cc1}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\MyWorkBoxes\MyWorkBoxes.webpart" />
+    <None Include="WebParts\MyWorkBoxes\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{2d0dbae6-d729-4862-bee5-7dd6828e4f96}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\MyTeams\MyTeams.webpart" />
+    <None Include="WebParts\MyTeams\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{d021653e-9064-41bc-be75-55713c3c030d}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ViewTeamsMeetings\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{cf3b529a-6df0-43e6-ba4d-c816a433f34e}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ViewTeamsMeetings\ViewTeamsMeetings.webpart" />
+    <None Include="WebParts\DisplaySelectedTeamRecords\DisplaySelectedTeamRecords.webpart" />
+    <None Include="WebParts\DisplaySelectedTeamRecords\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{c94da4e8-0542-4e8d-9cb1-d7298f0c1e51}</SharePointProjectItemId>
+    </None>
+    <None Include="CustomActions\FarmWideAdminLink\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{352386ea-dad8-4c7a-b169-72556f5e3060}</SharePointProjectItemId>
+    </None>
+    <None Include="Features\CoreComponents\CoreComponents.feature">
+      <FeatureId>{d6611606-4769-4ad3-b59d-0042b58731b5}</FeatureId>
+    </None>
+    <None Include="Features\FarmWideAdmin\FarmWideAdmin.feature">
+      <FeatureId>{a09d6d96-ebfb-48e7-972c-23134ece170a}</FeatureId>
+    </None>
+    <None Include="Features\WebParts\WebParts.feature">
+      <FeatureId>{a415a88a-d669-4b39-834a-1ea20cab0d2d}</FeatureId>
+    </None>
+    <None Include="Features\TeamManagement\TeamManagement.feature">
+      <FeatureId>{240226a7-44cf-4523-be68-5fe549b1b9fe}</FeatureId>
+    </None>
+    <None Include="WebParts\GoToInvolvedTeamsWebPart\GoToInvolvedTeamsWebPart.webpart" />
+    <None Include="WebParts\GoToInvolvedTeamsWebPart\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{36bba2c1-0d65-4887-8683-b0828d9df018}</SharePointProjectItemId>
+    </None>
+    <None Include="Images\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{a90b15d8-3fc1-4466-b5c6-72c2d902ae6d}</SharePointProjectItemId>
+    </None>
+    <None Include="key.snk" />
+    <None Include="Layouts\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{6301f556-5cc1-47b3-a9d0-eb1439485ef6}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\MyFavouriteWorkBoxes\MyFavouriteWorkBoxes.webpart" />
+    <None Include="WebParts\MyFavouriteWorkBoxes\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{cb8879f9-a237-42c2-93d5-b3cf06b96eb4}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\MyRecentWorkBoxes\MyRecentWorkBoxes.webpart" />
+    <None Include="WebParts\MyRecentWorkBoxes\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{997d6a83-eb86-4dbd-9ab8-aaa3f94554ad}</SharePointProjectItemId>
+    </None>
+    <None Include="Package\Package.package">
+      <PackageId>{122d1e78-156a-4d31-adc1-66fee258b162}</PackageId>
+    </None>
+    <None Include="Package\Package.Template.xml">
+      <DependentUpon>Package.package</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="CustomActions\TeamAdminLinks\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{203aaea7-d8c4-41e9-aea7-581ac3798163}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ListWorkBoxesWebPart\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{1d426416-396f-47ee-abcb-de48098140b4}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\ListWorkBoxesWebPart\ListWorkBoxesWebPart.webpart">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="CustomActions\WorkBoxCustomActions\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{6a509b17-754b-4926-86bf-a5c128b095f3}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\WorkBoxExplorer\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{fe09818f-f37c-4610-aa6c-cba75c37e0c2}</SharePointProjectItemId>
+    </None>
+    <None Include="WebParts\WorkBoxExplorer\WorkBoxExplorer.webpart" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ADMIN\WorkBoxFramework\CheckConfiguration.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="ControlTemplates\WorkBoxFramework\WBFUser.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Features\LinkedCalendars\LinkedCalendars.Template.xml">
+      <DependentUpon>LinkedCalendars.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\TeamSiteCalendarUpdates\TeamSiteCalendarUpdates.Template.xml">
+      <DependentUpon>TeamSiteCalendarUpdates.feature</DependentUpon>
+    </Content>
+    <Content Include="Images\WorkBoxFramework\columns-icon-32.png" />
+    <Content Include="Images\WorkBoxFramework\details-view-32.png" />
+    <Content Include="Images\WorkBoxFramework\filter-icon-32.png" />
+    <Content Include="Images\WorkBoxFramework\green-tick-32.png" />
+    <Content Include="Images\WorkBoxFramework\icons-view-32.png" />
+    <Content Include="Images\WorkBoxFramework\list-item-32.png" />
+    <Content Include="Images\WorkBoxFramework\menu-icon-32.png" />
+    <Content Include="Images\WorkBoxFramework\order-by-icon-32.png" />
+    <Content Include="Images\WorkBoxFramework\plus-icon-32.png" />
+    <Content Include="Images\WorkBoxFramework\red-cross-32.png" />
+    <Content Include="Images\WorkBoxFramework\search-icon-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-closed-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-closed-24.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-closed-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-closed-64.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-deleted-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-deleted-24.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-deleted-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-deleted-64.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-error-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-error-24.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-error-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-error-64.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-open-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-open-24.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-open-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-open-64.png" />
+    <Content Include="Layouts\WorkBoxFramework\AddAllManagersReports.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\AddManagersDirectReports.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\AddSubjectTag.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ChangeTeamManager.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\CheckTeamSync.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ConfigureLinkedCalendar.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ConfigureWorkBoxCollection.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\EditLinkedCalendarSettings.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="ADMIN\WorkBoxFramework\FarmWideSettings.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="ADMIN\WorkBoxFramework\EditSubjectTagRouting.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\GoToTeamManagement.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="CustomActions\LinkedCalendarSettingsCustomAction\Elements.xml" />
+    <Content Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\jquery-1.11.3.min.js" />
+    <Content Include="ADMIN\WorkBoxFramework\RecordsManagementAdmin.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\SubjectTags.js" />
+    <Content Include="Layouts\WorkBoxFramework\MailToLinkReplacement.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="StyleLibrary\Elements.xml" />
+    <Content Include="StyleLibrary\wb-explorer-search-results.xslt" />
+    <Content Include="STYLES\WorkBoxFramework\css\SubjectTags.css" />
+    <Content Include="STYLES\WorkBoxFramework\css\WBF.css" />
+    <Content Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\ConfigurationStatus\Elements.xml" />
+    <Content Include="CustomActions\UpdateRecordsMetadataAction\Elements.xml" />
+    <Content Include="Features\ErrorPages\ErrorPages.Template.xml">
+      <DependentUpon>ErrorPages.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\UpdateRecordsMetadata\UpdateRecordsMetadata.Template.xml">
+      <DependentUpon>UpdateRecordsMetadata.feature</DependentUpon>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\AccessDenied.html" />
+    <Content Include="ControlTemplates\WorkBoxFramework\LinkToWorkBoxHome.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="ControlTemplates\WorkBoxFramework\LinkToWorkBoxOwner.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="ControlTemplates\WorkBoxFramework\TeamSiteTreeNavigation.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Features\TimerJobs\TimerJobs.Template.xml">
+      <DependentUpon>TimerJobs.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\WorkBoxCollections\WorkBoxCollections.Template.xml">
+      <DependentUpon>WorkBoxCollections.feature</DependentUpon>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="CustomActions\CoreActions\Elements.xml" />
+    <Content Include="CustomActions\WorkBoxCollectionAdminLinks\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="ControlTemplates\WorkBoxFramework\MaybeShowWorkBoxRibbonTools.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="ControlTemplates\WorkBoxFramework\RecordsClassesListNavigation.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Images\WorkBoxFramework\box_16x16.png" />
+    <Content Include="Images\WorkBoxFramework\box_32x32.png" />
+    <Content Include="Images\WorkBoxFramework\box_48x48.png" />
+    <Content Include="Images\WorkBoxFramework\change-owner-32.png" />
+    <Content Include="Images\WorkBoxFramework\closed-class.gif" />
+    <Content Include="Images\WorkBoxFramework\invite-individuals-32.png" />
+    <Content Include="Images\WorkBoxFramework\invite-teams-32.png" />
+    <Content Include="Images\WorkBoxFramework\last-class-last-type.gif" />
+    <Content Include="Images\WorkBoxFramework\last-class-type.gif" />
+    <Content Include="Images\WorkBoxFramework\last-closed-class.gif" />
+    <Content Include="Images\WorkBoxFramework\last-open-class.gif" />
+    <Content Include="Images\WorkBoxFramework\last-type.gif" />
+    <Content Include="Images\WorkBoxFramework\open-class.gif" />
+    <Content Include="Images\WorkBoxFramework\TasksList_16x16.gif" />
+    <Content Include="Images\WorkBoxFramework\TasksList_32x32.gif" />
+    <Content Include="Images\WorkBoxFramework\Task_16x16.gif" />
+    <Content Include="Images\WorkBoxFramework\Task_32x32.gif" />
+    <Content Include="Images\WorkBoxFramework\team-16.png" />
+    <Content Include="Images\WorkBoxFramework\team-32.png" />
+    <Content Include="Images\WorkBoxFramework\type.gif" />
+    <Content Include="Images\WorkBoxFramework\view-teams-involved-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-112.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-48.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-64.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-96.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-cross-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-cross-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-doc-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-doc-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-fav-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-fav-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-in-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-in-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-out-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-out-32.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-tick-16.png" />
+    <Content Include="Images\WorkBoxFramework\work-box-tick-32.png" />
+    <Content Include="Include\Newtonsoft.Json.dll" />
+    <Content Include="Include\Newtonsoft.Json.pdb" />
+    <Content Include="Include\Newtonsoft.Json.xml" />
+    <Content Include="Layouts\WorkBoxFramework\AddToClipboard.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\CreateRecordsTypesDetailsCSV.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="ADMIN\WorkBoxFramework\MigrationAdmin.aspx" />
+    <Content Include="ADMIN\WorkBoxFramework\DefaultInviteEmailTemplates.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\EditWorkBoxProperties.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\InviteIndividualsWithEmail.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\InviteTeamsWithEmail.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\InviteToTeamWithEmail.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\PasteFromClipboard.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\PublishDocDialogSuccessFailurePage.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\PublishDocJustToCaseFile.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\PublishDocPickWorkBoxFolder.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\PublishedDocumentPicker.aspx" />
+    <Content Include="Layouts\WorkBoxFramework\RemoveFromTeam.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\RemoveTeamOrIndividual.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ServerErrorPage.htm" />
+    <Content Include="Layouts\WorkBoxFramework\jquery-1.7.2.min.js" />
+    <Content Include="Layouts\WorkBoxFramework\EditRibbonButtonsSettings.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\PageComponent.js" />
+    <Content Include="Layouts\WorkBoxFramework\RecordsTypePicker.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\SubjectTagsManagement.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\TestDocumentPicker.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\UpdateRecordsMetadata.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ViewClipboard.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ViewWorkBoxLibrary.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="1033\WBF404Page.html" />
+    <Content Include="Layouts\WorkBoxFramework\ViewWorkBoxProperties.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\RedirectToMyWorkBox\Elements.xml" />
+    <Content Include="WebParts\RedirectToMyWorkBox\RedirectToMyWorkBoxUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\TeamSiteTreeNavWebPart\Elements.xml" />
+    <Content Include="WebParts\TeamSiteTreeNavWebPart\TeamSiteTreeNavWebPartUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\TeamSiteWorkBoxes\Elements.xml" />
+    <Content Include="WebParts\TeamSiteWorkBoxes\TeamSiteWorkBoxesUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\TeamDetails\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="WebParts\TeamDetails\TeamDetailsUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\ViewWorkBoxLibraryWebPart\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="WebParts\ViewWorkBoxLibraryWebPart\ViewWorkBoxLibraryWebPartUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\ViewTeamsPublishedDocuments\Elements.xml" />
+    <Content Include="WebParts\ViewTeamsPublishedDocuments\ViewTeamsPublishedDocumentsUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\ViewSubjectPages\Elements.xml" />
+    <Content Include="WebParts\ViewSubjectPages\ViewSubjectPagesUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\ViewSeriesPages\Elements.xml" />
+    <Content Include="WebParts\ViewSeriesPages\ViewSeriesPagesUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\ViewRecordsLibraryWebPart\Elements.xml" />
+    <Content Include="WebParts\ViewRecordsLibraryWebPart\ViewRecordsLibraryWebPartUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\RelatedMeetings\Elements.xml" />
+    <Content Include="WebParts\RelatedMeetings\RelatedMeetingsUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\ShowWorkBoxesFromSeries\Elements.xml" />
+    <Content Include="WebParts\ShowPublishedDocumentsFromSeries\Elements.xml" />
+    <Content Include="WebParts\TeamSiteTreeSelection\Elements.xml" />
+    <Content Include="WebParts\TeamSiteTreeSelection\TeamSiteTreeSelectionUserControl.ascx" />
+    <Content Include="WebParts\ShowTimeToAutoClose\Elements.xml" />
+    <Content Include="WebParts\RelatedWorkBoxes\Elements.xml" />
+    <Content Include="WebParts\RelatedWorkBoxes\RelatedWorkBoxesUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\OurTeamsWorkBoxes\Elements.xml" />
+    <Content Include="WebParts\FindWorkBoxByLocalID\Elements.xml" />
+    <Content Include="WebParts\FindWorkBoxByLocalID\FindWorkBoxByLocalIDUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ChangeWorkBoxOwner.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\InviteIndividuals.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\RecordsTypeManagement.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ReOpenWorkBox.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="ADMIN\WorkBoxFramework\UploadAndCreate.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\routing.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ViewAllInvolved.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ViewAllProperties.aspx" />
+    <Content Include="Layouts\WorkBoxFramework\ViewAuditLog.aspx" />
+    <Content Include="Layouts\WorkBoxFramework\WorkBoxPicker.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\MyWorkBoxes\Elements.xml" />
+    <Content Include="WebParts\MyTeams\Elements.xml" />
+    <Content Include="WebParts\ViewTeamsMeetings\Elements.xml" />
+    <Content Include="WebParts\ViewTeamsMeetings\ViewTeamsMeetingsUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\DisplaySelectedTeamRecords\DisplaySelectedTeamRecordsUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\DisplaySelectedTeamRecords\Elements.xml" />
+    <Content Include="CustomActions\FarmWideAdminLink\Elements.xml" />
+    <Content Include="Features\CoreComponents\CoreComponents.Template.xml">
+      <DependentUpon>CoreComponents.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\FarmWideAdmin\FarmWideAdmin.Template.xml">
+      <DependentUpon>FarmWideAdmin.feature</DependentUpon>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Features\WebParts\WebParts.Template.xml">
+      <DependentUpon>WebParts.feature</DependentUpon>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Features\TeamManagement\TeamManagement.Template.xml">
+      <DependentUpon>TeamManagement.feature</DependentUpon>
+    </Content>
+    <Content Include="WebParts\GoToInvolvedTeamsWebPart\Elements.xml" />
+    <Content Include="Layouts\WorkBoxFramework\AddWorkBoxToFavourites.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\CloseWorkBox.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\DisplayUserProfileInfo.aspx" />
+    <Content Include="ADMIN\WorkBoxFramework\CoreWBFConfiguration.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\GenericOKPage.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\InviteTeams.aspx" />
+    <Content Include="Layouts\WorkBoxFramework\NewWorkBox.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\RemoveWorkBoxFromFavourites.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\TeamManagement.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\TeamSiteSetup.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ViewRecordsLibrary.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\WorkBoxFramework.js" />
+    <Content Include="Layouts\WorkBoxFramework\PublishDocDialogRequiredMetadataPage.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\PublishDocDialogSelectDestinationPage.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\WorkBoxCollectionSettingsPage.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\MyFavouriteWorkBoxes\Elements.xml" />
+    <Content Include="WebParts\MyRecentWorkBoxes\Elements.xml" />
+    <Content Include="CustomActions\TeamAdminLinks\Elements.xml" />
+    <Content Include="WebParts\ListWorkBoxesWebPart\Elements.xml" />
+    <Content Include="WebParts\ListWorkBoxesWebPart\ListWorkBoxesWebPartUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="CustomActions\WorkBoxCustomActions\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="WebParts\WorkBoxExplorer\Elements.xml" />
+    <Content Include="WebParts\WorkBoxExplorer\WorkBoxExplorerUserControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" />
+</Project>

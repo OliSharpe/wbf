@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<webParts>
+  <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
+    <metaData>
+      <type name="WorkBoxFramework.MyFavouriteWorkBoxes.MyFavouriteWorkBoxes, $SharePoint.Project.AssemblyFullName$" />
+      <importErrorMessage>$Resources:core,ImportErrorMessage;</importErrorMessage>
+    </metaData>
+    <data>
+      <properties>
+        <property name="Title" type="string">My Favourite Work Boxes</property>
+        <property name="Description" type="string">This web part lists the work boxes that the current user has selected to be a favourite.</property>
+        <property name="NumberToShow" type="int">10</property>
+      </properties>
+    </data>
+  </webPart>
+</webParts>

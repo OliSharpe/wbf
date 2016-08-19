@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<webParts>
+  <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
+    <metaData>
+      <type name="WBFWebParts.PickRelatedDocuments.PickRelatedDocuments, $SharePoint.Project.AssemblyFullName$" />
+      <importErrorMessage>$Resources:core,ImportErrorMessage;</importErrorMessage>
+    </metaData>
+    <data>
+      <properties>
+        <property name="Title" type="string">Related documents</property>
+        <property name="Description" type="string">Pick documents related to a page.</property>
+      </properties>
+    </data>
+  </webPart>
+</webParts>

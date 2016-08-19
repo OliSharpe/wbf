@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<webParts>
+  <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
+    <metaData>
+      <type name="WorkBoxFramework.ShowWorkBoxesFromSeries.ShowWorkBoxesFromSeries, $SharePoint.Project.AssemblyFullName$" />
+      <importErrorMessage>$Resources:core,ImportErrorMessage;</importErrorMessage>
+    </metaData>
+    <data>
+      <properties>
+        <property name="Title" type="string">Show Work Boxes From Series</property>
+        <property name="Description" type="string">Shows a set of work boxes from a series</property>
+        <property name="FilterBySeriesTag" type="bool">True</property>
+        <property name="FilterByReferenceID" type="bool">False</property>
+        <property name="FilterByOwningTeam" type="bool">False</property>
+        <property name="ShowCreateNewLink" type="bool">True</property>
+      </properties>
+    </data>
+  </webPart>
+</webParts>

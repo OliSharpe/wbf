@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<webParts>
+  <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
+    <metaData>
+      <type name="WorkBoxFramework.FindWorkBoxByLocalID.FindWorkBoxByLocalID, $SharePoint.Project.AssemblyFullName$" />
+      <importErrorMessage>$Resources:core,ImportErrorMessage;</importErrorMessage>
+    </metaData>
+    <data>
+      <properties>
+        <property name="Title" type="string">Find Work Box By LocalID</property>
+        <property name="Description" type="string">Find a work box by its local ID value.</property>
+      </properties>
+    </data>
+  </webPart>
+</webParts>

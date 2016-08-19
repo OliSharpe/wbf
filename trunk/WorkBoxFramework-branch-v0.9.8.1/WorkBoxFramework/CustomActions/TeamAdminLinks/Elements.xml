@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+
+  <CustomAction Id="TeamManagementLink"
+            GroupId="WorkBoxFramework.SiteSettingsGroup"
+            Location="Microsoft.SharePoint.SiteSettings"
+            Sequence="4000"
+            Title="Team Management"
+            RequireSiteAdministrator="TRUE">
+    <UrlAction Url="_layouts/WorkBoxFramework/GoToTeamManagement.aspx"/>
+  </CustomAction>
+
+  <CustomAction Id="RecordsTypeManagementLink"
+            GroupId="WorkBoxFramework.SiteSettingsGroup"
+            Location="Microsoft.SharePoint.SiteSettings"
+            Sequence="5000"
+            Title="Records Type Management"
+            RequireSiteAdministrator="TRUE">
+    <UrlAction Url="_layouts/WorkBoxFramework/RecordsTypeManagement.aspx"/>
+  </CustomAction>
+
+  <CustomAction Id="TeamSiteSetupLink"
+            GroupId="WorkBoxFramework.SiteSettingsGroup"
+            Location="Microsoft.SharePoint.SiteSettings"
+            Sequence="5000"
+            Title="Team Site Setup"
+            RequireSiteAdministrator="TRUE">
+    <UrlAction Url="_layouts/WorkBoxFramework/TeamSiteSetup.aspx"/>
+  </CustomAction>
+
+  <CustomAction Id="SubjectTagManagementLink"
+            GroupId="WorkBoxFramework.SiteSettingsGroup"
+            Location="Microsoft.SharePoint.SiteSettings"
+            Sequence="6000"
+            Title="Subject Tag Management"
+            RequireSiteAdministrator="TRUE">
+    <UrlAction Url="_layouts/WorkBoxFramework/SubjectTagsManagement.aspx"/>
+  </CustomAction>
+
+</Elements>
