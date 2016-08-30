@@ -1769,7 +1769,7 @@ namespace WorkBoxFramework
 
                 if (protectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
                 {
-                    // OK so we're goijng to copy this item to all relevant public library:
+                    // OK so we're going to copy this item to all relevant public extranet libraries:
 
                     List<String> extranetLibraries = routings.ExtranetLibrariesToRouteTo(subjectTagsApplied);
 

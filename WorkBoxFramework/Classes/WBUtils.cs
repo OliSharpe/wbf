@@ -1482,8 +1482,44 @@ namespace WorkBoxFramework
 
             if (existingContentType != null)
             {
-                feedback.Checked("On " + web.Url + " Found content type " + contentTypeName);
-                feedback.JustLog("Not yet checking existing content types have the right columns!!");
+                bool columnsAdded = false;
+
+                feedback.JustLog("On " + web.Url + " Found content type " + contentTypeName);
+
+                foreach (WBColumn column in requiredFields)
+                {
+                    if (!existingContentType.Fields.ContainsField(column.DisplayName))
+                    {
+                        SPFieldLink fieldLink = new SPFieldLink(web.Fields[column.DisplayName]);
+                        existingContentType.FieldLinks.Add(fieldLink);
+                        fieldLink.Required = true;
+                        columnsAdded = true;
+                        feedback.Updating("Added column " + column.DisplayName + " to content type " + contentTypeName);
+                    }
+                }
+
+                foreach (WBColumn column in optionalFields)
+                {
+                    if (!existingContentType.Fields.ContainsField(column.DisplayName))
+                    {
+                        SPFieldLink fieldLink = new SPFieldLink(web.Fields[column.DisplayName]);
+                        existingContentType.FieldLinks.Add(fieldLink);
+                        fieldLink.Required = false;
+                        columnsAdded = true;
+                        feedback.Updating("Added column " + column.DisplayName + " to content type " + contentTypeName);
+                    }
+                }
+
+                if (columnsAdded)
+                {
+                    existingContentType.Update(true);
+                    feedback.Updated("Finished adding any missing columns to " + contentTypeName);
+                }
+                else
+                {
+                    feedback.Checked("Checked no missing columns for " + contentTypeName);
+                }
+
                 return existingContentType;
             }
 

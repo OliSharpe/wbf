@@ -35,13 +35,34 @@ namespace WorkBoxFramework
         #region Constructors
         public WBDocument(SPListItem item) : base(item)
         {
+            RecordsLibrary = null;
+        }
+
+        public WBDocument(WBRecordsLibrary library, SPListItem item)
+            : base(item)
+        {
+            RecordsLibrary = library;
         }
 
         public WBDocument() : base()
         {
+            RecordsLibrary = null;
         }
+
+        public WBDocument(WBRecordsLibrary library)
+            : base()
+        {
+            RecordsLibrary = library;
+        }
+
         #endregion
 
+
+        public WBRecordsLibrary RecordsLibrary
+        {
+            public get;
+            private set;
+        }
 
         public WBRecordsType RecordsType
         {
@@ -203,6 +224,18 @@ namespace WorkBoxFramework
         {
             get { return this[WBColumn.ProtectiveZone] as String; }
             set { this[WBColumn.ProtectiveZone] = value; }
+        }
+
+        public String LiveOrArchived
+        {
+            get { return this[WBColumn.LiveOrArchived] as String; }
+            set { this[WBColumn.LiveOrArchived] = value; }
+        }
+
+        public String RecordID
+        {
+            get { return this[WBColumn.RecordID] as String; }
+            set { this[WBColumn.RecordID] = value; }
         }
 
 

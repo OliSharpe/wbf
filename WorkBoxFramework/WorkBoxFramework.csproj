@@ -218,6 +218,9 @@
     <Compile Include="ADMIN\WorkBoxFramework\RecordsManagementAdmin.aspx.designer.cs">
       <DependentUpon>RecordsManagementAdmin.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Classes\WBRecord.cs" />
+    <Compile Include="Classes\WBRecordsLibraries.cs" />
+    <Compile Include="Classes\WBRecordsLibrary.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
