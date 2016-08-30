@@ -212,7 +212,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 List<String> librariesRequiringCopy = new List<String>();
                 List<String> librariesMustNotHaveCopy = new List<String>();
 
-                if (LiveOrArchived.SelectedValue == "Live" || LiveOrArchived.SelectedValue == "Retired")
+                if (LiveOrArchived.SelectedValue == "Live")
                 {
                     if (ProtectiveZone.SelectedValue == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
                     {

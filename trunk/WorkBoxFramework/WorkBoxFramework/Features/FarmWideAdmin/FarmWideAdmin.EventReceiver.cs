@@ -60,30 +60,18 @@ namespace WorkBoxFramework.Features.FarmWideAdmin
             // SPFarm farm = properties.Feature.Parent as SPFarm;
             SPFarm farm = SPFarm.Local;
 
-            WBUtils.logMessage("Here");
-
             if (farm != null)
             {
-                WBUtils.logMessage("Farm was NOT null!!");
                 WBLogging service = WBLogging.Local;
 
-                WBUtils.logMessage("service = " + service);
                 if (service == null)
                 {
                     service = new WBLogging();
 
-                    WBUtils.logMessage("And now service = " + service);
-
                     service.Update();
-                    WBUtils.logMessage("And Here");
 
                     if (service.Status != SPObjectStatus.Online)
                         service.Provision();
-
-
-                    WBUtils.logMessage("Here as well");
-
-                    WBLogging.Teams.Unexpected("Did this work???");
 
                 }
             }

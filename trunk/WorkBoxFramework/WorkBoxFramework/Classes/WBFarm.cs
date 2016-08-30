@@ -916,6 +916,10 @@ namespace WorkBoxFramework
                 WBColumn.SourceSystem,
                 WBColumn.SourceID,
                 WBColumn.RecordID,
+                WBColumn.RecordSeriesID,
+                WBColumn.ReplacesRecordID,
+                WBColumn.RecordSeriesIssue,
+
                 WBColumn.LiveOrArchived,
 
                 WBColumn.WorkBoxTemplateTitle,
@@ -1073,6 +1077,9 @@ namespace WorkBoxFramework
                 WBColumn.SourceSystem,
                 WBColumn.SourceID,
                 WBColumn.RecordID,
+                WBColumn.RecordSeriesID,
+                WBColumn.ReplacesRecordID,
+                WBColumn.RecordSeriesIssue,
                 WBColumn.LiveOrArchived
             };
 

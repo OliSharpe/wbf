@@ -71,6 +71,19 @@ namespace WorkBoxFramework
             Success(feedback);
         }
 
+        public void Updating(String feedback)
+        {
+            UpdateType = UPDATE_TYPE__UPDATE;
+            AddFeedback(feedback);
+        }
+
+        public void Updated(String feedback)
+        {
+            UpdateType = UPDATE_TYPE__UPDATE;            
+            Success(feedback);
+        }
+
+
         public void Success()
         {
             Success("");

@@ -858,6 +858,10 @@ namespace WorkBoxFramework
         public static readonly WBColumn SourceID = WBColumn.TextColumn("Source ID");
         public static readonly WBColumn RecordID = WBColumn.IntegerColumn("Record ID");
 
+        public static readonly WBColumn RecordSeriesID = WBColumn.IntegerColumn("Record Series ID");
+        public static readonly WBColumn ReplacesRecordID = WBColumn.IntegerColumn("Replaces Record ID");
+        public static readonly WBColumn RecordSeriesIssue = WBColumn.IntegerColumn("Record Series Issue");
+        
         public static readonly WBColumn WorkBoxTemplate = WBColumn.LookupColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE, false, WorkBox.LIST_NAME__WORK_BOX_TEMPLATES);
 
         public static readonly WBColumn WorkBoxTemplateTitle = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE_TITLE);
