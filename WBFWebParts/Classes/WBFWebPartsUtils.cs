@@ -88,7 +88,7 @@ namespace WBFWebParts
         {
             WBFarm farm = WBFarm.Local;
 
-            if (String.IsNullOrEmpty(farm.FarmInstance) || farm.FarmInstance.Equals(WBFarm.FARM_INSTANCE__PUBLIC_EXTERNAL_FARM))
+            if (String.IsNullOrEmpty(recordsLibraryToUse))
             {
                 recordsLibraryToUse = WBF_WEB_PARTS__RECORDS_LIBRARY__PUBLIC;
             }
