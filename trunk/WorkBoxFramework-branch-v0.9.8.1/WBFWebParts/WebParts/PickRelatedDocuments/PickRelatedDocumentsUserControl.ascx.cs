@@ -142,6 +142,8 @@ namespace WBFWebParts.PickRelatedDocuments
 
                 String recordsLibraryURL = WBFWebPartsUtils.GetRecordsLibraryURL(SPContext.Current.Site);
 
+                WBLogging.Generic.Unexpected("Using recordsLibraryURL = " + recordsLibraryURL);
+
                 using (SPSite site = new SPSite(recordsLibraryURL))
                 using (SPWeb web = site.OpenWeb())
                 {
@@ -199,7 +201,9 @@ namespace WBFWebParts.PickRelatedDocuments
                                     title);
                             }
 
-                            html += "<li><a target=\"_blank\" href=\"" + item.WBxGetAsString(WBColumn.EncodedAbsoluteURL) + "\">" + title + "</a> <span>(" + extension + additionalText + ")</span></li>";
+                            String hrefURL = item.WBxGetAsString(WBColumn.EncodedAbsoluteURL);
+
+                            html += "<li><a target=\"_blank\" href=\"" + hrefURL + "\">" + title + "</a> <span>(" + extension + additionalText + ")</span></li>";
                         }
                     }
 

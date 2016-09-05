@@ -64,22 +64,23 @@ namespace WBFWebParts
         internal static String GetRecordsLibraryToUse(SPSite site) {
             WBFarm farm = WBFarm.Local;
 
-            if (String.IsNullOrEmpty(farm.FarmInstance) || farm.FarmInstance.Equals(WBFarm.FARM_INSTANCE__PUBLIC_EXTERNAL_FARM))
-            {
-                return WBF_WEB_PARTS__RECORDS_LIBRARY__PUBLIC;
-            }
-            else
-            {
-                String libraryToUse = site.RootWeb.WBxGetProperty(SP_SITE_PROPERTY__RECORDS_LIBRARY_TO_USE);
+            String libraryToUse = site.RootWeb.WBxGetProperty(SP_SITE_PROPERTY__RECORDS_LIBRARY_TO_USE);
 
-                if (String.IsNullOrEmpty(libraryToUse))
+            if (String.IsNullOrEmpty(libraryToUse))
+            {
+
+                if (String.IsNullOrEmpty(farm.FarmInstance) || farm.FarmInstance.Equals(WBFarm.FARM_INSTANCE__PUBLIC_EXTERNAL_FARM))
                 {
                     return WBF_WEB_PARTS__RECORDS_LIBRARY__PUBLIC;
                 }
-                else 
+                else
                 {
-                    return libraryToUse;
+                    return WBF_WEB_PARTS__RECORDS_LIBRARY__PROTECTED;
                 }
+            }
+            else
+            {
+                return libraryToUse;
             }
         }
 
