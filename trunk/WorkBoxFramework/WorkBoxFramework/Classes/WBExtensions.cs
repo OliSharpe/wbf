@@ -967,7 +967,7 @@ namespace WorkBoxFramework
                         {
                             if (value is String)
                             {
-                                item.WBxSetMultiTermColumn(column.DisplayName, value as String);
+                                item.WBxSetMultiTermColumn(column.DisplayName, value.WBxToString());
                             }
                             else if (value is WBTermCollection<WBTerm>)
                             {
@@ -987,6 +987,12 @@ namespace WorkBoxFramework
                                 //WBLogging.Debug("Setting " + column.DisplayName + " to value: " + collection.ToString());
                                 item.WBxSetMultiTermColumn<WBTeam>(column.DisplayName, collection);
                             }
+                            else if (value is WBTermCollection<WBSubjectTag>)
+                            {
+                                WBTermCollection<WBSubjectTag> collection = value as WBTermCollection<WBSubjectTag>;
+                                //WBLogging.Debug("Setting " + column.DisplayName + " to value: " + collection.ToString());
+                                item.WBxSetMultiTermColumn<WBSubjectTag>(column.DisplayName, collection);
+                            }
                             else
                             {
                                 WBUtils.shouldThrowError("You can only set multi ManagedMetadata columns with values of type String or WBTermCollection<WBTerm>. Column: " + column.DisplayName + " Value: " + value);
@@ -998,11 +1004,23 @@ namespace WorkBoxFramework
                         {
                             if (value is String)
                             {
-                                item.WBxSetSingleTermColumn(column.DisplayName, value as String);
+                                item.WBxSetSingleTermColumn(column.DisplayName, value.WBxToString());
                             }
                             else if (value is WBTerm)
                             {
                                 item.WBxSetSingleTermColumn(column.DisplayName, value as WBTerm);
+                            }
+                            else if (value is WBRecordsType)
+                            {
+                                item.WBxSetSingleTermColumn(column.DisplayName, value as WBRecordsType);
+                            }
+                            else if (value is WBTeam)
+                            {
+                                item.WBxSetSingleTermColumn(column.DisplayName, value as WBTeam);
+                            }
+                            else if (value is WBSubjectTag)
+                            {
+                                item.WBxSetSingleTermColumn(column.DisplayName, value as WBSubjectTag);
                             }
                             else
                             {
@@ -1222,6 +1240,23 @@ namespace WorkBoxFramework
 
             item[columnName] = userValueCollection;
         }
+
+
+        public static List<String> WBxGetFolderPath(this SPListItem item)
+        {
+            List<String> path = new List<String>(item.Url.Split('/'));
+
+            int lastLocation = path.Count - 1;
+            if (lastLocation >= 0)
+                path.RemoveAt(lastLocation);
+
+            //Then finally remove the first part of the path as this will just be the list name:
+            if (path.Count > 0) path.RemoveAt(0);
+
+            return path;
+        }
+
+
 
         #endregion
 
@@ -2504,7 +2539,7 @@ namespace WorkBoxFramework
 
             foreach (UserProfile directReportProfile in directReportProfiles)
             {
-                String userLogin = directReportProfile["AccountName"].Value as String;
+                String userLogin = directReportProfile["AccountName"].Value.WBxToString();
 
                 if (!String.IsNullOrEmpty(userLogin))
                 {
@@ -2519,7 +2554,7 @@ namespace WorkBoxFramework
         public static List<String> WBxGetAllReportsLogins(this UserProfile profile)
         {
             List<String> allReportsLogins = new List<String>();
-            String userLogin = profile["AccountName"].Value as String;
+            String userLogin = profile["AccountName"].Value.WBxToString();
 
             if (!String.IsNullOrEmpty(userLogin))
             {
@@ -2629,42 +2664,42 @@ namespace WorkBoxFramework
             }
         }
 
-        public static void WBxCreateConfigurationStepsTable(this PlaceHolder placeHolder, ICollection<String> configurationStepsNames)
+        public static void WBxCreateTasksTable(this PlaceHolder placeHolder, ICollection<String> taskNames)
         {
             Table table = new Table();
             table.CellPadding = 0;
             table.CellSpacing = 5;
 
-            foreach (String stepName in configurationStepsNames)
+            foreach (String taskName in taskNames)
             {
                 TableRow row = new TableRow();
-                row.ID = placeHolder.WBxMakeControlID(stepName, "row");
-                row.CssClass = "wbf-configuration-step-table-row";
+                row.ID = placeHolder.WBxMakeControlID(taskName, "row");
+                row.CssClass = "wbf-task-table-row";
 
                 Image image = new Image();
-                image.ID = placeHolder.WBxMakeControlID(stepName, "image");
+                image.ID = placeHolder.WBxMakeControlID(taskName, "image");
                 image.ImageUrl = "/_layouts/images/WorkBoxFramework/list-item-32.png";
                 image.Width = Unit.Pixel(32);
                 image.Height = Unit.Pixel(32);
-                row.CssClass = "wbf-configuration-step-image";
-                row.WBxAddInTableCell(image, "wbf-configuation-step-image-table-cell");
+                row.CssClass = "wbf-task-image";
+                row.WBxAddInTableCell(image, "wbf-task-image-table-cell");
 
                 System.Web.UI.WebControls.Label label = new System.Web.UI.WebControls.Label();
-                label.ID = placeHolder.WBxMakeControlID(stepName, "name");
-                label.Text = stepName;
-                label.CssClass = "wbf-configuration-step-name";
-                row.WBxAddInTableCell(label, "wbf-configuation-step-name-table-cell");
+                label.ID = placeHolder.WBxMakeControlID(taskName, "name");
+                label.Text = taskName;
+                label.CssClass = "wbf-task-name";
+                row.WBxAddInTableCell(label, "wbf-task-name-table-cell");
 
                 label = new System.Web.UI.WebControls.Label();
-                label.ID = placeHolder.WBxMakeControlID(stepName, "status");
+                label.ID = placeHolder.WBxMakeControlID(taskName, "status");
                 label.Text = "";
-                label.CssClass = "wbf-configuration-step-status";
-                row.WBxAddInTableCell(label, "wbf-configuation-step-status-table-cell");
+                label.CssClass = "wbf-task-status";
+                row.WBxAddInTableCell(label, "wbf-task-status-table-cell");
 
                 Literal literal = new System.Web.UI.WebControls.Literal();
-                literal.ID = placeHolder.WBxMakeControlID(stepName, "feedback");
+                literal.ID = placeHolder.WBxMakeControlID(taskName, "feedback");
                 literal.Text = "";
-                row.WBxAddInTableCell(literal, "wbf-configuation-step-feedback-table-cell");
+                row.WBxAddInTableCell(literal, "wbf-task-feedback-table-cell");
 
                 table.Rows.Add(row);
             }
@@ -2673,10 +2708,10 @@ namespace WorkBoxFramework
         }
 
 
-        public static void WBxUpdateConfigurationStep(this PlaceHolder placeHolder, WBConfigStepFeedback feedback)
+        public static void WBxUpdateTask(this PlaceHolder placeHolder, WBTaskFeedback feedback)
         {
             Image image = (Image)placeHolder.WBxFindNestedControlByID(placeHolder.WBxMakeControlID(feedback.Name, "image"));
-            if (feedback.Status == WBConfigStepFeedback.STATUS__SUCCESS)
+            if (feedback.Status == WBTaskFeedback.STATUS__SUCCESS)
             {
                 image.ImageUrl = "/_layouts/images/WorkBoxFramework/green-tick-32.png";
             }
@@ -2686,7 +2721,7 @@ namespace WorkBoxFramework
             }
 
             System.Web.UI.WebControls.Label label = (System.Web.UI.WebControls.Label)placeHolder.WBxFindNestedControlByID(placeHolder.WBxMakeControlID(feedback.Name, "status"));
-            label.Text = feedback.UpdateType + " " + feedback.Status;
+            label.Text = feedback.TaskType + " " + feedback.Status;
 
             Literal literal = (System.Web.UI.WebControls.Literal)placeHolder.WBxFindNestedControlByID(placeHolder.WBxMakeControlID(feedback.Name, "feedback"));
 
@@ -2697,8 +2732,8 @@ namespace WorkBoxFramework
 
                 String first = copy[0]; copy.RemoveAt(0);
                 String second = copy[0]; copy.RemoveAt(0);
-                String showID = "wbf-config-feedback-show--" + feedback.Name.Replace(" ", "-");
-                String hideID = "wbf-config-feedback-hide--" + feedback.Name.Replace(" ", "-");
+                String showID = "wbf-task-feedback-show--" + feedback.Name.Replace(" ", "-");
+                String hideID = "wbf-task-feedback-hide--" + feedback.Name.Replace(" ", "-");
                 StringBuilder html = new StringBuilder();
                 html.Append("<div>").Append(first).Append("<br/>").Append(second).Append("</div>");
                 html.Append("<div id='").Append(showID).Append("'>").Append("<a href='#' onclick=' $(\"#").Append(showID).Append("\").hide(); $(\"#").Append(hideID).Append("\").show(); '/> ... show more feedback</a></div>");

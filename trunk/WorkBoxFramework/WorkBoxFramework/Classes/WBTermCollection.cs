@@ -74,6 +74,8 @@ namespace WorkBoxFramework
         private WBTaxonomy _taxonomy = null;
         public WBTaxonomy Taxonomy { get { return _taxonomy; } }
 
+        public bool NoTaxonomy { get { return _taxonomy == null; } }
+
         private string _UIControlValue = null;
         public String UIControlValue
         {
@@ -208,6 +210,26 @@ namespace WorkBoxFramework
             }
 
             return String.Join("; ", names.ToArray());
+        }
+
+        public WBTermCollection<T> RecreateWithTaxonomy(WBTaxonomy taxonomy)
+        {
+            return new WBTermCollection<T>(taxonomy, this.UIControlValue);
+        }
+
+        public WBTermCollection<WBRecordsType> ToRecordsTypes(WBTaxonomy taxonomy)
+        {
+            return new WBTermCollection<WBRecordsType>(taxonomy, this.UIControlValue);
+        }
+
+        public WBTermCollection<WBTeam> ToTeams(WBTaxonomy taxonomy)
+        {
+            return new WBTermCollection<WBTeam>(taxonomy, this.UIControlValue);
+        }
+
+        public WBTermCollection<WBSubjectTag> ToSubjectTags(WBTaxonomy taxonomy)
+        {
+            return new WBTermCollection<WBSubjectTag>(taxonomy, this.UIControlValue);
         }
 
         #endregion

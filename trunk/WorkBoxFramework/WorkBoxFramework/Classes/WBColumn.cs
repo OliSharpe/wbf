@@ -510,7 +510,7 @@ namespace WorkBoxFramework
         }
 
 
-        public bool CreateOrCheck(WBConfigStepFeedback feedback, SPSite site)
+        public bool CreateOrCheck(WBTaskFeedback feedback, SPSite site)
         {
             using (SPWeb rootWeb = site.RootWeb)
             {
@@ -519,7 +519,7 @@ namespace WorkBoxFramework
         }
 
 
-        public bool CreateOrCheck(WBConfigStepFeedback feedback, SPSite site, SPWeb web)
+        public bool CreateOrCheck(WBTaskFeedback feedback, SPSite site, SPWeb web)
         {
             return CreateOrCheck(feedback, site, web, WorkBox.SITE_COLUMNS_GROUP_NAME);
         }
@@ -537,7 +537,7 @@ namespace WorkBoxFramework
         /// <param name="site"></param>
         /// <param name="web"></param>
         /// <returns></returns>
-        public bool CreateOrCheck(WBConfigStepFeedback feedback, SPSite site, SPWeb web, String siteColumnsGroupName)
+        public bool CreateOrCheck(WBTaskFeedback feedback, SPSite site, SPWeb web, String siteColumnsGroupName)
         {
             if (String.IsNullOrEmpty(InternalName)) throw new NotImplementedException("Cannot create a column that doesn't have an internal name set!");
             if (String.IsNullOrEmpty(DisplayName)) throw new NotImplementedException("Cannot create a column that doesn't have a display name set!");

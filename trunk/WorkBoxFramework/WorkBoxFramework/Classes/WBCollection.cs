@@ -356,9 +356,9 @@ namespace WorkBoxFramework
                                                   CONFIG_STEP__SYNC_TEAMS_TIMER_TASK
                                               };
 
-        internal WBConfigStepFeedback DoConfigurationStep(String stepName)
+        internal WBTaskFeedback DoConfigurationStep(String stepName)
         {
-            WBConfigStepFeedback feedback = new WBConfigStepFeedback(stepName);
+            WBTaskFeedback feedback = new WBTaskFeedback(stepName);
 
             SPWeb siteCollectionRootWeb = Site.RootWeb;
             try
@@ -424,17 +424,17 @@ namespace WorkBoxFramework
 
             if (thisStep >= 0 && thisStep < ConfigurationStepsNames.Length - 1)
             {
-                feedback.NextStepName = ConfigurationStepsNames[thisStep + 1];
+                feedback.NextTaskName = ConfigurationStepsNames[thisStep + 1];
             }
             else
             {
-                feedback.NextStepName = "";
+                feedback.NextTaskName = "";
             }
 
             return feedback;
         }
 
-        internal void CreateOrCheckWBCPermissionLevels(WBConfigStepFeedback feedback)
+        internal void CreateOrCheckWBCPermissionLevels(WBTaskFeedback feedback)
         {
 
             WBUtils.CreateOrCheckPermissionLevel(feedback, Site, PERMISSION_LEVEL__WORK_BOX_SYSTEM_ADMIN, "For system admins of the whole work box collection.", BASE_PERMISSIONS__WORK_BOX_SYSTEM_ADMIN);
@@ -447,7 +447,7 @@ namespace WorkBoxFramework
 
         }
 
-        internal void CreateOrCheckWorkBoxesList(WBConfigStepFeedback feedback, SPSite site, SPWeb rootWeb, SPWeb web)
+        internal void CreateOrCheckWorkBoxesList(WBTaskFeedback feedback, SPSite site, SPWeb rootWeb, SPWeb web)
         {
             bool createdList = WBUtils.CreateOrCheckListUsingContentType(feedback, rootWeb, web, ListName, WorkBox.CONTENT_TYPE__WORK_BOX_METADATA_ITEM);
 
@@ -476,7 +476,7 @@ namespace WorkBoxFramework
 
         }
 
-        internal void CreateOrCheckTemplatesList(WBConfigStepFeedback feedback, SPSite site, SPWeb rootWeb, SPWeb web)
+        internal void CreateOrCheckTemplatesList(WBTaskFeedback feedback, SPSite site, SPWeb rootWeb, SPWeb web)
         {
             bool createdList = WBUtils.CreateOrCheckListUsingContentType(feedback, rootWeb, web, WorkBox.LIST_NAME__WORK_BOX_TEMPLATES, WorkBox.CONTENT_TYPE__WORK_BOX_TEMPLATES_ITEM);
 
@@ -500,7 +500,7 @@ namespace WorkBoxFramework
 
         }
 
-        internal void CreateOrCheckLookupColumn(WBConfigStepFeedback feedback)
+        internal void CreateOrCheckLookupColumn(WBTaskFeedback feedback)
         {
             SPFieldLookup lookupField = null;
 
@@ -1337,17 +1337,17 @@ namespace WorkBoxFramework
                 {
                     foreach (DictionaryEntry entry in extraRequiredColumnValues)
                     {
-                        switch (entry.Key as String)
+                        switch (entry.Key.WBxToString())
                         {
                             case  WorkBox.COLUMN_NAME__FUNCTIONAL_AREA:
                                 {
-                                    newItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, entry.Value as String);
+                                    newItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, entry.Value.WBxToString());
                                     break;
                                 }
 
                             case WorkBox.COLUMN_NAME__SERIES_TAG:
                                 {
-                                    newItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__SERIES_TAG, entry.Value as String);
+                                    newItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__SERIES_TAG, entry.Value.WBxToString());
                                     break;
                                 }
 

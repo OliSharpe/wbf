@@ -658,7 +658,6 @@ namespace WorkBoxFramework
         }
 
 
-
         public static String GetParentPath(String path, bool keepHTTPAndDomain)
         {
             bool pathContainsHTTP = false;
@@ -1349,7 +1348,7 @@ namespace WorkBoxFramework
         /// <param name="listName"></param>
         /// <param name="itemContentTypeName"></param>
         /// <returns></returns>
-        public static bool CreateOrCheckListUsingContentType(WBConfigStepFeedback feedback, SPWeb rootWeb, SPWeb web, String listName, String itemContentTypeName)
+        public static bool CreateOrCheckListUsingContentType(WBTaskFeedback feedback, SPWeb rootWeb, SPWeb web, String listName, String itemContentTypeName)
         {
             feedback.JustLog("Starting CreateOrCheckCustomList with custom content type for: " + listName);
 
@@ -1414,7 +1413,7 @@ namespace WorkBoxFramework
             return true;
         }
 
-        public static SPList CreateOrCheckCustomList(WBConfigStepFeedback feedback, SPWeb rootWeb, SPWeb web, String listName, IEnumerable<WBColumn> columns)
+        public static SPList CreateOrCheckCustomList(WBTaskFeedback feedback, SPWeb rootWeb, SPWeb web, String listName, IEnumerable<WBColumn> columns)
         {
             feedback.JustLog("Starting CreateOrCheckCustomList with custom columns for: " + listName);
 
@@ -1467,7 +1466,7 @@ namespace WorkBoxFramework
 
 
         public static SPContentType CreateOrCheckContentType(
-            WBConfigStepFeedback feedback, 
+            WBTaskFeedback feedback, 
             SPWeb web,
             String contentTypeName,
             String parentContentTypeName,
@@ -1558,7 +1557,7 @@ namespace WorkBoxFramework
 
 
         public static void CreateOrCheckPermissionLevel(
-            WBConfigStepFeedback feedback, 
+            WBTaskFeedback feedback, 
             SPSite site,
             String permissionLevelName,
             String permissionLevelDescription,
@@ -1593,7 +1592,7 @@ namespace WorkBoxFramework
         /// <param name="web"></param>
         /// <param name="navLinkTitle"></param>
         /// <param name="navLinkURL"></param>
-        public static void CheckOrCreateQuickLaunchNav(WBConfigStepFeedback feedback, SPWeb web, String navLinkTitle, String navLinkURL)
+        public static void CheckOrCreateQuickLaunchNav(WBTaskFeedback feedback, SPWeb web, String navLinkTitle, String navLinkURL)
         {
             CheckOrCreateQuickLaunchNav(feedback, web, "", navLinkTitle, navLinkURL, false);
         }
@@ -1606,7 +1605,7 @@ namespace WorkBoxFramework
         /// <param name="heading"></param>
         /// <param name="navLinkTitle"></param>
         /// <param name="navLinkURL"></param>
-        public static void CheckOrCreateQuickLaunchNav(WBConfigStepFeedback feedback, SPWeb web, String heading, String navLinkTitle, String navLinkURL)
+        public static void CheckOrCreateQuickLaunchNav(WBTaskFeedback feedback, SPWeb web, String heading, String navLinkTitle, String navLinkURL)
         {
             CheckOrCreateQuickLaunchNav(feedback, web, heading, navLinkTitle, navLinkURL, false);
         }
@@ -1620,7 +1619,7 @@ namespace WorkBoxFramework
         /// <param name="navLinkTitle"></param>
         /// <param name="navLinkURL"></param>
         /// <param name="isExternal"></param>
-        public static void CheckOrCreateQuickLaunchNav(WBConfigStepFeedback feedback, SPWeb web, String heading, String navLinkTitle, String navLinkURL, bool isExternal)
+        public static void CheckOrCreateQuickLaunchNav(WBTaskFeedback feedback, SPWeb web, String heading, String navLinkTitle, String navLinkURL, bool isExternal)
         {
             SPNavigationNodeCollection nodes = web.Navigation.QuickLaunch;
 
@@ -1677,7 +1676,7 @@ namespace WorkBoxFramework
             web.Update();
         }
 
-        public static void AddColumnsToView(WBConfigStepFeedback feedback, SPView view, IEnumerable<WBColumn> columns)
+        public static void AddColumnsToView(WBTaskFeedback feedback, SPView view, IEnumerable<WBColumn> columns)
         {
             foreach (WBColumn column in columns) {
                 if (!view.ViewFields.Exists(column.DisplayName))

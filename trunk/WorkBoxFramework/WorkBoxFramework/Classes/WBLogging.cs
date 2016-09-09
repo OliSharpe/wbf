@@ -67,6 +67,11 @@ namespace WorkBoxFramework
 
         protected override IEnumerable<SPDiagnosticsArea> ProvideAreas()
         {
+            TraceSeverity debugTraceSeverity = TraceSeverity.None;
+
+            WBFarm farm = WBFarm.Local;
+            if (farm.FarmInstance == WBFarm.FARM_INSTANCE__DEVELOPMENT_FARM) debugTraceSeverity = TraceSeverity.High;
+
             List<SPDiagnosticsArea> areas = new List<SPDiagnosticsArea> { 
                 new SPDiagnosticsArea(LOGGING_AREA_NAME, new List<SPDiagnosticsCategory> {
                     new SPDiagnosticsCategory(CATEGORY__TEAMS, TraceSeverity.Monitorable, EventSeverity.Information),
@@ -77,7 +82,7 @@ namespace WorkBoxFramework
                     new SPDiagnosticsCategory(CATEGORY__MIGRATION, TraceSeverity.Monitorable, EventSeverity.Information),
                     new SPDiagnosticsCategory(CATEGORY__QUERIES, TraceSeverity.Monitorable, EventSeverity.Information),
                     new SPDiagnosticsCategory(CATEGORY__CONFIG, TraceSeverity.Monitorable, EventSeverity.Information),
-                    new SPDiagnosticsCategory(CATEGORY__DEBUG, TraceSeverity.None, EventSeverity.Information),
+                    new SPDiagnosticsCategory(CATEGORY__DEBUG, debugTraceSeverity, EventSeverity.Information),
                     new SPDiagnosticsCategory(CATEGORY__GENERIC, TraceSeverity.Monitorable, EventSeverity.Information)
             })
             };

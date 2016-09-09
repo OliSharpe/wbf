@@ -498,6 +498,70 @@ namespace WorkBoxFramework
         }
 
 
+        private WBTaxonomy _recordsTypesTaxonomy = null;
+        public WBTaxonomy RecordsTypesTaxonomy
+        {
+            get
+            {
+                if (_recordsTypesTaxonomy == null)
+                {
+                    _recordsTypesTaxonomy = WBTaxonomy.GetRecordsTypes(Site);
+                }
+                return _recordsTypesTaxonomy;
+            }
+        }
+
+        private WBTaxonomy _teamsTaxonomy = null;
+        public WBTaxonomy TeamsTaxonomy
+        {
+            get
+            {
+                if (_teamsTaxonomy == null)
+                {
+                    _teamsTaxonomy = WBTaxonomy.GetTeams(RecordsTypesTaxonomy);
+                }
+                return _teamsTaxonomy;
+            }
+        }
+
+        private WBTaxonomy _seriesTagsTaxonomy = null;
+        public WBTaxonomy SeriesTagsTaxonomy
+        {
+            get
+            {
+                if (_seriesTagsTaxonomy == null)
+                {
+                    _seriesTagsTaxonomy = WBTaxonomy.GetSeriesTags(RecordsTypesTaxonomy);
+                }
+                return _seriesTagsTaxonomy;
+            }
+        }
+
+        private WBTaxonomy _subjectTagsTaxonomy = null;
+        public WBTaxonomy SubjectTagsTaxonomy
+        {
+            get
+            {
+                if (_subjectTagsTaxonomy == null)
+                {
+                    _subjectTagsTaxonomy = WBTaxonomy.GetSubjectTags(RecordsTypesTaxonomy);
+                }
+                return _subjectTagsTaxonomy;
+            }
+        }
+
+        private WBTaxonomy _functionalAreasTaxonomy = null;
+        public WBTaxonomy FunctionalAreasTaxonomy
+        {
+            get
+            {
+                if (_functionalAreasTaxonomy == null)
+                {
+                    _functionalAreasTaxonomy = WBTaxonomy.GetFunctionalAreas(RecordsTypesTaxonomy);
+                }
+                return _functionalAreasTaxonomy;
+            }
+        }
 
 //        private bool _needsUpdating = false;
 //        public bool NeedsUpdating { get { return _needsUpdating; } }

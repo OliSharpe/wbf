@@ -45,6 +45,8 @@ namespace WorkBoxFramework
         private SPListItem _listItem = null;
         private List<WBColumn> _usedColumns = new List<WBColumn>();
 
+        private bool _valuesHaveChanged = false;
+
 
         #region Constructors
 
@@ -70,18 +72,39 @@ namespace WorkBoxFramework
 
 
         public bool IsSPListItem { get { return (_listItem != null && BackingType == BackingTypes.SPListItem); } }
-        public bool IsDictionaryItem { get { return (_dictionary != null && BackingType == BackingTypes.Dictionary); } } 
+        public bool IsDictionaryItem { get { return (_dictionary != null && BackingType == BackingTypes.Dictionary); } }
 
+        public bool ValuesHaveChanged { get { return _valuesHaveChanged; } }
+
+        public SPListItem Item
+        {
+            get 
+            {
+                if (IsSPListItem) return _listItem;
+                return null;
+            }
+        }
 
         #endregion
 
         #region Methods
+
+        public void CheckForChangesFromNow()
+        {
+            _valuesHaveChanged = false;
+        }
 
         public void UseColumn(WBColumn column)
         {
             if (!_usedColumns.Contains(column)) _usedColumns.Add(column);
         }
 
+        public bool IsUsingColumn(WBColumn column)
+        {
+            return _usedColumns.Contains(column);
+        }
+
+        [System.Runtime.CompilerServices.IndexerName("Get")]
         public Object this[WBColumn column]
         {
             get 
@@ -95,6 +118,7 @@ namespace WorkBoxFramework
                     case BackingTypes.SPListItem:
                         {
                             value = _listItem.WBxGet(column);
+                            // WBLogging.Debug("Got value: " + value + " for column: " + column.DisplayName);
                             break;
                         }
                     case BackingTypes.Dictionary:
@@ -115,6 +139,7 @@ namespace WorkBoxFramework
             set 
             {
                 UseColumn(column);
+                _valuesHaveChanged = true;
 
                 // First we might do some general processing of the value being set dependent on the type of column:
                 Object processedValue = value;
@@ -130,7 +155,7 @@ namespace WorkBoxFramework
                 {
                     case BackingTypes.SPListItem:
                         {
-                            WBLogging.Generic.Verbose("Setting WBItem metadata value backed by SPListItem using Column: " + column.DisplayName + "  Value: " + processedValue);
+                            // WBLogging.Debug("Setting WBItem metadata value backed by SPListItem using Column: " + column.DisplayName + "  Value: " + processedValue);
                             _listItem.WBxSet(column, processedValue);
                             break;
                         }
@@ -191,6 +216,13 @@ namespace WorkBoxFramework
             }
         }
 
+        public void Reload()
+        {
+            if (BackingType == BackingTypes.SPListItem)
+            {
+                _listItem = _listItem.ParentList.GetItemById(_listItem.ID);
+            }
+        }
 
         public IEnumerable<WBColumn> Columns
         {

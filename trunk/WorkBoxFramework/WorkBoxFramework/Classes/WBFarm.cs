@@ -524,9 +524,9 @@ namespace WorkBoxFramework
                                                   CONFIG_STEP__REGISTER_TIMER_JOBS
                                               };
 
-        internal WBConfigStepFeedback DoConfigurationStep(String stepName)
+        internal WBTaskFeedback DoConfigurationStep(String stepName)
         {
-            WBConfigStepFeedback feedback = new WBConfigStepFeedback(stepName);
+            WBTaskFeedback feedback = new WBTaskFeedback(stepName);
 
             WBLogging.Config.Unexpected("farm.SystemAdminTeamSiteUrl = " + this.SystemAdminTeamSiteUrl); 
 
@@ -594,11 +594,11 @@ namespace WorkBoxFramework
 
             if (thisStep >= 0 && thisStep < ConfigurationStepsNames.Length - 1)
             {
-                feedback.NextStepName = ConfigurationStepsNames[thisStep + 1];
+                feedback.NextTaskName = ConfigurationStepsNames[thisStep + 1];
             }
             else
             {
-                feedback.NextStepName = "";
+                feedback.NextTaskName = "";
             }
 
             return feedback;
@@ -657,9 +657,9 @@ namespace WorkBoxFramework
 
             SPWeb rootWeb = site.RootWeb;
 
-            CreateOrCheckWBFSiteColumns(new WBConfigStepFeedback("WBF Site Columns"), site, rootWeb);
+            CreateOrCheckWBFSiteColumns(new WBTaskFeedback("WBF Site Columns"), site, rootWeb);
 
-            CreateOrCheckWBCSiteContentTypes(new WBConfigStepFeedback("WBF Site Content Types"), site, rootWeb);
+            CreateOrCheckWBCSiteContentTypes(new WBTaskFeedback("WBF Site Content Types"), site, rootWeb);
 
             if (SPContext.Current == null || rootWeb != SPContext.Current.Web)
             {
@@ -670,7 +670,7 @@ namespace WorkBoxFramework
         }
 
 
-        internal WBConfigStepFeedback CheckSetupOfTermSets(WBConfigStepFeedback feedback, SPSite site)
+        internal WBTaskFeedback CheckSetupOfTermSets(WBTaskFeedback feedback, SPSite site)
         {
             feedback.JustLog("Started term set initial setup.");
 
@@ -802,7 +802,7 @@ namespace WorkBoxFramework
 
 
 
-        internal void CreateOrCheckCachedDetailsList(WBConfigStepFeedback feedback, SPWeb rootWeb)
+        internal void CreateOrCheckCachedDetailsList(WBTaskFeedback feedback, SPWeb rootWeb)
         {
             WBColumn[] columns = 
             {             
@@ -831,7 +831,7 @@ namespace WorkBoxFramework
 
         }
 
-        internal void CreateOrCheckTimerTasksLists(WBConfigStepFeedback feedback, SPSite site, SPWeb rootweb, SPWeb web)
+        internal void CreateOrCheckTimerTasksLists(WBTaskFeedback feedback, SPSite site, SPWeb rootweb, SPWeb web)
         {
             WBColumn[] columns = 
             {             
@@ -868,7 +868,7 @@ namespace WorkBoxFramework
         }
 
 
-        internal void CreateOrCheckWBFSiteColumns(WBConfigStepFeedback feedback, SPSite site, SPWeb rootWeb)
+        internal void CreateOrCheckWBFSiteColumns(WBTaskFeedback feedback, SPSite site, SPWeb rootWeb)
         {
             feedback.JustLog("Starting CreateOrCheckWBFSiteColumns");
 
@@ -951,7 +951,7 @@ namespace WorkBoxFramework
             WBLogging.Generic.Monitorable("Finished CreateOrCheckWBFSiteColumns");
         }
 
-        internal void CreateOrCheckWBCSiteContentTypes(WBConfigStepFeedback feedback, SPSite site, SPWeb rootWeb)
+        internal void CreateOrCheckWBCSiteContentTypes(WBTaskFeedback feedback, SPSite site, SPWeb rootWeb)
         {
             WBLogging.Generic.Monitorable("Starting CreateOrCheckWBCSiteContentTypes");
 
@@ -967,7 +967,7 @@ namespace WorkBoxFramework
             WBLogging.Generic.Monitorable("Completed CreateOrCheckWBCSiteContentTypes");
         }
 
-        internal void CreateOrCheckTeamSitesContentTypes(WBConfigStepFeedback feedback, SPSite site, SPWeb rootWeb)
+        internal void CreateOrCheckTeamSitesContentTypes(WBTaskFeedback feedback, SPSite site, SPWeb rootWeb)
         {
             WBLogging.Generic.Monitorable("Starting CreateOrCheckTeamSitesContentTypes");
 
@@ -1017,7 +1017,7 @@ namespace WorkBoxFramework
             };
 
 
-        private void CreateOrCheckWorkBoxMetadataItemContentType(WBConfigStepFeedback feedback, SPWeb web)
+        private void CreateOrCheckWorkBoxMetadataItemContentType(WBTaskFeedback feedback, SPWeb web)
         {
             WBColumn[] requiredFields = {};
 
@@ -1025,7 +1025,7 @@ namespace WorkBoxFramework
             WBUtils.CreateOrCheckContentType(feedback, web, WorkBox.CONTENT_TYPE__WORK_BOX_METADATA_ITEM, "Item", WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, WBCMetadataItemFields);
         }
 
-        private void CreateOrCheckWorkBoxTemplatesItemContentType(WBConfigStepFeedback feedback, SPWeb web)
+        private void CreateOrCheckWorkBoxTemplatesItemContentType(WBTaskFeedback feedback, SPWeb web)
         {
             WBColumn[] requiredFields = 
             { 
@@ -1052,7 +1052,7 @@ namespace WorkBoxFramework
             WBUtils.CreateOrCheckContentType(feedback, web, WorkBox.CONTENT_TYPE__WORK_BOX_TEMPLATES_ITEM, "Item", WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, optionalFields);
         }
 
-        private void CreateOrCheckWorkBoxDocumentContentType(WBConfigStepFeedback feedback, SPWeb web)
+        private void CreateOrCheckWorkBoxDocumentContentType(WBTaskFeedback feedback, SPWeb web)
         {
             WBColumn[] requiredFields = 
             { 
@@ -1086,7 +1086,7 @@ namespace WorkBoxFramework
             WBUtils.CreateOrCheckContentType(feedback, web, WBFarm.Local.WorkBoxDocumentContentTypeName, "Document", WorkBox.SITE_CONTENT_TYPES_GROUP_NAME, requiredFields, optionalFields);
         }
 
-        private void CreateOrCheckWorkBoxRecordContentType(WBConfigStepFeedback feedback, SPWeb web)
+        private void CreateOrCheckWorkBoxRecordContentType(WBTaskFeedback feedback, SPWeb web)
         {
             WBColumn[] requiredFields = 
             { 
@@ -1111,7 +1111,7 @@ namespace WorkBoxFramework
         // http://www.woaychee.com/sharepoint-2010-create-custom-user-profile-properties-programmatically-part-1/
         // http://www.woaychee.com/sharepoint-2010-create-custom-user-profile-properties-programmatically-part-2/
         // 
-        private void CheckSetupOfUserProfileProperties(WBConfigStepFeedback feedback, SPSite site)
+        private void CheckSetupOfUserProfileProperties(WBTaskFeedback feedback, SPSite site)
         {
             feedback.JustLog("Starting process of setting up the user profile properties");
 
@@ -1163,7 +1163,7 @@ namespace WorkBoxFramework
         }
 
         private void MaybeCreateNewUserProfileStringProperty(
-            WBConfigStepFeedback feedback, 
+            WBTaskFeedback feedback, 
             CorePropertyManager corePropertyManager,
             ProfileTypePropertyManager profileTypePropertyManager, 
             ProfileSubtypePropertyManager profileSubtypePropertyManager,
@@ -1249,7 +1249,7 @@ namespace WorkBoxFramework
         }
 
 
-        internal void RegisterTimerJobs(WBConfigStepFeedback feedback, SPSite site)
+        internal void RegisterTimerJobs(WBTaskFeedback feedback, SPSite site)
         {
             SPWebApplication webApplication = site.WebApplication;
 

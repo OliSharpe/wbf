@@ -149,7 +149,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                     LiveOrArchived.DataSource = new String[] { "Live", "Archived" };
                     LiveOrArchived.DataBind();
-                    LiveOrArchived.SelectedValue = record[WBColumn.LiveOrArchived] as String;
+                    LiveOrArchived.SelectedValue = record[WBColumn.LiveOrArchived].WBxToString();
 
                     ProtectiveZone.DataSource = WBRecordsType.getProtectiveZones();
                     ProtectiveZone.DataBind();
@@ -169,6 +169,40 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
         }
 
+
+        protected void updateButton_OnClick(object sender, EventArgs e)
+        {
+            bool digestOK = SPContext.Current.Web.ValidateFormDigest();
+
+            if (digestOK)
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (WBRecordsManager manager = new WBRecordsManager())
+                    {
+                        WBRecord record = manager.Libraries.GetRecordByID(RecordID.Text);
+
+                        record.LiveOrArchived = LiveOrArchived.SelectedValue;
+                        record.ProtectiveZone = ProtectiveZone.SelectedValue;
+                        record.SubjectTagsUIControlValue = SubjectTags.Text;
+
+                        record.Update();
+                    }
+                });
+
+                CloseDialogAndRefresh();
+            }
+            else
+            {
+                returnFromDialogError("The security digest for the request was not OK");
+            }
+
+            libraryWeb.Dispose();
+            librarySite.Dispose();
+        }
+
+
+        /*
         protected void updateButton_OnClick(object sender, EventArgs e)
         {
             bool digestOK = SPContext.Current.Web.ValidateFormDigest();
@@ -350,6 +384,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 }
             }
         }
+         */ 
 
 
         protected void cancelButton_OnClick(object sender, EventArgs e)
