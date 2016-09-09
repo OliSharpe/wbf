@@ -59,26 +59,26 @@ table.wbf-title-table { padding: 6px 0px 12px 10px; }
 .wbf-admin-page { padding: 10px }
 
 
-td.wbf-configuation-step-image-table-cell 
+td.wbf-task-image-table-cell 
 {
     width: 32px;
     height: 32px;
     vertical-align: top;
 }
 
-td.wbf-configuation-step-name-table-cell 
+td.wbf-task-name-table-cell 
 {
     width: 150px !important;    
     font-weight: bold;  
 }
 
-td.wbf-configuation-step-status-table-cell 
+td.wbf-task-status-table-cell 
 {
     width: 150px !important;  
     font-weight: bold;  
 }
 
-td.wbf-configuation-step-feedback-table-cell 
+td.wbf-task-feedback-table-cell 
 {
     font-weight: normal;  
 }

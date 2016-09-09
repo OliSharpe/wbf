@@ -5,27 +5,36 @@ using System.Text;
 
 namespace WorkBoxFramework
 {
-    public class WBConfigStepFeedback
+    public class WBTaskFeedback
     {
         public String Name { get; private set; }
-        public String UpdateType { get; private set; }
+        public String TaskType { get; private set; }
         public String Status { get; private set; }
         public List<String> Feedback { get; private set; }
-        public String NextStepName { get; set; }
+        public String NextTaskName { get; set; }
 
-        public const String UPDATE_TYPE__CHECK = "Check";
-        public const String UPDATE_TYPE__UPDATE = "Update";
-        public const String UPDATE_TYPE__SETUP = "Setup";
+        public const String TASK_TYPE__CHECK = "Check";
+        public const String TASK_TYPE__UPDATE = "Update";
+        public const String TASK_TYPE__SETUP = "Setup";
+        public const String TASK_TYPE__PUBLISH = "Publish";
 
         public const String STATUS__TO_DO = "To Do";
         public const String STATUS__SUCCESS = "Success";
         public const String STATUS__FAILED = "Failed";
 
 
-        public WBConfigStepFeedback(String name)
+        public WBTaskFeedback(String type, String name)
         {
             Name = name;
-            UpdateType = UPDATE_TYPE__SETUP;
+            TaskType = type;
+            Status = STATUS__TO_DO;
+            Feedback = new List<String>();
+        }
+
+        public WBTaskFeedback(String name)
+        {
+            Name = name;
+            TaskType = TASK_TYPE__SETUP;
             Status = STATUS__TO_DO;
             Feedback = new List<String>();
         }
@@ -38,48 +47,48 @@ namespace WorkBoxFramework
 
         public void JustLog(String message)
         {
-            WBLogging.Config.Monitorable(Name + " (" + UpdateType + " " + Status + "): Log: " + message);
+            WBLogging.Config.Monitorable(Name + " (" + TaskType + " " + Status + "): Log: " + message);
         }
 
         public void JustLog(String message, Exception exception)
         {
-            WBLogging.Config.Unexpected(Name + " (" + UpdateType + " " + Status + "): Log: " + message, exception);
+            WBLogging.Config.Unexpected(Name + " (" + TaskType + " " + Status + "): Log: " + message, exception);
         }
 
         public void LogFeedback(String feedback)
         {
             AddFeedback(feedback);
-            WBLogging.Config.Monitorable(Name + " (" + UpdateType + " " + Status + "): Log: " + feedback);
+            WBLogging.Config.Monitorable(Name + " (" + TaskType + " " + Status + "): Log: " + feedback);
         }
 
         public void LogFeedback(String feedback, Exception exception)
         {
             AddFeedback(feedback);
-            WBLogging.Config.Unexpected(Name + " (" + UpdateType + " " + Status + "): Log: " + feedback, exception);
+            WBLogging.Config.Unexpected(Name + " (" + TaskType + " " + Status + "): Log: " + feedback, exception);
         }
 
         public void Checked(String feedback)
         {
-            if (UpdateType != UPDATE_TYPE__UPDATE) UpdateType = UPDATE_TYPE__CHECK;
+            if (TaskType != TASK_TYPE__UPDATE) TaskType = TASK_TYPE__CHECK;
             Success(feedback);
         }
 
         public void Created(String feedback)
         {
-            if (UpdateType == UPDATE_TYPE__CHECK) UpdateType = UPDATE_TYPE__UPDATE;
-            else UpdateType = UPDATE_TYPE__SETUP;
+            if (TaskType == TASK_TYPE__CHECK) TaskType = TASK_TYPE__UPDATE;
+            else TaskType = TASK_TYPE__SETUP;
             Success(feedback);
         }
 
         public void Updating(String feedback)
         {
-            UpdateType = UPDATE_TYPE__UPDATE;
+            TaskType = TASK_TYPE__UPDATE;
             AddFeedback(feedback);
         }
 
         public void Updated(String feedback)
         {
-            UpdateType = UPDATE_TYPE__UPDATE;            
+            TaskType = TASK_TYPE__UPDATE;            
             Success(feedback);
         }
 
@@ -93,7 +102,7 @@ namespace WorkBoxFramework
         {
             if (Status != STATUS__FAILED) Status = STATUS__SUCCESS;
             AddFeedback(feedback);
-            WBLogging.Config.Monitorable(Name + " (" + UpdateType + " " + Status + "): Success: " + feedback);
+            WBLogging.Config.Monitorable(Name + " (" + TaskType + " " + Status + "): Success: " + feedback);
         }
 
         public void Failed()
@@ -112,7 +121,7 @@ namespace WorkBoxFramework
             AddFeedback(feedback);
             AddException(exception);
 
-            WBLogging.Config.Unexpected(Name + " (" + UpdateType + " " + Status + "): Failed: " + feedback, exception);
+            WBLogging.Config.Unexpected(Name + " (" + TaskType + " " + Status + "): Failed: " + feedback, exception);
         }
 
         public void AddException(Exception exception)
@@ -132,12 +141,12 @@ namespace WorkBoxFramework
 
         public bool IsUpdate()
         {
-            return (this.UpdateType == UPDATE_TYPE__UPDATE);
+            return (this.TaskType == TASK_TYPE__UPDATE);
         }
 
         public bool IsCheck()
         {
-            return (this.UpdateType == UPDATE_TYPE__CHECK);
+            return (this.TaskType == TASK_TYPE__CHECK);
         }
 
     }

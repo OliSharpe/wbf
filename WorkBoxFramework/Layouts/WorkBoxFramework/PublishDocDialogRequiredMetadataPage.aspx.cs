@@ -531,7 +531,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected WBDocument CaptureAsDocument(SPListItem sourceDocAsItem, WBRecordsType documentRecordsType)
         {
-            WBDocument document = new WBDocument(sourceDocAsItem);
+            WBDocument document = new WBDocument(WorkBox, sourceDocAsItem);
 
             // Which of the metadata fields are being used by the active records type?
             showReferenceID = documentRecordsType.DocumentReferenceIDRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
@@ -634,6 +634,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void publishButton_OnClick(object sender, EventArgs e)
         {
+            WBLogging.Debug("In publishButton_OnClick()");
+
             Hashtable metadataProblems = checkMetadataState();
 
             string protectiveZone = "";
@@ -664,10 +666,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (pageRenderingRequired)
             {
+                WBLogging.Debug("In publishButton_OnClick(): Page render required - not publishing at this point");
                 renderPage();
             }
             else
             {
+                WBLogging.Debug("In publishButton_OnClick(): No page render required - so moving to publish");
+
                 // The event should only be processed if there is no other need to render the page again
 
                 // First let's update the item with the new metadata values submitted:
@@ -711,36 +716,46 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 }
                 else
                 {
-                    WBRecordsType recordsType = new WBRecordsType(recordsTypeTaxonomy, document[WBColumn.RecordsType] as String);
+                    // WBRecordsType recordsType = new WBRecordsType(recordsTypeTaxonomy, document[WBColumn.RecordsType].WBxToString());
 
-                    try
+                    using (WBRecordsManager manager = new WBRecordsManager())
                     {
-                        recordsType.PublishDocument(document, sourceFile.OpenBinaryStream());
-
-                        
-                        string fullClassPath = WBUtils.NormalisePath(document.FunctionalArea.Names() + "/" + recordsType.FullPath);
-
-                        successMessage += "<tr><td>Published out to location:</td><td>" + fullClassPath + "</td></tr>\n";
-
-
-                        if (document.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
+                        try
                         {
-                            successMessage += "<tr><td>To public records library</td><td><a href=\"http://stagingweb/publicrecords\">Our public library</a></td></tr>\n";
-                        }
+                            WBLogging.Debug("In publishButton_OnClick(): About to try to publish");
 
-                        if (document.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
+                            manager.PublishDocument(WorkBox, document);
+
+                            WBLogging.Debug("In publishButton_OnClick(): Should have finished the publishing");
+
+                            //recordsType.PublishDocument(document, sourceFile.OpenBinaryStream());
+
+                            string fullClassPath = "Just a test"; //  WBUtils.NormalisePath(document.FunctionalArea.Names() + "/" + recordsType.FullPath);
+
+                            successMessage += "<tr><td>Published out to location:</td><td>" + fullClassPath + "</td></tr>\n";
+
+
+                            if (document.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
+                            {
+                                successMessage += "<tr><td>To public records library</td><td><a href=\"http://stagingweb/publicrecords\">Our public library</a></td></tr>\n";
+                            }
+
+                            if (document.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
+                            {
+                                successMessage += "<tr><td>To public extranet records library</td><td><a href=\"http://stagingextranets/records\">Our public extranet library</a></td></tr>\n";
+                            }
+
+                            successMessage += "<tr><td>To internal records library</td><td><a href=\"http://sp.izzi/library/Pages/ViewByFunctionThenType.aspx\">Our internal library</a></td></tr>\n";
+
+                        }
+                        catch (Exception exception)
                         {
-                            successMessage += "<tr><td>To public extranet records library</td><td><a href=\"http://stagingextranets/records\">Our public extranet library</a></td></tr>\n";
+                            errorMessage = "An error occurred when trying to publish: " + exception.Message;
+                            WBLogging.Generic.Unexpected(exception);
                         }
-
-                        successMessage += "<tr><td>To internal records library</td><td><a href=\"http://sp.izzi/library/Pages/ViewByFunctionThenType.aspx\">Our internal library</a></td></tr>\n";
-
                     }
-                    catch (Exception exception)
-                    {
-                        errorMessage = "An error occurred when trying to publish: " + exception.Message;
-                        WBLogging.Generic.Unexpected(exception);
-                    }
+
+                    
 
                 }
 

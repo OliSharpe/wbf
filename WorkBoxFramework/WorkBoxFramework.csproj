@@ -206,7 +206,7 @@
     <Compile Include="Layouts\WorkBoxFramework\GoToWBCollectionSettings.aspx.designer.cs">
       <DependentUpon>GoToWBCollectionSettings.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="Classes\WBConfigStepFeedback.cs" />
+    <Compile Include="Classes\WBTaskFeedback.cs" />
     <Compile Include="Classes\WBDynamicFormattedIconTemplateField.cs" />
     <Compile Include="Classes\WBDynamicIconTemplateField.cs" />
     <Compile Include="Classes\WBStatusIconTemplateField.cs" />
@@ -221,6 +221,7 @@
     <Compile Include="Classes\WBRecord.cs" />
     <Compile Include="Classes\WBRecordsLibraries.cs" />
     <Compile Include="Classes\WBRecordsLibrary.cs" />
+    <Compile Include="Classes\WBRecordsManager.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>

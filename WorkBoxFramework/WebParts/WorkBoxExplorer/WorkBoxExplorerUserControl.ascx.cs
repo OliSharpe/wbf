@@ -668,7 +668,7 @@ namespace WorkBoxFramework.WorkBoxExplorer
             //OrderBy.DataSource = orderByColumnOptions;
             //OrderBy.DataBind();
 
-            OrderBy.WBxSafeSetSelectedValue(ViewState["SortExpression"] as String);
+            OrderBy.WBxSafeSetSelectedValue(ViewState["SortExpression"].WBxToString());
 
 
             WBRecordsType recordsType = null;
@@ -782,7 +782,7 @@ namespace WorkBoxFramework.WorkBoxExplorer
 
         private void checkSortState()
         {
-            String sortExpression = ViewState["SortExpression"] as String;
+            String sortExpression = ViewState["SortExpression"].WBxToString();
 
             sortColumn = WBColumn.GetKnownColumnByInternalName(sortExpression);
 

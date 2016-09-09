@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.SharePoint;
+using Microsoft.Office.RecordsManagement.RecordsRepository;
 
 namespace WorkBoxFramework
 {
@@ -34,34 +35,132 @@ namespace WorkBoxFramework
 
         #region Constructors
         public WBDocument(SPListItem item) : base(item)
-        {
+        {            
             RecordsLibrary = null;
+            WorkBox = null;
         }
 
         public WBDocument(WBRecordsLibrary library, SPListItem item)
             : base(item)
         {
             RecordsLibrary = library;
+            WorkBox = null;
+            DebugName = "<WBDocument>";
+        }
+
+        public WBDocument(WorkBox workBox, SPListItem item)
+            : base(item)
+        {
+            RecordsLibrary = null;
+            WorkBox = workBox;
+            DebugName = "<WBDocument>";
         }
 
         public WBDocument() : base()
         {
             RecordsLibrary = null;
+            WorkBox = null;
+            DebugName = "<WBDocument>";
         }
 
         public WBDocument(WBRecordsLibrary library)
             : base()
         {
             RecordsLibrary = library;
+            WorkBox = null;
+            DebugName = "<WBDocument>";
+        }
+
+        public WBDocument(WorkBox workBox)
+            : base()
+        {
+            RecordsLibrary = null;
+            WorkBox = workBox;
+            DebugName = "<WBDocument>";
         }
 
         #endregion
 
+        public String DebugName;
 
-        public WBRecordsLibrary RecordsLibrary
+        public SPSite Site
         {
-            public get;
-            private set;
+            get
+            {
+                if (RecordsLibrary != null) return RecordsLibrary.Site;
+                if (WorkBox != null) return WorkBox.Site;
+                return null;
+            }
+        }
+
+        public SPWeb Web
+        {
+            get
+            {
+                if (RecordsLibrary != null) return RecordsLibrary.Web;
+                if (WorkBox != null) return WorkBox.Web;
+                return null;
+            }
+        }
+
+        public WBRecordsLibrary RecordsLibrary { get; private set; }
+        public WorkBox WorkBox { get; private set; }
+
+        public WBTaxonomy RecordsTypesTaxonomy {
+            get
+            {
+                if (RecordsLibrary != null) return RecordsLibrary.RecordsTypesTaxonomy;
+                if (WorkBox != null) return WorkBox.RecordsTypesTaxonomy;
+                return null;
+            }
+        }
+
+        public WBTaxonomy TeamsTaxonomy
+        {
+            get
+            {
+                if (RecordsLibrary != null) return RecordsLibrary.TeamsTaxonomy;
+                if (WorkBox != null) return WorkBox.TeamsTaxonomy;
+                return null;
+            }
+        }
+        public WBTaxonomy SeriesTagsTaxonomy
+        {
+            get
+            {
+                if (RecordsLibrary != null) return RecordsLibrary.SeriesTagsTaxonomy;
+                if (WorkBox != null) return WorkBox.SeriesTagsTaxonomy;
+                return null;
+            }
+        }
+        public WBTaxonomy SubjectTagsTaxonomy
+        {
+            get
+            {
+                if (RecordsLibrary != null) return RecordsLibrary.SubjectTagsTaxonomy;
+                if (WorkBox != null) return WorkBox.SubjectTagsTaxonomy;
+                WBLogging.Debug("Returning null from WBDocument.SubjectTagsTaxonomy because RecordsLibrary = " + RecordsLibrary + " in doc: " + DebugName);
+                return null;
+            }
+        }
+        public WBTaxonomy FunctionalAreasTaxonomy
+        {
+            get
+            {
+                if (RecordsLibrary != null) return RecordsLibrary.FunctionalAreasTaxonomy;
+                if (WorkBox != null) return WorkBox.FunctionalAreasTaxonomy;
+                return null;
+            }
+        }
+
+
+        public String AbsoluteURL
+        {
+            get
+            {
+                if (IsSPListItem) return Item.Web.Url + Item.Url;
+                return "";
+            }
         }
 
         public WBRecordsType RecordsType
@@ -70,7 +169,7 @@ namespace WorkBoxFramework
             {
                 Object value = this[WBColumn.RecordsType];
                 if (value == null) return null;
-                return new WBRecordsType(null, value.ToString());
+                return new WBRecordsType(RecordsTypesTaxonomy, value.ToString());
             }
             set { this[WBColumn.RecordsType] = value; }
         }
@@ -81,18 +180,18 @@ namespace WorkBoxFramework
             {
                 Object value = this[WBColumn.FunctionalArea];
                 if (value == null) return null;
-                return new WBTermCollection<WBTerm>(null, value.ToString());
+                return new WBTermCollection<WBTerm>(FunctionalAreasTaxonomy, value.ToString());
             }
             set { this[WBColumn.FunctionalArea] = value; }
         }
 
-        public WBTermCollection<WBTerm> SubjectTags
+        public WBTermCollection<WBSubjectTag> SubjectTags
         {
             get
             {
                 Object value = this[WBColumn.SubjectTags];
                 if (value == null) return null;
-                return new WBTermCollection<WBTerm>(null, value.ToString());
+                return new WBTermCollection<WBSubjectTag>(SubjectTagsTaxonomy, value.ToString());
             }
             set { this[WBColumn.SubjectTags] = value; }
         }
@@ -103,7 +202,7 @@ namespace WorkBoxFramework
             {
                 Object value = this[WBColumn.SeriesTag];
                 if (value == null) return null;
-                return new WBTerm(null, value.ToString());
+                return new WBTerm(SeriesTagsTaxonomy, value.ToString());
             }
             set { this[WBColumn.SeriesTag] = value; }
         }
@@ -192,52 +291,77 @@ namespace WorkBoxFramework
 
         public String ReferenceID
         {
-            get { return this[WBColumn.ReferenceID] as String; }
+            get { return this[WBColumn.ReferenceID].WBxToString(); }
             set { this[WBColumn.ReferenceID] = value; }
         }
 
         public String OriginalFilename
         {
-            get { return this[WBColumn.OriginalFilename] as String; }
+            get { return this[WBColumn.OriginalFilename].WBxToString(); }
             set { this[WBColumn.OriginalFilename] = value; }
         }
 
         public String Name
         {
-            get { return this[WBColumn.Name] as String; }
+            get { return this[WBColumn.Name].WBxToString(); }
             set { this[WBColumn.Name] = value; }
         }
 
         public String Title
         {
-            get { return this[WBColumn.Title] as String; }
+            get { return this[WBColumn.Title].WBxToString(); }
             set { this[WBColumn.Title] = value; }
         }
 
         public String Filename
         {
-            get { return this[WBColumn.Name] as String; }
+            get { return this[WBColumn.Name].WBxToString(); }
             set { this[WBColumn.Name] = value; }
         }
 
         public String ProtectiveZone
         {
-            get { return this[WBColumn.ProtectiveZone] as String; }
+            get { return this[WBColumn.ProtectiveZone].WBxToString(); }
             set { this[WBColumn.ProtectiveZone] = value; }
         }
 
         public String LiveOrArchived
         {
-            get { return this[WBColumn.LiveOrArchived] as String; }
+            get { return this[WBColumn.LiveOrArchived].WBxToString(); }
             set { this[WBColumn.LiveOrArchived] = value; }
         }
 
         public String RecordID
         {
-            get { return this[WBColumn.RecordID] as String; }
+            get {
+                Object gotValue = this[WBColumn.RecordID];
+                // WBLogging.Debug("Got value back for RecordID as: " + gotValue);
+
+                String asStringValue = gotValue.WBxToString();
+                //WBLogging.Debug("Got value back for RecordID ToString as: " + asStringValue);
+
+                return asStringValue; 
+            }
             set { this[WBColumn.RecordID] = value; }
         }
 
+        public String RecordSeriesID
+        {
+            get { return this[WBColumn.RecordSeriesID].WBxToString(); }
+            set { this[WBColumn.RecordSeriesID] = value; }
+        }
+
+        public String ReplacesRecordID
+        {
+            get { return this[WBColumn.ReplacesRecordID].WBxToString(); }
+            set { this[WBColumn.ReplacesRecordID] = value; }
+        }
+
+        public String RecordSeriesIssue
+        {
+            get { return this[WBColumn.RecordSeriesIssue].WBxToString(); }
+            set { this[WBColumn.RecordSeriesIssue] = value; }
+        }
 
         public WBTeam OwningTeam
         {
@@ -245,7 +369,7 @@ namespace WorkBoxFramework
             {
                 Object value = this[WBColumn.OwningTeam];
                 if (value == null) return null;
-                return new WBTeam(null, value.ToString());
+                return new WBTeam(TeamsTaxonomy, value.ToString());
             }
 
             set 
@@ -270,7 +394,7 @@ namespace WorkBoxFramework
             get {
                 Object value = this[WBColumn.InvolvedTeams];
                 if (value == null) return new WBTermCollection<WBTeam>(null, ""); ;
-                return new WBTermCollection<WBTeam>(null, value.ToString());
+                return new WBTermCollection<WBTeam>(TeamsTaxonomy, value.ToString());
             }
             set
             {
@@ -279,7 +403,104 @@ namespace WorkBoxFramework
             }
         }
 
-        public Stream BinaryStream { get; set; }
+        public Stream OpenBinaryStream()
+        {
+            if (!IsSPListItem) throw new Exception("You can only call WBDocument.OpenBinaryStream() on an SPListItem backed WBDocument");
+
+            SPFile file = Item.File;
+            if (file == null) throw new Exception("The SPFile of the SPListItem was null");
+
+            SPDocumentLibrary library = file.DocumentLibrary;
+
+            if (library.EnableVersioning)
+            {
+                SPListItemVersionCollection versionCollection = Item.Versions;
+                SPListItemVersion version = versionCollection[0];
+
+                file = version.ListItem.File;
+            }
+
+            return file.OpenBinaryStream();
+        }
+
+
+        public void CopyColumns(WBDocument documentToCopy, IEnumerable<WBColumn> columnsToCopy)
+        {
+            foreach (WBColumn column in columnsToCopy)
+            {
+                // WBLogging.Debug("Copying: " + column.DisplayName + " = " + documentToCopy[column] + " in library: " + this.RecordsLibrary.URL);
+                this[column] = documentToCopy[column];
+            }
+        }
+
+
+        public bool MaybeCopyColumns(WBDocument documentToCopy, IEnumerable<WBColumn> columnsToCopy)
+        {
+            bool allCorrect = false;
+            foreach (WBColumn column in columnsToCopy)
+            {
+                if (this[column] != documentToCopy[column])
+                {
+                    /*
+                    if (this.RecordsLibrary != null)                     
+                    {
+                        WBLogging.RecordsTypes.Unexpected("this[column] = " + this[column] + " != documentToCopy[column] = " + documentToCopy[column] + " for column " + column.DisplayName + " in library: " + this.RecordsLibrary.URL);
+                    }
+                     */ 
+                    allCorrect = false;
+                    this[column] = documentToCopy[column];
+                }
+            }
+
+            return allCorrect;
+        }
+
+
+        public bool MaybeUpdateRecordColumns(WBDocument documentToCopy, IEnumerable<WBColumn> columnsToCopy)
+        {
+            WBLogging.Debug("In MaybeUpdateRecordColumns() for " + DebugName);
+            bool updateRequired = false;
+
+            RecordsLibrary.Web.AllowUnsafeUpdates = true;
+
+            Records.BypassLocks(this.Item, delegate(SPListItem item)
+            {
+                WBLogging.Debug("In MaybeUpdateRecordColumns() inside BypassLocks() for " + DebugName);
+                if (item.File.CheckOutType != SPFile.SPCheckOutType.None)
+                {
+                    WBLogging.RecordsTypes.Unexpected("Somehow the record being updated (Record ID = " + this.RecordID + ") was checked out to: " + item.File.CheckedOutByUser.LoginName);
+                    item.File.UndoCheckOut();
+                }
+
+                item.File.CheckOut();
+
+                WBLogging.Debug("In MaybeUpdateRecordColumns() done check out for " + DebugName);
+
+                foreach (WBColumn column in columnsToCopy)
+                {
+                    if (item.WBxGet(column) != documentToCopy[column])
+                    {
+                        item.WBxSet(column, documentToCopy[column]);
+                        updateRequired = true;
+                    }
+                }
+
+                if (updateRequired)
+                {
+                    item.Update();
+                    item.File.CheckIn("Metadata updated");
+                }
+                else
+                {
+                    item.File.UndoCheckOut();
+                }
+            });
+
+            RecordsLibrary.Web.AllowUnsafeUpdates = false;
+
+            return updateRequired;
+        }
+
 
     }
 }

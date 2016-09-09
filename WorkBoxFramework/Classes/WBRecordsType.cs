@@ -1617,7 +1617,7 @@ namespace WorkBoxFramework
             String extension = Path.GetExtension(document.OriginalFilename);
             String filename = WBUtils.RemoveDisallowedCharactersFromFilename(document.OriginalFilename);
 
-            String titleForFilename = document[WBColumn.Title] as String;
+            String titleForFilename = document[WBColumn.Title].WBxToString();
             String referenceID = document.ReferenceID;
 
             // We don't want to use a title that is too long:

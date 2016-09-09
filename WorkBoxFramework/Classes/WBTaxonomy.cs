@@ -189,7 +189,7 @@ namespace WorkBoxFramework
             {
                 if (_termStore == null)
                 {
-                    WBLogging.Debug("In WBTaxonomy.TermStore: trying to get term store: " + _termStoreName);
+                    // WBLogging.Debug("In WBTaxonomy.TermStore: trying to get term store: " + _termStoreName);
 
                     _termStore = Session.TermStores[_termStoreName];
                 }

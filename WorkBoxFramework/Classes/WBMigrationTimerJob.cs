@@ -486,7 +486,7 @@ namespace WorkBoxFramework
 
             WBRecordsType recordsType = null;
             WBTermCollection<WBTerm> functionalArea = null;
-            WBTermCollection<WBTerm> subjectTags = null;
+            WBTermCollection<WBSubjectTag> subjectTags = null;
 
             if (MigrationSourceSystem == MIGRATION_SOURCE__DOCUMENTUM_WEB_DOCUMENTS)
             {
@@ -537,7 +537,7 @@ namespace WorkBoxFramework
 
                 if (!String.IsNullOrEmpty(subjectTagsPaths))
                 {
-                    List<WBTerm> sterms = new List<WBTerm>();
+                    List<WBSubjectTag> sterms = new List<WBSubjectTag>();
 
 
                     // Note that it is not necessarily an error for the subject tags to be empty.
@@ -554,7 +554,7 @@ namespace WorkBoxFramework
                                 Term sterm = mapping.SubjectTagsTaxonomy.GetOrCreateSelectedTermByPath(path);
                                 if (sterm != null)
                                 {
-                                    sterms.Add(new WBTerm(mapping.SubjectTagsTaxonomy, sterm));
+                                    sterms.Add(new WBSubjectTag(mapping.SubjectTagsTaxonomy, sterm));
                                 }
                                 else
                                 {
@@ -564,7 +564,7 @@ namespace WorkBoxFramework
                         }
                     }
 
-                    subjectTags = new WBTermCollection<WBTerm>(mapping.SubjectTagsTaxonomy, sterms);
+                    subjectTags = new WBTermCollection<WBSubjectTag>(mapping.SubjectTagsTaxonomy, sterms);
                 }
             }
             else
@@ -844,7 +844,7 @@ namespace WorkBoxFramework
             migrationItem.Update();
         }
 
-        private WBTermCollection<WBTerm> AddAdditionalSubjectTags(SPSite controlSite, WBTermCollection<WBTerm> subjectTags, String sourceID)
+        private WBTermCollection<WBSubjectTag> AddAdditionalSubjectTags(SPSite controlSite, WBTermCollection<WBSubjectTag> subjectTags, String sourceID)
         {
             WBLogging.Migration.Verbose("Adding additional subject tags for item with Source ID = " + sourceID);
             WBQuery query = new WBQuery();
@@ -857,7 +857,7 @@ namespace WorkBoxFramework
             {
                 WBTaxonomy subjectTagsTaxonomy = subjectTags.Taxonomy;
 
-                subjectTags = new WBTermCollection<WBTerm>(subjectTags);
+                subjectTags = new WBTermCollection<WBSubjectTag>(subjectTags);
 
                 foreach (SPListItem item in items)
                 {
@@ -871,7 +871,7 @@ namespace WorkBoxFramework
                         {
                             WBLogging.Migration.Verbose("Adding additional subject: " + path);
 
-                            subjectTags.Add(new WBTerm(subjectTagsTaxonomy, subjectTerm));
+                            subjectTags.Add(new WBSubjectTag(subjectTagsTaxonomy, subjectTerm));
                         }
                         else
                         {

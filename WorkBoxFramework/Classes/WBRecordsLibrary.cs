@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,9 @@ namespace WorkBoxFramework
 
 
         #region Properties
+
+        public WBRecordsLibraries Libraries { get; private set; }
+
         private String _url = null;
         public String URL
         {
@@ -42,28 +46,106 @@ namespace WorkBoxFramework
         private SPSite _site = null;        
         public SPSite Site
         {
-            get { return _site; }
+            get {
+                Open();
+                return _site; 
+            }
         }
 
         private SPWeb _web = null;
         public SPWeb Web
         {
-            get { return _web; }
+            get {
+                Open();
+                return _web; 
+            }
         }
 
         private SPList _list = null;
         public SPList List
         {
-            get { return _list; }
+            get {
+                Open();
+                return _list; 
+            }
         }
+
+        private WBTaxonomy _recordsTypesTaxonomy = null;
+        public WBTaxonomy RecordsTypesTaxonomy {
+            get
+            {
+                if (_recordsTypesTaxonomy == null)
+                {
+                    _recordsTypesTaxonomy = WBTaxonomy.GetRecordsTypes(Site);
+                }
+                return _recordsTypesTaxonomy;
+            }
+        }
+
+        private WBTaxonomy _teamsTaxonomy = null;
+        public WBTaxonomy TeamsTaxonomy {
+            get
+            {
+                if (_teamsTaxonomy == null)
+                {
+                    _teamsTaxonomy = WBTaxonomy.GetTeams(RecordsTypesTaxonomy);
+                }
+                return _teamsTaxonomy;
+            }
+        }
+
+        private WBTaxonomy _seriesTagsTaxonomy = null;
+        public WBTaxonomy SeriesTagsTaxonomy
+        {
+            get
+            {
+                if (_seriesTagsTaxonomy == null)
+                {
+                    _seriesTagsTaxonomy = WBTaxonomy.GetSeriesTags(RecordsTypesTaxonomy);
+                }
+                return _seriesTagsTaxonomy;
+            }
+        }
+
+        private WBTaxonomy _subjectTagsTaxonomy = null;
+        public WBTaxonomy SubjectTagsTaxonomy
+        {
+            get
+            {
+                if (_subjectTagsTaxonomy == null)
+                {
+                    _subjectTagsTaxonomy = WBTaxonomy.GetSubjectTags(RecordsTypesTaxonomy);
+                }
+                return _subjectTagsTaxonomy;
+            }
+        }
+
+        private WBTaxonomy _functionalAreasTaxonomy = null;
+        public WBTaxonomy FunctionalAreasTaxonomy
+        {
+            get
+            {
+                if (_functionalAreasTaxonomy == null)
+                {
+                    _functionalAreasTaxonomy = WBTaxonomy.GetFunctionalAreas(RecordsTypesTaxonomy);
+                }
+                return _functionalAreasTaxonomy;
+            }
+        }
+
         #endregion
 
         #region Constructors
 
-        public WBRecordsLibrary(String url, String protectiveZone)
+        public WBRecordsLibrary(WBRecordsLibraries libraries, String url, String protectiveZone)
         {
+            WBLogging.Debug("In WBRecordsLibrary() constructor for: " + url);
+
+            Libraries = libraries;
             _url = url;
             _protectiveZone = protectiveZone;
+
+            WBLogging.Debug("Finished WBRecordsLibrary() constructor for: " + url);
         }
 
         #endregion
@@ -73,14 +155,17 @@ namespace WorkBoxFramework
         public bool Open()
         {
             if (IsOpen) return false;
-            if (String.IsNullOrEmpty(URL)) {
+            if (String.IsNullOrEmpty(_url))
+            {
                 WBLogging.RecordsTypes.Unexpected("You can't open a WBRecordsLibrary if the URL is null or empty");
                 throw new Exception("You can't open a WBRecordsLibrary if the URL is null or empty");
             }
 
-            _site = new SPSite(URL);
-            _web = Site.OpenWeb();
-            _list = _web.GetList(URL);
+            WBLogging.Debug("In WBRecordsLibrary().Open() for: " + _url);
+
+            _site = new SPSite(_url);
+            _web = _site.OpenWeb();
+            _list = _web.GetList(_url);
 
             _openedByThisObject = true;
 
@@ -89,6 +174,7 @@ namespace WorkBoxFramework
 
             _isOpen = true;
 
+            WBLogging.Debug("Finished WBRecordsLibrary().Open() for: " + URL);
             return true;
         }
 
@@ -122,7 +208,7 @@ namespace WorkBoxFramework
             SPListItem recordItem = WBUtils.FindItemByColumn(Site, List, WBColumn.RecordID, recordID);
 
             if (recordItem == null) return null;
-            return new WBDocument(recordItem);
+            return new WBDocument(this, recordItem);
         }
 
         public WBDocument this[String recordID]
@@ -135,6 +221,8 @@ namespace WorkBoxFramework
         public bool RemoveDocumentByID(String recordID)
         {
             if (!IsOpen) Open();
+
+            WBLogging.Debug("Call to RemoveDocumentByID with recordID = " + recordID + " for library: " + this.URL);
 
             SPListItem recordItem = WBUtils.FindItemByColumn(Site, List, WBColumn.RecordID, recordID);
 
@@ -153,17 +241,62 @@ namespace WorkBoxFramework
             }
         }
 
-        public WBDocument GetOrCreateCopyFromMaster(WBDocument masterRecord)
+        public WBDocument GetOrCreateRecordCopy(WBRecord record)
         {
-            WBDocument document = GetDocumentByID(masterRecord.RecordID);
+            WBDocument masterRecordDocument = record.ProtectedMasterRecord;
+            WBDocument recordCopyDocument = GetDocumentByID(record.RecordID);
 
-            if (document == null)
+            if (recordCopyDocument == null)
             {
-                // OK So i haven't implemented this yet!!
-                throw new NotImplementedException("Not yet done!!");
+                Web.AllowUnsafeUpdates = true;
+
+                bool forPublicWeb = true;
+                if (ProtectiveZone == WBRecordsLibrary.PROTECTIVE_ZONE__PROTECTED) forPublicWeb = false;
+
+                List<String> path = masterRecordDocument.Item.WBxGetFolderPath();
+
+                SPFolder rootFolder = List.RootFolder;
+                SPFolder actualDestinationFolder = rootFolder.WBxGetOrCreateFolderPath(path, forPublicWeb);
+
+                string filename = masterRecordDocument.Item.Name;
+
+                if (forPublicWeb)
+                {
+                    filename = WBUtils.PrepareFilenameForPublicWeb(filename);
+                }
+
+                if (Web.WBxFileExists(actualDestinationFolder, filename))
+                {
+                    throw new Exception("The file being copied already exists in the library - this should never happen!");
+                }
+
+                SPFile copiedFile = null;
+
+                using (Stream stream = masterRecordDocument.OpenBinaryStream())
+                {
+                    copiedFile = actualDestinationFolder.Files.Add(filename, stream);
+                    stream.Close();
+                }
+
+                recordCopyDocument = new WBDocument(this, copiedFile.Item);
+
+                recordCopyDocument.MaybeCopyColumns(record.Metadata, WBRecord.DefaultColumnsToCopy);
+
+                recordCopyDocument.Item.UpdateOverwriteVersion();
+
+                // If the new file is checked out by this creation process - then check it in:
+                if (copiedFile.CheckOutType != SPFile.SPCheckOutType.None)
+                {
+                    copiedFile.CheckIn("Document published here from a workbox. The original source URL was: " + masterRecordDocument.AbsoluteURL, SPCheckinType.MajorCheckIn);
+                }
+
+                Web.AllowUnsafeUpdates = false;
+
+                recordCopyDocument.DebugName = "Copy of " + record.RecordID + " for: " + this.URL;
+
             }
 
-            return document;
+            return recordCopyDocument;
         }
 
 

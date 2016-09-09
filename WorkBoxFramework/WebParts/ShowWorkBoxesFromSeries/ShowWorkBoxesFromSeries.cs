@@ -199,7 +199,7 @@ namespace WorkBoxFramework.ShowWorkBoxesFromSeries
 
         private void checkSortState()
         {
-            String sortExpression = ViewState["SortExpression"] as String;
+            String sortExpression = ViewState["SortExpression"].WBxToString();
 
             sortColumn = WBColumn.GetKnownColumnByInternalName(sortExpression);
 

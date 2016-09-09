@@ -130,8 +130,8 @@ namespace WorkBoxFramework
         }
 
 
-        private WBTermCollection<WBTerm> _subjectTags;
-        public WBTermCollection<WBTerm> SubjectTags
+        private WBTermCollection<WBSubjectTag> _subjectTags;
+        public WBTermCollection<WBSubjectTag> SubjectTags
         {
             get
             {
@@ -140,7 +140,7 @@ namespace WorkBoxFramework
                     if (_mapping == null) return null;
                     if (_mapping.SubjectTagsTaxonomy == null) return null;
 
-                    List<WBTerm> terms = new List<WBTerm>();
+                    List<WBSubjectTag> terms = new List<WBSubjectTag>();
 
 
                     // Note that it is not necessarily an error for the subject tags to be empty.
@@ -157,7 +157,7 @@ namespace WorkBoxFramework
                                 Term term = _mapping.SubjectTagsTaxonomy.GetOrCreateSelectedTermByPath(path);
                                 if (term != null)
                                 {
-                                    terms.Add(new WBTerm(_mapping.SubjectTagsTaxonomy, term));
+                                    terms.Add(new WBSubjectTag(_mapping.SubjectTagsTaxonomy, term));
                                 }
                                 else
                                 {
@@ -167,7 +167,7 @@ namespace WorkBoxFramework
                         }
                     }
 
-                    _subjectTags = new WBTermCollection<WBTerm>(_mapping.SubjectTagsTaxonomy, terms);
+                    _subjectTags = new WBTermCollection<WBSubjectTag>(_mapping.SubjectTagsTaxonomy, terms);
 
                 }
                 return _subjectTags;

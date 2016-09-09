@@ -37,7 +37,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void Page_Init(object sender, EventArgs e)
         {
-            ConfigurationSteps.WBxCreateConfigurationStepsTable(WBCollection.ConfigurationStepsNames);
+            ConfigurationSteps.WBxCreateTasksTable(WBCollection.ConfigurationStepsNames);
             if (String.IsNullOrEmpty(NextConfigurationStep.Value)) NextConfigurationStep.Value = WBCollection.ConfigurationStepsNames[0];
         }
 
@@ -71,13 +71,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         private void doNextConfigurationStep()
         {
-            WBConfigStepFeedback feedback = collection.DoConfigurationStep(NextConfigurationStep.Value);
+            WBTaskFeedback feedback = collection.DoConfigurationStep(NextConfigurationStep.Value);
 
-            ConfigurationSteps.WBxUpdateConfigurationStep(feedback);
+            ConfigurationSteps.WBxUpdateTask(feedback);
 
-            if (!String.IsNullOrEmpty(feedback.NextStepName))
+            if (!String.IsNullOrEmpty(feedback.NextTaskName))
             {
-                NextConfigurationStep.Value = feedback.NextStepName;
+                NextConfigurationStep.Value = feedback.NextTaskName;
                 ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "TriggerNextStepFunction", "WorkBoxFramework_triggerNextConfigurationStep();", true);
             }
             else

@@ -68,6 +68,9 @@ namespace WorkBoxFramework
             {
                 if (_term == null) 
                 {
+                    if (_taxonomy == null) WBLogging.Debug("The _taxonomy was null!!");
+                    if (_taxonomy.TermSet == null) WBLogging.Debug("The _taxonomy.TermSet was null!!");
+
                     _term = _taxonomy.TermSet.GetTerm(this.Id);
                 }
                 return _term; 
