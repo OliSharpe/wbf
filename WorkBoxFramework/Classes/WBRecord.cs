@@ -90,7 +90,7 @@ namespace WorkBoxFramework
         /// </summary>
         /// <param name="libraries"></param>
         /// <param name="newMasterRecordDocument"></param>
-        public WBRecord(WBRecordsLibraries libraries, SPListItem newRecordItem, String newRecordID, WBDocument originalDocument)
+        public WBRecord(WBRecordsLibraries libraries, SPListItem newRecordItem, String newRecordID, WBDocument originalDocument, WBItem extraMetadata)
         {
 
             _libraries = libraries;
@@ -98,6 +98,7 @@ namespace WorkBoxFramework
             _recordID = newRecordID;
 
             Metadata.CopyColumns(originalDocument, WBRecord.DefaultColumnsToCopy);
+            Metadata.CopyColumns(extraMetadata);
 
             // Now make sure that the record ID is set correctly:
             Metadata.RecordID = newRecordID;

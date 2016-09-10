@@ -424,36 +424,6 @@ namespace WorkBoxFramework
         }
 
 
-        public void CopyColumns(WBDocument documentToCopy, IEnumerable<WBColumn> columnsToCopy)
-        {
-            foreach (WBColumn column in columnsToCopy)
-            {
-                // WBLogging.Debug("Copying: " + column.DisplayName + " = " + documentToCopy[column] + " in library: " + this.RecordsLibrary.URL);
-                this[column] = documentToCopy[column];
-            }
-        }
-
-
-        public bool MaybeCopyColumns(WBDocument documentToCopy, IEnumerable<WBColumn> columnsToCopy)
-        {
-            bool allCorrect = false;
-            foreach (WBColumn column in columnsToCopy)
-            {
-                if (this[column] != documentToCopy[column])
-                {
-                    /*
-                    if (this.RecordsLibrary != null)                     
-                    {
-                        WBLogging.RecordsTypes.Unexpected("this[column] = " + this[column] + " != documentToCopy[column] = " + documentToCopy[column] + " for column " + column.DisplayName + " in library: " + this.RecordsLibrary.URL);
-                    }
-                     */ 
-                    allCorrect = false;
-                    this[column] = documentToCopy[column];
-                }
-            }
-
-            return allCorrect;
-        }
 
 
         public bool MaybeUpdateRecordColumns(WBDocument documentToCopy, IEnumerable<WBColumn> columnsToCopy)

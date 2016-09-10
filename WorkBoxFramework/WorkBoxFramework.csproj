@@ -222,6 +222,27 @@
     <Compile Include="Classes\WBRecordsLibraries.cs" />
     <Compile Include="Classes\WBRecordsLibrary.cs" />
     <Compile Include="Classes\WBRecordsManager.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogPickLocation.aspx.cs">
+      <DependentUpon>PublishDocDialogPickLocation.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogPickLocation.aspx.designer.cs">
+      <DependentUpon>PublishDocDialogPickLocation.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogSelfApprove.aspx.cs">
+      <DependentUpon>PublishDocDialogSelfApprove.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogSelfApprove.aspx.designer.cs">
+      <DependentUpon>PublishDocDialogSelfApprove.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocRequiredMetadata.aspx.cs">
+      <DependentUpon>PublishDocRequiredMetadata.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocRequiredMetadata.aspx.designer.cs">
+      <DependentUpon>PublishDocRequiredMetadata.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
@@ -1085,6 +1106,15 @@
     </Content>
     <Content Include="Layouts\WorkBoxFramework\jquery-1.11.3.min.js" />
     <Content Include="ADMIN\WorkBoxFramework\RecordsManagementAdmin.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\PublishDocDialogPickLocation.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\PublishDocDialogSelfApprove.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\PublishDocRequiredMetadata.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\SubjectTags.js" />

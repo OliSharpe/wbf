@@ -90,7 +90,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             string listGuid = ListGUID.Value;
             string itemID = ItemID.Value;
 
-            string redirectUrl = "WorkBoxFramework/PublishDocDialogRequiredMetadataPage.aspx?ListGUID=" + listGuid + "&ItemID=" + itemID + "&DestinationURL=" + destinationUrl + "&DestinationTitle=" + destinationTitle + "&DestinationType=" + destinationType;
+            string redirectUrl = "WorkBoxFramework/PublishDocRequiredMetadata.aspx?ListGUID=" + listGuid + "&ItemID=" + itemID + "&DestinationURL=" + destinationUrl + "&DestinationTitle=" + destinationTitle + "&DestinationType=" + destinationType;
 
             SPUtility.Redirect(redirectUrl, SPRedirectFlags.RelativeToLayoutsPage, Context);
         }
