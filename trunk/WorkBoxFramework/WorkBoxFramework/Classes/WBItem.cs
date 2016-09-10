@@ -229,6 +229,39 @@ namespace WorkBoxFramework
             get { return _usedColumns.AsEnumerable(); }
         }
 
+        public void CopyColumns(WBItem itemToCopy, IEnumerable<WBColumn> columnsToCopy)
+        {
+            foreach (WBColumn column in columnsToCopy)
+            {
+                this[column] = itemToCopy[column];
+            }
+        }
+
+        public void CopyColumns(WBItem itemToCopy)
+        {
+            IEnumerable<WBColumn> columnsToCopy = itemToCopy.Columns;
+
+            foreach (WBColumn column in columnsToCopy)
+            {
+                this[column] = itemToCopy[column];
+            }
+        }
+
+        public bool MaybeCopyColumns(WBItem itemToCopy, IEnumerable<WBColumn> columnsToCopy)
+        {
+            bool allCorrect = false;
+            foreach (WBColumn column in columnsToCopy)
+            {
+                if (this[column] != itemToCopy[column])
+                {
+                    allCorrect = false;
+                    this[column] = itemToCopy[column];
+                }
+            }
+
+            return allCorrect;
+        }
+
         #endregion
     }
 }

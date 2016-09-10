@@ -102,15 +102,15 @@ namespace WorkBoxFramework
                 return feedback;
             }
 
-            return PublishDocument(workBox, new WBDocument(item), replacingRecordID, replacingAction);
+            return PublishDocument(workBox, new WBDocument(item), replacingRecordID, replacingAction, new WBItem());
         }
         
         public WBTaskFeedback PublishDocument(WorkBox workBox, WBDocument document)
         {
-            return PublishDocument(workBox, document, null, null);
+            return PublishDocument(workBox, document, null, null, new WBItem());
         }
 
-        public WBTaskFeedback PublishDocument(WorkBox workBox, WBDocument document, String replacingRecordID, String replacingAction)
+        public WBTaskFeedback PublishDocument(WorkBox workBox, WBDocument document, String replacingRecordID, String replacingAction, WBItem extraMetadata)
         {
             WBTaskFeedback feedback = new WBTaskFeedback(WBTaskFeedback.TASK_TYPE__PUBLISH, document.AbsoluteURL);
 
@@ -141,7 +141,7 @@ namespace WorkBoxFramework
 
             WBLogging.Debug("WBRecordsManager.PublishDocument(): About to declare new record");
 
-            WBRecord newRecord = Libraries.DeclareNewRecord(feedback, document, recordToReplace, replacingAction);
+            WBRecord newRecord = Libraries.DeclareNewRecord(feedback, document, recordToReplace, replacingAction, extraMetadata);
 
             WBLogging.Debug("WBRecordsManager.PublishDocument(): Declared new record");
 

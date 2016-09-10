@@ -104,7 +104,8 @@ namespace WorkBoxFramework
             }
         }
 
-        public WBRecord DeclareNewRecord(WBTaskFeedback feedback, WBDocument document, WBRecord recordToReplace, String replacingAction)
+
+        public WBRecord DeclareNewRecord(WBTaskFeedback feedback, WBDocument document, WBRecord recordToReplace, String replacingAction, WBItem extraMetadata)
         {
 
             WBTerm functionalArea = document.FunctionalArea[0];
@@ -225,7 +226,7 @@ namespace WorkBoxFramework
 
             SPListItem uploadedItem = uploadedFile.Item;
 
-            WBRecord newRecord = new WBRecord(this, uploadedItem, uploadedItem.ID.ToString(), document);
+            WBRecord newRecord = new WBRecord(this, uploadedItem, uploadedItem.ID.ToString(), document, extraMetadata);
 
             if (recordToReplace != null)
             {

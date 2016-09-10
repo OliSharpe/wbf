@@ -414,6 +414,24 @@ function WorkBoxFramework_pickANewRecordsType(callbackFunction, currentRecordsTy
 }
 
 
+function WorkBoxFramework_pickANewLocation(callbackFunction, currentFunctionalAreasUIControlValue, currentRecordsTypeUIControlValue) {
+
+    var urlValue = L_Menu_BaseUrl + '/_layouts/WorkBoxFramework/PublishDocDialogPickLocation.aspx?FunctionalAreasUIControlValue=' + currentFunctionalAreasUIControlValue + '&RecordsTypeUIControlValue=' + currentRecordsTypeUIControlValue;
+
+    var options = {
+        url: urlValue,
+        title: 'Pick Location in Records Library',
+        allowMaximize: false,
+        showClose: true,
+        width: 600,
+        height: 700,
+        dialogReturnValueCallback: callbackFunction
+    };
+
+    SP.UI.ModalDialog.showModalDialog(options);
+}
+
+
 function WorkBoxFramework_pickAPublishedDocument(callbackFunction, protectiveZone) {
 
     var urlValue = L_Menu_BaseUrl + '/_layouts/WorkBoxFramework/PublishedDocumentPicker.aspx';
