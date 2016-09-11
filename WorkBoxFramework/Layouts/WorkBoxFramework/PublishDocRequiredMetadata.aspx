@@ -16,6 +16,13 @@
       runat="server"
     />
 
+    <SharePoint:ScriptLink ID="WBFjQueryScriptRegistration"
+        name="WorkBoxFramework/jquery-1.11.3.min.js"
+        language="javascript"
+        localizable="false"
+        runat="server"
+     />
+
     <SharePoint:ScriptLink ID="WBFScriptRegistration"
         name="WorkBoxFramework/WorkBoxFramework.js"
         language="javascript"
@@ -37,10 +44,48 @@
             var newRecordsType = document.getElementById("<%=NewRecordsTypeUIControlValue.ClientID %>");
             newRecordsType.value = values[1];
 
+            var toReplaceRecordID = document.getElementById("<%=ToReplaceRecordID.ClientID %>");
+            toReplaceRecordID.value = values[2];
+
+            var toReplaceRecordPath = document.getElementById("<%=ToReplaceRecordPath.ClientID %>");
+            toReplaceRecordPath.value = values[3];
+            
             document.forms['aspnetForm'].submit();
         }
-
     }
+
+
+    function WorkBoxFramework_pickANewLocation(callbackFunction, currentFunctionalAreasUIControlValue, currentRecordsTypeUIControlValue) {
+
+        var listGUID = document.getElementById("<%=ListGUID.ClientID %>");
+        var itemID = document.getElementById("<%=ItemID.ClientID %>");
+        var destinationTitle = document.getElementById("<%=DestinationTitle.ClientID %>");
+        var newOrReplace = document.getElementById("<%=NewOrReplace.ClientID %>");
+        var protectiveZone = document.getElementById("<%=ProtectiveZone.ClientID %>");
+
+        var urlValue = L_Menu_BaseUrl + '/_layouts/WorkBoxFramework/PublishDocDialogPickLocation.aspx?FunctionalAreasUIControlValue=' + currentFunctionalAreasUIControlValue
+            + '&RecordsTypeUIControlValue=' + currentRecordsTypeUIControlValue
+            + "&NewOrReplace=" + $(newOrReplace).text()
+            + "&ListGUID=" + listGUID.value
+            + "&ItemID=" + itemID.value
+            + "&DestinationTitle=" + destinationTitle.value
+            + "&ProtectiveZone=" + protectiveZone.value;
+
+        var options = {
+            url: urlValue,
+            title: 'Pick Location in Records Library',
+            allowMaximize: false,
+            showClose: true,
+            width: 600,
+            height: 700,
+            dialogReturnValueCallback: callbackFunction
+        };
+
+        SP.UI.ModalDialog.showModalDialog(options);
+    }
+
+
+
 </script>
 
 </asp:Content>
@@ -69,6 +114,10 @@ You must enter the following metadata for the document
 </table>
 
 
+<asp:HiddenField ID="ListGUID" runat="server" />
+<asp:HiddenField ID="ItemID" runat="server" />
+<asp:HiddenField ID="TheDestinationType" runat="server" />
+<asp:HiddenField ID="DestinationURL" runat="server" />
 
 <asp:HiddenField ID="RecordsTypeUIControlValue" runat="server"/>
 <asp:HiddenField ID="NewRecordsTypeUIControlValue" runat="server" Value="" />
@@ -76,7 +125,11 @@ You must enter the following metadata for the document
 <asp:HiddenField ID="FunctionalAreasUIControlValue" runat="server"/>
 <asp:HiddenField ID="NewFunctionalAreasUIControlValue" runat="server" Value="" />
 
+<asp:HiddenField ID="ToReplaceRecordID" runat="server" Value="" />
+<asp:HiddenField ID="ToReplaceRecordPath" runat="server" Value="" />
+
 <asp:HiddenField ID="ProtectiveZone" runat="server"/>
+<asp:Label ID="NewOrReplace" Text="New" runat="server"/>
 
 <table class="wbf-dialog-form">
 
@@ -100,7 +153,7 @@ You must enter the following metadata for the document
 <td class="wbf-field-name-panel" colspan="2">
 
 <div>
-<asp:RadioButton id="ReplaceRadioButton" GroupName="NewOrReplace"
+<asp:RadioButton id="ReplaceRadioButton" GroupName="NewOrReplaceRadios" Value="Replace"
              Text="I want to replace existing document" runat="server"/>
 </div>
 <div>
@@ -124,7 +177,7 @@ the document being replaced.
 </div>
 
 <div>
-<asp:RadioButton id="NewRadioButton" GroupName="NewOrReplace"
+<asp:RadioButton id="NewRadioButton" GroupName="NewOrReplaceRadios" Value="New" Checked="true"
              Text="I want to publish a new document" runat="server"/>
 </div>
 <div>
@@ -317,11 +370,25 @@ Other teams that were involved with the creation of this document.
 
 </table>
 
-    <asp:HiddenField ID="ListGUID" runat="server" />
-    <asp:HiddenField ID="ItemID" runat="server" />
-    <asp:HiddenField ID="TheDestinationType" runat="server" />
-    <asp:HiddenField ID="DestinationURL" runat="server" />
 </div>
+
+<script>
+    $(function () {
+
+        var selectLocationButton = $('#<%=SelectLocationButton.ClientID %>');
+
+        $('input:radio[name="ctl00$PlaceHolderMain$NewOrReplaceRadios"]').change(function () {
+            if ($(this).val() == 'New') {
+                selectLocationButton.val("Choose Location");
+                $("#<%=NewOrReplace.ClientID %>").text("New");
+            } else {
+                selectLocationButton.val("Choose Document");
+                $("#<%=NewOrReplace.ClientID %>").text("Replace");
+            }
+        });
+    });
+</script>
+
 
 </asp:Content>
 

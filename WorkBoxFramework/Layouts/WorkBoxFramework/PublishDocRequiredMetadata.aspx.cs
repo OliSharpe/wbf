@@ -45,6 +45,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         WBTaxonomy subjectTagsTaxonomy = null;
         WBTaxonomy functionalAreasTaxonomy = null;
 
+        WBRecordsManager manager = null;
+        WBRecord recordBeingReplaced = null;
+
         WBRecordsType documentRecordsType = null;
         SPListItem sourceDocAsItem = null;
         SPFile sourceFile = null;
@@ -57,6 +60,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         protected bool showSubjectTags = true;
         protected bool showScanDate = false;
 
+        
         protected void Page_Load(object sender, EventArgs e)
         {
             WBLogging.Generic.Verbose("In Page_Load for the public doc metadata dialog");
@@ -67,6 +71,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             seriesTagsTaxonomy = WBTaxonomy.GetSeriesTags(recordsTypeTaxonomy);
             subjectTagsTaxonomy = WBTaxonomy.GetSubjectTags(recordsTypeTaxonomy);
             functionalAreasTaxonomy = WBTaxonomy.GetFunctionalAreas(recordsTypeTaxonomy);
+
+            manager = new WBRecordsManager();
 
             // If this is the initial call to the page then we need to load the basic details of the document we're publishing out:
             if (!IsPostBack)
@@ -141,6 +147,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 WBLogging.Debug("Setting the subject tags: " + SubjectTagsField.Text);
                 sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__SUBJECT_TAGS, SubjectTagsField.Text);
 
+                if (!String.IsNullOrEmpty(ToReplaceRecordID.Value))
+                {
+                    recordBeingReplaced = manager.Libraries.GetRecordByID(ToReplaceRecordID.Value);
+                    if (recordBeingReplaced == null)
+                    {
+                        ErrorMessageLabel.Text = "Could not find the record that is meant to be replaced. Supposedly it has RecordID = " + ToReplaceRecordID.Value;
+                        return;
+                    }
+                }
 
                 // If this is a post back - then let's check if the records type has been modified:
                 if (NewRecordsTypeUIControlValue.Value != "")
@@ -151,22 +166,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     WBRecordsType newRecordsType = new WBRecordsType(recordsTypeTaxonomy, NewRecordsTypeUIControlValue.Value);
 
                     RecordsTypeUIControlValue.Value = NewRecordsTypeUIControlValue.Value;
+                    FunctionalAreasUIControlValue.Value = NewFunctionalAreasUIControlValue.Value;
                     pageRenderingRequired = true;
-
-                    // These are now being done in CaptureAsDocument()
-                    // sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__RECORDS_TYPE, NewRecordsTypeUIControlValue.Value);
-                    // sourceDocAsItem.WBxSet(WBColumn.Title, this.TitleField.Text);
-
-                    // This is now being done in CaptureAsDocument()
-                    // WorkBox.GenerateFilename(newRecordsType, sourceDocAsItem);
-
-                    /* This is now being done in CaptureAsDocument()
-                                        else
-                                        {
-                                            WBLogging.Debug("Saving the current functional area selection: " + this.FunctionalAreaField.Text);
-                                            sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, this.FunctionalAreaField.Text);
-                                        }
-                    */
 
                     WBDocument document = CaptureAsDocument(sourceDocAsItem, newRecordsType);
                     document.Update();
@@ -204,6 +205,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         }
 
+        protected void Page_Unload(object sender, EventArgs e)
+        {
+            if (manager != null)
+            {
+                manager.Dispose();
+                manager = null;
+            }
+        }
+
         private void renderPage()
         {
             // OK, so now we're finally in a position to load up the values of the page fields:
@@ -228,7 +238,28 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             RecordsTypeUIControlValue.Value = documentRecordsType.UIControlValue;
             SelectLocationButton.OnClientClick = "WorkBoxFramework_pickANewLocation(WorkBoxFramework_PublishDoc_pickedANewLocation, '" + functionalAreasUIControlValue + "', '" + documentRecordsType.UIControlValue + "'); return false;";
-            LocationPath.Text = functionalAreas[0].Name + " / " + documentRecordsType.FullPath.Replace("/", " / ");
+
+            if (recordBeingReplaced == null)
+            {
+                LocationPath.Text = functionalAreas[0].Name + " / " + documentRecordsType.FullPath.Replace("/", " / ");
+            }
+            else
+            {
+                LocationPath.Text = ToReplaceRecordPath.Value;
+            }
+
+            if (NewOrReplace.Text == "New")
+            {
+                NewRadioButton.Checked = true;
+                ReplaceRadioButton.Checked = false;
+                SelectLocationButton.Text = "Choose Location";
+            }
+            else
+            {
+                NewRadioButton.Checked = false;
+                ReplaceRadioButton.Checked = true;
+                SelectLocationButton.Text = "Choose Document";
+            }
 
 
             bool userCanPublishToPublic = false;
@@ -677,13 +708,11 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 {
                     // WBRecordsType recordsType = new WBRecordsType(recordsTypeTaxonomy, document[WBColumn.RecordsType].WBxToString());
 
-                    using (WBRecordsManager manager = new WBRecordsManager())
-                    {
                         try
                         {
-                            WBLogging.Debug("In publishButton_OnClick(): About to try to publish");
+                            WBLogging.Debug("In publishButton_OnClick(): About to try to publish replacing: " + ToReplaceRecordID.Value + " with action: " + ReplacementActions.SelectedValue);
 
-                            manager.PublishDocument(WorkBox, document);
+                            manager.PublishDocument(WorkBox, document, ToReplaceRecordID.Value, ReplacementActions.SelectedValue, new WBItem());
 
                             WBLogging.Debug("In publishButton_OnClick(): Should have finished the publishing");
 
@@ -712,7 +741,6 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                             errorMessage = "An error occurred when trying to publish: " + exception.Message;
                             WBLogging.Generic.Unexpected(exception);
                         }
-                    }
 
 
 

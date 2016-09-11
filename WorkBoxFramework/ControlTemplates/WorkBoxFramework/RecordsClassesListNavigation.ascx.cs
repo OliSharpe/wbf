@@ -193,7 +193,7 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
                                     WBRecordsType recordsType = new WBRecordsType(recordsTypesTaxonomy, term);
                                     
                                     // If the term has been marked as unavailable then it shouldn't be liseted here.
-                                    if (!recordsType.IsAvailableForTegging || !recordsType.AllowWorkBoxRecords) continue;
+                                    if (!recordsType.IsAvailableForTagging || !recordsType.AllowWorkBoxRecords) continue;
 
                                     recordsTypeGUID = recordsType.Id.ToString();
 

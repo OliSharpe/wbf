@@ -37,16 +37,117 @@ RecordsType = <asp:Label ID="RecordsTypeUIControlValue" runat="server"/>
 <br />
 FunctionAreas = <asp:Label ID="FunctionalAreasUIControlValue" runat="server"/>
 
+<br />
+NewOrReplace = <asp:Label ID="NewOrReplace" runat="server"/>
+<br />
+ProtectiveZone = <asp:Label ID="ProtectiveZone" runat="server"/>
 
 <asp:Label ID="RecordsTypeFieldMessage" runat="server" Text="" ForeColor="Red"/>
 </td>
 </tr>
 
+</table>
+
+</div>
+
+
+<asp:Label ID="Label1" runat="server" Text="" ForeColor="Red"></asp:Label>
+<style type="text/css">
+ 
+td.wbf-records-type { border: 0px; }
+td.wbf-metadata-title-panel { width: 300px; padding: 8px; border-top:solid 1px grey; vertical-align: top; }
+td.wbf-metadata-value-panel { width: 405px; padding: 8px; border-top:solid 1px grey; vertical-align: top; background-color: #f1f1f2;  }
+td.wbf-buttons-panel { border-top:solid 1px grey; text-align: center; vertical-align: top; }
+.wbf-metadata-title { font-weight: bold; padding-bottom: 2px; }
+.wbf-metadata-description { font-weight: normal; padding: 2px; }
+.wbf-metadata-read-only-value { font-weight: bold; padding: 2px; }
+.wbf-metadata-error { font-weight: normal; padding: 0px; color: Red; }
+div.wbf-publish-out-title { font-weight: bold; font-size: 16px; vertical-align: top; padding-bottom:4px; }
+table.wbf-title-table { padding: 6px 0px 12px 10px; }
+</style>
+
+<table cellpadding="8" cellspacing="0" class="wbf-title-table">
+<tr>
+<td valign="middle">
+<asp:Image ID="SourceDocIcon" runat="server" />
+</td>
+<td valign="middle" class="wbf-create-new-title">
+<div class="wbf-publish-out-title">
+Publish Document to: <asp:Label ID="DestinationTitle" runat="server" />
+</div>
+<div>
+Select the folder into which to publish the document
+</div>
+</td>
+</tr>
+</table>
+
+<table width="100%" cellpadding="5" cellspacing="0">
 
 <tr>
-<td colspan="2" align="center" valign="top">
+<td class="wbf-metadata-title-panel">
+        <div class="wbf-metadata-title">Select Folder</div>
+<div class="wbf-metadata-description">Pick the folder in the work box into which you would like to publish the document.</div>
+</td>
+<td class="wbf-metadata-value-panel">
+
+  <SharePoint:SPTreeView
+        id="WorkBoxFolders"
+        UseInternalDataBindings="false"
+        runat="server"
+        ShowLines="true"
+        ExpandDepth="1"
+        SelectedNodeStyle-CssClass="ms-tvselected"
+        OnSelectedNodeChanged="WorkBoxFolders_SelectedNodeChanged"
+        NodeStyle-CssClass="ms-navitem"
+        NodeStyle-HorizontalPadding="0"
+        NodeStyle-VerticalPadding="0"
+        NodeStyle-ImageUrl="/_layouts/Images/FOLDER.GIF"
+        SkipLinkText=""
+        NodeIndent="20"
+        ExpandImageUrl="/_layouts/images/tvplus.gif"
+        CollapseImageUrl="/_layouts/images/tvminus.gif"
+        NoExpandImageUrl="/_layouts/images/tvblank.gif" />
+
+</td>
+</tr>
+
+<tr>
+<td class="wbf-metadata-title-panel">
+        <div class="wbf-metadata-title">Selected Folder Path</div>
+<div class="wbf-metadata-description"></div>
+</td>
+<td class="wbf-metadata-value-panel">
+
+
+<asp:UpdatePanel ID="ShowSelectionPanel" runat="server">
+    <Triggers>
+        <asp:AsyncPostBackTrigger ControlID="WorkBoxFolders" EventName="SelectedNodeChanged" />
+    </Triggers>
+    <ContentTemplate>
+
+<div>
+
+Selected folder: <asp:Label ID="SelectedFolderPath" runat="server" />
+
+</div>
+
+<div>
+    <asp:Label ID="SelectedRecordID" runat="server" />
+</div>
+
+    </ContentTemplate>
+</asp:UpdatePanel>
+
+
+</td>
+</tr>
+
+
+<tr>
+<td colspan="2" class="wbf-buttons-panel">
 <p>
-        <asp:Button ID="Select" UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" Text="Save" OnClick="selectButton_OnClick" />
+        <asp:Button ID="Select" UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" Text="Select" OnClick="selectButton_OnClick" />
 
         &nbsp;
 
@@ -58,7 +159,11 @@ FunctionAreas = <asp:Label ID="FunctionalAreasUIControlValue" runat="server"/>
 
 </table>
 
-</div>
+    <asp:HiddenField ID="ListGUID" runat="server" />
+    <asp:HiddenField ID="ItemID" runat="server" />
+    <asp:HiddenField ID="TheDestinationType" runat="server" />
+    <asp:HiddenField ID="DestinationURL" runat="server" />
+
 
 
 </asp:Content>

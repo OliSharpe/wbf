@@ -949,6 +949,20 @@ namespace WorkBoxFramework
             return "";
         }
 
+        public bool BranchCanHaveDocuments()
+        {
+            if (!IsAvailableForTagging) return false;
+            if (AllowDocumentRecords) return true;
+
+            bool childCanHaveDocuments = false;
+            foreach (Term childTerm in Term.Terms)
+            {
+                WBRecordsType childRecordsType = new WBRecordsType(Taxonomy, childTerm);
+                if (childRecordsType.BranchCanHaveDocuments()) return true;
+            }
+
+            return childCanHaveDocuments;
+        }
 
 
         #endregion

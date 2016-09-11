@@ -95,6 +95,17 @@ namespace WorkBoxFramework
             return new WBRecord(this, recordID);
         }
 
+        public WBRecord GetRecordByPath(String path)
+        {
+            String serverRelativePath = ProtectedMasterLibrary.Web.ServerRelativeUrl + "/" + ProtectedMasterLibrary.List.RootFolder.Name + "/" + path;
+
+            WBLogging.Debug("Trying to find the RecordID by way of the server relative path: " + serverRelativePath);
+
+            SPListItem masterRecordItem = ProtectedMasterLibrary.Web.GetListItem(serverRelativePath);
+
+            return new WBRecord(this, masterRecordItem);
+        }
+
 
         public void Dispose()
         {
@@ -253,12 +264,18 @@ namespace WorkBoxFramework
 
             newRecord.UpdateMasterAndCreateCopies();
 
+            bool beforeForDocument = document.Web.AllowUnsafeUpdates;
+            document.Web.AllowUnsafeUpdates = true;
+
             // And now just copy back to the original document any metadata changes:
             document.MaybeCopyColumns(newRecord.Metadata, WBRecord.DefaultColumnsToCopy);
             document.Update();
 
 //            uploadedItem.Update();
   //          uploadedFile.Update();
+
+            bool beforeForUploadedFile = uploadedFile.Web.AllowUnsafeUpdates;
+            uploadedFile.Web.AllowUnsafeUpdates = true;
 
             if (uploadedFile.CheckOutType != SPFile.SPCheckOutType.None)
             {
@@ -268,6 +285,9 @@ namespace WorkBoxFramework
             {
                 WBLogging.Migration.Verbose("There was no need to check in file: " + uploadedFile.Name);
             }
+
+            uploadedFile.Web.AllowUnsafeUpdates = beforeForUploadedFile;
+            document.Web.AllowUnsafeUpdates = beforeForDocument;
 
             return newRecord;
         }

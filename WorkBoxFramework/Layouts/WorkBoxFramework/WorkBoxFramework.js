@@ -259,9 +259,13 @@ function WorkBoxFramework_PublishDoc_commandAction() {
 }
 
 function WorkBoxFramework_PublishDoc_enabled() {
-    var items = SP.ListOperation.Selection.getSelectedItems();
-    var itemCount = CountDictionary(items);
-    return (itemCount == 1) && WorkBoxFramework_actionIsEnabled('publish_document');
+
+    return WorkBoxFramework_actionIsEnabled('publish_document');
+
+    // We're no longer restricted the selection to just one document to publish!
+    //var items = SP.ListOperation.Selection.getSelectedItems();
+    //var itemCount = CountDictionary(items);
+    //return (itemCount == 1) && WorkBoxFramework_actionIsEnabled('publish_document');
 }
 
 function WorkBoxFramework_AddToClipboard_commandAction(clipboardAction) {
@@ -413,23 +417,6 @@ function WorkBoxFramework_pickANewRecordsType(callbackFunction, currentRecordsTy
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
-
-function WorkBoxFramework_pickANewLocation(callbackFunction, currentFunctionalAreasUIControlValue, currentRecordsTypeUIControlValue) {
-
-    var urlValue = L_Menu_BaseUrl + '/_layouts/WorkBoxFramework/PublishDocDialogPickLocation.aspx?FunctionalAreasUIControlValue=' + currentFunctionalAreasUIControlValue + '&RecordsTypeUIControlValue=' + currentRecordsTypeUIControlValue;
-
-    var options = {
-        url: urlValue,
-        title: 'Pick Location in Records Library',
-        allowMaximize: false,
-        showClose: true,
-        width: 600,
-        height: 700,
-        dialogReturnValueCallback: callbackFunction
-    };
-
-    SP.UI.ModalDialog.showModalDialog(options);
-}
 
 
 function WorkBoxFramework_pickAPublishedDocument(callbackFunction, protectiveZone) {

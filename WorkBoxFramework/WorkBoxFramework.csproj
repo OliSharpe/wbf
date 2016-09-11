@@ -243,6 +243,8 @@
     <Compile Include="Layouts\WorkBoxFramework\PublishDocRequiredMetadata.aspx.designer.cs">
       <DependentUpon>PublishDocRequiredMetadata.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Classes\TreeViewLocation.cs" />
+    <Compile Include="Classes\TreeViewLocationCollection.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
