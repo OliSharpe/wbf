@@ -109,7 +109,7 @@ namespace WorkBoxFramework
             }
         }
 
-        public bool IsAvailableForTegging { get { return Term.IsAvailableForTagging; } }
+        public bool IsAvailableForTagging { get { return Term.IsAvailableForTagging; } }
 
         protected string _name = null;
         public String Name 

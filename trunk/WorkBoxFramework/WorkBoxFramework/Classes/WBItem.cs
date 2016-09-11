@@ -202,8 +202,12 @@ namespace WorkBoxFramework
             {
                 case BackingTypes.SPListItem:
                     {
+
+                        bool before = _listItem.Web.AllowUnsafeUpdates;
+                        _listItem.Web.AllowUnsafeUpdates = true;
                         WBLogging.Generic.Verbose("Calling WBItem.Update() on item backed by SPListItem");
                         _listItem.Update();
+                        _listItem.Web.AllowUnsafeUpdates = before;
                         return;
                     }
                 case BackingTypes.Dictionary:

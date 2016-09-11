@@ -85,6 +85,17 @@ namespace WorkBoxFramework
             _recordID = recordID;
         }
 
+
+        public WBRecord(WBRecordsLibraries libraries, SPListItem masterRecordItem)
+        {
+            _libraries = libraries;
+            _protectedMasterRecord = new WBDocument(libraries.ProtectedMasterLibrary, masterRecordItem); ;
+            _recordID = _protectedMasterRecord.RecordID;
+
+            if (String.IsNullOrEmpty(_recordID)) throw new Exception("You cannot create a WBRecord with a SPListItem that doesn't have a RecordID value!");
+        }
+
+
         /// <summary>
         /// This constructor should only be used to create a newly declared record
         /// </summary>
@@ -94,7 +105,7 @@ namespace WorkBoxFramework
         {
 
             _libraries = libraries;
-            _protectedMasterRecord = new WBDocument(libraries.ProtectedMasterLibrary, newRecordItem); ;
+            _protectedMasterRecord = new WBDocument(libraries.ProtectedMasterLibrary, newRecordItem);
             _recordID = newRecordID;
 
             Metadata.CopyColumns(originalDocument, WBRecord.DefaultColumnsToCopy);
