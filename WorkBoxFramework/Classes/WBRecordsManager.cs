@@ -148,13 +148,53 @@ namespace WorkBoxFramework
             return feedback;
         }
 
-        #endregion 
+        public bool AllowBulkPublishingOfFileType(String fileType)
+        {
+            if (fileType == "pdf") return true;
+            return false;
+        }
 
+        public bool AllowPublishingOfFileType(String fileType)
+        {
+            switch (fileType)
+            {
+                case "pdf":
+                case "doc":
+                case "docx":
+                case "xls":
+                case "xlsx":
+                case "ppt":
+                case "pptx":
+                case "txt":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public String PrettyNameForFileType(String fileType)
+        {
+            switch (fileType)
+            {
+                case "pdf": return "PDF Document";
+                case "doc": return "Word Document (1997-2003)";
+                case "docx": return "Word Document";
+                case "xls": return "Excel Document (1997-2003)";
+                case "xlsx": return "Excel Document";
+                case "ppt": return "PowerPoint Presentation (1997-2003)";
+                case "pptx": return "PowerPoint Presentation";
+                case "txt": return "Text Document";
+                default:
+                    return "<Unknown File Type>";
+            }
+        }
 
         public void Dispose()
         {
             _libraries.Dispose();
         }
+
+        #endregion
 
     }
 }

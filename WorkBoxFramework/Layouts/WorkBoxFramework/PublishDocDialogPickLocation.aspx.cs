@@ -39,16 +39,16 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (!IsPostBack)
             {
-                FunctionalAreasUIControlValue.Text = Request.QueryString["FunctionalAreasUIControlValue"];
-                RecordsTypeUIControlValue.Text = Request.QueryString["RecordsTypeUIControlValue"];
-                NewOrReplace.Text = Request.QueryString["NewOrReplace"];
-                ProtectiveZone.Text = Request.QueryString["ProtectiveZone"];
+                FunctionalAreasUIControlValue.Value = Request.QueryString["FunctionalAreasUIControlValue"];
+                RecordsTypeUIControlValue.Value = Request.QueryString["RecordsTypeUIControlValue"];
+                NewOrReplace.Value = Request.QueryString["NewOrReplace"];
+                ProtectiveZone.Value = Request.QueryString["ProtectiveZone"];
 
                 ListGUID.Value = Request.QueryString["ListGUID"];
                 ItemID.Value = Request.QueryString["ItemID"];
 
                 // The following variable has its name due to a strange compliation error with the name 'DestinationType' 
-                TheDestinationType.Value = Request.QueryString["DestinationType"];
+                DestinationType.Value = Request.QueryString["DestinationType"];
                 DestinationURL.Value = Request.QueryString["DestinationURL"];
                 DestinationTitle.Text = Request.QueryString["DestinationTitle"];
 
@@ -75,8 +75,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                 SPFolder rootFolder = masterLibrary.List.RootFolder;
 
-                WBTerm functionalArea = new WBTerm(manager.FunctionalAreasTaxonomy, FunctionalAreasUIControlValue.Text);
-                TreeViewLocationCollection collection = new TreeViewLocationCollection(manager, NewOrReplace.Text, WBRecordsType.PROTECTIVE_ZONE__PROTECTED, functionalArea);
+                WBTerm functionalArea = new WBTerm(manager.FunctionalAreasTaxonomy, FunctionalAreasUIControlValue.Value);
+                TreeViewLocationCollection collection = new TreeViewLocationCollection(manager, NewOrReplace.Value, ProtectiveZone.Value, functionalArea);
 
                 WorkBoxFolders.DataSource = collection;
                 WorkBoxFolders.DataBind();
@@ -96,7 +96,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 errorMessage += "ItemID hasn't been set. ";
             }
 
-            if (TheDestinationType.Value == null || TheDestinationType.Value == "")
+            if (DestinationType.Value == null || DestinationType.Value == "")
             {
                 errorMessage += "DestinationType hasn't been set. ";
             }
@@ -155,12 +155,14 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 WBRecordsType recordsType = new WBRecordsType(manager.RecordsTypesTaxonomy, recordsTypeTerm);
 
 
-                FunctionalAreasUIControlValue.Text = functionalArea.UIControlValue;
-                RecordsTypeUIControlValue.Text = recordsType.UIControlValue;
+                FunctionalAreasUIControlValue.Value = functionalArea.UIControlValue;
+                RecordsTypeUIControlValue.Value = recordsType.UIControlValue;
+
+                WBLogging.Debug("Set the new records type to be: " + RecordsTypeUIControlValue.Value);
 
 
                 // Finally let's see if there is a specific record being selected as well:
-                if (NewOrReplace.Text == "Replace")
+                if (NewOrReplace.Value == "Replace")
                 {
                     WBRecord record = manager.Libraries.GetRecordByPath(selectedPath);
 
@@ -183,7 +185,11 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void selectButton_OnClick(object sender, EventArgs e)
         {
-            returnFromDialogOK(FunctionalAreasUIControlValue.Text + "@" + RecordsTypeUIControlValue.Text + "@" + SelectedRecordID.Text + "@" + SelectedFolderPath.Text);
+            String postBackValue = FunctionalAreasUIControlValue.Value + "@" + RecordsTypeUIControlValue.Value + "@" + SelectedRecordID.Text + "@" + SelectedFolderPath.Text;
+
+            WBLogging.Debug("About to post back with: " + postBackValue);
+
+            returnFromDialogOK(postBackValue);
         }
 
         protected void cancelButton_OnClick(object sender, EventArgs e)

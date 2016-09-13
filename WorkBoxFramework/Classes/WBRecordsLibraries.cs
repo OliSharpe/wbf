@@ -244,20 +244,29 @@ namespace WorkBoxFramework
                 if (replacingAction == WBRecordsManager.REPLACING_ACTION__ARCHIVE)
                 {
                     recordToReplace.LiveOrArchived = WBColumn.LIVE_OR_ARCHIVED__ARCHIVED;
-                    recordToReplace.Update();
-                    feedback.AddFeedback("Archived record being replaced");
-                    WBLogging.Debug("WBRecordsLibraries.DeclareNewRecord(): Archived the record being replaced Record ID = " + recordToReplace.RecordID);
+                    recordToReplace.RecordSeriesStatus = WBColumn.RECORD_SERIES_STATUS__ARCHIVED;
                 }
+                else
+                {
+                    recordToReplace.RecordSeriesStatus = WBColumn.RECORD_SERIES_STATUS__RETIRED;
+                }
+
+                recordToReplace.Update();
+                feedback.AddFeedback("Archived record being replaced");
+                WBLogging.Debug("WBRecordsLibraries.DeclareNewRecord(): Archived the record being replaced Record ID = " + recordToReplace.RecordID);
 
                 newRecord.ReplacesRecordID = recordToReplace.RecordID;
                 newRecord.RecordSeriesID = recordToReplace.RecordSeriesID;
                 newRecord.RecordSeriesIssue = "" + (recordToReplace.RecordSeriesIssue.WBxToInt() + 1);
+                newRecord.RecordSeriesStatus = WBColumn.RECORD_SERIES_STATUS__LATEST;
+
             }
             else
             {
                 newRecord.ReplacesRecordID = null;
                 newRecord.RecordSeriesID = newRecord.RecordID;
                 newRecord.RecordSeriesIssue = "1";
+                newRecord.RecordSeriesStatus = WBColumn.RECORD_SERIES_STATUS__LATEST;
             }
 
             newRecord.LiveOrArchived = WBColumn.LIVE_OR_ARCHIVED__LIVE;

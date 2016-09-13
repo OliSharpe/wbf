@@ -251,7 +251,8 @@ namespace WorkBoxFramework
                                         WBColumn.RecordID,
                                         WBColumn.RecordSeriesID,
                                         WBColumn.RecordSeriesIssue,
-                                        WBColumn.DeclaredRecord,
+                                        WBColumn.RecordSeriesStatus,
+                                        WBColumn.ReplacesRecordID,
                                         WBColumn.Title,
                                         WBColumn.RecordsType, 
                                         WBColumn.FunctionalArea, 
@@ -263,9 +264,6 @@ namespace WorkBoxFramework
                                         WBColumn.OwningTeam,
                                         WBColumn.InvolvedTeams,
                                         WBColumn.OriginalFilename,
-                                        WBColumn.SourceID,
-                                        WBColumn.SourceFilePath,
-                                        WBColumn.SourceSystem,
                                         WBColumn.ProtectiveZone,
                                         WBColumn.LiveOrArchived
                                       };
@@ -275,6 +273,8 @@ namespace WorkBoxFramework
                                         WBColumn.RecordID,
                                         WBColumn.RecordSeriesID,
                                         WBColumn.RecordSeriesIssue,
+                                        WBColumn.RecordSeriesStatus,
+                                        WBColumn.ReplacesRecordID,
                                         WBColumn.DeclaredRecord,
                                         WBColumn.Title,
                                         WBColumn.RecordsType, 
@@ -291,7 +291,12 @@ namespace WorkBoxFramework
                                         WBColumn.SourceFilePath,
                                         WBColumn.SourceSystem,
                                         WBColumn.ProtectiveZone,
-                                        WBColumn.LiveOrArchived
+                                        WBColumn.LiveOrArchived,
+                                        WBColumn.PublishingApprovedBy,
+                                        WBColumn.PublishingApprovalChecklist,
+                                        WBColumn.PublishingApprovalStatement,
+                                        WBColumn.PublishedBy,
+                                        WBColumn.DatePublished
                                       };
 
 
@@ -432,6 +437,12 @@ namespace WorkBoxFramework
         {
             get { return Metadata.RecordSeriesIssue; }
             set { Metadata.RecordSeriesIssue = value; }
+        }
+
+        public String RecordSeriesStatus
+        {
+            get { return Metadata[WBColumn.RecordSeriesStatus].WBxToString(); }
+            set { Metadata[WBColumn.RecordSeriesStatus] = value; }
         }
 
 

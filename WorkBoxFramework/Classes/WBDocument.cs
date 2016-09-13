@@ -158,8 +158,46 @@ namespace WorkBoxFramework
         {
             get
             {
-                if (IsSPListItem) return Item.Web.Url + Item.Url;
+                if (IsSPListItem) return Item.Web.Url + "/" + Item.Url;
                 return "";
+            }
+        }
+
+        public String LibraryRelativePath
+        {
+            get
+            {
+                if (IsSPListItem && RecordsLibrary != null)
+                {
+                    WBLogging.Debug("AbsoluteURL = " + AbsoluteURL);
+                    WBLogging.Debug("RecordsLibrary.URL = " + RecordsLibrary.URL);
+
+                    String path = AbsoluteURL.Replace(RecordsLibrary.URL, "");
+                    if (path.Length > 0 && path[0] == '/') path = path.Remove(0, 1);
+
+                    WBLogging.Debug("LibraryRelativePath = " + path);
+
+                    return path;
+                } else {
+                    return "<n/a>";
+                }
+            }
+        }
+
+        public String LibraryLocation
+        {
+            get
+            {
+                String path = LibraryRelativePath;
+                if (path == "<n/a>") return "<n/a>";
+
+                int startOfFilename = path.LastIndexOf(Filename);
+                // Plus we want to get rid of the last forward slash:
+                if (startOfFilename > 0) startOfFilename = startOfFilename - 1;
+
+                path = path.Remove(startOfFilename);
+
+                return path;
             }
         }
 
@@ -317,6 +355,11 @@ namespace WorkBoxFramework
         {
             get { return this[WBColumn.Name].WBxToString(); }
             set { this[WBColumn.Name] = value; }
+        }
+
+        public String FileType
+        {
+            get { return Path.GetExtension(Filename).WBxTrim().ToLower(); }   // Use of WBxTrim is mostly to change any null into a "" 
         }
 
         public String ProtectiveZone

@@ -39,6 +39,8 @@ namespace WorkBoxFramework
 
         public const string VIEW_MODE__NEW = "New";
         public const string VIEW_MODE__REPLACE = "Replace";
+        public const string VIEW_MODE__BROWSE_FOLDERS = "Browse Folders";
+        public const string VIEW_MODE__BROWSE_DOCUMENTS = "Browse Documents";
         
 
         private string _type = null;
@@ -142,14 +144,19 @@ namespace WorkBoxFramework
                         {
                             WBRecordsType recordsType = new WBRecordsType(recordsTypes, childTerm);
                             bool protectiveZoneOK = true;
-                            if (!String.IsNullOrEmpty(_minimumProtectiveZone))
-                            {
-                                protectiveZoneOK = (recordsType.IsZoneAtLeastMinimum(_minimumProtectiveZone));
-                            }
+                            //if (!String.IsNullOrEmpty(_minimumProtectiveZone))
+                            //{
+                             //   protectiveZoneOK = (recordsType.IsZoneAtLeastMinimum(_minimumProtectiveZone));
+                           // }
 
                             if (recordsType.BranchCanHaveDocuments() && protectiveZoneOK)
                             {
                                 _children.Add(new TreeViewLocation(this, _manager, _mode, _minimumProtectiveZone, recordsType));
+                            }
+                            else
+                            {
+                                WBLogging.Debug("In GetChildren() excluded " + recordsType.Name + " because " + recordsType.BranchCanHaveDocuments() + " && " + protectiveZoneOK);
+
                             }
                         }
 
@@ -178,7 +185,7 @@ namespace WorkBoxFramework
                             }
                         } else {
 
-                            if (_mode == VIEW_MODE__REPLACE)
+                            if (_mode == VIEW_MODE__REPLACE || _mode == VIEW_MODE__BROWSE_FOLDERS)
                             {
                                 // WBLogging.Debug("In view mode replace switching to folders part of tree");
 
@@ -225,12 +232,15 @@ namespace WorkBoxFramework
                         }
                         else
                         {
-                            SPListItemCollection items = GetItemsRecursive(_folder);
-                            foreach (SPListItem item in items)
+                            if (_mode == VIEW_MODE__REPLACE)
                             {
-                                if (ItemCanBePicked(item))
+                                SPListItemCollection items = GetItemsRecursive(_folder);
+                                foreach (SPListItem item in items)
                                 {
-                                    _children.Add(new TreeViewLocation(this, _manager, _mode, _minimumProtectiveZone, new WBDocument(_manager.Libraries.ProtectedMasterLibrary, item)));
+                                    if (ItemCanBePicked(item))
+                                    {
+                                        _children.Add(new TreeViewLocation(this, _manager, _mode, _minimumProtectiveZone, new WBDocument(_manager.Libraries.ProtectedMasterLibrary, item)));
+                                    }
                                 }
                             }
                         }
@@ -254,7 +264,10 @@ namespace WorkBoxFramework
 
             if (String.IsNullOrEmpty(item.WBxGetAsString(WBColumn.RecordID))) return false;
             if (item.WBxGetAsString(WBColumn.LiveOrArchived) == WBColumn.LIVE_OR_ARCHIVED__ARCHIVED) return false;
-            
+
+            String recordSeriesStatus = item.WBxGetAsString(WBColumn.RecordSeriesStatus);
+            if (recordSeriesStatus != "Latest" && !String.IsNullOrEmpty(recordSeriesStatus)) return false;
+
             String itemProtectiveZone = item.WBxGetAsString(WBColumn.ProtectiveZone);
             if (itemProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC) return true;
 

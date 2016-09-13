@@ -861,7 +861,40 @@ namespace WorkBoxFramework
         public static readonly WBColumn RecordSeriesID = WBColumn.IntegerColumn("Record Series ID");
         public static readonly WBColumn ReplacesRecordID = WBColumn.IntegerColumn("Replaces Record ID");
         public static readonly WBColumn RecordSeriesIssue = WBColumn.IntegerColumn("Record Series Issue");
-        
+
+        public static readonly String RECORD_SERIES_STATUS__LATEST = "Latest";
+        public static readonly String RECORD_SERIES_STATUS__RETIRED = "Retired";
+        public static readonly String RECORD_SERIES_STATUS__ARCHIVED = "Archived";
+        public static readonly String RECORD_SERIES_STATUS__DELETED = "Deleted";
+        public static string[] RecordSeriesStatusChoices = 
+        {
+            RECORD_SERIES_STATUS__LATEST,
+            RECORD_SERIES_STATUS__RETIRED,
+            RECORD_SERIES_STATUS__ARCHIVED,
+            RECORD_SERIES_STATUS__DELETED
+        };
+        public static readonly WBColumn RecordSeriesStatus = WBColumn.ChoiceColumn("Record Series Status", RecordSeriesStatusChoices);                           
+
+        public static readonly String RECORD_SERIES_STATUS__ACTION__RETIRE = "Retire";
+        public static readonly String RECORD_SERIES_STATUS__ACTION__ARCHIVE = "Archive";
+        public static readonly String RECORD_SERIES_STATUS__ACTION__DELETE = "Delete";
+        public static string[] RecordSeriesStatusActions = 
+        {
+            RECORD_SERIES_STATUS__ACTION__RETIRE,
+            RECORD_SERIES_STATUS__ACTION__ARCHIVE,
+            RECORD_SERIES_STATUS__ACTION__DELETE
+        };
+
+
+        public static readonly WBColumn PublishingApprovedBy = WBColumn.UserColumn("Publishing Approved By", INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, true);
+        public static readonly WBColumn PublishingApprovalChecklist = WBColumn.TextColumn("Publishing Approval Checklist");
+        public static readonly WBColumn PublishingApprovalStatement = WBColumn.MultiLineTextColumn("Publishing Approval Statement");
+
+        public static readonly WBColumn PublishedBy = WBColumn.UserColumn("Published By", INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, false);
+        public static readonly WBColumn DatePublished = WBColumn.DateTimeColumn("Date Published", "DatePublished", "Published Date");
+
+
+
         public static readonly WBColumn WorkBoxTemplate = WBColumn.LookupColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE, false, WorkBox.LIST_NAME__WORK_BOX_TEMPLATES);
 
         public static readonly WBColumn WorkBoxTemplateTitle = WBColumn.TextColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE_TITLE);
