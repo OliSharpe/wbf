@@ -19,39 +19,6 @@
 <asp:Label ID="ErrorMessageLabel" runat="server" Text="" ForeColor="Red"></asp:Label>
 </div>
 
-<table class="ms-propertysheet" width="100%" cellpadding="5" cellspacing="0">
-
-<tr>
-<td valign="top">
-<b>New Records Type</b>
-<p>
-Select from the taxonomy of records types.
-</p>
-</td>
-<td class="ms-authoringcontrols" valign="top">
-
-The tree will go here.
-
-<br />
-RecordsType = <asp:Label ID="RecordsTypeUIControlValue" runat="server"/>
-<br />
-FunctionAreas = <asp:Label ID="FunctionalAreasUIControlValue" runat="server"/>
-
-<br />
-NewOrReplace = <asp:Label ID="NewOrReplace" runat="server"/>
-<br />
-ProtectiveZone = <asp:Label ID="ProtectiveZone" runat="server"/>
-
-<asp:Label ID="RecordsTypeFieldMessage" runat="server" Text="" ForeColor="Red"/>
-</td>
-</tr>
-
-</table>
-
-</div>
-
-
-<asp:Label ID="Label1" runat="server" Text="" ForeColor="Red"></asp:Label>
 <style type="text/css">
  
 td.wbf-records-type { border: 0px; }
@@ -91,6 +58,8 @@ Select the folder into which to publish the document
 </td>
 <td class="wbf-metadata-value-panel">
 
+<div id="" style="overflow:scroll; height:400px; border: 1px solid #ccc; ">
+
   <SharePoint:SPTreeView
         id="WorkBoxFolders"
         UseInternalDataBindings="false"
@@ -108,6 +77,8 @@ Select the folder into which to publish the document
         ExpandImageUrl="/_layouts/images/tvplus.gif"
         CollapseImageUrl="/_layouts/images/tvminus.gif"
         NoExpandImageUrl="/_layouts/images/tvblank.gif" />
+
+</div>
 
 </td>
 </tr>
@@ -136,6 +107,12 @@ Selected folder: <asp:Label ID="SelectedFolderPath" runat="server" />
     <asp:Label ID="SelectedRecordID" runat="server" />
 </div>
 
+    <asp:HiddenField ID="FunctionalAreasUIControlValue" runat="server" />
+    <asp:HiddenField ID="RecordsTypeUIControlValue" runat="server" />
+    <asp:HiddenField ID="ProtectiveZone" runat="server" />
+    <asp:HiddenField ID="NewOrReplace" runat="server" />
+
+
     </ContentTemplate>
 </asp:UpdatePanel>
 
@@ -161,10 +138,10 @@ Selected folder: <asp:Label ID="SelectedFolderPath" runat="server" />
 
     <asp:HiddenField ID="ListGUID" runat="server" />
     <asp:HiddenField ID="ItemID" runat="server" />
-    <asp:HiddenField ID="TheDestinationType" runat="server" />
+    <asp:HiddenField ID="DestinationType" runat="server" />
     <asp:HiddenField ID="DestinationURL" runat="server" />
 
-
+</div>
 
 </asp:Content>
 

@@ -676,6 +676,10 @@ namespace WorkBoxFramework
                     {
                         return item[column.DisplayName];
                     }
+                case WBColumn.DataTypes.MultiLineText:
+                    {
+                        return item[column.DisplayName];
+                    }
                 case WBColumn.DataTypes.Integer:
                     {
                         return item[column.DisplayName];
@@ -1053,7 +1057,7 @@ namespace WorkBoxFramework
                         {
                             if (value is SPUser)
                             {
-                                item[column.DisplayName] = value;
+                                item.WBxSetSingleUserColumn(item.Web, column.DisplayName, (SPUser)value);
                             }
                             else if (String.IsNullOrEmpty(value.WBxToString()))
                             {
@@ -1061,7 +1065,7 @@ namespace WorkBoxFramework
                             }
                             else
                             {
-                                throw new Exception("In WBxSet() for User column type: The value being saved was not an SPUser object or null: " + value);
+                                throw new Exception("In WBxSet() for User column type: The value being saved was not an SPUser object or null: " + value + " for column: " + column.DisplayName);
                             }
                         }
                         else
@@ -1070,9 +1074,17 @@ namespace WorkBoxFramework
                             {
                                 item.WBxSetMultiUserColumn(item.Web, column, value as List<SPUser>);
                             }
-                            else
+                            else if (value is SPFieldUserValueCollection)
                             {
-                                throw new Exception("In WBxSet() for User column type: The value is not a List<SPUser> object when setting a multi-User column");
+                                item[column.DisplayName] = value;
+                            }
+                            else if (value == null)
+                            {
+                                item[column.DisplayName] = null;
+                            }
+                            else
+                            {                                
+                                throw new Exception("In WBxSet() for User column type: The value is not a List<SPUser> object when setting a multi-User column:  " + column.DisplayName + " the value's type is: " + value.GetType());
                             }
                         }
                         break;
@@ -1239,6 +1251,13 @@ namespace WorkBoxFramework
             }
 
             item[columnName] = userValueCollection;
+        }
+
+        public static void WBxSetSingleUserColumn(this SPListItem item, SPWeb web, String columnName, SPUser user)
+        {
+            SPFieldUserValue userValue = new SPFieldUserValue(web, user.ID, user.LoginName);
+
+            item[columnName] = userValue;
         }
 
 

@@ -912,6 +912,7 @@ namespace WorkBoxFramework
                 WBColumn.InvolvedIndividuals,
                 WBColumn.VisitingIndividuals,
                 WBColumn.ProtectiveZone,
+                WBColumn.LiveOrArchived,
                 WBColumn.OriginalFilename,
                 WBColumn.SourceSystem,
                 WBColumn.SourceID,
@@ -919,8 +920,13 @@ namespace WorkBoxFramework
                 WBColumn.RecordSeriesID,
                 WBColumn.ReplacesRecordID,
                 WBColumn.RecordSeriesIssue,
+                WBColumn.RecordSeriesStatus,
 
-                WBColumn.LiveOrArchived,
+                WBColumn.PublishingApprovedBy,
+                WBColumn.PublishingApprovalChecklist,
+                WBColumn.PublishingApprovalStatement,
+                WBColumn.PublishedBy,
+                WBColumn.DatePublished,
 
                 WBColumn.WorkBoxTemplateTitle,
                 WBColumn.WorkBoxTemplateStatus,
@@ -1080,6 +1086,7 @@ namespace WorkBoxFramework
                 WBColumn.RecordSeriesID,
                 WBColumn.ReplacesRecordID,
                 WBColumn.RecordSeriesIssue,
+                WBColumn.RecordSeriesStatus,
                 WBColumn.LiveOrArchived
             };
 
@@ -1096,6 +1103,11 @@ namespace WorkBoxFramework
             
             WBColumn[] optionalFields = 
             {
+                WBColumn.PublishingApprovedBy,
+                WBColumn.PublishingApprovalChecklist,
+                WBColumn.PublishingApprovalStatement,
+                WBColumn.PublishedBy,
+                WBColumn.DatePublished
             };
 
 

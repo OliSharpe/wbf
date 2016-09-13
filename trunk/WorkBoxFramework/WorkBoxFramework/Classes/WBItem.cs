@@ -237,6 +237,7 @@ namespace WorkBoxFramework
         {
             foreach (WBColumn column in columnsToCopy)
             {
+                WBLogging.Debug("Copying column: " + column.DisplayName);
                 this[column] = itemToCopy[column];
             }
         }
@@ -247,6 +248,7 @@ namespace WorkBoxFramework
 
             foreach (WBColumn column in columnsToCopy)
             {
+                WBLogging.Debug("Copying column: " + column.DisplayName);
                 this[column] = itemToCopy[column];
             }
         }
@@ -256,6 +258,7 @@ namespace WorkBoxFramework
             bool allCorrect = false;
             foreach (WBColumn column in columnsToCopy)
             {
+                WBLogging.Debug("Copying column in MaybeCopyColumns(): " + column.DisplayName);
                 if (this[column] != itemToCopy[column])
                 {
                     allCorrect = false;

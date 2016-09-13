@@ -229,13 +229,6 @@
     <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogPickLocation.aspx.designer.cs">
       <DependentUpon>PublishDocDialogPickLocation.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogSelfApprove.aspx.cs">
-      <DependentUpon>PublishDocDialogSelfApprove.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogSelfApprove.aspx.designer.cs">
-      <DependentUpon>PublishDocDialogSelfApprove.aspx.cs</DependentUpon>
-    </Compile>
     <Compile Include="Layouts\WorkBoxFramework\PublishDocRequiredMetadata.aspx.cs">
       <DependentUpon>PublishDocRequiredMetadata.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -245,6 +238,28 @@
     </Compile>
     <Compile Include="Classes\TreeViewLocation.cs" />
     <Compile Include="Classes\TreeViewLocationCollection.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocSelfApprove.aspx.cs">
+      <DependentUpon>PublishDocSelfApprove.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocSelfApprove.aspx.designer.cs">
+      <DependentUpon>PublishDocSelfApprove.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewRecordSeriesDetails.aspx.cs">
+      <DependentUpon>ViewRecordSeriesDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ViewRecordSeriesDetails.aspx.designer.cs">
+      <DependentUpon>ViewRecordSeriesDetails.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WebParts\SearchOrBrowseOurRecords\SearchOrBrowseOurRecords.cs" />
+    <Compile Include="WebParts\SearchOrBrowseOurRecords\SearchOrBrowseOurRecordsUserControl.ascx.cs">
+      <DependentUpon>SearchOrBrowseOurRecordsUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebParts\SearchOrBrowseOurRecords\SearchOrBrowseOurRecordsUserControl.ascx.designer.cs">
+      <DependentUpon>SearchOrBrowseOurRecordsUserControl.ascx.cs</DependentUpon>
+    </Compile>
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatus.cs" />
     <Compile Include="WebParts\ConfigurationStatus\ConfigurationStatusUserControl.ascx.cs">
       <DependentUpon>ConfigurationStatusUserControl.ascx</DependentUpon>
@@ -822,6 +837,10 @@
     <None Include="CustomActions\LinkedCalendarSettingsCustomAction\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{1e23a6c4-0355-4468-ae40-72b4eceaa13f}</SharePointProjectItemId>
     </None>
+    <None Include="WebParts\SearchOrBrowseOurRecords\SearchOrBrowseOurRecords.webpart" />
+    <None Include="WebParts\SearchOrBrowseOurRecords\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{55b6b29a-9cbb-40e4-a870-43749db2c4b9}</SharePointProjectItemId>
+    </None>
     <None Include="SharePointProjectItem.spdata" />
     <None Include="StyleLibrary\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{d7fb0eea-3b09-4265-85f2-56014fc263e2}</SharePointProjectItemId>
@@ -1113,14 +1132,21 @@
     <Content Include="Layouts\WorkBoxFramework\PublishDocDialogPickLocation.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\WorkBoxFramework\PublishDocDialogSelfApprove.aspx">
+    <Content Include="Layouts\WorkBoxFramework\PublishDocRequiredMetadata.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\WorkBoxFramework\PublishDocRequiredMetadata.aspx">
+    <Content Include="Layouts\WorkBoxFramework\PublishDocSelfApprove.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\SubjectTags.js" />
     <Content Include="Layouts\WorkBoxFramework\MailToLinkReplacement.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ViewRecordSeriesDetails.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="WebParts\SearchOrBrowseOurRecords\Elements.xml" />
+    <Content Include="WebParts\SearchOrBrowseOurRecords\SearchOrBrowseOurRecordsUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="StyleLibrary\Elements.xml" />

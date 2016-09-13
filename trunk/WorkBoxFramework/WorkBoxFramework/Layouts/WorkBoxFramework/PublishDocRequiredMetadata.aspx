@@ -49,7 +49,7 @@
 
             var toReplaceRecordPath = document.getElementById("<%=ToReplaceRecordPath.ClientID %>");
             toReplaceRecordPath.value = values[3];
-            
+
             document.forms['aspnetForm'].submit();
         }
     }
@@ -60,15 +60,18 @@
         var listGUID = document.getElementById("<%=ListGUID.ClientID %>");
         var itemID = document.getElementById("<%=ItemID.ClientID %>");
         var destinationTitle = document.getElementById("<%=DestinationTitle.ClientID %>");
+        var destinationType = document.getElementById("<%=TheDestinationType.ClientID %>");
         var newOrReplace = document.getElementById("<%=NewOrReplace.ClientID %>");
         var protectiveZone = document.getElementById("<%=ProtectiveZone.ClientID %>");
 
-        var urlValue = L_Menu_BaseUrl + '/_layouts/WorkBoxFramework/PublishDocDialogPickLocation.aspx?FunctionalAreasUIControlValue=' + currentFunctionalAreasUIControlValue
+        var urlValue = L_Menu_BaseUrl + '/_layouts/WorkBoxFramework/PublishDocDialogPickLocation.aspx' 
+            + '?FunctionalAreasUIControlValue=' + currentFunctionalAreasUIControlValue
             + '&RecordsTypeUIControlValue=' + currentRecordsTypeUIControlValue
             + "&NewOrReplace=" + $(newOrReplace).text()
             + "&ListGUID=" + listGUID.value
             + "&ItemID=" + itemID.value
             + "&DestinationTitle=" + destinationTitle.value
+            + "&DestinationType=" + destinationType.value
             + "&ProtectiveZone=" + protectiveZone.value;
 
         var options = {
@@ -82,6 +85,11 @@
         };
 
         SP.UI.ModalDialog.showModalDialog(options);
+    }
+
+    function WBF_editShortTitle() {
+        $("#wbf-show-short-title").hide();
+        $("#wbf-edit-short-title").show();
     }
 
 
@@ -129,7 +137,8 @@ You must enter the following metadata for the document
 <asp:HiddenField ID="ToReplaceRecordPath" runat="server" Value="" />
 
 <asp:HiddenField ID="ProtectiveZone" runat="server"/>
-<asp:Label ID="NewOrReplace" Text="New" runat="server"/>
+
+<asp:Label ID="NewOrReplace" runat="server"/>
 
 <table class="wbf-dialog-form">
 
@@ -167,8 +176,8 @@ I want to
 <asp:DropDownList id="ReplacementActions"
                     runat="server">
 
-                  <asp:ListItem Selected="True" Value="Archive"> Archive </asp:ListItem>
-                  <asp:ListItem Value="Leave"> Leave on public website </asp:ListItem>
+                  <asp:ListItem Value="Archive">Archive</asp:ListItem>
+                  <asp:ListItem Value="Retire">Retire</asp:ListItem>
 
                </asp:DropDownList>
 the document being replaced.
@@ -177,7 +186,7 @@ the document being replaced.
 </div>
 
 <div>
-<asp:RadioButton id="NewRadioButton" GroupName="NewOrReplaceRadios" Value="New" Checked="true"
+<asp:RadioButton id="NewRadioButton" GroupName="NewOrReplaceRadios" Value="New"
              Text="I want to publish a new document" runat="server"/>
 </div>
 <div>
@@ -198,17 +207,14 @@ the document being replaced.
 </td>
 <td class="wbf-field-value-panel">
 
-<div class="wbf-field-value">
-    <asp:TextBox ID="TitleField" runat="server"></asp:TextBox>
+<div id="wbf-show-short-title" class="wbf-field-value">
+    <asp:Label ID="ShortTitle" runat="server"></asp:Label> | <a href='#' onclick='WBF_editShortTitle();'>edit</a>
 </div>
-    <div class="wbf-field-error">
-    <asp:RequiredFieldValidator
-        ID="TitleFieldValidator" runat="server" 
-        ErrorMessage="You must enter a value for the Title"
-        ControlToValidate="TitleField">        
-    </asp:RequiredFieldValidator>
-    </div>
-<div class="wbf-field-description">Give a short, meaningful title.</div>
+
+<div id="wbf-edit-short-title" class="wbf-field-value" style=" display:none; ">
+
+    <asp:TextBox ID="EditShortTitle" runat="server"></asp:TextBox>
+</div>
 </td>
 </tr>
 
@@ -358,7 +364,7 @@ Other teams that were involved with the creation of this document.
 <tr>
 <td colspan="2" class="wbf-buttons-panel">
 <p>
-        <asp:Button ID="Publish" UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" Text="Publish" OnClick="publishButton_OnClick" />
+        <asp:Button ID="Publish" UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" Text="Next" OnClick="publishButton_OnClick" />
 
         &nbsp;
 
@@ -388,7 +394,6 @@ Other teams that were involved with the creation of this document.
         });
     });
 </script>
-
 
 </asp:Content>
 

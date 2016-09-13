@@ -238,22 +238,22 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.Label LocationPath;
         
         /// <summary>
-        /// TitleField control.
+        /// ShortTitle control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox TitleField;
+        protected global::System.Web.UI.WebControls.Label ShortTitle;
         
         /// <summary>
-        /// TitleFieldValidator control.
+        /// EditShortTitle control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator TitleFieldValidator;
+        protected global::System.Web.UI.WebControls.TextBox EditShortTitle;
         
         /// <summary>
         /// SubjectTagsTitle control.

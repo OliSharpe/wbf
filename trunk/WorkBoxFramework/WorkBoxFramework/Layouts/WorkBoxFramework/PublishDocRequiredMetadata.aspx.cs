@@ -83,10 +83,14 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 // The following variable has its name due to a strange compliation error with the name 'DestinationType' 
                 TheDestinationType.Value = Request.QueryString["DestinationType"];
                 DestinationURL.Value = Request.QueryString["DestinationURL"];
-                DestinationTitle.Text = Request.QueryString["DestinationTitle"] + " (" + Request.QueryString["DestinationType"] + ")";
+                DestinationTitle.Text = Request.QueryString["DestinationTitle"];
 
                 WBLogging.Generic.Verbose("DestinationType = " + TheDestinationType.Value);
                 WBLogging.Generic.Verbose("DestinationURL = " + DestinationURL.Value);
+
+                NewRadioButton.Checked = true;
+                NewOrReplace.Text = "New";
+                ReplacementActions.SelectedIndex = 0;
             }
 
             // Now do a check that we do at this stage have the basic details of the document:
@@ -221,7 +225,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             SourceDocIcon.AlternateText = "Icon of document being publishing out.";
             SourceDocIcon.ImageUrl = WBUtils.DocumentIcon32(sourceDocAsItem.Url);
 
-            TitleField.Text = sourceFile.Title;
+            EditShortTitle.Text = sourceFile.Title;
+            ShortTitle.Text = sourceFile.Title;
 
             ReadOnlyNameField.Text = sourceDocAsItem.Name;
  //           NameField.Text = sourceDocAsItem.Name;
@@ -248,17 +253,23 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 LocationPath.Text = ToReplaceRecordPath.Value;
             }
 
-            if (NewOrReplace.Text == "New")
+            if (recordBeingReplaced == null && NewOrReplace.Text == "New")
             {
+                WBLogging.Debug("Setting buttons etc for NEW");
+
                 NewRadioButton.Checked = true;
                 ReplaceRadioButton.Checked = false;
                 SelectLocationButton.Text = "Choose Location";
             }
             else
             {
+                WBLogging.Debug("Setting buttons etc for REPLACE");
+
                 NewRadioButton.Checked = false;
                 ReplaceRadioButton.Checked = true;
                 SelectLocationButton.Text = "Choose Document";
+
+                NewOrReplace.Text = "replace";
             }
 
 
@@ -539,8 +550,10 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             //          }
 
 
-
-            document.Title = TitleField.Text;
+            if (EditShortTitle.Text != ShortTitle.Text)
+            {
+                document.Title = EditShortTitle.Text;
+            }
             //sourceDocAsItem["Title"] = TitleField.Text;
 
             if (documentRecordsType.IsFunctionalAreaEditable)
@@ -633,12 +646,16 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (metadataProblems.Count > 0)
             {
-//                RecordsTypeFieldMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__RECORDS_TYPE].WBxToString();
+                String errorMessage = ErrorMessageLabel.Text;
 
-  //              FunctionalAreaFieldMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__FUNCTIONAL_AREA].WBxToString();
-//                ProtectiveZoneMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__PROTECTIVE_ZONE].WBxToString();
+                // Have to give these somewhere to be be shown!
+                errorMessage += metadataProblems[WorkBox.COLUMN_NAME__RECORDS_TYPE].WBxToString();
+                errorMessage += metadataProblems[WorkBox.COLUMN_NAME__FUNCTIONAL_AREA].WBxToString();
+                errorMessage += metadataProblems[WorkBox.COLUMN_NAME__PROTECTIVE_ZONE].WBxToString();
+                errorMessage += metadataProblems[WorkBox.COLUMN_NAME__SUBJECT_TAGS].WBxToString();
+                
+                ErrorMessageLabel.Text = errorMessage;
 
-                //               SubjectTagsMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__SUBJECT_TAGS].WBxToString();
                 ReferenceIDMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__REFERENCE_ID].WBxToString(); ;
                 ReferenceDateMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__REFERENCE_DATE].WBxToString(); ;
                 SeriesTagFieldMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__SERIES_TAG].WBxToString();
@@ -701,120 +718,18 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                         if (errorMessage == "")
                         {
                             successMessage += "<tr><td>Filename</td><td><b>" + sourceFile.Name + "</b></td></tr><tr><td>Published out to:</td><td><a href=\"" + destinationRootFolderUrl + "\"><b>" + destinationRootFolderUrl + "</b></a></td></tr>";
+                            successMessage += "</table>";
+                            GoToGenericOKPage("Publishing Out Success", successMessage);
+                        }
+                        else
+                        {
+                            GoToGenericOKPage("Publishing Out Error", errorMessage);
                         }
                     }
                 }
                 else
                 {
-                    // WBRecordsType recordsType = new WBRecordsType(recordsTypeTaxonomy, document[WBColumn.RecordsType].WBxToString());
-
-                        try
-                        {
-                            WBLogging.Debug("In publishButton_OnClick(): About to try to publish replacing: " + ToReplaceRecordID.Value + " with action: " + ReplacementActions.SelectedValue);
-
-                            manager.PublishDocument(WorkBox, document, ToReplaceRecordID.Value, ReplacementActions.SelectedValue, new WBItem());
-
-                            WBLogging.Debug("In publishButton_OnClick(): Should have finished the publishing");
-
-                            //recordsType.PublishDocument(document, sourceFile.OpenBinaryStream());
-
-                            string fullClassPath = "Just a test"; //  WBUtils.NormalisePath(document.FunctionalArea.Names() + "/" + recordsType.FullPath);
-
-                            successMessage += "<tr><td>Published out to location:</td><td>" + fullClassPath + "</td></tr>\n";
-
-
-                            if (document.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
-                            {
-                                successMessage += "<tr><td>To public records library</td><td><a href=\"http://stagingweb/publicrecords\">Our public library</a></td></tr>\n";
-                            }
-
-                            if (document.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
-                            {
-                                successMessage += "<tr><td>To public extranet records library</td><td><a href=\"http://stagingextranets/records\">Our public extranet library</a></td></tr>\n";
-                            }
-
-                            successMessage += "<tr><td>To internal records library</td><td><a href=\"http://sp.izzi/library/Pages/ViewByFunctionThenType.aspx\">Our internal library</a></td></tr>\n";
-
-                        }
-                        catch (Exception exception)
-                        {
-                            errorMessage = "An error occurred when trying to publish: " + exception.Message;
-                            WBLogging.Generic.Unexpected(exception);
-                        }
-
-
-
-                }
-
-                /*
-                                WBFarm farm = WBFarm.Local;
-                                string destinationRootFolderUrl = farm.ProtectedRecordsLibraryUrl;
-                                List<String> filingPath = null;
-
-
-                                filingPath = documentRecordsType.FilingPathForItem(sourceDocAsItem);
-
-                                string filingPathString = string.Join("/", filingPath.ToArray());
-
-                                WBLogging.Generic.Verbose("The file is: " + sourceFile.Url);
-                                WBLogging.Generic.Verbose("The destination is: " + destinationRootFolderUrl);
-                                WBLogging.Generic.Verbose("The destination filing path is: " + filingPathString);
-
-
-                                string errorMessage = sourceFile.WBxCopyTo(destinationRootFolderUrl, filingPath);
-
-                                if (errorMessage == "")
-                                {
-                                    successMessage += "<tr><td>Filename</td><td><b>" + sourceFile.Name + "</b></td></tr><tr><td>Published out to:</td><td><a href=\"" + destinationRootFolderUrl + "\"><b>" + destinationRootFolderUrl + "</b></a></td></tr><tr><td>Filing path:</td><td><a href=\"" + destinationRootFolderUrl + "/" + filingPathString + "\"><b>" + filingPathString + "</b></td></tr>";
-                                }
-
-                                WBLogging.Generic.Verbose("Protective zone was set to be: " + protectiveZone);
-
-
-                                if (!TheDestinationType.Value.Equals(WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__WORK_BOX)
-                                    && protectiveZone.Equals(WBRecordsType.PROTECTIVE_ZONE__PUBLIC))
-                                {
-                                    // OK so we're going to copy this to the public library as well:
-                                WBLogging.Generic.Verbose("The file is: " + sourceFile.Url);
-                                WBLogging.Generic.Verbose("The destination is: " + farm.PublicRecordsLibraryUrl);
-                                WBLogging.Generic.Verbose("The destination filing path is: " + filingPathString);
-
-                                    string errorMessagePublic = sourceFile.WBxCopyTo(farm.PublicRecordsLibraryUrl, filingPath);
-
-                                    if (errorMessagePublic == "")
-                                    {
-                                        successMessage += "<tr><td colspan='2'><b>And also published to the public library.</b></td></tr>";
-                                    }
-                                }
-
-                                if (!TheDestinationType.Value.Equals(WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__WORK_BOX)
-                                    && protectiveZone.Equals(WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET))
-                                {
-                                    // OK so we're going to copy this to the public extranet library as well:
-                                    WBLogging.Generic.Verbose("The file is: " + sourceFile.Url);
-                                    WBLogging.Generic.Verbose("The destination is: " + farm.PublicExtranetRecordsLibraryUrl);
-                                    WBLogging.Generic.Verbose("The destination filing path is: " + filingPathString);
-
-                                    string errorMessagePublicExtranet = sourceFile.WBxCopyTo(farm.PublicExtranetRecordsLibraryUrl, filingPath);
-
-                                    if (errorMessagePublicExtranet == "")
-                                    {
-                                        successMessage += "<tr><td colspan='2'><b>And also published to the public extranet library.</b></td></tr>";
-                                    }
-                                }
-                                */
-                successMessage += "</table>";
-
-                if (errorMessage == "")
-                {
-                    //returnFromDialogOKAndRefresh();
-                    GoToGenericOKPage("Publishing Out Success", successMessage);
-                }
-                else
-                {
-                    GoToGenericOKPage("Publishing Out Error", errorMessage);
-
-                    //returnFromDialogOK("An error occurred during publishing: " + errorMessage);
+                    GoToApprovalPage();
                 }
             }
         }
@@ -861,6 +776,29 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             return dataRow;
 
+        }
+
+
+        private void GoToApprovalPage()
+        {
+            String destinationType = TheDestinationType.Value;
+            String destinationTitle = DestinationTitle.Text;
+            String destinationUrl = DestinationURL.Value;
+            string listGuid = ListGUID.Value;
+            string itemID = ItemID.Value;
+
+            string redirectUrl = "WorkBoxFramework/PublishDocSelfApprove.aspx?"
+                + "ListGUID=" + listGuid
+                + "&ItemID=" + itemID
+                + "&DestinationURL=" + destinationUrl
+                + "&DestinationTitle=" + destinationTitle
+                + "&DestinationType=" + destinationType
+                + "&ToReplaceRecordID=" + ToReplaceRecordID.Value
+                + "&ToReplaceRecordPath=" + ToReplaceRecordPath.Value
+                + "&NewOrReplace=" + NewOrReplace.Text
+                + "&ReplacementAction=" + ReplacementActions.SelectedValue;
+
+            SPUtility.Redirect(redirectUrl, SPRedirectFlags.RelativeToLayoutsPage, Context);
         }
 
 
