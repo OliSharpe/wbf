@@ -184,6 +184,14 @@ namespace WorkBoxFramework
             return textColumn;
         }
 
+        public static WBColumn UniqueTextColumn(String displayName)
+        {
+            WBColumn newColumn = new WBColumn(displayName, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, DataTypes.Text);
+            newColumn.EnforceUniqueValues = true;
+
+            return newColumn;
+        }
+
 
         public static WBColumn MultiLineTextColumn(String displayName)
         {
@@ -439,8 +447,23 @@ namespace WorkBoxFramework
             set
             {
                 _enforceUniqueValues = value;
+                if (_enforceUniqueValues) IsIndexed = true;
             }
         }
+
+        private bool _isIndexed = false;
+        public bool IsIndexed
+        {
+            get
+            {
+                return _isIndexed;
+            }
+            set
+            {
+                _isIndexed = value;
+            }
+        }
+
 
         private String _defaultValue = "";
         public String DefaultValue 
@@ -567,6 +590,10 @@ namespace WorkBoxFramework
                             textField.StaticName = InternalName;
                             textField.Group = siteColumnsGroupName;
 
+                            textField.Indexed = IsIndexed;
+                            textField.EnforceUniqueValues = EnforceUniqueValues;
+                            textField.Required = ValueIsRequired;
+
                             web.Fields.Add(textField);
                             web.Update();
 
@@ -582,6 +609,11 @@ namespace WorkBoxFramework
                             multiLineTextField.Group = siteColumnsGroupName;
                             multiLineTextField.RichText = false;
 
+                            multiLineTextField.Indexed = IsIndexed;
+                            multiLineTextField.EnforceUniqueValues = EnforceUniqueValues;
+                            multiLineTextField.Required = ValueIsRequired;
+
+
                             web.Fields.Add(multiLineTextField);
                             web.Update();
 
@@ -595,6 +627,7 @@ namespace WorkBoxFramework
                             numberField.StaticName = InternalName;
                             numberField.Group = siteColumnsGroupName;
 
+                            numberField.Indexed = IsIndexed;
                             numberField.EnforceUniqueValues = true;
                             numberField.Indexed = true;
                             numberField.DisplayFormat = SPNumberFormatTypes.NoDecimal;
@@ -614,6 +647,11 @@ namespace WorkBoxFramework
 
                             numberField.DisplayFormat = SPNumberFormatTypes.NoDecimal;
 
+                            numberField.Indexed = IsIndexed;
+                            numberField.EnforceUniqueValues = EnforceUniqueValues;
+                            numberField.Required = ValueIsRequired;
+
+
                             web.Fields.Add(numberField);
                             web.Update();
 
@@ -626,6 +664,11 @@ namespace WorkBoxFramework
                             dateTimeField.Title = DisplayName;
                             dateTimeField.StaticName = InternalName;
                             dateTimeField.Group = siteColumnsGroupName;
+
+                            dateTimeField.Indexed = IsIndexed;
+                            dateTimeField.EnforceUniqueValues = EnforceUniqueValues;
+                            dateTimeField.Required = ValueIsRequired;
+
 
                             if (UseDateAndTime)
                             {
@@ -660,11 +703,16 @@ namespace WorkBoxFramework
                             taxonomyField.TermSetId = termSet.Id;
 
                             taxonomyField.AllowMultipleValues = AllowMultipleValues;
+                            taxonomyField.Indexed = IsIndexed;
+                            taxonomyField.EnforceUniqueValues = EnforceUniqueValues;
+                            taxonomyField.Required = ValueIsRequired;
 
                             taxonomyField.TargetTemplate = string.Empty;
                             taxonomyField.CreateValuesInEditForm = true;
                             taxonomyField.Open = false;
                             taxonomyField.AnchorId = Guid.Empty;
+
+
 
                             web.Fields.Add(taxonomyField);
                             web.Update();
@@ -696,6 +744,11 @@ namespace WorkBoxFramework
 
                             choiceField.FillInChoice = AllowFillInValues;
 
+                            choiceField.Indexed = IsIndexed;
+                            choiceField.EnforceUniqueValues = EnforceUniqueValues;
+                            choiceField.Required = ValueIsRequired;
+
+
                             web.Fields.Add(choiceField);
                             web.Update();
 
@@ -722,6 +775,10 @@ namespace WorkBoxFramework
                             urlField.StaticName = InternalName;
                             urlField.Group = siteColumnsGroupName;
 
+                            urlField.Indexed = IsIndexed;
+                            urlField.EnforceUniqueValues = EnforceUniqueValues;
+                            urlField.Required = ValueIsRequired;
+
                             web.Fields.Add(urlField);
                             web.Update();
 
@@ -736,6 +793,10 @@ namespace WorkBoxFramework
                             userField.Group = siteColumnsGroupName;
 
                             userField.AllowMultipleValues = AllowMultipleValues;
+                            userField.Indexed = IsIndexed;
+                            userField.EnforceUniqueValues = EnforceUniqueValues;
+                            userField.Required = ValueIsRequired;
+
                             userField.SelectionMode = SPFieldUserSelectionMode.PeopleOnly;
 
                             web.Fields.Add(userField);
@@ -893,6 +954,30 @@ namespace WorkBoxFramework
         public static readonly WBColumn PublishedBy = WBColumn.UserColumn("Published By", INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, false);
         public static readonly WBColumn DatePublished = WBColumn.DateTimeColumn("Date Published", "DatePublished", "Published Date");
 
+
+        public static readonly WBColumn FileTypeExtension = WBColumn.UniqueTextColumn("File Type Extension");
+        public static readonly WBColumn CanPublishToPublic = WBColumn.BooleanColumn("Can Publish To Public");
+        public static readonly WBColumn CanBulkPublishToPublic = WBColumn.BooleanColumn("Can Bulk Publish To Public");
+        public static readonly WBColumn FileTypePrettyName = WBColumn.TextColumn("File Type Pretty Name");
+
+        public static readonly String DOCUMENT_TYPE__TEXT_DOCUMENT = "Text Document";
+        public static readonly String DOCUMENT_TYPE__SPREADSHEET = "Spreadsheet";
+        public static readonly String DOCUMENT_TYPE__IMAGE_OR_VIDEO = "Image or Video";
+        public static readonly String DOCUMENT_TYPE__UNKNOWN = "Unknown";
+        private static string[] documentTypeChoices = 
+        {
+            DOCUMENT_TYPE__TEXT_DOCUMENT,
+            DOCUMENT_TYPE__SPREADSHEET,
+            DOCUMENT_TYPE__IMAGE_OR_VIDEO,
+            DOCUMENT_TYPE__UNKNOWN
+        };
+        public static readonly WBColumn DocumentType = WBColumn.ChoiceColumn("Document Type", documentTypeChoices);
+
+        public static readonly WBColumn Order = WBColumn.IntegerColumn("Order");
+
+        public static readonly WBColumn CheckBoxCode = WBColumn.UniqueTextColumn("Check Box Code");
+        public static readonly WBColumn CheckBoxText = WBColumn.TextColumn("Check Box Text");
+        public static readonly WBColumn UseCheckBox = WBColumn.BooleanColumn("Use Check Box");
 
 
         public static readonly WBColumn WorkBoxTemplate = WBColumn.LookupColumn(WorkBox.COLUMN_NAME__WORK_BOX_TEMPLATE, false, WorkBox.LIST_NAME__WORK_BOX_TEMPLATES);

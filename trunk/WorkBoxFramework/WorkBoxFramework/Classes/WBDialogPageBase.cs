@@ -158,6 +158,22 @@ namespace WorkBoxFramework
             Page.Response.Write(String.Format(CultureInfo.InvariantCulture, "<script type=\"text/javascript\">window.frameElement.commonModalDialogClose({0}, {1});</script>", new object[] { resultValue, String.IsNullOrEmpty(returnValue) ? "null" : String.Format("\"{0}\"", returnValue) }));
             Page.Response.End(); 
         }
+
+        protected void ReturnJSONFromDialogOK(string returnValue)
+        {
+            int resultValue = OK_RESULT;
+
+            WBLogging.Debug("Dialog returning with values: result = " + resultValue + " return = " + returnValue);
+
+            //            if (Page.Request.QueryString["IsDlg"] != null)
+            //              SPUtility.Redirect("/", SPRedirectFlags.UseSource, Context, "");
+
+
+            Page.Response.Clear();
+            Page.Response.Write(String.Format(CultureInfo.InvariantCulture, "<script type=\"text/javascript\">\n var returnVal = {1}; \n window.frameElement.commonModalDialogClose({0}, returnVal);</script>", new object[] { resultValue, String.IsNullOrEmpty(returnValue) ? "null" : String.Format("'{0}'", returnValue) }));
+            Page.Response.End();
+        }
+
         #endregion
 
         #region Go To methods

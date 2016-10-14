@@ -204,7 +204,10 @@ namespace WorkBoxFramework.ControlTemplates.WorkBoxFramework
             }
             catch (Exception exception)
             {
+
                 // If this isn't working - let's just do nothing so that at least the SharePoint site is visible.
+                scriptForSettingGlobalVariables = "<!-- Exception thrown in MaybeShowWorkBoxRibbonTools \n\n" + exception.Message + "\n\n" + exception.StackTrace + "\n\n-->";
+
             }
         }
 

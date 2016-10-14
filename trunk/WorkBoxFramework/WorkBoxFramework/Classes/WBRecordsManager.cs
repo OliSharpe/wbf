@@ -16,6 +16,11 @@ namespace WorkBoxFramework
         public const String REPLACING_ACTION__NOTHING = "Nothing";
         public const String REPLACING_ACTION__ARCHIVE = "Archive";
 
+        public const String FILE_TYPES_LIST_NAME = "FileTypes";
+        public const String CHECK_BOXES_LIST_NAME = "CheckBoxes";
+        public const String FILE_TYPES_LIST_TITLE = "File Types";
+        public const String CHECK_BOXES_LIST_TITLE = "Check Boxes";
+
         #endregion
 
 
@@ -61,8 +66,8 @@ namespace WorkBoxFramework
 
         #region Methods
 
-
-        public WBTaskFeedback PublishDocument(String documentURL)
+        /*
+        public WBPublishingProcess PublishDocument(String documentURL)
         {
             WBTaskFeedback feedback = null;
 
@@ -74,7 +79,7 @@ namespace WorkBoxFramework
             return feedback;
         }
 
-        public WBTaskFeedback PublishDocument(String documentURL, String replacingRecordID, String replacingAction)
+        public WBPublishingProcess PublishDocument(String documentURL, String replacingRecordID, String replacingAction)
         {
             WBTaskFeedback feedback = null;
 
@@ -86,13 +91,12 @@ namespace WorkBoxFramework
             return feedback;
         }
 
-        public WBTaskFeedback PublishDocument(WorkBox workBox, String documentURL)
+        public WBPublishingProcess PublishDocument(WorkBox workBox, String documentURL)
         {
             return PublishDocument(workBox, documentURL, null, null);
         }
 
-
-        public WBTaskFeedback PublishDocument(WorkBox workBox, String documentURL, String replacingRecordID, String replacingAction)
+        public WBPublishingProcess PublishDocument(WorkBox workBox, String documentURL, String replacingRecordID, String replacingAction)
         {
             SPListItem item = workBox.Web.GetListItem(documentURL);
             if (item == null)
@@ -104,36 +108,89 @@ namespace WorkBoxFramework
 
             return PublishDocument(workBox, new WBDocument(item), replacingRecordID, replacingAction, new WBItem());
         }
-        
-        public WBTaskFeedback PublishDocument(WorkBox workBox, WBDocument document)
-        {
-            return PublishDocument(workBox, document, null, null, new WBItem());
-        }
 
-        public WBTaskFeedback PublishDocument(WorkBox workBox, WBDocument document, String replacingRecordID, String replacingAction, WBItem extraMetadata)
+         */
+ 
+        public WBPublishingProcess PublishDocument(WorkBox workBox, WBDocument document)
         {
-            WBTaskFeedback feedback = new WBTaskFeedback(WBTaskFeedback.TASK_TYPE__PUBLISH, document.AbsoluteURL);
+            throw new NotImplementedException("This method is no longer being used!!");
+         //   return PublishDocument(workBox, document, null, null, new WBItem());
+        }
+        
+        public WBPublishingProcess PublishDocument(WBPublishingProcess process)
+        {
+            SPListItem currentItem = process.CurrentItem;
+            WBDocument document = new WBDocument(process.WorkBox, currentItem);
+            
+            WBTaskFeedback feedback = new WBTaskFeedback(WBTaskFeedback.TASK_TYPE__PUBLISH, process.CurrentItemID);
+            feedback.PrettyName = document.Name;
+
+            process.LastTaskFeedback = feedback;
+
+            if (process.RecordsTypeTaxonomy == null)
+            {
+                WBLogging.Debug("Yeah - the process.RecordsTypeTaxonomy == null !! ");
+            }
+            else
+            {
+                WBLogging.Debug("No - the process.RecordsTypeTaxonomy was NOT  null !! ");
+            }
+
+            try
+            {
+                // Setting the various keys metadata values on the document to be published:
+                WBRecordsType recordsType = new WBRecordsType(process.RecordsTypeTaxonomy, process.RecordsTypeUIControlValue);
+                document.RecordsType = recordsType;
+                document.FunctionalArea = new WBTermCollection<WBTerm>(process.FunctionalAreasTaxonomy, process.FunctionalAreaUIControlValue);
+                document.SubjectTags = new WBTermCollection<WBSubjectTag>(process.SubjectTagsTaxonomy, process.SubjectTagsUIControlValue);
+                document.OwningTeam = new WBTeam(process.TeamsTaxonomy, process.OwningTeamUIControlValue);
+                document.InvolvedTeams = new WBTermCollection<WBTeam>(process.TeamsTaxonomy, process.InvolvedTeamsUIControlValue);
+                document.ProtectiveZone = process.ProtectiveZone;
+                document.Title = process.CurrentShortTitle;
+
+                document.Update();
+                document.Reload();
+
+                process.WorkBox.GenerateFilename(recordsType, currentItem);
+
+                document.Update();
+                document.Reload();
+
+                process.ReloadCurrentItem();
+            }
+            catch (Exception e)
+            {
+                feedback.Failed("It was not possible to save the metadata to the document before publishing it", e);
+                WBLogging.Debug("It was not possible to save the metadata to the document before publishing it");
+
+                process.CurrentItemFailed();
+                return process;
+            }
 
             WBLogging.Debug("Starting WBRecordsManager.PublishDocument()");
 
             if (!document.IsSPListItem) {
                 feedback.Failed("You can currently only publish SPListItem backed WBDocument objects");
                 WBLogging.Debug("WBRecordsManager.PublishDocument(): WBDocument wasn't a list item");
-                return feedback;
+
+                process.CurrentItemFailed();
+                return process;
             }
 
             WBRecord recordToReplace = null;
 
-            if (!String.IsNullOrEmpty(replacingRecordID))
+            if (!String.IsNullOrEmpty(process.ToReplaceRecordID))
             {
-                WBLogging.Debug("WBRecordsManager.PublishDocument(): Replacing record with id: " + replacingRecordID);
-                recordToReplace = Libraries.GetRecordByID(replacingRecordID);
+                WBLogging.Debug("WBRecordsManager.PublishDocument(): Replacing record with id: " + process.ToReplaceRecordID);
+                recordToReplace = Libraries.GetRecordByID(process.ToReplaceRecordID);
 
                 if (recordToReplace == null)
                 {
-                    feedback.Failed("Couldn't find the record that is meant to be replaced with Record ID = " + replacingRecordID);
-                    WBLogging.Debug("WBRecordsManager.PublishDocument(): Couldn't find the record that is meant to be replaced with Record ID = " + replacingRecordID);
-                    return feedback;
+                    feedback.Failed("Couldn't find the record that is meant to be replaced with Record ID = " + process.ToReplaceRecordID);
+                    WBLogging.Debug("WBRecordsManager.PublishDocument(): Couldn't find the record that is meant to be replaced with Record ID = " + process.ToReplaceRecordID);
+
+                    process.CurrentItemFailed();
+                    return process;
                 }
 
             }
@@ -141,11 +198,25 @@ namespace WorkBoxFramework
 
             WBLogging.Debug("WBRecordsManager.PublishDocument(): About to declare new record");
 
-            WBRecord newRecord = Libraries.DeclareNewRecord(feedback, document, recordToReplace, replacingAction, extraMetadata);
+            try
+            {
+                WBRecord newRecord = Libraries.DeclareNewRecord(feedback, document, recordToReplace, process.ReplaceAction, new WBItem());
+            }
+            catch (Exception e)
+            {
+                feedback.Failed("Something went wrong with the publishing process", e);
+                WBLogging.Debug("Something went wrong with the publishing process");
+
+                process.CurrentItemFailed();
+                return process;
+            }
 
             WBLogging.Debug("WBRecordsManager.PublishDocument(): Declared new record");
 
-            return feedback;
+            feedback.Success();
+
+            process.CurrentItemSucceeded();
+            return process;
         }
 
         public bool AllowBulkPublishingOfFileType(String fileType)

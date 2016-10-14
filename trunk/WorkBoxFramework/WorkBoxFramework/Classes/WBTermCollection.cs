@@ -38,7 +38,7 @@ namespace WorkBoxFramework
         public WBTermCollection(WBTaxonomy taxonomy, String UIControlValue)
         {
             _taxonomy = taxonomy;
-            _UIControlValue = UIControlValue;
+            _UIControlValue = UIControlValue.WBxTrim();
             _list = null;
         }
 
@@ -127,14 +127,17 @@ namespace WorkBoxFramework
         private void makeList()
         {
             _list = new List<T>();
-            if (_UIControlValue == null || _UIControlValue == "") return;
+            if (String.IsNullOrEmpty(_UIControlValue)) return;
 
             string[] values = _UIControlValue.Split(';');
             foreach (string value in values)
             {
-                T term = new T();
-                term.Initialise(_taxonomy, value);
-                _list.Add(term);
+                if (!String.IsNullOrEmpty(value.WBxTrim()))
+                {
+                    T term = new T();
+                    term.Initialise(_taxonomy, value.WBxTrim());
+                    _list.Add(term);
+                }
             }
         }
 

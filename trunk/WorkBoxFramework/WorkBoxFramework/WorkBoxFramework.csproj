@@ -107,6 +107,9 @@
     <Compile Include="Features\LinkedCalendars\LinkedCalendars.EventReceiver.cs">
       <DependentUpon>LinkedCalendars.feature</DependentUpon>
     </Compile>
+    <Compile Include="Features\UpdateRecordsMetadata\UpdateRecordsMetadata.EventReceiver.cs">
+      <DependentUpon>UpdateRecordsMetadata.feature</DependentUpon>
+    </Compile>
     <Compile Include="Features\TeamSiteCalendarUpdates\TeamSiteCalendarUpdates.EventReceiver.cs">
       <DependentUpon>TeamSiteCalendarUpdates.feature</DependentUpon>
     </Compile>
@@ -222,6 +225,13 @@
     <Compile Include="Classes\WBRecordsLibraries.cs" />
     <Compile Include="Classes\WBRecordsLibrary.cs" />
     <Compile Include="Classes\WBRecordsManager.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocActuallyPublish.aspx.cs">
+      <DependentUpon>PublishDocActuallyPublish.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocActuallyPublish.aspx.designer.cs">
+      <DependentUpon>PublishDocActuallyPublish.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\WorkBoxFramework\PublishDocDialogPickLocation.aspx.cs">
       <DependentUpon>PublishDocDialogPickLocation.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -238,6 +248,13 @@
     </Compile>
     <Compile Include="Classes\TreeViewLocation.cs" />
     <Compile Include="Classes\TreeViewLocationCollection.cs" />
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocSelectProtectiveZone.aspx.cs">
+      <DependentUpon>PublishDocSelectProtectiveZone.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\PublishDocSelectProtectiveZone.aspx.designer.cs">
+      <DependentUpon>PublishDocSelectProtectiveZone.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\WorkBoxFramework\PublishDocSelfApprove.aspx.cs">
       <DependentUpon>PublishDocSelfApprove.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -252,6 +269,7 @@
     <Compile Include="Layouts\WorkBoxFramework\ViewRecordSeriesDetails.aspx.designer.cs">
       <DependentUpon>ViewRecordSeriesDetails.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Classes\WBPublishingProcess.cs" />
     <Compile Include="WebParts\SearchOrBrowseOurRecords\SearchOrBrowseOurRecords.cs" />
     <Compile Include="WebParts\SearchOrBrowseOurRecords\SearchOrBrowseOurRecordsUserControl.ascx.cs">
       <DependentUpon>SearchOrBrowseOurRecordsUserControl.ascx</DependentUpon>
@@ -1064,12 +1082,16 @@
     <Content Include="Images\WorkBoxFramework\columns-icon-32.png" />
     <Content Include="Images\WorkBoxFramework\details-view-32.png" />
     <Content Include="Images\WorkBoxFramework\filter-icon-32.png" />
+    <Content Include="Images\WorkBoxFramework\green-tick-16.png" />
     <Content Include="Images\WorkBoxFramework\green-tick-32.png" />
     <Content Include="Images\WorkBoxFramework\icons-view-32.png" />
+    <Content Include="Images\WorkBoxFramework\list-item-16.png" />
     <Content Include="Images\WorkBoxFramework\list-item-32.png" />
     <Content Include="Images\WorkBoxFramework\menu-icon-32.png" />
     <Content Include="Images\WorkBoxFramework\order-by-icon-32.png" />
     <Content Include="Images\WorkBoxFramework\plus-icon-32.png" />
+    <Content Include="Images\WorkBoxFramework\processing-task-32.gif" />
+    <Content Include="Images\WorkBoxFramework\red-cross-16.png" />
     <Content Include="Images\WorkBoxFramework\red-cross-32.png" />
     <Content Include="Images\WorkBoxFramework\search-icon-32.png" />
     <Content Include="Images\WorkBoxFramework\work-box-closed-16.png" />
@@ -1129,10 +1151,16 @@
     <Content Include="ADMIN\WorkBoxFramework\RecordsManagementAdmin.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
+    <Content Include="Layouts\WorkBoxFramework\PublishDocActuallyPublish.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\PublishDocDialogPickLocation.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\PublishDocRequiredMetadata.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\PublishDocSelectProtectiveZone.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\PublishDocSelfApprove.aspx">

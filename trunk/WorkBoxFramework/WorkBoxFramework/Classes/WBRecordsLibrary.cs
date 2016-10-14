@@ -241,7 +241,7 @@ namespace WorkBoxFramework
             }
         }
 
-        public WBDocument GetOrCreateRecordCopy(WBRecord record)
+        public WBDocument GetOrCreateRecordCopy(WBTaskFeedback feedback, WBRecord record)
         {
             WBDocument masterRecordDocument = record.ProtectedMasterRecord;
             WBDocument recordCopyDocument = GetDocumentByID(record.RecordID);
@@ -294,6 +294,11 @@ namespace WorkBoxFramework
 
                 recordCopyDocument.DebugName = "Copy of " + record.RecordID + " for: " + this.URL;
 
+                if (feedback != null)
+                {
+                    feedback.Created("Created copy: " + recordCopyDocument.AbsoluteURL);
+                    feedback.Created("In folder: " + WBUtils.GetFolderPathWithoutFilename(recordCopyDocument.AbsoluteURL));
+                }
             }
 
             return recordCopyDocument;

@@ -32,12 +32,13 @@ using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.Taxonomy;
+using Newtonsoft.Json;
 
 namespace WorkBoxFramework.Layouts.WorkBoxFramework
 {
     public partial class PublishDocSelfApprove : WorkBoxDialogPageBase
     {
-        protected List<SPListItem> ListItems;
+        private WBPublishingProcess process = null;
 
         WBRecordsManager manager = null;
         WBRecord recordBeingReplaced = null;
@@ -55,49 +56,23 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             // If this is the initial call to the page then we need to load the basic details of the document we're publishing out:
             if (!IsPostBack)
             {
-                ListGUID.Value = Request.QueryString["ListGUID"];
-                ItemID.Value = Request.QueryString["ItemID"];
+                process = JsonConvert.DeserializeObject<WBPublishingProcess>(Request.QueryString["PublishingProcessJSON"]);
+                process.WorkBox = WorkBox;
 
-                // The following variable has its name due to a strange compliation error with the name 'DestinationType' 
-                TheDestinationType.Value = Request.QueryString["DestinationType"];
-                DestinationURL.Value = Request.QueryString["DestinationURL"];
-                DestinationTitle.Text = Request.QueryString["DestinationTitle"];
+//                WBLogging.Debug("Created the WBProcessObject");
 
-                ToReplaceRecordID.Value = Request.QueryString["ToReplaceRecordID"];
-                ToReplaceRecordPath.Value = Request.QueryString["ToReplaceRecordPath"];
-                NewOrReplace.Value = Request.QueryString["NewOrReplace"];
-                ReplacementAction.Value = Request.QueryString["ReplacementAction"];
+                PublishingProcessJSON.Value = JsonConvert.SerializeObject(process);
 
-                WBLogging.Debug("NewOrReplace = " + NewOrReplace.Value);
-                WBLogging.Debug("ReplacementAction = " + ReplacementAction.Value);
-                WBLogging.Debug("ToReplaceRecordID = " + ToReplaceRecordID.Value);
-                WBLogging.Debug("ToReplaceRecordPath = " + ToReplaceRecordPath.Value);
+   //             WBLogging.Debug("Serialized the WBProcessObject to hidden field");
 
-                WBLogging.Generic.Verbose("DestinationType = " + TheDestinationType.Value);
-                WBLogging.Generic.Verbose("DestinationURL = " + DestinationURL.Value);
             }
-
-            // Now do a check that we do at this stage have the basic details of the document:
-            if (ListGUID.Value == null || ListGUID.Value == "")
+            else
             {
-                errorMessage += "ListGUID hasn't been set. ";
+                process = JsonConvert.DeserializeObject<WBPublishingProcess>(PublishingProcessJSON.Value);
+                process.WorkBox = WorkBox;
             }
 
-            if (ItemID.Value == null || ItemID.Value == "")
-            {
-                errorMessage += "ItemID hasn't been set. ";
-            }
 
-            if (TheDestinationType.Value == null || TheDestinationType.Value == "")
-            {
-                errorMessage += "DestinationType hasn't been set. ";
-            }
-
-            if (errorMessage.Length > 0)
-            {
-                ErrorMessageLabel.Text = errorMessage;
-                return;
-            }
 
             // Let's clear out all of the error messages text fields:
             ErrorMessageLabel.Text = "";
@@ -105,23 +80,25 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             //OK so we have the basic identity information for the document being published out so let's get the document item:
 
-            Guid sourceListGuid = new Guid(ListGUID.Value);
+            Guid sourceListGuid = new Guid(process.ListGUID);
             SPDocumentLibrary sourceDocLib = (SPDocumentLibrary)WorkBox.Web.Lists[sourceListGuid];
 
-            sourceDocAsItem = sourceDocLib.GetItemById(int.Parse(ItemID.Value));
+            sourceDocAsItem = sourceDocLib.GetItemById(int.Parse(process.CurrentItemID));
             sourceFile = sourceDocAsItem.File;
 
             WBDocument sourceDocument = new WBDocument(WorkBox, sourceDocAsItem);
 
             if (!IsPostBack)
             {
-                SourceDocIcon.AlternateText = "Icon of document being publishing out.";
-                SourceDocIcon.ImageUrl = WBUtils.DocumentIcon32(sourceDocAsItem.Url);
 
-                ReadOnlyNameField.Text = sourceDocAsItem.Name;
+                DocumentsBeingPublished.Text = process.GetStandardHTMLTableRows();
 
-                 DocumentType.Text = manager.PrettyNameForFileType(sourceDocument.FileType);
-                WBLogging.Debug("The file type of the record is: " + DocumentType.Text);
+                String typeText = manager.PrettyNameForFileType(sourceDocument.FileType);
+                if (String.IsNullOrEmpty(typeText)) typeText = sourceDocument.FileType + " " + sourceDocument.Name;
+                DocumentType.Text = typeText;
+                WBLogging.Debug("The file type of the record is: " + typeText);
+
+                IAO.Text = "Bill Smith";
             }
 
         }
@@ -135,100 +112,83 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
         }
 
+        private Hashtable CheckMetadataOK()
+        {
+            Hashtable metadataProblems = new Hashtable();
+
+            List<SPUser> newUsers = PublishingApprovedBy.WBxGetMultiResolvedUsers(SPContext.Current.Web);
+
+            if (newUsers.Count == 0) metadataProblems.Add("PublishingApprovedBy", "You must enter at least one person who approved publication.");
+
+            List<String> checkListErrors = new List<String>();
+            if (!CheckBox1.Checked) checkListErrors.Add("You haven't checked box 1");
+            if (!CheckBox2.Checked) checkListErrors.Add("You haven't checked box 2");
+            if (!CheckBox3.Checked) checkListErrors.Add("You haven't checked box 3");
+
+            if (checkListErrors.Count > 0)
+            {
+                String html = "<ul>\n";
+                foreach (String error in checkListErrors)
+                {
+                    html += "<li>" + error + "</li>\n";
+                }
+                html += "</ul>\n";
+                metadataProblems.Add("CheckList", html);
+            }
+
+            return metadataProblems;
+        }
+
+
 
         protected void publishButton_OnClick(object sender, EventArgs e)
         {
             WBLogging.Debug("In publishButton_OnClick()");
 
-                WBLogging.Debug("In publishButton_OnClick(): No page render required - so moving to publish");
+            Hashtable metadataProblems = CheckMetadataOK();
 
-                // The event should only be processed if there is no other need to render the page again
+            if (metadataProblems.Count > 0)
+            {
 
-                // First let's update the item with the new metadata values submitted:
-                SPDocumentLibrary sourceDocLib = (SPDocumentLibrary)SPContext.Current.Web.Lists[new Guid(ListGUID.Value)];
-                SPListItem sourceDocAsItem = sourceDocLib.GetItemById(int.Parse(ItemID.Value));
+                PublishingApprovedByError.Text = metadataProblems["PublishingApprovedBy"].WBxToString();
+                CheckListError.Text = metadataProblems["CheckList"].WBxToString();
 
-                WBDocument document = new WBDocument(WorkBox, sourceDocAsItem);
+                pageRenderingRequired = true;
+            }
+            else
+            {
+                pageRenderingRequired = false;
+            }
 
-                /*
-                 * 
-                 *   OK So now we actually publish out the document:
-                 * 
-                 */
-
-                WBItem selfApprovalMetadata = new WBItem();
-
-                selfApprovalMetadata[WBColumn.PublishingApprovalChecklist] = "Test value";
-                selfApprovalMetadata[WBColumn.PublishingApprovedBy] = PublishingApprovedBy.WBxGetMultiResolvedUsers(SPContext.Current.Web);
-                selfApprovalMetadata[WBColumn.PublishingApprovalStatement] = PublishingApprovalStatement.Text;
-
-                SPUser currentUser = SPContext.Current.Web.CurrentUser;
-                WBLogging.Debug("Current user: " + currentUser);
-                selfApprovalMetadata[WBColumn.PublishedBy] = currentUser;
-                selfApprovalMetadata[WBColumn.DatePublished] = DateTime.Now;
-
-                SPFile sourceFile = sourceDocAsItem.File;
-                string errorMessage = "";
-
-                string successMessage = "<h3>Successfully Published Out</h3> <table cellpadding='5'>";
-
-                    try
-                    {
-                        WBLogging.Debug("In publishButton_OnClick(): About to try to publish replacing: " + ToReplaceRecordID.Value + " with action: " + ReplacementAction.Value);
-
-                        manager.PublishDocument(WorkBox, document, ToReplaceRecordID.Value, ReplacementAction.Value, selfApprovalMetadata);
-
-                        WBLogging.Debug("In publishButton_OnClick(): Should have finished the publishing");
-
-                        WBRecord record = manager.Libraries.GetRecordByID(document.RecordID);
-
-                        WBLogging.Debug("In publishButton_OnClick():got the record object");
-
-                        //recordsType.PublishDocument(document, sourceFile.OpenBinaryStream());
-
-                        string fullClassPath = record.ProtectedMasterRecord.LibraryRelativePath; //  WBUtils.NormalisePath(document.FunctionalArea.Names() + "/" + recordsType.FullPath);
-
-                        successMessage += "<tr><td>Published out to location:</td><td>" + fullClassPath + "</td></tr>\n";
-
-                        /*
-                        if (document.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
-                        {
-                            successMessage += "<tr><td>To public records library</td><td><a href=\"http://stagingweb/publicrecords\">Our public library</a></td></tr>\n";
-                        }
-
-                        if (document.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
-                        {
-                            successMessage += "<tr><td>To public extranet records library</td><td><a href=\"http://stagingextranets/records\">Our public extranet library</a></td></tr>\n";
-                        }
-
-                        successMessage += "<tr><td>To internal records library</td><td><a href=\"http://sp.izzi/library/Pages/ViewByFunctionThenType.aspx\">Our internal library</a></td></tr>\n";
-                        */
-                    }
-                    catch (Exception exception)
-                    {
-                        errorMessage = "An error occurred when trying to publish: " + exception.Message;
-                        WBLogging.Generic.Unexpected(exception);
-                    }
-
-                successMessage += "</table>";
-
-                if (errorMessage == "")
-                {
-                    //returnFromDialogOKAndRefresh();
-                    GoToGenericOKPage("Publishing Out Success", successMessage);
-                }
-                else
-                {
-                    GoToGenericOKPage("Publishing Out Error", errorMessage);
-
-                    //returnFromDialogOK("An error occurred during publishing: " + errorMessage);
-                }
+            if (pageRenderingRequired)
+            {
+                WBLogging.Debug("In publishButton_OnClick(): Page render required - not publishing at this point");
+                ReRenderPage();
+            }
+            else
+            {
+                WBLogging.Debug("In publishButton_OnClick(): No page render required - so moving to GoToPublishPage");
+                GoToPublishPage();
+            }
         }
 
         protected void cancelButton_OnClick(object sender, EventArgs e)
         {
             returnFromDialogCancel("Publishing of document was cancelled");
         }
+
+        private void ReRenderPage()
+        {
+            // For the moment I think there is nothing to do here
+        }
+
+        private void GoToPublishPage()
+        {
+            string redirectUrl = "WorkBoxFramework/PublishDocActuallyPublish.aspx?PublishingProcessJSON=" + JsonConvert.SerializeObject(process);
+
+            SPUtility.Redirect(redirectUrl, SPRedirectFlags.RelativeToLayoutsPage, Context);
+        }
+
 
     }
 }

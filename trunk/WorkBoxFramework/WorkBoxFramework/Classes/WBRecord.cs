@@ -193,14 +193,13 @@ namespace WorkBoxFramework
         }
 
         private bool _allCopiesLoaded = false;
-        private void CheckAllCopiesAreCreatedAndLoaded
-            ()
+        private void CheckAllCopiesAreCreatedAndLoaded(WBTaskFeedback feedback)
         {
             if (_allCopiesLoaded) return;
                 
             foreach (String libraryURL in _librariesNeedingACopy)
             {
-                WBDocument document = _libraries[libraryURL].GetOrCreateRecordCopy(this);
+                WBDocument document = _libraries[libraryURL].GetOrCreateRecordCopy(feedback, this);
 
                 _recordCopies[libraryURL] = document;
             }
@@ -223,11 +222,20 @@ namespace WorkBoxFramework
 
         public void UpdateMasterAndCreateCopies()
         {
+            UpdateMasterAndCreateCopies(null);
+        }
+
+        public void UpdateMasterAndCreateCopies(WBTaskFeedback feedback)
+        {
             ProtectedMasterRecord.MaybeCopyColumns(Metadata, WBRecord.DefaultMasterColumnsToSave);
             ProtectedMasterRecord.Update();
+            if (feedback != null)
+            {
+                feedback.AddFeedback("Updated metadata in protected, master records library");
+            }
 
             UpdateWhichLibrariesNeedACopy();
-            CheckAllCopiesAreCreatedAndLoaded();
+            CheckAllCopiesAreCreatedAndLoaded(feedback);
         }
 
         public void Update()
@@ -238,7 +246,7 @@ namespace WorkBoxFramework
                 
                 UpdateWhichLibrariesNeedACopy();
                 CheckNoCopiesInWrongLibraries();
-                CheckAllCopiesAreCreatedAndLoaded();
+                CheckAllCopiesAreCreatedAndLoaded(null);
 
                 foreach (WBDocument recordCopy in _recordCopies.Values)
                 {
@@ -248,12 +256,12 @@ namespace WorkBoxFramework
         }
 
         public static WBColumn[] DefaultColumnsToCopy = { 
+                                        WBColumn.Title,
                                         WBColumn.RecordID,
                                         WBColumn.RecordSeriesID,
                                         WBColumn.RecordSeriesIssue,
                                         WBColumn.RecordSeriesStatus,
                                         WBColumn.ReplacesRecordID,
-                                        WBColumn.Title,
                                         WBColumn.RecordsType, 
                                         WBColumn.FunctionalArea, 
                                         WBColumn.SubjectTags,
@@ -270,13 +278,13 @@ namespace WorkBoxFramework
 
         // Have a separate list of the metadata to save to the master record - because it might include some extra details:
         public static WBColumn[] DefaultMasterColumnsToSave = { 
+                                        WBColumn.Title,
                                         WBColumn.RecordID,
                                         WBColumn.RecordSeriesID,
                                         WBColumn.RecordSeriesIssue,
                                         WBColumn.RecordSeriesStatus,
                                         WBColumn.ReplacesRecordID,
                                         WBColumn.DeclaredRecord,
-                                        WBColumn.Title,
                                         WBColumn.RecordsType, 
                                         WBColumn.FunctionalArea, 
                                         WBColumn.SubjectTags,

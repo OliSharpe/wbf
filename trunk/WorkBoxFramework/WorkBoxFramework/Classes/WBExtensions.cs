@@ -1090,6 +1090,32 @@ namespace WorkBoxFramework
                         break;
                     }
 
+                case WBColumn.DataTypes.Boolean:
+                    {
+                        if (value is bool)
+                        {
+                            item[column.DisplayName] = value;
+                        }
+                        else if (value is String)
+                        {
+                            if (String.IsNullOrEmpty((String)value)) throw new Exception("In WBxSet() for Boolean column type: You cannot set a Boolean column with a null or empty string!");
+
+                            String boolValue = ((String)value).Trim().ToLower();
+
+                            if (boolValue == "true") item[column.DisplayName] = true;
+                            else if (boolValue == "false") item[column.DisplayName] = false;
+                            else
+                            {
+                                throw new Exception("In WBxSet() for Boolean column type: the value of the string being used to set was not recognised: " + value);
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("In WBxSet() for Boolean column type: you can only set with a bool or String value. You attempted with: " + value.GetType());
+                        }
+                        break;
+                    }
+
                 default: throw new Exception("There is no WBxSet implementation (yet) for WBColumn of type : " + column.DataType);
             }
 
@@ -1428,18 +1454,20 @@ namespace WorkBoxFramework
             }
         }
 
-        public static SPView WBxCreateOrUpdateView(this SPList list, SPSite site, String viewName, WBQuery query)
+        public static SPView WBxCreateOrUpdateView(this SPList list, SPSite site, String viewTitle, WBQuery query)
         {
-            return list.WBxCreateOrUpdateView(site, viewName, query, 50, true, false);
+            return list.WBxCreateOrUpdateView(site, viewTitle, query, 50, true, false);
         }
 
-        public static SPView WBxCreateOrUpdateView(this SPList list, SPSite site, String viewName, WBQuery query, uint itemsPerPage, bool paginate, bool setAsDefault)
+        public static SPView WBxCreateOrUpdateView(this SPList list, SPSite site, String viewTitle, WBQuery query, uint itemsPerPage, bool paginate, bool setAsDefault)
         {
             SPView view = null;
 
+            String viewName = viewTitle.Replace(" ", "");
+
             try
             {
-                view = list.Views[viewName];
+                view = list.Views[viewTitle];
 
                 // First update the fields:
                 // view.ViewFields.DeleteAll();
@@ -1469,7 +1497,11 @@ namespace WorkBoxFramework
 
             if (view == null)
             {
-                return list.Views.Add(viewName, query.JustViewFields(), query.JustCAMLQueryForView(site), itemsPerPage, paginate, setAsDefault);
+                view = list.Views.Add(viewName, query.JustViewFields(), query.JustCAMLQueryForView(site), itemsPerPage, paginate, setAsDefault);
+                view.Title = viewTitle;
+                view.Update();
+
+                return view;
             }
             else
             {
@@ -1827,7 +1859,12 @@ namespace WorkBoxFramework
 
         public static SPFolder WBxGetSubFolder(this SPFolder parent, String childName)
         {
-            return WBxGetSubFolder(parent, childName, false);
+            WBLogging.Debug("Looking for subfolder called: " + childName + "       Called on folder = " + parent.Name);
+
+            SPFolder folder = WBxGetSubFolder(parent, childName, false);
+
+            if (folder == null) WBLogging.Debug("Didn't find folder with name " + childName);
+            return folder;
         }
 
         public static SPFolder WBxGetSubFolder(this SPFolder parent, String childName, bool forPublicWeb)
@@ -2685,6 +2722,11 @@ namespace WorkBoxFramework
 
         public static void WBxCreateTasksTable(this PlaceHolder placeHolder, ICollection<String> taskNames)
         {
+            WBxCreateTasksTable(placeHolder, taskNames, null);
+        }
+
+        public static void WBxCreateTasksTable(this PlaceHolder placeHolder, ICollection<String> taskNames, Dictionary<String, String> prettyNames)
+        {
             Table table = new Table();
             table.CellPadding = 0;
             table.CellSpacing = 5;
@@ -2705,7 +2747,15 @@ namespace WorkBoxFramework
 
                 System.Web.UI.WebControls.Label label = new System.Web.UI.WebControls.Label();
                 label.ID = placeHolder.WBxMakeControlID(taskName, "name");
-                label.Text = taskName;
+
+                if (prettyNames != null && prettyNames.ContainsKey(taskName))
+                {
+                    label.Text = prettyNames[taskName];
+                }
+                else
+                {
+                    label.Text = taskName;
+                }
                 label.CssClass = "wbf-task-name";
                 row.WBxAddInTableCell(label, "wbf-task-name-table-cell");
 

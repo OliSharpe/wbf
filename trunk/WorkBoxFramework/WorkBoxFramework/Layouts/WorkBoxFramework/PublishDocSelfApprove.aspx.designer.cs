@@ -49,112 +49,22 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.Label ErrorMessageLabel;
         
         /// <summary>
-        /// SourceDocIcon control.
+        /// PublishingProcessJSON control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Image SourceDocIcon;
+        protected global::System.Web.UI.WebControls.HiddenField PublishingProcessJSON;
         
         /// <summary>
-        /// DestinationTitle control.
+        /// DocumentsBeingPublished control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label DestinationTitle;
-        
-        /// <summary>
-        /// ListGUID control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField ListGUID;
-        
-        /// <summary>
-        /// ItemID control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField ItemID;
-        
-        /// <summary>
-        /// TheDestinationType control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField TheDestinationType;
-        
-        /// <summary>
-        /// DestinationURL control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField DestinationURL;
-        
-        /// <summary>
-        /// ToReplaceRecordID control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField ToReplaceRecordID;
-        
-        /// <summary>
-        /// ToReplaceRecordPath control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField ToReplaceRecordPath;
-        
-        /// <summary>
-        /// NewOrReplace control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField NewOrReplace;
-        
-        /// <summary>
-        /// ReplacementAction control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField ReplacementAction;
-        
-        /// <summary>
-        /// ProtectiveZone control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField ProtectiveZone;
-        
-        /// <summary>
-        /// ReadOnlyNameField control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label ReadOnlyNameField;
+        protected global::System.Web.UI.WebControls.Literal DocumentsBeingPublished;
         
         /// <summary>
         /// DocumentType control.
@@ -193,6 +103,24 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.CheckBox CheckBox3;
         
         /// <summary>
+        /// CheckListError control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal CheckListError;
+        
+        /// <summary>
+        /// IAO control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label IAO;
+        
+        /// <summary>
         /// PublishingApprovedBy control.
         /// </summary>
         /// <remarks>
@@ -202,6 +130,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::Microsoft.SharePoint.WebControls.PeopleEditor PublishingApprovedBy;
         
         /// <summary>
+        /// PublishingApprovedByError control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label PublishingApprovedByError;
+        
+        /// <summary>
         /// PublishingApprovalStatement control.
         /// </summary>
         /// <remarks>
@@ -209,15 +146,6 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox PublishingApprovalStatement;
-        
-        /// <summary>
-        /// PublishingApprovalStatementValidator control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator PublishingApprovalStatementValidator;
         
         /// <summary>
         /// PublishingApprovalStatementError control.

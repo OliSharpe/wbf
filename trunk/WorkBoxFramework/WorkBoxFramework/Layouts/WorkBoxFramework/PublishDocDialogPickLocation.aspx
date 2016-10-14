@@ -9,6 +9,13 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <Sharepoint:ScriptLink ID="SP2010ModalDialogs" 
+        Name="sp.ui.dialog.js" 
+        Localizable="false" 
+        runat="server"
+     />
+
+
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
@@ -19,25 +26,9 @@
 <asp:Label ID="ErrorMessageLabel" runat="server" Text="" ForeColor="Red"></asp:Label>
 </div>
 
-<style type="text/css">
- 
-td.wbf-records-type { border: 0px; }
-td.wbf-metadata-title-panel { width: 300px; padding: 8px; border-top:solid 1px grey; vertical-align: top; }
-td.wbf-metadata-value-panel { width: 405px; padding: 8px; border-top:solid 1px grey; vertical-align: top; background-color: #f1f1f2;  }
-td.wbf-buttons-panel { border-top:solid 1px grey; text-align: center; vertical-align: top; }
-.wbf-metadata-title { font-weight: bold; padding-bottom: 2px; }
-.wbf-metadata-description { font-weight: normal; padding: 2px; }
-.wbf-metadata-read-only-value { font-weight: bold; padding: 2px; }
-.wbf-metadata-error { font-weight: normal; padding: 0px; color: Red; }
-div.wbf-publish-out-title { font-weight: bold; font-size: 16px; vertical-align: top; padding-bottom:4px; }
-table.wbf-title-table { padding: 6px 0px 12px 10px; }
-</style>
 
 <table cellpadding="8" cellspacing="0" class="wbf-title-table">
 <tr>
-<td valign="middle">
-<asp:Image ID="SourceDocIcon" runat="server" />
-</td>
 <td valign="middle" class="wbf-create-new-title">
 <div class="wbf-publish-out-title">
 Publish Document to: <asp:Label ID="DestinationTitle" runat="server" />
@@ -49,25 +40,28 @@ Select the folder into which to publish the document
 </tr>
 </table>
 
-<table width="100%" cellpadding="5" cellspacing="0">
+<table class="wbf-dialog-form">
+
+<asp:Literal ID="DocumentsBeingPublished" runat="server" />
 
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title">Select Folder</div>
-<div class="wbf-metadata-description">Pick the folder in the work box into which you would like to publish the document.</div>
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Select Folder</div>
+<div class="wbf-field-description">Pick the folder in the work box into which you would like to publish the document.</div>
 </td>
-<td class="wbf-metadata-value-panel">
+<td class="wbf-field-value-panel">
 
-<div id="" style="overflow:scroll; height:400px; border: 1px solid #ccc; ">
+<div id="" style="overflow:scroll; height:400px; width: 400px; border: 1px solid #ccc; ">
 
   <SharePoint:SPTreeView
-        id="WorkBoxFolders"
+        id="LibraryLocations"
         UseInternalDataBindings="false"
         runat="server"
         ShowLines="true"
         ExpandDepth="1"
         SelectedNodeStyle-CssClass="ms-tvselected"
-        OnSelectedNodeChanged="WorkBoxFolders_SelectedNodeChanged"
+        OnSelectedNodeChanged="LibraryLocations_SelectedNodeChanged"
+        OnTreeNodeDataBound="LibraryLocations_Bound"
         NodeStyle-CssClass="ms-navitem"
         NodeStyle-HorizontalPadding="0"
         NodeStyle-VerticalPadding="0"
@@ -84,16 +78,15 @@ Select the folder into which to publish the document
 </tr>
 
 <tr>
-<td class="wbf-metadata-title-panel">
-        <div class="wbf-metadata-title">Selected Folder Path</div>
-<div class="wbf-metadata-description"></div>
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Selected Folder Path</div>
+<div class="wbf-field-description"></div>
 </td>
-<td class="wbf-metadata-value-panel">
-
+<td class="wbf-field-value-panel">
 
 <asp:UpdatePanel ID="ShowSelectionPanel" runat="server">
     <Triggers>
-        <asp:AsyncPostBackTrigger ControlID="WorkBoxFolders" EventName="SelectedNodeChanged" />
+        <asp:AsyncPostBackTrigger ControlID="LibraryLocations" EventName="SelectedNodeChanged" />
     </Triggers>
     <ContentTemplate>
 
@@ -107,15 +100,10 @@ Selected folder: <asp:Label ID="SelectedFolderPath" runat="server" />
     <asp:Label ID="SelectedRecordID" runat="server" />
 </div>
 
-    <asp:HiddenField ID="FunctionalAreasUIControlValue" runat="server" />
-    <asp:HiddenField ID="RecordsTypeUIControlValue" runat="server" />
-    <asp:HiddenField ID="ProtectiveZone" runat="server" />
-    <asp:HiddenField ID="NewOrReplace" runat="server" />
-
+<asp:HiddenField ID="PublishingProcessJSON" runat="server" />
 
     </ContentTemplate>
 </asp:UpdatePanel>
-
 
 </td>
 </tr>
@@ -136,12 +124,14 @@ Selected folder: <asp:Label ID="SelectedFolderPath" runat="server" />
 
 </table>
 
-    <asp:HiddenField ID="ListGUID" runat="server" />
-    <asp:HiddenField ID="ItemID" runat="server" />
-    <asp:HiddenField ID="DestinationType" runat="server" />
-    <asp:HiddenField ID="DestinationURL" runat="server" />
-
 </div>
+
+<script type="text/javascript">
+    // Hopefully this will resize the modal correctly. 
+    // Found with thanks in answers here: https://social.msdn.microsoft.com/Forums/sharepoint/en-US/ddd6ce37-b289-47d5-92ad-067b2c9ee4fd/resizing-an-open-dialog-as-its-contents-change
+    var currentModal = SP.UI.ModalDialog.get_childDialog();
+    currentModal.$$d_autoSize();
+</script>
 
 </asp:Content>
 

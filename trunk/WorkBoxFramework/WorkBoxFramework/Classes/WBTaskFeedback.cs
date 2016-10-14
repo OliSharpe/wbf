@@ -23,6 +23,19 @@ namespace WorkBoxFramework
         public const String STATUS__FAILED = "Failed";
 
 
+        private String _prettyName = null;
+        public String PrettyName {
+            get
+            {
+                if (String.IsNullOrEmpty(_prettyName)) return Name;
+                return _prettyName;
+            }
+            set
+            {
+                _prettyName = value;
+            }
+        }
+
         public WBTaskFeedback(String type, String name)
         {
             Name = name;

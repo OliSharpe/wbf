@@ -32,25 +32,23 @@ using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.Taxonomy;
+using Newtonsoft.Json;
 
 namespace WorkBoxFramework.Layouts.WorkBoxFramework
 {
     public partial class PublishDocRequiredMetadata : WorkBoxDialogPageBase
     {
 
-        protected List<SPListItem> ListItems;
-        WBTaxonomy recordsTypeTaxonomy = null;
-        WBTaxonomy teamsTaxonomy = null;
-        WBTaxonomy seriesTagsTaxonomy = null;
-        WBTaxonomy subjectTagsTaxonomy = null;
-        WBTaxonomy functionalAreasTaxonomy = null;
+        public WBPublishingProcess process = null;
+
 
         WBRecordsManager manager = null;
         WBRecord recordBeingReplaced = null;
 
         WBRecordsType documentRecordsType = null;
-        SPListItem sourceDocAsItem = null;
-        SPFile sourceFile = null;
+        WBTerm documentFunctionalArea = null;
+        //SPListItem sourceDocAsItem = null;
+        //SPFile sourceFile = null;
         string destinationType = "";
 
         protected bool functionalAreaFieldIsEditable = false;
@@ -63,50 +61,37 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         
         protected void Page_Load(object sender, EventArgs e)
         {
-            WBLogging.Generic.Verbose("In Page_Load for the public doc metadata dialog");
-
-            // Creating the taxonomy objects for later use:
-            recordsTypeTaxonomy = WBTaxonomy.GetRecordsTypes(WorkBox.Site);
-            teamsTaxonomy = WBTaxonomy.GetTeams(recordsTypeTaxonomy);
-            seriesTagsTaxonomy = WBTaxonomy.GetSeriesTags(recordsTypeTaxonomy);
-            subjectTagsTaxonomy = WBTaxonomy.GetSubjectTags(recordsTypeTaxonomy);
-            functionalAreasTaxonomy = WBTaxonomy.GetFunctionalAreas(recordsTypeTaxonomy);
+            WBLogging.Debug("In Page_Load for the public doc metadata dialog");
 
             manager = new WBRecordsManager();
 
             // If this is the initial call to the page then we need to load the basic details of the document we're publishing out:
             if (!IsPostBack)
             {
-                ListGUID.Value = Request.QueryString["ListGUID"];
-                ItemID.Value = Request.QueryString["ItemID"];
 
-                // The following variable has its name due to a strange compliation error with the name 'DestinationType' 
-                TheDestinationType.Value = Request.QueryString["DestinationType"];
-                DestinationURL.Value = Request.QueryString["DestinationURL"];
-                DestinationTitle.Text = Request.QueryString["DestinationTitle"];
+                process = JsonConvert.DeserializeObject<WBPublishingProcess>(Request.QueryString["PublishingProcessJSON"]);
+                process.WorkBox = WorkBox;
 
-                WBLogging.Generic.Verbose("DestinationType = " + TheDestinationType.Value);
-                WBLogging.Generic.Verbose("DestinationURL = " + DestinationURL.Value);
+                WBLogging.Debug("Created the WBProcessObject");
+
+                PublishingProcessJSON.Value = JsonConvert.SerializeObject(process);
+
+                WBLogging.Debug("Serialized the WBProcessObject to hidden field");
 
                 NewRadioButton.Checked = true;
                 NewOrReplace.Text = "New";
-                ReplacementActions.SelectedIndex = 0;
-            }
 
-            // Now do a check that we do at this stage have the basic details of the document:
-            if (ListGUID.Value == null || ListGUID.Value == "")
-            {
-                errorMessage += "ListGUID hasn't been set. ";
+                pageRenderingRequired = true;
             }
-
-            if (ItemID.Value == null || ItemID.Value == "")
+            else
             {
-                errorMessage += "ItemID hasn't been set. ";
-            }
+                process = JsonConvert.DeserializeObject<WBPublishingProcess>(PublishingProcessJSON.Value.WBxTrim());
+                process.WorkBox = WorkBox;
 
-            if (TheDestinationType.Value == null || TheDestinationType.Value == "")
-            {
-                errorMessage += "DestinationType hasn't been set. ";
+                CaptureChanges();
+
+                // By default we should not be rendering the page on a post back call
+                pageRenderingRequired = false;
             }
 
             if (errorMessage.Length > 0)
@@ -123,63 +108,26 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             ScanDateMessage.Text = "";
             OwningTeamFieldMessage.Text = "";
             InvolvedTeamsFieldMessage.Text = "";
+            PublishingLocationError.Text = "";
+            ShortTitleError.Text = "";
 
-
-            //OK so we have the basic identity information for the document being published out so let's get the document item:
-
-            Guid sourceListGuid = new Guid(ListGUID.Value);
-            SPDocumentLibrary sourceDocLib = (SPDocumentLibrary)WorkBox.Web.Lists[sourceListGuid];
-
-            sourceDocAsItem = sourceDocLib.GetItemById(int.Parse(ItemID.Value));
-            sourceFile = sourceDocAsItem.File;
-
-            // Now, if this is the first time we might need to load up the default metadata values for the document:
-            if (!IsPostBack)
+            if (IsPostBack)
             {
-                WorkBox.Web.AllowUnsafeUpdates = true;
-                WorkBox.ApplyPublishOutDefaults(sourceDocAsItem);
-                WorkBox.Web.AllowUnsafeUpdates = false;
-
-                // Let's now re-load the item as it's name may have changed:
-                sourceDocAsItem = null;
-                sourceDocAsItem = sourceDocLib.GetItemById(int.Parse(ItemID.Value));
-                sourceFile = sourceDocAsItem.File;
-                pageRenderingRequired = true;
-            }
-            else
-            {
-                WBLogging.Debug("Setting the subject tags: " + SubjectTagsField.Text);
-                sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__SUBJECT_TAGS, SubjectTagsField.Text);
-
-                if (!String.IsNullOrEmpty(ToReplaceRecordID.Value))
-                {
-                    recordBeingReplaced = manager.Libraries.GetRecordByID(ToReplaceRecordID.Value);
-                    if (recordBeingReplaced == null)
-                    {
-                        ErrorMessageLabel.Text = "Could not find the record that is meant to be replaced. Supposedly it has RecordID = " + ToReplaceRecordID.Value;
-                        return;
-                    }
-                }
-
                 // If this is a post back - then let's check if the records type has been modified:
-                if (NewRecordsTypeUIControlValue.Value != "")
+                if (!String.IsNullOrEmpty(UpdatedPublishingProcessJSON.Value))
                 {
-                    WBLogging.Generic.Unexpected("The returned value was: " + NewRecordsTypeUIControlValue.Value);
+                    WBLogging.Generic.Unexpected("The returned value was: " + UpdatedPublishingProcessJSON.Value);
 
-                    WBRecordsType oldRecordsType = sourceDocAsItem.WBxGetSingleTermColumn<WBRecordsType>(recordsTypeTaxonomy, WorkBox.COLUMN_NAME__RECORDS_TYPE);
-                    WBRecordsType newRecordsType = new WBRecordsType(recordsTypeTaxonomy, NewRecordsTypeUIControlValue.Value);
+                    process = JsonConvert.DeserializeObject<WBPublishingProcess>(UpdatedPublishingProcessJSON.Value.WBxTrim());
+                    process.WorkBox = WorkBox;
 
-                    RecordsTypeUIControlValue.Value = NewRecordsTypeUIControlValue.Value;
-                    FunctionalAreasUIControlValue.Value = NewFunctionalAreasUIControlValue.Value;
+                    CaptureChanges();
+
+                    // Now blanking this hidden field so that it doesn't trigger a recapture each time!
+                    UpdatedPublishingProcessJSON.Value = "";
+
                     pageRenderingRequired = true;
 
-                    WBDocument document = CaptureAsDocument(sourceDocAsItem, newRecordsType);
-                    document.Update();
-
-                    // Let's now re-load the item as it's name may have changed:
-                    sourceDocAsItem = null;
-                    sourceDocAsItem = sourceDocLib.GetItemById(int.Parse(ItemID.Value));
-                    sourceFile = sourceDocAsItem.File;
                 }
                 else
                 {
@@ -189,26 +137,48 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
 
 
+            destinationType = process.ProtectiveZone;
 
             // Now load up some of the basic details:
-            documentRecordsType = sourceDocAsItem.WBxGetSingleTermColumn<WBRecordsType>(recordsTypeTaxonomy, WorkBox.COLUMN_NAME__RECORDS_TYPE);
+            if (String.IsNullOrEmpty(process.RecordsTypeUIControlValue))
+            {
+                showReferenceID = false;
+                showReferenceDate = false;
+                showSubjectTags = true; 
+                showSeriesTag = false;
+                showScanDate = false;
+            }
+            else
+            {
+                documentRecordsType = new WBRecordsType(process.RecordsTypeTaxonomy, process.RecordsTypeUIControlValue);
 
-            destinationType = TheDestinationType.Value;
+                // Which of the metadata fields are being used in the form (or will need to be processed in any postback) :
+                showReferenceID = documentRecordsType.DocumentReferenceIDRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
+                showReferenceDate = documentRecordsType.DocumentReferenceDateRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
+                showSubjectTags = true; // documentRecordsType.DocumentSubjectTagsRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
+                showSeriesTag = documentRecordsType.DocumentSeriesTagRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
+                showScanDate = documentRecordsType.DocumentScanDateRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
+            }
 
-            // Which of the metadata fields are being used in the form (or will need to be processed in any postback) :
-            showReferenceID = documentRecordsType.DocumentReferenceIDRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
-            showReferenceDate = documentRecordsType.DocumentReferenceDateRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
-            showSubjectTags = true; // documentRecordsType.DocumentSubjectTagsRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
-            showSeriesTag = documentRecordsType.DocumentSeriesTagRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
-            showScanDate = documentRecordsType.DocumentScanDateRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
+            if (!String.IsNullOrEmpty(process.FunctionalAreaUIControlValue))
+            {
+                documentFunctionalArea = new WBTerm(process.FunctionalAreasTaxonomy, process.FunctionalAreaUIControlValue);
+            }
+            else
+            {
+                documentFunctionalArea = null;
+            }
+
 
             if (pageRenderingRequired)
             {
-                renderPage();
+                WBLogging.Debug("In Page_Load calling RenderPage()");
+                RenderPage();
             }
 
         }
 
+        
         protected void Page_Unload(object sender, EventArgs e)
         {
             if (manager != null)
@@ -218,48 +188,63 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
         }
 
-        private void renderPage()
+        private void RenderPage()
         {
-            // OK, so now we're finally in a position to load up the values of the page fields:
+            if (process == null)
+            {
+                WBLogging.Debug("process == null");
+                return;
+            }
 
-            SourceDocIcon.AlternateText = "Icon of document being publishing out.";
-            SourceDocIcon.ImageUrl = WBUtils.DocumentIcon32(sourceDocAsItem.Url);
+            DocumentsBeingPublished.Text = process.GetStandardHTMLTableRows();
 
-            EditShortTitle.Text = sourceFile.Title;
-            ShortTitle.Text = sourceFile.Title;
+            SPListItem currentItem = process.CurrentItem;
 
-            ReadOnlyNameField.Text = sourceDocAsItem.Name;
- //           NameField.Text = sourceDocAsItem.Name;
-            OriginalFileName.Text = sourceDocAsItem.WBxGetColumnAsString(WorkBox.COLUMN_NAME__ORIGINAL_FILENAME);
+            EditShortTitle.Text = process.CurrentShortTitle; 
+            ShortTitle.Text = process.CurrentShortTitle;
 
-//            DocumentFileNamingConvention.Text = documentRecordsType.DocumentNamingConvention.Replace("<", "&lt;").Replace(">", "&gt;");
+            WBLogging.Debug("Passed title / name");
 
-
-            WBTermCollection<WBTerm> functionalAreas = sourceDocAsItem.WBxGetMultiTermColumn<WBTerm>(functionalAreasTaxonomy, WorkBox.COLUMN_NAME__FUNCTIONAL_AREA);
-            String functionalAreasUIControlValue = functionalAreas.UIControlValue;
-
-            FunctionalAreasUIControlValue.Value = functionalAreasUIControlValue;
+            SelectLocationButton.OnClientClick = "WorkBoxFramework_pickANewLocation(WorkBoxFramework_PublishDoc_pickedANewLocation, '" + process.FunctionalAreaUIControlValue + "', '" + process.RecordsTypeUIControlValue + "'); return false;";
 
 
-            RecordsTypeUIControlValue.Value = documentRecordsType.UIControlValue;
-            SelectLocationButton.OnClientClick = "WorkBoxFramework_pickANewLocation(WorkBoxFramework_PublishDoc_pickedANewLocation, '" + functionalAreasUIControlValue + "', '" + documentRecordsType.UIControlValue + "'); return false;";
+            if (!String.IsNullOrEmpty(process.ToReplaceRecordID) && process.ReplaceAction != WBPublishingProcess.REPLACE_ACTION__CREATE_NEW_SERIES)
+            {
+                recordBeingReplaced = manager.Libraries.GetRecordByID(process.ToReplaceRecordID);
+                if (recordBeingReplaced == null)
+                {
+                    ErrorMessageLabel.Text = "Could not find the record that is meant to be replaced. Supposedly it has RecordID = " + process.ToReplaceRecordID;
+                    return;
+                }
+            }
 
             if (recordBeingReplaced == null)
             {
-                LocationPath.Text = functionalAreas[0].Name + " / " + documentRecordsType.FullPath.Replace("/", " / ");
+                if (documentFunctionalArea != null && documentRecordsType != null)
+                {
+                    LocationPath.Text = documentFunctionalArea.Name + " / " + documentRecordsType.FullPath.Replace("/", " / ");
+                }
+                else
+                {
+                    LocationPath.Text = "<none>";
+                }
             }
             else
             {
-                LocationPath.Text = ToReplaceRecordPath.Value;
+                LocationPath.Text = process.ToReplaceRecordPath;
             }
 
-            if (recordBeingReplaced == null && NewOrReplace.Text == "New")
+            if (recordBeingReplaced == null || process.ReplaceAction == WBPublishingProcess.REPLACE_ACTION__CREATE_NEW_SERIES)
             {
                 WBLogging.Debug("Setting buttons etc for NEW");
 
                 NewRadioButton.Checked = true;
                 ReplaceRadioButton.Checked = false;
+                LeaveOnIzziCheckBox.Enabled = true; // Otherwise the surrounding span tag is disabled too! - we'll disable with jQuery!
                 SelectLocationButton.Text = "Choose Location";
+                PublishAll.Enabled = true;
+
+                NewOrReplace.Text = "New";
             }
             else
             {
@@ -267,53 +252,28 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                 NewRadioButton.Checked = false;
                 ReplaceRadioButton.Checked = true;
-                SelectLocationButton.Text = "Choose Document";
-
-                NewOrReplace.Text = "replace";
-            }
-
-
-            bool userCanPublishToPublic = false;
-            SPGroup publishersGroup = WorkBox.OwningTeam.PublishersGroup(SPContext.Current.Site);
-            if (publishersGroup != null)
-            {
-                if (publishersGroup.ContainsCurrentUser)
+                LeaveOnIzziCheckBox.Enabled = true;
+                if (process.ReplaceAction == WBPublishingProcess.REPLACE_ACTION__LEAVE_ON_IZZI)
                 {
-                    userCanPublishToPublic = true;
-                }
-            }
-
-            String selectedZone = WBRecordsType.PROTECTIVE_ZONE__PROTECTED;
-            if (userCanPublishToPublic)
-            {
-                if (destinationType.Equals(WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__PUBLIC_WEB_SITE))
-                {
-                    WBLogging.Generic.Verbose("In PUBLIC: The destination type was: " + destinationType);
-                    selectedZone = WBRecordsType.PROTECTIVE_ZONE__PUBLIC;
-                }
-                else if (destinationType.Equals(WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__PUBLIC_EXTRANET))
-                {
-                    WBLogging.Generic.Verbose("In PUBLIC EXTRANET: The destination type was: " + destinationType);
-                    selectedZone = WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET;
+                    LeaveOnIzziCheckBox.Checked = true;
                 }
                 else
                 {
-                    WBLogging.Generic.Verbose("The destination type was: " + destinationType);
-                    selectedZone = WBRecordsType.PROTECTIVE_ZONE__PROTECTED;
+                    LeaveOnIzziCheckBox.Checked = false;
                 }
+                SelectLocationButton.Text = "Choose Document";
+                PublishAll.Enabled = false;
+
+                NewOrReplace.Text = "Replace";
             }
-            else
-            {
-                selectedZone = WBRecordsType.PROTECTIVE_ZONE__PROTECTED;
-            }
 
+            WBLogging.Debug("Just before protective zone stage");
 
-            ProtectiveZone.Value = selectedZone;
-
+            TheProtectiveZone.Text = process.ProtectiveZone;
 
             if (showSubjectTags)
             {
-                if (documentRecordsType.IsDocumentSubjectTagsRequired)
+                if (documentRecordsType == null || documentRecordsType.IsDocumentSubjectTagsRequired)
                 {
                     SubjectTagsTitle.Text = "Subject Tags" + WBConstant.REQUIRED_ASTERISK;
                 }
@@ -321,14 +281,17 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 {
                     SubjectTagsTitle.Text = "Subject Tags (optional)";
                 }
-                SubjectTagsDescription.Text = documentRecordsType.DocumentSubjectTagsDescription;
 
-                subjectTagsTaxonomy.InitialiseTaxonomyControl(SubjectTagsField, WorkBox.COLUMN_NAME__SUBJECT_TAGS, true, true, this);
-                WBTermCollection<WBTerm> subjectTags = sourceDocAsItem.WBxGetMultiTermColumn<WBTerm>(subjectTagsTaxonomy, WorkBox.COLUMN_NAME__SUBJECT_TAGS);
-                SubjectTagsField.Text = subjectTags.WBxToString();
+                if (documentRecordsType != null)
+                {
+                    SubjectTagsDescription.Text = documentRecordsType.DocumentSubjectTagsDescription;
+                }
+
+                process.SubjectTagsTaxonomy.InitialiseTaxonomyControl(SubjectTagsField, WorkBox.COLUMN_NAME__SUBJECT_TAGS, true);
+                SubjectTagsField.Text = process.SubjectTagsUIControlValue;
             }
 
-
+            /*
             if (showReferenceID)
             {
                 if (documentRecordsType.IsDocumentReferenceIDRequired)
@@ -376,14 +339,14 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 }
                 SeriesTagDescription.Text = documentRecordsType.DocumentSeriesTagDescription;
 
-                SeriesTagDropDownList.DataSource = GetSeriesTagDataSource(documentRecordsType.DocumentSeriesTagParentTerm(seriesTagsTaxonomy));
+                SeriesTagDropDownList.DataSource = GetSeriesTagDataSource(documentRecordsType.DocumentSeriesTagParentTerm(process.SeriesTagsTaxonomy));
                 SeriesTagDropDownList.DataTextField = "SeriesTagTermName";
                 SeriesTagDropDownList.DataValueField = "SeriesTagTermUIControlValue";
                 SeriesTagDropDownList.DataBind();
 
                 if (sourceDocAsItem.WBxColumnHasValue(WorkBox.COLUMN_NAME__SERIES_TAG))
                 {
-                    SeriesTagDropDownList.SelectedValue = sourceDocAsItem.WBxGetSingleTermColumn<WBTerm>(seriesTagsTaxonomy, WorkBox.COLUMN_NAME__SERIES_TAG).UIControlValue;
+                    SeriesTagDropDownList.SelectedValue = sourceDocAsItem.WBxGetSingleTermColumn<WBTerm>(process.SeriesTagsTaxonomy, WorkBox.COLUMN_NAME__SERIES_TAG).UIControlValue;
                 }
             }
 
@@ -403,16 +366,43 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     ScanDate.SelectedDate = (DateTime)sourceDocAsItem[WorkBox.COLUMN_NAME__SCAN_DATE];
                 }
             }
+            */
 
-            teamsTaxonomy.InitialiseTaxonomyControl(OwningTeamField, WorkBox.COLUMN_NAME__OWNING_TEAM, false);
-            TaxonomyFieldValue owningTeamValue = sourceDocAsItem[WorkBox.COLUMN_NAME__OWNING_TEAM] as TaxonomyFieldValue;
-            OwningTeamField.Text = owningTeamValue.WBxUIControlValue();
+            WBLogging.Debug("Just owning team");
 
-            teamsTaxonomy.InitialiseTaxonomyControl(InvolvedTeamsField, WorkBox.COLUMN_NAME__INVOLVED_TEAMS, true);
-            TaxonomyFieldValueCollection involvedTeamsValues = sourceDocAsItem[WorkBox.COLUMN_NAME__INVOLVED_TEAMS] as TaxonomyFieldValueCollection;
-            InvolvedTeamsField.Text = involvedTeamsValues.WBxUIControlValue();
+            process.TeamsTaxonomy.InitialiseTaxonomyControl(OwningTeamField, WorkBox.COLUMN_NAME__OWNING_TEAM, false);
+            OwningTeamField.Text = process.OwningTeamUIControlValue;
 
+            WBLogging.Debug("Just involved team");
+
+            process.TeamsTaxonomy.InitialiseTaxonomyControl(InvolvedTeamsField, WorkBox.COLUMN_NAME__INVOLVED_TEAMS, true);
+            InvolvedTeamsField.Text = process.GetInvolvedTeamsWithoutOwningTeamAsUIControlValue();
+
+            WebPageURL.Text = process.WebPageURL;
+
+            WBLogging.Debug("Just before serialization");
+
+            // Lastly we're going to capture the state of the publishing process:
+            PublishingProcessJSON.Value = JsonConvert.SerializeObject(process);
         }
+
+
+        private Hashtable CheckMetadataOK()
+        {
+            Hashtable metadataProblems = new Hashtable();
+
+            if (OwningTeamField.Text.Equals("")) metadataProblems.Add(WorkBox.COLUMN_NAME__OWNING_TEAM, "You must enter the owning team.");
+
+            if (ShortTitle.Text.Equals("")) metadataProblems.Add(WBColumn.WorkBoxShortTitle.InternalName, "You must enter a short title.");
+
+
+            if (String.IsNullOrEmpty(process.FunctionalAreaUIControlValue) || String.IsNullOrEmpty(process.RecordsTypeUIControlValue)) {
+                metadataProblems.Add("PublishingLocation", "You must pick either a location or replacement document");
+            }
+
+            return metadataProblems;
+        }
+
 
         private Hashtable checkMetadataState()
         {
@@ -429,7 +419,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             else
             {
                 // So here we'll load up the actual records type so that we can check what other metadata is required:
-                documentRecordsType = new WBRecordsType(recordsTypeTaxonomy, RecordsTypeUIControlValue.Value);
+                documentRecordsType = new WBRecordsType(process.RecordsTypeTaxonomy, process.RecordsTypeUIControlValue);
 
                 if (documentRecordsType != null)
                 {
@@ -459,9 +449,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                     if (userCanPublishToPublic)
                     {
-                        if (!documentRecordsType.IsZoneAtLeastMinimum(ProtectiveZone.Value))
+                        if (!documentRecordsType.IsZoneAtLeastMinimum(TheProtectiveZone.Text))
                         {
-                            if (ProtectiveZone.Value == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
+                            if (TheProtectiveZone.Text == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
                             {
                                 metadataProblems.Add(WorkBox.COLUMN_NAME__PROTECTIVE_ZONE, "You can only publish to the public extranet zone if the records type has that zone explicitly set. This records type has the minimum zone set as: " + documentRecordsType.DocumentMinimumProtectiveZone);
                             }
@@ -473,7 +463,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     }
                     else
                     {
-                        if (ProtectiveZone.Value != WBRecordsType.PROTECTIVE_ZONE__PROTECTED)
+                        if (TheProtectiveZone.Text != WBRecordsType.PROTECTIVE_ZONE__PROTECTED)
                         {
                             metadataProblems.Add(WorkBox.COLUMN_NAME__PROTECTIVE_ZONE, "In this work box you only have permissions to publish to the internal records library.");
                         }
@@ -518,7 +508,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
 
             if (destinationType.Equals(WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__PUBLIC_WEB_SITE)
-                && !ProtectiveZone.Value.Equals(WBRecordsType.PROTECTIVE_ZONE__PUBLIC))
+                && !TheProtectiveZone.Text.Equals(WBRecordsType.PROTECTIVE_ZONE__PUBLIC))
             {
                 if (!metadataProblems.ContainsKey(WorkBox.COLUMN_NAME__PROTECTIVE_ZONE))
                 {
@@ -530,116 +520,40 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             return metadataProblems;
         }
 
-        protected WBDocument CaptureAsDocument(SPListItem sourceDocAsItem, WBRecordsType documentRecordsType)
+        protected void CaptureChanges()
         {
-            WBDocument document = new WBDocument(WorkBox, sourceDocAsItem);
 
-            // Which of the metadata fields are being used by the active records type?
-            showReferenceID = documentRecordsType.DocumentReferenceIDRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
-            showReferenceDate = documentRecordsType.DocumentReferenceDateRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
-            showSubjectTags = true; // documentRecordsType.DocumentSubjectTagsRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
-            showSeriesTag = documentRecordsType.DocumentSeriesTagRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
-            showScanDate = documentRecordsType.DocumentScanDateRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN;
+            process.SubjectTagsUIControlValue = SubjectTagsField.Text;
 
+            WBLogging.Debug("Captured subject tags to be: " + SubjectTagsField.Text);
 
-            //document.Name = 
+            process.OwningTeamUIControlValue = OwningTeamField.Text;
+            process.SetInvolvedTeamsWithoutOwningTeamAsUIControlValue(InvolvedTeamsField.Text);
 
-            //                if (!generatingFilename)
-            //              {
-            //                sourceDocAsItem["Name"] = NameField.Text;
-            //          }
-
-
-            if (EditShortTitle.Text != ShortTitle.Text)
-            {
-                document.Title = EditShortTitle.Text;
-            }
-            //sourceDocAsItem["Title"] = TitleField.Text;
-
-            if (documentRecordsType.IsFunctionalAreaEditable)
-            {
-                document[WBColumn.FunctionalArea] = FunctionalAreasUIControlValue.Value;
-                sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, FunctionalAreasUIControlValue.Value);
-            }
-
-            //document.FunctionalArea = sourceDocAsItem.WBxGetMultiTermColumn<WBTerm>(functionalAreasTaxonomy, WBColumn.FunctionalArea.DisplayName);
-
-
-            String protectiveZone = ProtectiveZone.Value;
-            document.ProtectiveZone = protectiveZone;
-            //sourceDocAsItem.WBxSetColumnAsString(WorkBox.COLUMN_NAME__PROTECTIVE_ZONE, protectiveZone);
-
-            // Now to save the current value of the Records Type field:
-            document[WBColumn.RecordsType] = RecordsTypeUIControlValue.Value;
-            //sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__RECORDS_TYPE, RecordsTypeUIControlValue.Value);
-
-            if (showSubjectTags)
-            {
-                WBLogging.Debug("Setting subject tags to be: " + SubjectTagsField.Text);
-                document[WBColumn.SubjectTags] = SubjectTagsField.Text;
-            }
-            else
-            {
-                WBLogging.Debug("NOT !!! Setting subject tags to be: " + SubjectTagsField.Text);
-            }
-
-
-            if (showReferenceID)
-            {
-                document.ReferenceID = ReferenceID.Text;
-                //sourceDocAsItem.WBxSetColumnAsString(WorkBox.COLUMN_NAME__REFERENCE_ID, ReferenceID.Text);
-            }
-
-            if (showReferenceDate)
-            {
-                document.ReferenceDate = ReferenceDate.SelectedDate;
-                // sourceDocAsItem[WorkBox.COLUMN_NAME__REFERENCE_DATE] = ReferenceDate.SelectedDate;
-            }
-
-            if (showSeriesTag)
-            {
-                document[WBColumn.SeriesTag] = SeriesTagDropDownList.SelectedValue;
-                //sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__SERIES_TAG, SeriesTagDropDownList.SelectedValue);
-            }
-
-            if (showScanDate)
-            {
-                document.ScanDate = ScanDate.SelectedDate;
-                //sourceDocAsItem[WorkBox.COLUMN_NAME__SCAN_DATE] = ScanDate.SelectedDate;
-            }
-
-
-            //sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__OWNING_TEAM, OwningTeamField.Text);
-            //sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__INVOLVED_TEAMS, InvolvedTeamsField.Text);
-
-            document[WBColumn.OwningTeam] = OwningTeamField.Text;
-            document[WBColumn.InvolvedTeams] = InvolvedTeamsField.Text;
-            document.CheckOwningTeamIsAlsoInvolved();
-
-            if (String.IsNullOrEmpty(document.OriginalFilename))
-            {
-                document.OriginalFilename = sourceDocAsItem.Name;
-            }
-
-            WorkBox.GenerateFilename(documentRecordsType, sourceDocAsItem);
-
-            /*
-            if (WorkBox.RecordsType.GeneratePublishOutFilenames)
-            {
-                WorkBox.GenerateFilename(documentRecordsType, sourceDocAsItem);
-            }
-
-            sourceDocAsItem.Update();
-             */
-
-            return document;
+            process.WebPageURL = WebPageURL.Text;
         }
+
 
         protected void publishButton_OnClick(object sender, EventArgs e)
         {
             WBLogging.Debug("In publishButton_OnClick()");
+            MaybeGoToNextPage();
+        }
 
-            Hashtable metadataProblems = checkMetadataState();
+        protected void publishAllButton_OnClick(object sender, EventArgs e)
+        {
+            WBLogging.Debug("In publishAllButton_OnClick()");
+            process.PublishMode = WBPublishingProcess.PUBLISH_MODE__ALL_TOGETHER;
+
+            MaybeGoToNextPage();
+        }
+
+        protected void MaybeGoToNextPage() {
+
+            // There should be no reason to call this here now
+            // CaptureChanges();
+
+            Hashtable metadataProblems = CheckMetadataOK();
 
             string protectiveZone = "";
 
@@ -653,7 +567,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 errorMessage += metadataProblems[WorkBox.COLUMN_NAME__FUNCTIONAL_AREA].WBxToString();
                 errorMessage += metadataProblems[WorkBox.COLUMN_NAME__PROTECTIVE_ZONE].WBxToString();
                 errorMessage += metadataProblems[WorkBox.COLUMN_NAME__SUBJECT_TAGS].WBxToString();
-                
+
                 ErrorMessageLabel.Text = errorMessage;
 
                 ReferenceIDMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__REFERENCE_ID].WBxToString(); ;
@@ -663,6 +577,10 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                 OwningTeamFieldMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__OWNING_TEAM].WBxToString();
                 InvolvedTeamsFieldMessage.Text = metadataProblems[WorkBox.COLUMN_NAME__INVOLVED_TEAMS].WBxToString();
+
+                ShortTitleError.Text = metadataProblems[WBColumn.WorkBoxShortTitle.InternalName].WBxToString();
+                PublishingLocationError.Text = metadataProblems["PublishingLocation"].WBxToString();
+
 
                 pageRenderingRequired = true;
             }
@@ -674,65 +592,16 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             if (pageRenderingRequired)
             {
                 WBLogging.Debug("In publishButton_OnClick(): Page render required - not publishing at this point");
-                renderPage();
+                RenderPage();
             }
             else
             {
                 WBLogging.Debug("In publishButton_OnClick(): No page render required - so moving to publish");
-
-                // The event should only be processed if there is no other need to render the page again
-
-                // First let's update the item with the new metadata values submitted:
-                SPDocumentLibrary sourceDocLib = (SPDocumentLibrary)SPContext.Current.Web.Lists[new Guid(ListGUID.Value)];
-                SPListItem sourceDocAsItem = sourceDocLib.GetItemById(int.Parse(ItemID.Value));
-
-                WBDocument document = CaptureAsDocument(sourceDocAsItem, documentRecordsType);
-
-                document.Update();
-
-                /*
-                 * 
-                 *   OK So now we actually publish out the document:
-                 * 
-                 */
-
-
-                SPFile sourceFile = sourceDocAsItem.File;
-                string errorMessage = "";
-
-                string successMessage = "<h3>Successfully Published Out</h3> <table cellpadding='5'>";
-                if (TheDestinationType.Value.Equals(WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__WORK_BOX))
-                {
-                    using (WorkBox workBox = new WorkBox(DestinationURL.Value))
-                    {
-                        string selectedFolderPath = Request.QueryString["SelectedFolderPath"];
-                        if (string.IsNullOrEmpty(selectedFolderPath))
-                        {
-                            selectedFolderPath = "/";
-                        }
-
-                        string destinationRootFolderUrl = DestinationURL.Value + "/" + workBox.DocumentLibrary.RootFolder.Url + selectedFolderPath;
-
-                        errorMessage = sourceFile.WBxCopyTo(destinationRootFolderUrl, new List<String>());
-
-                        if (errorMessage == "")
-                        {
-                            successMessage += "<tr><td>Filename</td><td><b>" + sourceFile.Name + "</b></td></tr><tr><td>Published out to:</td><td><a href=\"" + destinationRootFolderUrl + "\"><b>" + destinationRootFolderUrl + "</b></a></td></tr>";
-                            successMessage += "</table>";
-                            GoToGenericOKPage("Publishing Out Success", successMessage);
-                        }
-                        else
-                        {
-                            GoToGenericOKPage("Publishing Out Error", errorMessage);
-                        }
-                    }
-                }
-                else
-                {
-                    GoToApprovalPage();
-                }
+                GoToNextPage();
             }
         }
+
+
 
         protected void cancelButton_OnClick(object sender, EventArgs e)
         {
@@ -779,24 +648,18 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         }
 
 
-        private void GoToApprovalPage()
+        private void GoToNextPage()
         {
-            String destinationType = TheDestinationType.Value;
-            String destinationTitle = DestinationTitle.Text;
-            String destinationUrl = DestinationURL.Value;
-            string listGuid = ListGUID.Value;
-            string itemID = ItemID.Value;
+            string redirectUrl; 
 
-            string redirectUrl = "WorkBoxFramework/PublishDocSelfApprove.aspx?"
-                + "ListGUID=" + listGuid
-                + "&ItemID=" + itemID
-                + "&DestinationURL=" + destinationUrl
-                + "&DestinationTitle=" + destinationTitle
-                + "&DestinationType=" + destinationType
-                + "&ToReplaceRecordID=" + ToReplaceRecordID.Value
-                + "&ToReplaceRecordPath=" + ToReplaceRecordPath.Value
-                + "&NewOrReplace=" + NewOrReplace.Text
-                + "&ReplacementAction=" + ReplacementActions.SelectedValue;
+            if (process.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PROTECTED)
+            {
+                redirectUrl = "WorkBoxFramework/PublishDocActuallyPublish.aspx?PublishingProcessJSON=" + JsonConvert.SerializeObject(process);
+            }
+            else
+            {
+                redirectUrl = "WorkBoxFramework/PublishDocSelfApprove.aspx?PublishingProcessJSON=" + JsonConvert.SerializeObject(process);
+            }
 
             SPUtility.Redirect(redirectUrl, SPRedirectFlags.RelativeToLayoutsPage, Context);
         }

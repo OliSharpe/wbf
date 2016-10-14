@@ -589,8 +589,8 @@ namespace WorkBoxFramework
         {
             get 
             {
-                // If the default value is not explictly set then assume we use this same type for publishing out.
-                if (DefaultPublishingOutRecordsTypeUIControlValue == "") return this;
+                // If the default value is not explictly set then we'll return the records type of the work box:
+                if (DefaultPublishingOutRecordsTypeUIControlValue == "") return this; // null;
                 return new WBRecordsType(Taxonomy, DefaultPublishingOutRecordsTypeUIControlValue);
             }
 
@@ -962,6 +962,17 @@ namespace WorkBoxFramework
             }
 
             return childCanHaveDocuments;
+        }
+
+        public bool IsRelevantToFunctionalArea(WBTerm functionalArea)
+        {
+            WBLogging.Debug("In IsRelevantToFunctionalArea(): " + AllowOtherFunctionalAreas);
+            WBLogging.Debug("In IsRelevantToFunctionalArea(): " + DefaultFunctionalAreaUIControlValue + " ?=? " + functionalArea.UIControlValue);
+
+            if (this.AllowOtherFunctionalAreas) return true;
+            if (String.IsNullOrEmpty(this.DefaultFunctionalAreaUIControlValue)) return true;
+            if (this.DefaultFunctionalAreaUIControlValue == functionalArea.UIControlValue) return true;
+            return false;
         }
 
 

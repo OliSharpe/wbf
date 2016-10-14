@@ -31,24 +31,14 @@
      />
 
 
+
 <script type="text/javascript">
     function WorkBoxFramework_PublishDoc_pickedANewLocation(dialogResult, returnValue) {
 
         if (dialogResult == SP.UI.DialogResult.OK) {
 
-            var values = returnValue.split("@");
-
-            var newFunctionalAreas = document.getElementById("<%=NewFunctionalAreasUIControlValue.ClientID %>");
-            newFunctionalAreas.value = values[0];
-
-            var newRecordsType = document.getElementById("<%=NewRecordsTypeUIControlValue.ClientID %>");
-            newRecordsType.value = values[1];
-
-            var toReplaceRecordID = document.getElementById("<%=ToReplaceRecordID.ClientID %>");
-            toReplaceRecordID.value = values[2];
-
-            var toReplaceRecordPath = document.getElementById("<%=ToReplaceRecordPath.ClientID %>");
-            toReplaceRecordPath.value = values[3];
+            var updatedPublishingProcess = document.getElementById("<%=UpdatedPublishingProcessJSON.ClientID %>");
+            updatedPublishingProcess.value = returnValue;
 
             document.forms['aspnetForm'].submit();
         }
@@ -57,22 +47,15 @@
 
     function WorkBoxFramework_pickANewLocation(callbackFunction, currentFunctionalAreasUIControlValue, currentRecordsTypeUIControlValue) {
 
-        var listGUID = document.getElementById("<%=ListGUID.ClientID %>");
-        var itemID = document.getElementById("<%=ItemID.ClientID %>");
-        var destinationTitle = document.getElementById("<%=DestinationTitle.ClientID %>");
-        var destinationType = document.getElementById("<%=TheDestinationType.ClientID %>");
-        var newOrReplace = document.getElementById("<%=NewOrReplace.ClientID %>");
-        var protectiveZone = document.getElementById("<%=ProtectiveZone.ClientID %>");
+        var publishingProcessJSON = document.getElementById("<%=PublishingProcessJSON.ClientID %>");
+        var newOrReplace = $('#<% =NewOrReplace.ClientID %>').text();
+        var archiveOrLeave = "Archive";
+        if ($("#<% =LeaveOnIzziCheckBox.ClientID %>").is(':checked')) archiveOrLeave = "Leave";
 
-        var urlValue = L_Menu_BaseUrl + '/_layouts/WorkBoxFramework/PublishDocDialogPickLocation.aspx' 
-            + '?FunctionalAreasUIControlValue=' + currentFunctionalAreasUIControlValue
-            + '&RecordsTypeUIControlValue=' + currentRecordsTypeUIControlValue
-            + "&NewOrReplace=" + $(newOrReplace).text()
-            + "&ListGUID=" + listGUID.value
-            + "&ItemID=" + itemID.value
-            + "&DestinationTitle=" + destinationTitle.value
-            + "&DestinationType=" + destinationType.value
-            + "&ProtectiveZone=" + protectiveZone.value;
+        var urlValue = L_Menu_BaseUrl + '/_layouts/WorkBoxFramework/PublishDocDialogPickLocation.aspx'
+            + '?PublishingProcessJSON=' + publishingProcessJSON.value
+            + '&NewOrReplace=' + newOrReplace
+            + '&ArchiveOrLeave=' + archiveOrLeave;
 
         var options = {
             url: urlValue,
@@ -92,7 +75,20 @@
         $("#wbf-edit-short-title").show();
     }
 
+    function WBF_maybeDisablePublishButtons() {
+        var location = $("#<%=LocationPath.ClientID %>").text();
 
+        if (location == "") {
+            $("#<%=Publish.ClientID %>").attr("disabled", false);
+            $("#<%=PublishAll.ClientID %>").attr("disabled", false);
+        } else {
+            if ($("#<%=NewOrReplace.ClientID %>").text() == "New") {
+                $("#<%=PublishAll.ClientID %>").attr("disabled", false);
+            } else {
+                $("#<%=PublishAll.ClientID %>").attr("disabled", true);
+            }
+        }
+    } 
 
 </script>
 
@@ -107,94 +103,56 @@
 
 <table cellpadding="8" cellspacing="0" class="wbf-title-table">
 <tr>
-<td valign="middle">
-<asp:Image ID="SourceDocIcon" runat="server" />
-</td>
 <td valign="middle" class="wbf-create-new-title">
 <div class="wbf-publish-out-title">
-Publish Document to: <asp:Label ID="DestinationTitle" runat="server" />
+Publish Document(s) to:  <asp:Label ID="TheProtectiveZone" runat="server" /> Library
 </div>
 <div>
-You must enter the following metadata for the document
+You must enter the following metadata for the document(s)
 </div>
 </td>
 </tr>
 </table>
 
 
-<asp:HiddenField ID="ListGUID" runat="server" />
-<asp:HiddenField ID="ItemID" runat="server" />
-<asp:HiddenField ID="TheDestinationType" runat="server" />
-<asp:HiddenField ID="DestinationURL" runat="server" />
+<asp:HiddenField ID="PublishingProcessJSON" runat="server" />
 
-<asp:HiddenField ID="RecordsTypeUIControlValue" runat="server"/>
-<asp:HiddenField ID="NewRecordsTypeUIControlValue" runat="server" Value="" />
+<asp:HiddenField ID="UpdatedPublishingProcessJSON" runat="server" />
 
-<asp:HiddenField ID="FunctionalAreasUIControlValue" runat="server"/>
-<asp:HiddenField ID="NewFunctionalAreasUIControlValue" runat="server" Value="" />
-
-<asp:HiddenField ID="ToReplaceRecordID" runat="server" Value="" />
-<asp:HiddenField ID="ToReplaceRecordPath" runat="server" Value="" />
-
-<asp:HiddenField ID="ProtectiveZone" runat="server"/>
-
-<asp:Label ID="NewOrReplace" runat="server"/>
+<asp:Label ID="NewOrReplace" runat="server" style="display: none;"/>
 
 <table class="wbf-dialog-form">
 
-
-<tr>
-    <td class="wbf-field-name-panel">
-        <div class="wbf-field-name">Publishing Document</div>
-    </td>
-    <td class="wbf-field-value-panel">
-        <div class="wbf-field-read-only-title">
-            <asp:Label ID="ReadOnlyNameField" runat="server"></asp:Label>
-        </div>
-        <div class="wbf-field-read-only-value">
-            <asp:Label ID="OriginalFileName" runat="server"></asp:Label>
-        </div>
-    </td>
-</tr>
+<asp:Literal ID="DocumentsBeingPublished" runat="server" />
 
 
 <tr>
 <td class="wbf-field-name-panel" colspan="2">
 
-<div>
+<div class="wbf-publishing-replace-options">
+
 <asp:RadioButton id="ReplaceRadioButton" GroupName="NewOrReplaceRadios" Value="Replace"
-             Text="I want to replace existing document" runat="server"/>
-</div>
-<div>
-<!--                     
-AutoPostBack="True"
-OnSelectedIndexChanged="Selection_Change"
--->
-
-<span>
-I want to 
-<asp:DropDownList id="ReplacementActions"
-                    runat="server">
-
-                  <asp:ListItem Value="Archive">Archive</asp:ListItem>
-                  <asp:ListItem Value="Retire">Retire</asp:ListItem>
-
-               </asp:DropDownList>
-the document being replaced.
-</span>
+             Text="" runat="server"/><b>Replace</b> an existing document
 
 </div>
 
-<div>
+<div  class="wbf-publishing-replace-options" style="padding-left: 30px;">
+<asp:CheckBox id="LeaveOnIzziCheckBox" runat="server"/> Viewable on izzi search
+</div>
+
+<div class="wbf-publishing-replace-options">
 <asp:RadioButton id="NewRadioButton" GroupName="NewOrReplaceRadios" Value="New"
-             Text="I want to publish a new document" runat="server"/>
+             Text="" runat="server"/>Publish a <b>new</b> document
 </div>
-<div>
+<div class="wbf-publishing-location-button">
 <asp:Button ID="SelectLocationButton" UseSubmitBehavior="false" runat="server" Text="Select Location" />
 </div>
 
-<div>
-<span>Publishing Location:</span> <span><asp:Label ID="LocationPath" runat="server"></asp:Label></span>
+<div class="wbf-publishing-choosen-location">
+<span id="locationType" style="font-weight: bold; ">Publishing Location</span>: <span class="wbf-publishing-choosen-location"><asp:Label ID="LocationPath" runat="server"></asp:Label></span>
+</div>
+<div class="wbf-field-error">
+<asp:Label ID="PublishingLocationError" runat="server" Text="" ForeColor="Red"/>
 </div>
 </td>
 </tr>
@@ -212,9 +170,20 @@ the document being replaced.
 </div>
 
 <div id="wbf-edit-short-title" class="wbf-field-value" style=" display:none; ">
-
     <asp:TextBox ID="EditShortTitle" runat="server"></asp:TextBox>
 </div>
+<div class="wbf-field-error">
+<asp:Label ID="ShortTitleError" runat="server" Text="" ForeColor="Red"/>
+</div>
+
+<div class="wbf-field-description">
+You can use spaces and capitals. You should remove hyphens/underscores, version no’s, “DRAFT”/”FINAL”, etc.
+</div>
+
+<div class="wbf-field-description">
+It’s recommended you don’t change this when you’re replacing an existing document.
+</div>
+
 </td>
 </tr>
 
@@ -225,7 +194,7 @@ the document being replaced.
         <div class="wbf-field-name"><asp:Label ID="SubjectTagsTitle" runat="server"/></div>
 </td>
 <td class="wbf-field-value-panel" valign="top">
-<div class="wbf-field-value">
+<div class="wbf-field-value wbf-taxonomy-control">
 <Taxonomy:TaxonomyWebTaggingControl ID="SubjectTagsField" ControlMode="display" runat="server" />
 </div>
 <div class="wbf-field-error">
@@ -324,10 +293,10 @@ the document being replaced.
 
 <tr>
 <td class="wbf-field-name-panel">
-        <div class="wbf-field-name">Owning Team</div>
+        <div class="wbf-field-name">Owning Team<span class="wbf-required-asterisk">*</span></div>
 </td>
 <td class="wbf-field-value-panel" valign="top">
-<div class="wbf-field-value">
+<div class="wbf-field-value wbf-taxonomy-control">
 <Taxonomy:TaxonomyWebTaggingControl ID="OwningTeamField" ControlMode="display" runat="server" />
 </div>
 <div class="wbf-field-error">
@@ -347,7 +316,7 @@ The team responsible for this document.
 </td>
 <td class="wbf-field-value-panel" valign="top">
 
-<div class="wbf-field-value">
+<div class="wbf-field-value wbf-taxonomy-control">
 <Taxonomy:TaxonomyWebTaggingControl ID="InvolvedTeamsField" ControlMode="display" runat="server" />
 </div>
 <div class="wbf-field-error">
@@ -359,16 +328,40 @@ Other teams that were involved with the creation of this document.
 </td>
 </tr>
 
+<tr>
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Web Page URL</div>
+</td>
+<td class="wbf-field-value-panel" valign="top">
+
+<div class="wbf-field-value">
+<asp:TextBox ID="WebPageURL" runat="server" Columns="60" />
+</div>
+<div class="wbf-field-error">
+<asp:Label ID="WebPageURLMessage" runat="server" Text="" ForeColor="Red"/>
+</div>
+<div class="wbf-field-description">
+If this document needs to be shown on a webpage please provide the pages full URL (address) here.
+</div>
+</td>
+</tr>
 
 
 <tr>
 <td colspan="2" class="wbf-buttons-panel">
 <p>
-        <asp:Button ID="Publish" UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" Text="Next" OnClick="publishButton_OnClick" />
+        <asp:Button ID="Publish" UseSubmitBehavior="false" runat="server" Text="Publish" OnClick="publishButton_OnClick" />
+
+<% if (process.AllowBulkPublishAllTogether)
+   { %>
+        &nbsp;
+
+        <asp:Button ID="PublishAll" UseSubmitBehavior="false" runat="server" Text="Publish All" OnClick="publishAllButton_OnClick" />
+<%} %>
 
         &nbsp;
 
-        <asp:Button ID="Cancel" UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" Text="Cancel" OnClick="cancelButton_OnClick"
+        <asp:Button ID="Cancel" UseSubmitBehavior="false" runat="server" Text="Cancel" OnClick="cancelButton_OnClick"
             CausesValidation="False"/>
 </p>
 </td>
@@ -383,16 +376,36 @@ Other teams that were involved with the creation of this document.
 
         var selectLocationButton = $('#<%=SelectLocationButton.ClientID %>');
 
+        if ($("#<%=NewOrReplace.ClientID %>").text() == "New") {
+            $("#<%=LeaveOnIzziCheckBox.ClientID %>").attr("disabled", true);
+        }
+
         $('input:radio[name="ctl00$PlaceHolderMain$NewOrReplaceRadios"]').change(function () {
             if ($(this).val() == 'New') {
                 selectLocationButton.val("Choose Location");
                 $("#<%=NewOrReplace.ClientID %>").text("New");
+                $("#locationType").text("Publishing location");
+//                $("#<%=PublishAll.ClientID %>").attr("disabled", false);
+                $("#<%=LeaveOnIzziCheckBox.ClientID %>").attr("disabled", true);
             } else {
                 selectLocationButton.val("Choose Document");
                 $("#<%=NewOrReplace.ClientID %>").text("Replace");
+                $("#locationType").text("Document to replace");
+//                $("#<%=PublishAll.ClientID %>").attr("disabled", true);
+                $("#<%=LeaveOnIzziCheckBox.ClientID %>").attr("disabled", false);
             }
+
+            WBF_maybeDisablePublishButtons();
         });
+
+        WBF_maybeDisablePublishButtons();
+
     });
+
+    // Hopefully this will resize the modal correctly. 
+    // Found with thanks in answers here: https://social.msdn.microsoft.com/Forums/sharepoint/en-US/ddd6ce37-b289-47d5-92ad-067b2c9ee4fd/resizing-an-open-dialog-as-its-contents-change
+//    var currentModal = SP.UI.ModalDialog.get_childDialog();
+  //  currentModal.$$d_autoSize();
 </script>
 
 </asp:Content>
