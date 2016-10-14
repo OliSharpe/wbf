@@ -670,6 +670,94 @@ namespace WorkBoxFramework
         }
 
 
+        internal void InitialPublishingCheckBoxListsSetup(SPWeb web)
+        {
+            WBLogging.Config.Monitorable("Running WBFarm.InitialPublishingCheckBoxListsSetup()");
+
+            SPSite site = web.Site;
+
+            WBTaskFeedback feedback = new WBTaskFeedback("Setup Publishing Check Box Lists");
+
+            CreateOrCheckCheckBoxColumns(feedback, site, web);
+
+            CreateOrCheckFileTypesList(feedback, site, web, web);
+
+            MaybePopulateFileTypesList(feedback, site, web);
+
+            CreateOrCheckCheckBoxesList(new WBTaskFeedback("Check or Create Check Boxes List"), site, web, web);
+
+            MaybePopulateCheckBoxesList(feedback, site, web);
+
+            if (SPContext.Current == null || web != SPContext.Current.Web)
+            {
+                web.Dispose();
+            }
+
+            WBLogging.Config.Monitorable("Completed WBFarm.InitialPublishingCheckBoxListsSetup()");
+        }
+
+        internal void MaybePopulateFileTypesList(WBTaskFeedback feedback, SPSite site, SPWeb web)
+        {
+            SPList fileTypesList = web.Lists.TryGetList(WBRecordsManager.FILE_TYPES_LIST_TITLE);
+
+            if (fileTypesList != null)
+            {
+                MaybeAddFileType(site, fileTypesList, "pdf", true, true, "PDF Document", WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT);
+                MaybeAddFileType(site, fileTypesList, "doc", true, false, "Word Document 2003", WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT);
+                MaybeAddFileType(site, fileTypesList, "docx", true, false, "Word Document", WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT);
+            }
+
+        }
+
+        internal void MaybeAddFileType(SPSite site, SPList list, String fileTypeExtension, bool canPublish, bool canBulkPublish, String prettyName, String documentType) 
+        {
+            SPListItem exists = WBUtils.FindItemByColumn(site, list, WBColumn.FileTypeExtension, fileTypeExtension);
+            if (exists == null) {
+                SPListItem newItem = list.AddItem();
+                newItem.WBxSet(WBColumn.FileTypeExtension, fileTypeExtension);
+                newItem.WBxSet(WBColumn.CanPublishToPublic, canPublish);
+                newItem.WBxSet(WBColumn.CanBulkPublishToPublic, canBulkPublish);
+                if (!String.IsNullOrEmpty(prettyName)) newItem.WBxSet(WBColumn.FileTypePrettyName, prettyName);
+                newItem.WBxSet(WBColumn.DocumentType, documentType);
+
+                newItem.Update();
+            }
+        }
+
+        internal void MaybePopulateCheckBoxesList(WBTaskFeedback feedback, SPSite site, SPWeb web)
+        {
+            SPList checkBoxesList = web.Lists.TryGetList(WBRecordsManager.CHECK_BOXES_LIST_TITLE);
+
+            if (checkBoxesList != null)
+            {
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT, 110, "RmPhVid", "Removed photography and videos?", true);
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT, 120, "RmComPrN", "Removed any comments or presenter notes?", true);
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT, 130, "RmLnPivCht", "Removed  linked data within pivot tables and charts?", true);
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT, 140, "RmIncMD", "Removed old or incorrect meta-data?", true);
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT, 150, "RedPerDt", "Redacted personal data including the title or filename (eg Letter to John Smith)?", true);
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT, 160, "ChPrnHdFt", "Checked/Removed header or footer automatically added to a print-out?", true);
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT, 170, "RedAttch", "Redacted any attachments?", true);
+            }
+        }
+
+        internal void MaybeAddCheckBox(SPSite site, SPList list, String documentType, int order, String checkBoxCode, String checkBoxText, bool useCheckBox)
+        {
+            SPListItem exists = WBUtils.FindItemByColumn(site, list, WBColumn.CheckBoxCode, checkBoxCode);
+            if (exists == null)
+            {
+                SPListItem newItem = list.AddItem();
+                newItem.WBxSet(WBColumn.DocumentType, documentType);
+                newItem.WBxSet(WBColumn.Order, order);
+                newItem.WBxSet(WBColumn.CheckBoxCode, checkBoxCode);
+                newItem.WBxSet(WBColumn.CheckBoxText, checkBoxText);
+                newItem.WBxSet(WBColumn.UseCheckBox, useCheckBox);
+
+                newItem.Update();
+            }
+        }
+
+
+
         internal WBTaskFeedback CheckSetupOfTermSets(WBTaskFeedback feedback, SPSite site)
         {
             feedback.JustLog("Started term set initial setup.");
@@ -867,6 +955,66 @@ namespace WorkBoxFramework
 
         }
 
+        internal void CreateOrCheckFileTypesList(WBTaskFeedback feedback, SPSite site, SPWeb rootweb, SPWeb web)
+        {
+            WBColumn[] columns = 
+            {             
+                WBColumn.FileTypeExtension,
+                WBColumn.CanPublishToPublic,
+                WBColumn.CanBulkPublishToPublic,
+                WBColumn.FileTypePrettyName,
+                WBColumn.DocumentType
+            };
+
+
+            WBQuery viewQuery = new WBQuery();
+            viewQuery.AddViewColumn(WBColumn.FileTypeExtension);
+            viewQuery.AddViewColumn(WBColumn.CanPublishToPublic);
+            viewQuery.AddViewColumn(WBColumn.CanBulkPublishToPublic);
+            viewQuery.AddViewColumn(WBColumn.FileTypePrettyName);
+            viewQuery.AddViewColumn(WBColumn.DocumentType);
+
+//            viewQuery.OrderBy(WBColumn.ExecutionOrder, true);
+  //          viewQuery.AddFilter(WBColumn.ExecutionOrder, WBQueryClause.Comparators.GreaterThan, 0);
+
+            SPList fileTypesList = WBUtils.CreateOrCheckCustomList(feedback, rootweb, web, WBRecordsManager.FILE_TYPES_LIST_TITLE, columns, true);
+
+            fileTypesList.WBxCreateOrUpdateView(site, "In Use", viewQuery, 500, true, true);
+
+            fileTypesList.Update();
+            web.Update();
+        }
+
+        internal void CreateOrCheckCheckBoxesList(WBTaskFeedback feedback, SPSite site, SPWeb rootweb, SPWeb web)
+        {
+            WBColumn[] columns = 
+            {             
+                WBColumn.DocumentType,
+                WBColumn.Order,
+                WBColumn.CheckBoxCode,
+                WBColumn.CheckBoxText,
+                WBColumn.UseCheckBox
+            };
+
+
+            WBQuery viewQuery = new WBQuery();
+            viewQuery.AddViewColumn(WBColumn.DocumentType);
+            viewQuery.AddViewColumn(WBColumn.Order);
+            viewQuery.AddViewColumn(WBColumn.CheckBoxCode);
+            viewQuery.AddViewColumn(WBColumn.CheckBoxText);
+            viewQuery.AddViewColumn(WBColumn.UseCheckBox);
+
+            viewQuery.OrderBy(WBColumn.Order, true);
+            viewQuery.AddFilter(WBColumn.UseCheckBox, WBQueryClause.Comparators.Equals, true);
+
+            SPList checkBoxesList = WBUtils.CreateOrCheckCustomList(feedback, rootweb, web, WBRecordsManager.CHECK_BOXES_LIST_TITLE, columns, true);
+
+            checkBoxesList.WBxCreateOrUpdateView(site, "In Use", viewQuery, 500, true, true);
+
+            checkBoxesList.Update();
+            web.Update();
+        }
+
 
         internal void CreateOrCheckWBFSiteColumns(WBTaskFeedback feedback, SPSite site, SPWeb rootWeb)
         {
@@ -956,6 +1104,33 @@ namespace WorkBoxFramework
 
             WBLogging.Generic.Monitorable("Finished CreateOrCheckWBFSiteColumns");
         }
+
+        internal void CreateOrCheckCheckBoxColumns(WBTaskFeedback feedback, SPSite site, SPWeb rootWeb)
+        {
+            feedback.JustLog("Starting CreateOrCheckCheckBoxColumns");
+
+            WBColumn[] columnsToCreate = 
+            {
+                WBColumn.FileTypeExtension,
+                WBColumn.CanPublishToPublic,
+                WBColumn.CanBulkPublishToPublic,
+                WBColumn.FileTypePrettyName,
+                WBColumn.DocumentType,
+                WBColumn.Order,
+                WBColumn.CheckBoxCode,
+                WBColumn.CheckBoxText,
+                WBColumn.UseCheckBox
+            };
+
+            foreach (WBColumn column in columnsToCreate)
+            {
+                column.CreateOrCheck(feedback, site, rootWeb);
+            }
+
+            WBLogging.Generic.Monitorable("Finished CreateOrCheckCheckBoxColumns");
+        }
+
+      
 
         internal void CreateOrCheckWBCSiteContentTypes(WBTaskFeedback feedback, SPSite site, SPWeb rootWeb)
         {

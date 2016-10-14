@@ -10,79 +10,61 @@
 namespace WorkBoxFramework.Layouts.WorkBoxFramework {
     
     
-    public partial class PublishDocDialogPickLocation {
+    public partial class PublishDocActuallyPublish {
         
         /// <summary>
-        /// SP2010ModalDialogs control.
+        /// WBFCssRegistration control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Microsoft.SharePoint.WebControls.ScriptLink SP2010ModalDialogs;
+        protected global::Microsoft.SharePoint.WebControls.CssRegistration WBFCssRegistration;
         
         /// <summary>
-        /// ErrorMessageLabel control.
+        /// WBFjQueryScriptRegistration control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label ErrorMessageLabel;
+        protected global::Microsoft.SharePoint.WebControls.ScriptLink WBFjQueryScriptRegistration;
         
         /// <summary>
-        /// DestinationTitle control.
+        /// WBFScriptRegistration control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label DestinationTitle;
+        protected global::Microsoft.SharePoint.WebControls.ScriptLink WBFScriptRegistration;
         
         /// <summary>
-        /// DocumentsBeingPublished control.
+        /// HiddenSubmitLink control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal DocumentsBeingPublished;
+        protected global::System.Web.UI.WebControls.LinkButton HiddenSubmitLink;
         
         /// <summary>
-        /// LibraryLocations control.
+        /// PublishDocumentsPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Microsoft.SharePoint.WebControls.SPTreeView LibraryLocations;
+        protected global::System.Web.UI.UpdatePanel PublishDocumentsPanel;
         
         /// <summary>
-        /// ShowSelectionPanel control.
+        /// DocumentPublishingProgress control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel ShowSelectionPanel;
-        
-        /// <summary>
-        /// SelectedFolderPath control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label SelectedFolderPath;
-        
-        /// <summary>
-        /// SelectedRecordID control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label SelectedRecordID;
+        protected global::System.Web.UI.WebControls.PlaceHolder DocumentPublishingProgress;
         
         /// <summary>
         /// PublishingProcessJSON control.
@@ -91,24 +73,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField PublishingProcessJSON;
+        protected global::System.Web.UI.WebControls.Label PublishingProcessJSON;
         
         /// <summary>
-        /// Select control.
+        /// DoneButton control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Select;
-        
-        /// <summary>
-        /// Cancel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Cancel;
+        protected global::System.Web.UI.WebControls.Button DoneButton;
     }
 }

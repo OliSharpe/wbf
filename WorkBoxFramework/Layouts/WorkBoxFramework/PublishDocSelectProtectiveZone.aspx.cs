@@ -1,6 +1,6 @@
 ﻿#region Copyright and License
 
-// Copyright (c) Islington Council 2010-2013
+// Copyright (c) Islington Council 2010-2016
 // Author: Oli Sharpe  (oli@gometa.co.uk)
 //
 // This file is part of the Work Box Framework.
@@ -29,9 +29,11 @@ using Newtonsoft.Json;
 
 namespace WorkBoxFramework.Layouts.WorkBoxFramework
 {
-    public partial class PublishDocDialogSelectDestinationPage : WorkBoxDialogPageBase
+    public partial class PublishDocSelectProtectiveZone : WorkBoxDialogPageBase
     {
         public bool userCanPublishToPublic = false;
+
+        private WBPublishingProcess process = null;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -52,31 +54,39 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     string selectedListGUID = Request.QueryString["selectedListGUID"];
                     string[] selectedItemsIDs = Request.QueryString["selectedItemsIDsString"].ToString().Split('|');
 
-                    WBUtils.logMessage("The list GUID was: " + selectedListGUID);
-                    selectedListGUID = selectedListGUID.Substring(1, selectedListGUID.Length - 2).ToLower();
+                    WBLogging.Debug("Before creating the WBProcessObject");
 
-                    Guid sourceListGuid = new Guid(selectedListGUID);
+                    process = new WBPublishingProcess(WorkBox, selectedListGUID, selectedItemsIDs);
 
-                    ListGUID.Value = sourceListGuid.ToString();
-                    ItemID.Value = selectedItemsIDs[1].ToString();
+                    WBLogging.Debug("Created the WBProcessObject");
+                    
+                    PublishingProcessJSON.Value = JsonConvert.SerializeObject(process);
 
-                    WBUtils.logMessage("The ListGUID was: " + ListGUID.Value);
-                    WBUtils.logMessage("The ItemID was: " + ItemID.Value);
+                    String html = "";
 
-                    SPDocumentLibrary sourceDocLib = (SPDocumentLibrary)WorkBox.Web.Lists[sourceListGuid];
-                    SPListItem sourceDocAsItem = sourceDocLib.GetItemById(int.Parse(ItemID.Value));
+                    WBLogging.Debug("Created the WBProcessObject and serialised " + PublishingProcessJSON.Value);
 
-                    SourceDocFileName.Text = sourceDocAsItem.Name;
+                    if (process.ItemIDs.Count == 0)
+                    {
+                        WBLogging.Debug("process.ItemIDs.Count == 0");
+                        html += "<i>No documents selected!</i>";
+                    }
+                    else
+                    {
+                        html += "<table cellpadding='0px' cellspacing='5px'>";
 
-                    SourceDocIcon.AlternateText = "Icon of document being publishing out.";
-                    SourceDocIcon.ImageUrl = SPUtility.ConcatUrls("/_layouts/images/",
-                                                SPUtility.MapToIcon(WorkBox.Web,
-                                                SPUtility.ConcatUrls(WorkBox.Web.Url, sourceDocAsItem.Url), "", IconSize.Size32));
+                        foreach (String itemID in process.ItemIDs)
+                        {
+                            String filename = process.MappedFilenames[itemID];
 
-//                    foreach (SPList list in SPContext.Current.Web.Lists)
-  //                  {
-    //                    WBUtils.logMessage("Found list name = " + list.Title + " list ID = " + list.ID);
-      //              }
+                            WBLogging.Debug("list through item with name: " + filename);
+                            html += "<tr><td align='center'><img src='" + WBUtils.DocumentIcon16(filename) + "' alt='Icon for file " + filename + "'/></td><td align='left'>" + filename + "</td></tr>\n";
+                        }
+
+                        html += "</table>";
+                    }
+
+                    DocumentsBeingPublished.Text = html;
 
                 }
                 else
@@ -84,15 +94,17 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     ErrorMessageLabel.Text = "There was an error with the passed through values";
                 }
             }
-
+            else
+            {
+                process = JsonConvert.DeserializeObject<WBPublishingProcess>(PublishingProcessJSON.Value);
+                process.WorkBox = WorkBox;
+            }
         }
 
-        private void GoToMetadataPage(String destinationType, String destinationTitle, String destinationUrl)
+        private void GoToMetadataPage()
         {
-            string listGuid = ListGUID.Value;
-            string itemID = ItemID.Value;
-
-            string redirectUrl = "WorkBoxFramework/PublishDocRequiredMetadata.aspx?ListGUID=" + listGuid + "&ItemID=" + itemID + "&DestinationURL=" + destinationUrl + "&DestinationTitle=" + destinationTitle + "&DestinationType=" + destinationType;
+            string redirectUrl = "WorkBoxFramework/PublishDocRequiredMetadata.aspx?PublishingProcessJSON=" + JsonConvert.SerializeObject(process);
+            //string redirectUrl = "WorkBoxFramework/PublishDocActuallyPublish.aspx?PublishingProcessJSON=" + JsonConvert.SerializeObject(process);
 
             SPUtility.Redirect(redirectUrl, SPRedirectFlags.RelativeToLayoutsPage, Context);
         }
@@ -106,22 +118,20 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__USER_DEFINED_DESTINATION, 
                 DestinationURL.Value.Trim());
         }
-         */ 
+         */
 
         protected void PublicWebSiteButton_onClick(object sender, EventArgs e)
         {
-            GoToMetadataPage(
-                WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__PUBLIC_WEB_SITE,
-                WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__PUBLIC_WEB_SITE,
-                "");
+            process.ProtectiveZone = WBRecordsType.PROTECTIVE_ZONE__PUBLIC;
+
+            GoToMetadataPage();
         }
 
         protected void PublicExtranetButton_onClick(object sender, EventArgs e)
         {
-            GoToMetadataPage(
-                WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__PUBLIC_EXTRANET,
-                WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__PUBLIC_EXTRANET,
-                "");
+            process.ProtectiveZone = WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET;
+
+            GoToMetadataPage();
         }
 
         /* Not being used at the moment ... to be discussed.
@@ -136,12 +146,12 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void RecordsLibraryButton_onClick(object sender, EventArgs e)
         {
-            GoToMetadataPage(
-                WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__RECORDS_LIBRARY,
-                WorkBox.PUBLISHING_OUT_DESTINATION_TYPE__RECORDS_LIBRARY,
-                "");
+            process.ProtectiveZone = WBRecordsType.PROTECTIVE_ZONE__PROTECTED;
+
+            GoToMetadataPage();
         }
 
+        /*
         protected void WorkBoxButton_onClick(object sender, EventArgs e)
         {
             GoToMetadataPage(
@@ -149,6 +159,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 DestinationTitle.Value.Trim(),
                 DestinationURL.Value.Trim());
         }
+         */ 
 
         protected void cancelButton_OnClick(object sender, EventArgs e)
         {

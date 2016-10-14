@@ -21,16 +21,22 @@
 #endregion
 
 using System;
+using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Taxonomy;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Utilities;
+using Newtonsoft.Json;
 
 namespace WorkBoxFramework.Layouts.WorkBoxFramework
 {
     public partial class PublishDocDialogPickLocation : WorkBoxDialogPageBase
     {
         WBRecordsManager manager = null;
+        WBPublishingProcess process = null;
+        String newOrReplace = null;
+        String archiveOrLeave = null;
+
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -39,72 +45,53 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (!IsPostBack)
             {
-                FunctionalAreasUIControlValue.Value = Request.QueryString["FunctionalAreasUIControlValue"];
-                RecordsTypeUIControlValue.Value = Request.QueryString["RecordsTypeUIControlValue"];
-                NewOrReplace.Value = Request.QueryString["NewOrReplace"];
-                ProtectiveZone.Value = Request.QueryString["ProtectiveZone"];
+                process = JsonConvert.DeserializeObject<WBPublishingProcess>(Request.QueryString["PublishingProcessJSON"]);
+                process.WorkBox = WorkBox;
 
-                ListGUID.Value = Request.QueryString["ListGUID"];
-                ItemID.Value = Request.QueryString["ItemID"];
+                WBLogging.Debug("Created the WBProcessObject");
 
-                // The following variable has its name due to a strange compliation error with the name 'DestinationType' 
-                DestinationType.Value = Request.QueryString["DestinationType"];
-                DestinationURL.Value = Request.QueryString["DestinationURL"];
-                DestinationTitle.Text = Request.QueryString["DestinationTitle"];
-
-                WBRecordsLibrary masterLibrary = manager.Libraries.ProtectedMasterLibrary;
-
-
-
-                if (!string.IsNullOrEmpty(ListGUID.Value))
+                newOrReplace = Request.QueryString["NewOrReplace"];
+                archiveOrLeave = Request.QueryString["ArchiveOrLeave"];
+                if (newOrReplace == "New")
                 {
-                    Guid sourceListGuid = new Guid(ListGUID.Value);
-                    SPDocumentLibrary sourceDocLib = (SPDocumentLibrary)WorkBox.Web.Lists[sourceListGuid];
-
-                    SPListItem sourceDocAsItem = sourceDocLib.GetItemById(int.Parse(ItemID.Value));
-
-                    if (sourceDocAsItem != null)
+                    process.ReplaceAction = WBPublishingProcess.REPLACE_ACTION__CREATE_NEW_SERIES;
+                }
+                else
+                {
+                    if (archiveOrLeave == "Archive")
                     {
-                        SourceDocIcon.AlternateText = "Icon of document being publishing out.";
-                        SourceDocIcon.ImageUrl = SPUtility.ConcatUrls("/_layouts/images/",
-                                                    SPUtility.MapToIcon(WorkBox.Web,
-                                                    SPUtility.ConcatUrls(WorkBox.Web.Url, sourceDocAsItem.Url), "", IconSize.Size32));
+                        process.ReplaceAction = WBPublishingProcess.REPLACE_ACTION__ARCHIVE_FROM_IZZI;
+                    }
+                    else
+                    {
+                        process.ReplaceAction = WBPublishingProcess.REPLACE_ACTION__LEAVE_ON_IZZI;
                     }
                 }
 
+                WBLogging.Debug("Captured replace action as: " + process.ReplaceAction);
+
+                PublishingProcessJSON.Value = JsonConvert.SerializeObject(process);
+
+                WBLogging.Debug("Serialized the WBProcessObject to hidden field");
+
+                WBRecordsLibrary masterLibrary = manager.Libraries.ProtectedMasterLibrary;
 
                 SPFolder rootFolder = masterLibrary.List.RootFolder;
 
-                WBTerm functionalArea = new WBTerm(manager.FunctionalAreasTaxonomy, FunctionalAreasUIControlValue.Value);
-                TreeViewLocationCollection collection = new TreeViewLocationCollection(manager, NewOrReplace.Value, ProtectiveZone.Value, functionalArea);
+                WBTermCollection<WBTerm> teamFunctionalAreas = new WBTermCollection<WBTerm>(manager.FunctionalAreasTaxonomy, process.TeamFunctionalAreasUIControlValue);
 
-                WorkBoxFolders.DataSource = collection;
-                WorkBoxFolders.DataBind();
+                String viewMode = process.IsReplaceActionToCreateNewSeries ? "New" : "Replace";
+                TreeViewLocationCollection collection = new TreeViewLocationCollection(manager, viewMode, process.ProtectiveZone, teamFunctionalAreas);
+
+                LibraryLocations.DataSource = collection;
+                LibraryLocations.DataBind();
 
                 SelectedFolderPath.Text = "/";
             }
-
-
-            // Now do a check that we do at this stage have the basic details of the document:
-            if (ListGUID.Value == null || ListGUID.Value == "")
+            else
             {
-                errorMessage += "ListGUID hasn't been set. ";
-            }
-
-            if (ItemID.Value == null || ItemID.Value == "")
-            {
-                errorMessage += "ItemID hasn't been set. ";
-            }
-
-            if (DestinationType.Value == null || DestinationType.Value == "")
-            {
-                errorMessage += "DestinationType hasn't been set. ";
-            }
-
-            if (errorMessage.Length > 0)
-            {
-                ErrorMessageLabel.Text = errorMessage;
-                return;
+                process = JsonConvert.DeserializeObject<WBPublishingProcess>(PublishingProcessJSON.Value);
+                process.WorkBox = WorkBox;
             }
 
 
@@ -119,12 +106,22 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
         }
 
-
-        protected void WorkBoxFolders_SelectedNodeChanged(object sender, EventArgs e)
+        protected void LibraryLocations_Bound(object sender, TreeNodeEventArgs e)
         {
-            if (WorkBoxFolders.SelectedNode != null)
+            if (e.Node.Text.Contains("."))
             {
-                string selectedPath = WorkBoxFolders.SelectedNode.ValuePath;
+                e.Node.ImageUrl = SPUtility.ConcatUrls("/_layouts/images/",
+                            SPUtility.MapToIcon(WorkBox.Web,
+                            SPUtility.ConcatUrls(WorkBox.Web.Url, e.Node.Text), "", IconSize.Size16));
+            }
+
+        }
+        
+        protected void LibraryLocations_SelectedNodeChanged(object sender, EventArgs e)
+        {
+            if (LibraryLocations.SelectedNode != null)
+            {
+                string selectedPath = LibraryLocations.SelectedNode.ValuePath;
                 if (string.IsNullOrEmpty(selectedPath)) selectedPath = "/";
 
                 selectedPath = selectedPath.Replace("(root)", "");
@@ -155,41 +152,36 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 WBRecordsType recordsType = new WBRecordsType(manager.RecordsTypesTaxonomy, recordsTypeTerm);
 
 
-                FunctionalAreasUIControlValue.Value = functionalArea.UIControlValue;
-                RecordsTypeUIControlValue.Value = recordsType.UIControlValue;
+                process.FunctionalAreaUIControlValue = functionalArea.UIControlValue;
+                process.RecordsTypeUIControlValue = recordsType.UIControlValue;
 
-                WBLogging.Debug("Set the new records type to be: " + RecordsTypeUIControlValue.Value);
+                WBLogging.Debug("Set the new records type to be: " + process.RecordsTypeUIControlValue);
 
 
                 // Finally let's see if there is a specific record being selected as well:
-                if (NewOrReplace.Value == "Replace")
+                if (!process.IsReplaceActionToCreateNewSeries)
                 {
                     WBRecord record = manager.Libraries.GetRecordByPath(selectedPath);
 
                     SelectedRecordID.Text = record.RecordID;
+                    process.ToReplaceRecordID = record.RecordID;
+                    process.ToReplaceRecordPath = selectedPath;
                 }
+
+
+                PublishingProcessJSON.Value = JsonConvert.SerializeObject(process);
 
             }
         }
 
 
-        private void GoToMetadataPage(String destinationType, String destinationTitle, String destinationUrl)
-        {
-            string listGuid = ListGUID.Value;
-            string itemID = ItemID.Value;
-
-            string redirectUrl = "WorkBoxFramework/PublishDocDialogRequiredMetadataPage.aspx?ListGUID=" + listGuid + "&ItemID=" + itemID + "&DestinationURL=" + destinationUrl + "&DestinationTitle=" + destinationTitle + "&DestinationType=" + destinationType + "&SelectedFolderPath=" + SelectedFolderPath.Text;
-
-            SPUtility.Redirect(redirectUrl, SPRedirectFlags.RelativeToLayoutsPage, Context);
-        }
-
         protected void selectButton_OnClick(object sender, EventArgs e)
         {
-            String postBackValue = FunctionalAreasUIControlValue.Value + "@" + RecordsTypeUIControlValue.Value + "@" + SelectedRecordID.Text + "@" + SelectedFolderPath.Text;
+            String postBackValue = JsonConvert.SerializeObject(process); 
 
             WBLogging.Debug("About to post back with: " + postBackValue);
 
-            returnFromDialogOK(postBackValue);
+            ReturnJSONFromDialogOK(postBackValue);
         }
 
         protected void cancelButton_OnClick(object sender, EventArgs e)

@@ -599,9 +599,9 @@ namespace WorkBoxFramework
                         ShowClose = false;
                         AllowMaximise = false;
 
-                        ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/PublishDocDialogSelectDestinationPage.aspx";
-                        Width = 0; // 730;
-                        Height = 0; // 800;
+                        ActionUrl = "[WorkBoxURL]/_layouts/WorkBoxFramework/PublishDocSelectProtectiveZone.aspx";
+                        Width = 0; 
+                        Height = 0; 
 
                         break;
                     }

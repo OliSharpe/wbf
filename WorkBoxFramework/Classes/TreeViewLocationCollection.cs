@@ -37,10 +37,13 @@ namespace WorkBoxFramework
         {
         }
 
-        public TreeViewLocationCollection(WBRecordsManager manager, string mode, string minimumProtectiveZone, WBTerm functionalArea)
+        public TreeViewLocationCollection(WBRecordsManager manager, string mode, string minimumProtectiveZone, WBTermCollection<WBTerm> functionalAreas)
             : base()
         {
-            Add(new TreeViewLocation(null, manager, mode, minimumProtectiveZone, functionalArea));
+            foreach (WBTerm functionalArea in functionalAreas)
+            {
+                Add(new TreeViewLocation(null, manager, mode, minimumProtectiveZone, functionalArea));
+            }
         }
 
         public TreeViewLocationCollection(WBRecordsManager manager, string mode, string minimumProtectiveZone, WBSubjectTag subjectTag)

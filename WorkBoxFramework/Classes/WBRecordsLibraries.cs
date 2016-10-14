@@ -106,6 +106,17 @@ namespace WorkBoxFramework
             return new WBRecord(this, masterRecordItem);
         }
 
+        public SPFolder GetMasterFolderByPath(String path)
+        {
+            String serverRelativePath = ProtectedMasterLibrary.Web.ServerRelativeUrl + "/" + ProtectedMasterLibrary.List.RootFolder.Name + "/" + path;
+
+            WBLogging.Debug("Trying to find the SPFolder in the master library by way of the server relative path: " + serverRelativePath);
+
+            SPFolder folder = ProtectedMasterLibrary.Web.GetFolder(serverRelativePath);
+
+            return folder;
+        }
+
 
         public void Dispose()
         {
@@ -238,22 +249,42 @@ namespace WorkBoxFramework
             SPListItem uploadedItem = uploadedFile.Item;
 
             WBRecord newRecord = new WBRecord(this, uploadedItem, uploadedItem.ID.ToString(), document, extraMetadata);
+            if (feedback != null)
+            {
+                feedback.AddFeedback("Uploaded file to protected, master records library");
+                feedback.AddFeedback("Master record: " + newRecord.ProtectedMasterRecord.AbsoluteURL);
+                feedback.AddFeedback("In folder: " + WBUtils.GetFolderPathWithoutFilename(newRecord.ProtectedMasterRecord.AbsoluteURL));
+            }
 
             if (recordToReplace != null)
             {
-                if (replacingAction == WBRecordsManager.REPLACING_ACTION__ARCHIVE)
-                {
-                    recordToReplace.LiveOrArchived = WBColumn.LIVE_OR_ARCHIVED__ARCHIVED;
-                    recordToReplace.RecordSeriesStatus = WBColumn.RECORD_SERIES_STATUS__ARCHIVED;
-                }
-                else
-                {
-                    recordToReplace.RecordSeriesStatus = WBColumn.RECORD_SERIES_STATUS__RETIRED;
-                }
+                // OK so actually we need to do the replacement actions with elevated priviledges:
 
-                recordToReplace.Update();
-                feedback.AddFeedback("Archived record being replaced");
-                WBLogging.Debug("WBRecordsLibraries.DeclareNewRecord(): Archived the record being replaced Record ID = " + recordToReplace.RecordID);
+            //bool digestOK = SPContext.Current.Web.ValidateFormDigest();
+            //if (digestOK)
+            //{
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (WBRecordsManager manager = new WBRecordsManager())
+                    {
+                        WBRecord elevatedRecordToReplace = manager.Libraries.GetRecordByID(recordToReplace.RecordID);
+
+                        if (replacingAction == WBRecordsManager.REPLACING_ACTION__ARCHIVE)
+                        {
+                            elevatedRecordToReplace.LiveOrArchived = WBColumn.LIVE_OR_ARCHIVED__ARCHIVED;
+                            elevatedRecordToReplace.RecordSeriesStatus = WBColumn.RECORD_SERIES_STATUS__ARCHIVED;
+                        }
+                        else
+                        {
+                            elevatedRecordToReplace.RecordSeriesStatus = WBColumn.RECORD_SERIES_STATUS__RETIRED;
+                        }
+
+                        elevatedRecordToReplace.Update();
+
+                        if (feedback != null) feedback.AddFeedback("Archived record being replaced");
+                        WBLogging.Debug("WBRecordsLibraries.DeclareNewRecord(): Archived the record being replaced Record ID = " + recordToReplace.RecordID);
+                    }
+                });
 
                 newRecord.ReplacesRecordID = recordToReplace.RecordID;
                 newRecord.RecordSeriesID = recordToReplace.RecordSeriesID;
@@ -271,7 +302,7 @@ namespace WorkBoxFramework
 
             newRecord.LiveOrArchived = WBColumn.LIVE_OR_ARCHIVED__LIVE;
 
-            newRecord.UpdateMasterAndCreateCopies();
+            newRecord.UpdateMasterAndCreateCopies(feedback);
 
             bool beforeForDocument = document.Web.AllowUnsafeUpdates;
             document.Web.AllowUnsafeUpdates = true;

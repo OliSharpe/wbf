@@ -40,52 +40,26 @@
 
 <table cellpadding="8" cellspacing="0" class="wbf-title-table">
 <tr>
-<td valign="middle">
-<asp:Image ID="SourceDocIcon" runat="server" />
-</td>
 <td valign="middle" class="wbf-create-new-title">
 <div class="wbf-publish-out-title">
-Publish Document to: <asp:Label ID="DestinationTitle" runat="server" />
+Self Approval Stage
 </div>
 <div>
-Self approval step
+This is a self-approval stage to ensure you have taken the document through all the appropriate checks and approvals. Once submitted all content within this document will be made viewable by the public.
 </div>
 </td>
 </tr>
 </table>
 
-
-<asp:HiddenField ID="ListGUID" runat="server" />
-<asp:HiddenField ID="ItemID" runat="server" />
-<asp:HiddenField ID="TheDestinationType" runat="server" />
-<asp:HiddenField ID="DestinationURL" runat="server" />
-
-
-<asp:HiddenField ID="ToReplaceRecordID" runat="server" />
-<asp:HiddenField ID="ToReplaceRecordPath" runat="server" />
-<asp:HiddenField ID="NewOrReplace" runat="server" />
-<asp:HiddenField ID="ReplacementAction" runat="server" />
-
-<asp:HiddenField ID="ProtectiveZone" runat="server"/>
+<asp:HiddenField ID="PublishingProcessJSON" runat="server" />
 
 <table class="wbf-dialog-form">
 
-
-<tr>
-    <td class="wbf-field-name-panel">
-        <div class="wbf-field-name">Publishing Document</div>
-    </td>
-    <td class="wbf-field-value-panel">
-        <div class="wbf-field-read-only-title">
-            <asp:Label ID="ReadOnlyNameField" runat="server"></asp:Label>
-        </div>
-    </td>
-</tr>
-
+<asp:Literal ID="DocumentsBeingPublished" runat="server" />
 
 <tr>
 <td class="wbf-field-name-panel">
-        <div class="wbf-field-name">Document Type<span class="wbf-required-asterisk">*</span></div>
+        <div class="wbf-field-name">Document Type</div>
 </td>
 <td class="wbf-field-value-panel">
 
@@ -99,7 +73,7 @@ Self approval step
 
 <tr>
 <td class="wbf-field-name-panel">
-        <div class="wbf-field-name">Checklist</div>
+        <div class="wbf-field-name">Checklist<span class="wbf-required-asterisk">*</span></div>
 </td>
 <td class="wbf-field-value-panel" valign="top">
 
@@ -114,14 +88,37 @@ Self approval step
 <div class="wbf-field-value">
 <asp:CheckBox ID="CheckBox3" runat="server" /> Have you removed macros?
 </div>
+<div class="wbf-field-error">
+<asp:Literal ID="CheckListError" runat="server" Text="" />
+</div>
 
+<div class="wbf-field-description">
+        This record will be available to the public, please tick to confirm these checks have been completed
+</div>
 
 </td>
 </tr>
 
 <tr>
 <td class="wbf-field-name-panel">
-        <div class="wbf-field-name">Approved By</div>
+        <div class="wbf-field-name">Information Asset Owner</div>
+</td>
+<td class="wbf-field-value-panel" valign="top">
+
+<div class="wbf-field-value">
+<asp:Label ID="IAO" runat="server" />
+</div>
+<div class="wbf-field-description">
+This is the person who is ultimately responsible for the correct handling of this information.
+</div>
+</td>
+</tr>
+
+
+
+<tr>
+<td class="wbf-field-name-panel">
+        <div class="wbf-field-name">Approved By<span class="wbf-required-asterisk">*</span></div>
 </td>
 <td class="wbf-field-value-panel" valign="top">
 
@@ -133,13 +130,16 @@ Self approval step
 				MultiSelect = "true"
 				/>
 </div>
+<div class="wbf-field-error">
+<asp:Label ID="PublishingApprovedByError" runat="server" Text="" ForeColor="Red"/>
+</div>
 <div class="wbf-field-description">
-Who approved the publishing of this document?
+Please enter the name of the person approving the publication of this document.
 </div>
 </td>
 </tr>
 
-
+<!--
 <tr>
 <td class="wbf-field-name-panel">
     <div class="wbf-field-name">Approval Statement</div>
@@ -150,14 +150,17 @@ Who approved the publishing of this document?
 <asp:TextBox ID="PublishingApprovalStatement" runat="server" Text="" TextMode="multiline" Rows="4" Columns="50"></asp:TextBox>
 </div>
 <div class="wbf-field-error">
-    <asp:RequiredFieldValidator ID="PublishingApprovalStatementValidator" runat="server" ErrorMessage="You must enter an approval statement."
-            ControlToValidate = "PublishingApprovalStatement"></asp:RequiredFieldValidator>
 
 <asp:Label ID="PublishingApprovalStatementError" runat="server" />
+
+<div class="wbf-field-description">
+Please confirm the reason for publishing this record to the public records library
+</div>
+
 </div>
 </td>
 </tr>
-
+-->
 
 
 <tr>

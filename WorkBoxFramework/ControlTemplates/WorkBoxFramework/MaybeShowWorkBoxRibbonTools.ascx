@@ -7,6 +7,6 @@
 <%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="MaybeShowWorkBoxRibbonTools.ascx.cs" Inherits="WorkBoxFramework.ControlTemplates.WorkBoxFramework.MaybeShowWorkBoxRibbonTools" %>
 
-<!-- Checking if WorkBox Ribbon Tools should be shown -->
+<!-- Checking if WorkBox Ribbon Tools should be shown on this SPWeb -->
 
 <%=scriptForSettingGlobalVariables %>

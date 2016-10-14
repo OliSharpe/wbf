@@ -359,7 +359,7 @@ namespace WorkBoxFramework
 
         public String FileType
         {
-            get { return Path.GetExtension(Filename).WBxTrim().ToLower(); }   // Use of WBxTrim is mostly to change any null into a "" 
+            get { return Path.GetExtension(Filename).WBxTrim().ToLower().Replace(".", ""); }   // Use of WBxTrim is mostly to change any null into a "" 
         }
 
         public String ProtectiveZone

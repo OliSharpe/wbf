@@ -2944,74 +2944,78 @@ namespace WorkBoxFramework
                 if (recordsTypeUIControlValue == "" || documentRecordsType == null)
                 {
                     documentRecordsType = RecordsType.DefaultPublishingOutRecordsType;
-                    sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__RECORDS_TYPE, documentRecordsType);
-                    updateRequired = true;
-                }
 
-
-                if (documentRecordsType.IsFunctionalAreaEditable)
-                {
-                    if (!sourceDocAsItem.WBxColumnHasValue(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA))
+                    if (documentRecordsType != null)
                     {
-                        sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, this.OwningTeam.InheritedFunctionalAreaUIControlValue);
+                        sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__RECORDS_TYPE, documentRecordsType);
                         updateRequired = true;
                     }
                 }
-                else
-                {
-                    sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, documentRecordsType.DefaultFunctionalAreaUIControlValue);
-                    updateRequired = true;
-                }
 
-                if (ReferenceID != "" && !sourceDocAsItem.WBxColumnHasValue(WorkBox.COLUMN_NAME__REFERENCE_ID))
+                if (documentRecordsType != null)
                 {
-                    sourceDocAsItem.WBxSetColumnAsString(WorkBox.COLUMN_NAME__REFERENCE_ID, ReferenceID);
-                    updateRequired = true;
-                }
-
-                TaxonomyFieldValue owningTeamValue = sourceDocAsItem[WorkBox.COLUMN_NAME__OWNING_TEAM] as TaxonomyFieldValue;
-                if (owningTeamValue.WBxUIControlValue() == "")
-                {
-                    sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__OWNING_TEAM, OwningTeam);
-                    updateRequired = true;
-                }
-
-                TaxonomyFieldValueCollection involvedTeamsValues = sourceDocAsItem[WorkBox.COLUMN_NAME__INVOLVED_TEAMS] as TaxonomyFieldValueCollection;
-                if (involvedTeamsValues.WBxUIControlValue() == "")
-                {
-                    sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__INVOLVED_TEAMS, InvolvedTeams);
-                    updateRequired = true;
-                }
-            }
-
-            // Changing this so that the source value is set even if another date is already set
-            //if (!sourceDocAsItem.WBxColumnHasValue(WorkBox.COLUMN_NAME__REFERENCE_DATE))
-            //{
-            switch (documentRecordsType.DocumentReferenceDateSource)
-                {
-                    case WBRecordsType.DOCUMENT_REFERENCE_DATE_SOURCE__PUBLISH_OUT_DATE:
+                    if (documentRecordsType.IsFunctionalAreaEditable)
+                    {
+                        if (!sourceDocAsItem.WBxColumnHasValue(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA))
                         {
-                            sourceDocAsItem[WorkBox.COLUMN_NAME__REFERENCE_DATE] = DateTime.Now;
+                            sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, this.OwningTeam.InheritedFunctionalAreaUIControlValue);
                             updateRequired = true;
-                            break;
                         }
-                    case WBRecordsType.DOCUMENT_REFERENCE_DATE_SOURCE__WORK_BOX_REFERENCE_DATE:
-                        {
-                            sourceDocAsItem[WorkBox.COLUMN_NAME__REFERENCE_DATE] = this.ReferenceDate;
-                            updateRequired = true;
-                            break;
-                        }
-                }
+                    }
+                    else
+                    {
+                        sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, documentRecordsType.DefaultFunctionalAreaUIControlValue);
+                        updateRequired = true;
+                    }
 
-            //}
+                    if (ReferenceID != "" && !sourceDocAsItem.WBxColumnHasValue(WorkBox.COLUMN_NAME__REFERENCE_ID))
+                    {
+                        sourceDocAsItem.WBxSetColumnAsString(WorkBox.COLUMN_NAME__REFERENCE_ID, ReferenceID);
+                        updateRequired = true;
+                    }
 
-            if (documentRecordsType != null)
-            {
-                if (RecordsType.GeneratePublishOutFilenames)
-                {
-                    // OK so the document naming convention hasn't yet been applied, so let's apply it:
-                    GenerateFilename(documentRecordsType, sourceDocAsItem);
-                    updateRequired = true;
+                    TaxonomyFieldValue owningTeamValue = sourceDocAsItem[WorkBox.COLUMN_NAME__OWNING_TEAM] as TaxonomyFieldValue;
+                    if (owningTeamValue.WBxUIControlValue() == "")
+                    {
+                        sourceDocAsItem.WBxSetSingleTermColumn(WorkBox.COLUMN_NAME__OWNING_TEAM, OwningTeam);
+                        updateRequired = true;
+                    }
+
+                    TaxonomyFieldValueCollection involvedTeamsValues = sourceDocAsItem[WorkBox.COLUMN_NAME__INVOLVED_TEAMS] as TaxonomyFieldValueCollection;
+                    if (involvedTeamsValues.WBxUIControlValue() == "")
+                    {
+                        sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__INVOLVED_TEAMS, InvolvedTeams);
+                        updateRequired = true;
+                    }
+
+                    // Changing this so that the source value is set even if another date is already set
+                    //if (!sourceDocAsItem.WBxColumnHasValue(WorkBox.COLUMN_NAME__REFERENCE_DATE))
+                    //{
+                    switch (documentRecordsType.DocumentReferenceDateSource)
+                    {
+                        case WBRecordsType.DOCUMENT_REFERENCE_DATE_SOURCE__PUBLISH_OUT_DATE:
+                            {
+                                sourceDocAsItem[WorkBox.COLUMN_NAME__REFERENCE_DATE] = DateTime.Now;
+                                updateRequired = true;
+                                break;
+                            }
+                        case WBRecordsType.DOCUMENT_REFERENCE_DATE_SOURCE__WORK_BOX_REFERENCE_DATE:
+                            {
+                                sourceDocAsItem[WorkBox.COLUMN_NAME__REFERENCE_DATE] = this.ReferenceDate;
+                                updateRequired = true;
+                                break;
+                            }
+                    }
+
+                    //}
+
+                    if (RecordsType.GeneratePublishOutFilenames)
+                    {
+                        // OK so the document naming convention hasn't yet been applied, so let's apply it:
+                        GenerateFilename(documentRecordsType, sourceDocAsItem);
+                        updateRequired = true;
+                    }
+
                 }
 
             }
@@ -3027,13 +3031,17 @@ namespace WorkBoxFramework
         {
             if (documentRecordsType == null)
             {
-                WBLogging.WorkBoxes.Verbose("The documentRecordsType was null!");
+                WBLogging.Debug("The documentRecordsType was null!");
                 return;
+            }
+            else
+            {
+                WBLogging.Debug("No the documentRecordsType was NOT null!");
             }
 
             if (sourceDocAsItem == null)
             {
-                WBLogging.WorkBoxes.Verbose("The sourceDocAsItem was null!");
+                WBLogging.Debug("The sourceDocAsItem was null!");
                 return;
             }
 

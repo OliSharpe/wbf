@@ -24,8 +24,8 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
             if (!IsPostBack)
             {
 
-                WBTerm functionalArea = workBox.OwningTeam.FunctionalArea(workBox.FunctionalAreasTaxonomy)[0];
-                TreeViewLocationCollection collection = new TreeViewLocationCollection(manager, "Browse Folders", "", functionalArea);
+                WBTermCollection<WBTerm> functionalAreas = workBox.OwningTeam.FunctionalArea(workBox.FunctionalAreasTaxonomy);
+                TreeViewLocationCollection collection = new TreeViewLocationCollection(manager, "Browse Folders", "", functionalAreas);
 
                 RecordsLibraryFolders.DataSource = collection;
                 RecordsLibraryFolders.DataBind();

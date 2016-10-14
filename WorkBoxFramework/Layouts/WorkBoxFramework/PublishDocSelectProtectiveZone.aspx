@@ -5,7 +5,7 @@
 <%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="PublishDocDialogSelectDestinationPage.aspx.cs" Inherits="WorkBoxFramework.Layouts.WorkBoxFramework.PublishDocDialogSelectDestinationPage" DynamicMasterPageFile="~masterurl/default.master" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="PublishDocSelectProtectiveZone.aspx.cs" Inherits="WorkBoxFramework.Layouts.WorkBoxFramework.PublishDocSelectProtectiveZone" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
@@ -42,15 +42,12 @@ table.wbf-title-table { padding: 6px 0px 12px 10px; }
 
 <table cellpadding="8" cellspacing="0" class="wbf-title-table">
 <tr>
-<td valign="middle">
-<asp:Image ID="SourceDocIcon" runat="server" />
-</td>
 <td valign="middle" class="wbf-create-new-title">
 <div class="wbf-publish-out-title">
-Select Publish Out Destination for Document
+Select Publish Out Destination for Document(s)
 </div>
-<div>
-Publishing out file: <asp:Label ID="SourceDocFileName" runat="server" />
+<div style="text-align: center; padding-left: 20px; ">
+<asp:Literal ID="DocumentsBeingPublished" runat="server" />
 </div>
 </td>
 </tr>
@@ -120,17 +117,12 @@ Publishing out file: <asp:Label ID="SourceDocFileName" runat="server" />
 </table>
 
 
-    <asp:HiddenField ID="ListGUID" runat="server" />
-    <asp:HiddenField ID="ItemID" runat="server" />
-    <asp:HiddenField ID="DestinationURL" runat="server" />
-    <asp:HiddenField ID="DestinationTitle" runat="server"></asp:HiddenField>
-    <asp:HiddenField ID="DestinationType" runat="server"></asp:HiddenField>
-
+    <asp:HiddenField ID="PublishingProcessJSON" runat="server" />
 
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-Publish Document: Select Destination
+Publish Document: Select Protective Zone
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >

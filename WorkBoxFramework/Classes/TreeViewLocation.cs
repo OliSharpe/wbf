@@ -79,10 +79,15 @@ namespace WorkBoxFramework
 
             _functionalArea = functionalArea;
             _name = functionalArea.Name;
-            _guidString = functionalArea.Id.ToString();           
+            _guidString = functionalArea.Id.ToString();
+
+            if (_mode != VIEW_MODE__NEW)
+            {
+                _folder = manager.Libraries.GetMasterFolderByPath(functionalArea.Name);
+            }
         }
 
-        public TreeViewLocation(TreeViewLocation parent, WBRecordsManager manager, string mode, string minimumProtectiveZone, WBRecordsType recordsType)
+        public TreeViewLocation(TreeViewLocation parent, WBRecordsManager manager, string mode, string minimumProtectiveZone, WBTerm functionalArea, WBRecordsType recordsType)
         {
             _type = LOCATION_TYPE__RECORDS_TYPE;
 
@@ -91,9 +96,16 @@ namespace WorkBoxFramework
             _mode = mode;
             _minimumProtectiveZone = minimumProtectiveZone;
 
+            _functionalArea = functionalArea;
             _recordsType = recordsType;
             _name = _recordsType.Name;
-            _guidString = _recordsType.Id.ToString();           
+            _guidString = _recordsType.Id.ToString();
+
+            if (_mode != VIEW_MODE__NEW)
+            {
+                _folder = _parent._folder.WBxGetSubFolder(recordsType.Name);
+                if (_folder == null) WBLogging.Debug("Did not find folder for: " + recordsType.Name);
+            }
         }
 
         public TreeViewLocation(TreeViewLocation parent, WBRecordsManager manager, string mode, string minimumProtectiveZone, SPFolder folder)
@@ -149,9 +161,15 @@ namespace WorkBoxFramework
                              //   protectiveZoneOK = (recordsType.IsZoneAtLeastMinimum(_minimumProtectiveZone));
                            // }
 
-                            if (recordsType.BranchCanHaveDocuments() && protectiveZoneOK)
+                            if (recordsType.BranchCanHaveDocuments() && recordsType.IsRelevantToFunctionalArea(_functionalArea) && protectiveZoneOK)
                             {
-                                _children.Add(new TreeViewLocation(this, _manager, _mode, _minimumProtectiveZone, recordsType));
+                                TreeViewLocation newLocation = new TreeViewLocation(this, _manager, _mode, _minimumProtectiveZone, _functionalArea, recordsType);
+
+                                // If we're looking for existing records then we'll only add this location if it has a real folder existing underneath it:
+                                if (_mode == VIEW_MODE__NEW || newLocation._folder != null)
+                                {
+                                    _children.Add(newLocation);
+                                }
                             }
                             else
                             {
@@ -178,14 +196,20 @@ namespace WorkBoxFramework
                                     protectiveZoneOK = (recordsType.IsZoneAtLeastMinimum(_minimumProtectiveZone));
                                 }
 
-                                if (recordsType.BranchCanHaveDocuments() && protectiveZoneOK)
+                                if (recordsType.BranchCanHaveDocuments() && recordsType.IsRelevantToFunctionalArea(_functionalArea) && protectiveZoneOK)
                                 {
-                                    _children.Add(new TreeViewLocation(this, _manager, _mode, _minimumProtectiveZone, recordsType));
+                                    TreeViewLocation newLocation = new TreeViewLocation(this, _manager, _mode, _minimumProtectiveZone, _functionalArea, recordsType);
+
+                                    // If we're looking for existing records then we'll only add this location if it has a real folder existing underneath it:
+                                    if (_mode == VIEW_MODE__NEW || newLocation._folder != null)
+                                    {
+                                        _children.Add(newLocation);
+                                    }
                                 }
                             }
                         } else {
 
-                            if (_mode == VIEW_MODE__REPLACE || _mode == VIEW_MODE__BROWSE_FOLDERS)
+                            if (_mode != VIEW_MODE__NEW)
                             {
                                 // WBLogging.Debug("In view mode replace switching to folders part of tree");
 

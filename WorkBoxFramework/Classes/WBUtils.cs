@@ -1415,9 +1415,19 @@ namespace WorkBoxFramework
 
         public static SPList CreateOrCheckCustomList(WBTaskFeedback feedback, SPWeb rootWeb, SPWeb web, String listName, IEnumerable<WBColumn> columns)
         {
-            feedback.JustLog("Starting CreateOrCheckCustomList with custom columns for: " + listName);
+            return CreateOrCheckCustomList(feedback, rootWeb, web, listName, columns, false);
+        }
 
-            SPList list = web.Lists.TryGetList(listName);
+        public static SPList CreateOrCheckCustomList(WBTaskFeedback feedback, SPWeb rootWeb, SPWeb web, String listTitle, IEnumerable<WBColumn> columns, bool removeSpacesFromListName)
+        {
+            feedback.JustLog("Starting CreateOrCheckCustomList with custom columns for: " + listTitle);
+            String listName = listTitle;
+            if (removeSpacesFromListName)
+            {
+                listName = listName.Replace(" ", "");
+            }
+
+            SPList list = web.Lists.TryGetList(listTitle);
 
             bool listNeedsUpdating = false;
             if (list == null)
@@ -1427,11 +1437,12 @@ namespace WorkBoxFramework
                 feedback.Created("On " + web.Url + " Created list: " + listName);
 
                 list = web.Lists[listGuid];
+                list.Title = listTitle;
                 listNeedsUpdating = true;
             }
             else
             {
-                feedback.Checked("On " + web.Url + " Found list: " + listName);
+                feedback.Checked("On " + web.Url + " Found list: " + listTitle);
             }
 
             foreach (WBColumn column in columns)
@@ -1442,13 +1453,13 @@ namespace WorkBoxFramework
 
                     list.Fields.Add(field);
 
-                    feedback.Checked("List " + listName + " Added column: " + column.DisplayName);
+                    feedback.Checked("List " + listTitle + " Added column: " + column.DisplayName);
 
                     listNeedsUpdating = true;
                 }
                 else
                 {
-                    feedback.Checked("List " + listName + " has column: " + column.DisplayName);
+                    feedback.Checked("List " + listTitle + " has column: " + column.DisplayName);
                 }
             }
 
@@ -1458,7 +1469,7 @@ namespace WorkBoxFramework
                 web.Update();
             }
 
-            feedback.JustLog("Finished CreateOrCheckCustomList for: " + listName);
+            feedback.JustLog("Finished CreateOrCheckCustomList for: " + listTitle);
 
             return list;
         }

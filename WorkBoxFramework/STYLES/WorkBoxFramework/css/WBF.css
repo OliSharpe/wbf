@@ -104,6 +104,12 @@ table.wbf-dialog-form td
     color: Red; 
 }
 
+/* This is to make sure that the sizing of the div holding the taxonomy control is correct for the initial page layout */
+.wbf-taxonomy-control
+{
+    min-height: 30px;
+}
+
 table.wbf-dialog-just-buttons
 {
     width: 100%;
@@ -628,3 +634,27 @@ ul.wbf-my-work-boxes-list li { background:url(images/bullet-blue-square.png) no-
 .wbf-show-documents-for-subject table.ms-listviewtable tr:hover {
     background-color: #D2EFFA;
 }
+
+
+body.v4master {
+   overflow: scroll !important;
+}
+
+.wbf-publishing-replace-options 
+{
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.wbf-publishing-location-button 
+{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+div.wbf-publishing-choosen-location 
+{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
