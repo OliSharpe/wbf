@@ -107,8 +107,8 @@
     <Compile Include="Features\LinkedCalendars\LinkedCalendars.EventReceiver.cs">
       <DependentUpon>LinkedCalendars.feature</DependentUpon>
     </Compile>
-    <Compile Include="Features\UpdateRecordsMetadata\UpdateRecordsMetadata.EventReceiver.cs">
-      <DependentUpon>UpdateRecordsMetadata.feature</DependentUpon>
+    <Compile Include="Features\MasterRecordsLibrary\MasterRecordsLibrary.EventReceiver.cs">
+      <DependentUpon>MasterRecordsLibrary.feature</DependentUpon>
     </Compile>
     <Compile Include="Features\TeamSiteCalendarUpdates\TeamSiteCalendarUpdates.EventReceiver.cs">
       <DependentUpon>TeamSiteCalendarUpdates.feature</DependentUpon>
@@ -876,7 +876,7 @@
     <None Include="Features\ErrorPages\ErrorPages.feature">
       <FeatureId>{9c028719-6c00-44bc-9773-dcccc9ff9374}</FeatureId>
     </None>
-    <None Include="Features\UpdateRecordsMetadata\UpdateRecordsMetadata.feature">
+    <None Include="Features\MasterRecordsLibrary\MasterRecordsLibrary.feature">
       <FeatureId>{393c4749-9940-4be0-bf37-54a9a940b836}</FeatureId>
     </None>
     <None Include="Features\TimerJobs\TimerJobs.feature">
@@ -1189,8 +1189,8 @@
     <Content Include="Features\ErrorPages\ErrorPages.Template.xml">
       <DependentUpon>ErrorPages.feature</DependentUpon>
     </Content>
-    <Content Include="Features\UpdateRecordsMetadata\UpdateRecordsMetadata.Template.xml">
-      <DependentUpon>UpdateRecordsMetadata.feature</DependentUpon>
+    <Content Include="Features\MasterRecordsLibrary\MasterRecordsLibrary.Template.xml">
+      <DependentUpon>MasterRecordsLibrary.feature</DependentUpon>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\AccessDenied.html" />
     <Content Include="ControlTemplates\WorkBoxFramework\LinkToWorkBoxHome.ascx">
