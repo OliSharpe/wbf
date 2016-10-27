@@ -126,9 +126,9 @@ namespace WorkBoxFramework
             _librariesNeedingACopy.Clear();
             _librariesMustNotHaveCopy.Clear();
 
-            if (Metadata.LiveOrArchived == "Live")
+            if (LiveOrArchived == "Live" && (RecordSeriesStatus == WBColumn.RECORD_SERIES_STATUS__LATEST || String.IsNullOrEmpty(RecordSeriesStatus)))
             {
-                if (Metadata.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
+                if (ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
                 {
                     _librariesNeedingACopy.WBxAddIfNotNullOrEmpty(_farm.PublicRecordsLibraryUrl);
 
@@ -140,7 +140,7 @@ namespace WorkBoxFramework
 
                 }
 
-                if (Metadata.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
+                if (ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
                 {
                     _librariesNeedingACopy.WBxAddIfNotNullOrEmpty(_farm.PublicExtranetRecordsLibraryUrl);
 

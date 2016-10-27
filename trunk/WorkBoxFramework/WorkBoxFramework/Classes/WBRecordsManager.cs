@@ -151,7 +151,7 @@ namespace WorkBoxFramework
                 document.Update();
                 document.Reload();
 
-                process.WorkBox.GenerateFilename(recordsType, currentItem);
+                process.WorkBox.GenerateFilename(recordsType, document.Item);
 
                 document.Update();
                 document.Reload();
@@ -197,10 +197,11 @@ namespace WorkBoxFramework
 
 
             WBLogging.Debug("WBRecordsManager.PublishDocument(): About to declare new record");
-
+            
+            WBRecord newRecord = null;
             try
             {
-                WBRecord newRecord = Libraries.DeclareNewRecord(feedback, document, recordToReplace, process.ReplaceAction, new WBItem());
+                newRecord = Libraries.DeclareNewRecord(feedback, document, recordToReplace, process.ReplaceAction, process.SelfApprovalItem);
             }
             catch (Exception e)
             {
@@ -211,38 +212,47 @@ namespace WorkBoxFramework
                 return process;
             }
 
+
             WBLogging.Debug("WBRecordsManager.PublishDocument(): Declared new record");
-
             feedback.Success();
-
             process.CurrentItemSucceeded();
+
+            if (newRecord != null && !String.IsNullOrEmpty(process.WebPageURL))
+            {
+                WBLogging.Debug("WBRecordsManager.PublishDocument(): process.WebPageURL has been set - so creating or updating alert email");
+
+                if (String.IsNullOrEmpty(process.EmailAlertMessage))
+                {
+                    process.EmailAlertMessage = "One or more documents have been published that should be put on a web page.\n\nThe web page url is: " + process.WebPageURL + "\n\nThe documents are: \n\n";
+                }
+
+                String functionalAreaString = "";
+                if (newRecord.FunctionalArea.Count > 0)
+                {
+                    functionalAreaString = newRecord.FunctionalArea[0].FullPath;
+                }
+
+                process.EmailAlertMessage += newRecord.ProtectedMasterRecord.Name + "\n(" + newRecord.ProtectiveZone + "): " + functionalAreaString + "/" + newRecord.RecordsType.FullPath + "\n";
+
+                WBLogging.Debug("WBRecordsManager.PublishDocument(): Email Alert Message: " + process.EmailAlertMessage);
+
+
+                if (process.PublishMode != WBPublishingProcess.PUBLISH_MODE__ALL_TOGETHER || !process.HasMoreDocumentsToPublish)
+                {
+                    WBUtils.SendEmail(Libraries.ProtectedMasterLibrary.Web, WBFarm.Local.PublicDocumentEmailAlertsTo, "New documents published for a web page", process.EmailAlertMessage, false);
+                    process.EmailAlertMessage = null;
+                }
+            }
+            else
+            {
+                WBLogging.Debug("WBRecordsManager.PublishDocument(): Either publishing failed - or web page URL was not set");
+            }
+
+
             return process;
         }
 
-        public bool AllowBulkPublishingOfFileType(String fileType)
-        {
-            if (fileType == "pdf") return true;
-            return false;
-        }
-
-        public bool AllowPublishingOfFileType(String fileType)
-        {
-            switch (fileType)
-            {
-                case "pdf":
-                case "doc":
-                case "docx":
-                case "xls":
-                case "xlsx":
-                case "ppt":
-                case "pptx":
-                case "txt":
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
+        /*
         public String PrettyNameForFileType(String fileType)
         {
             switch (fileType)
@@ -259,6 +269,7 @@ namespace WorkBoxFramework
                     return "<Unknown File Type>";
             }
         }
+         */ 
 
         public void Dispose()
         {
@@ -267,5 +278,89 @@ namespace WorkBoxFramework
 
         #endregion
 
+
+        private Dictionary<String, SPListItem> _fileTypeInfo = new Dictionary<String, SPListItem>();
+        private SPList _fileTypesList = null;
+        internal SPListItem GetFileTypeInfo(String fileType)
+        {
+            if (_fileTypeInfo.ContainsKey(fileType)) return _fileTypeInfo[fileType];
+
+            if (_fileTypesList == null)
+            {
+                _fileTypesList = this.Libraries.ProtectedMasterLibrary.Web.Lists.TryGetList(FILE_TYPES_LIST_TITLE);
+            }
+
+            SPListItem fileTypeInfo = WBUtils.FindItemByColumn(Libraries.ProtectedMasterLibrary.Site, _fileTypesList, WBColumn.FileTypeExtension, fileType);
+            _fileTypeInfo[fileType] = fileTypeInfo;
+
+            return fileTypeInfo;
+        }
+
+        internal bool AllowPublishToPublicOfFileTypes(IEnumerable<String> fileTypes)
+        {
+            bool publicAllowed = true;
+            foreach (String fileType in fileTypes)
+            {
+                SPListItem fileTypeInfoItem = GetFileTypeInfo(fileType);
+
+                if (!fileTypeInfoItem.WBxGetAsBool(WBColumn.CanPublishToPublic))
+                {
+                    publicAllowed = false;
+                }
+            }
+
+            return publicAllowed;
+        }
+
+        internal bool AllowBulkPublishOfFileTypes(IEnumerable<String> fileTypes)
+        {
+            bool bulkPublishAllowed = true;
+            foreach (String fileType in fileTypes)
+            {
+                SPListItem fileTypeInfoItem = GetFileTypeInfo(fileType);
+
+                if (!fileTypeInfoItem.WBxGetAsBool(WBColumn.CanBulkPublish))
+                {
+                    bulkPublishAllowed = false;
+                }
+            }
+
+            return bulkPublishAllowed;
+        }
+
+        internal bool AllowBulkPublishToPublicOfFileTypes(IEnumerable<String> fileTypes)
+        {
+            bool bulkPublishToPublicAllowed = true;
+            foreach (String fileType in fileTypes)
+            {
+                SPListItem fileTypeInfoItem = GetFileTypeInfo(fileType);
+
+                if (!fileTypeInfoItem.WBxGetAsBool(WBColumn.CanBulkPublishToPublic))
+                {
+                    bulkPublishToPublicAllowed = false;
+                }
+            }
+
+            return bulkPublishToPublicAllowed;
+        }
+
+        internal Dictionary<String, String> GetCheckBoxDetailsForDocumentType(String documentType)
+        {
+            WBQuery query = new WBQuery();
+            query.AddEqualsFilter(WBColumn.DocumentType, documentType);
+            query.AddEqualsFilter(WBColumn.UseCheckBox, true);
+            query.OrderByAscending(WBColumn.Order);
+
+            SPList checkBoxDetailsList = Libraries.ProtectedMasterLibrary.Web.Lists.TryGetList(CHECK_BOXES_LIST_TITLE);
+            SPListItemCollection items = checkBoxDetailsList.WBxGetItems(Libraries.ProtectedMasterLibrary.Site, query);
+
+            Dictionary<String, String> checkBoxDetails = new Dictionary<String, String>();
+            foreach (SPListItem item in items)
+            {
+                checkBoxDetails.Add(item.WBxGetAsString(WBColumn.CheckBoxCode), item.WBxGetAsString(WBColumn.CheckBoxText));
+            }
+
+            return checkBoxDetails;
+        }
     }
 }

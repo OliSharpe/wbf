@@ -58,6 +58,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.Button PublicWebSiteButton;
         
         /// <summary>
+        /// PublicNotAllowedMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label PublicNotAllowedMessage;
+        
+        /// <summary>
         /// PublicExtranetButton control.
         /// </summary>
         /// <remarks>
@@ -65,6 +74,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button PublicExtranetButton;
+        
+        /// <summary>
+        /// PublicExtranetNotAllowedMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label PublicExtranetNotAllowedMessage;
         
         /// <summary>
         /// RecordsLibraryButton control.

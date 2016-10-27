@@ -21,9 +21,12 @@
 #endregion
 
 using System;
+using System.Linq;
 using System.IO;
 using System.Data;
 using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -46,6 +49,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         SPListItem sourceDocAsItem = null;
         SPFile sourceFile = null;
         string destinationType = "";
+
+        SPListItem fileTypeInfo = null;
+       
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -74,6 +80,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
 
 
+
+
             // Let's clear out all of the error messages text fields:
             ErrorMessageLabel.Text = "";
 
@@ -88,12 +96,30 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             WBDocument sourceDocument = new WBDocument(WorkBox, sourceDocAsItem);
 
+            fileTypeInfo = manager.GetFileTypeInfo(sourceDocument.FileType);
+
+            if (fileTypeInfo != null) 
+            {
+                Dictionary<String, String> checkBoxDetails = manager.GetCheckBoxDetailsForDocumentType(fileTypeInfo.WBxGetAsString(WBColumn.DocumentType));                
+                foreach (String checkBoxCode in checkBoxDetails.Keys)
+                {
+                    CheckBoxes.Controls.Add(CreateCheckBoxDiv(checkBoxCode, checkBoxDetails[checkBoxCode]));
+                }
+
+                CheckBoxesCodes.Value = String.Join(";", checkBoxDetails.Keys.ToArray<string>());
+            }
+
             if (!IsPostBack)
             {
 
                 DocumentsBeingPublished.Text = process.GetStandardHTMLTableRows();
 
-                String typeText = manager.PrettyNameForFileType(sourceDocument.FileType);
+                String typeText = null;
+
+                if (fileTypeInfo != null)
+                {
+                    typeText = fileTypeInfo.WBxGetAsString(WBColumn.DocumentType) + " (" + fileTypeInfo.WBxGetAsString(WBColumn.FileTypePrettyName) + ")";
+                }
                 if (String.IsNullOrEmpty(typeText)) typeText = sourceDocument.FileType + " " + sourceDocument.Name;
                 DocumentType.Text = typeText;
                 WBLogging.Debug("The file type of the record is: " + typeText);
@@ -101,6 +127,24 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 IAO.Text = "Bill Smith";
             }
 
+        }
+
+        private Control CreateCheckBoxDiv(String id, String text)
+        {
+            Panel div = new Panel();
+            div.CssClass ="wbf-field-value";
+
+            CheckBox checkBox = new CheckBox();
+            checkBox.ID = id;
+            checkBox.CssClass = "wbf-self-approval-check-box";
+
+            Literal checkBoxText = new Literal();
+            checkBoxText.Text = text;
+
+            div.Controls.Add(checkBox);
+            div.Controls.Add(checkBoxText);
+
+            return div;
         }
 
         protected void Page_Unload(object sender, EventArgs e)
@@ -120,20 +164,18 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (newUsers.Count == 0) metadataProblems.Add("PublishingApprovedBy", "You must enter at least one person who approved publication.");
 
-            List<String> checkListErrors = new List<String>();
-            if (!CheckBox1.Checked) checkListErrors.Add("You haven't checked box 1");
-            if (!CheckBox2.Checked) checkListErrors.Add("You haven't checked box 2");
-            if (!CheckBox3.Checked) checkListErrors.Add("You haven't checked box 3");
+            String[] checkBoxesCodes = CheckBoxesCodes.Value.Split(';');
 
-            if (checkListErrors.Count > 0)
+            bool allChecked = true;
+            foreach (String code in checkBoxesCodes)
             {
-                String html = "<ul>\n";
-                foreach (String error in checkListErrors)
-                {
-                    html += "<li>" + error + "</li>\n";
-                }
-                html += "</ul>\n";
-                metadataProblems.Add("CheckList", html);
+                CheckBox checkBox = (CheckBox)CheckBoxes.WBxFindNestedControlByID(code);
+                if (!checkBox.Checked) allChecked = false;
+            }
+
+            if (!allChecked)
+            {
+                metadataProblems.Add("CheckList", "You have to read and tick all check boxes");
             }
 
             return metadataProblems;
@@ -153,20 +195,21 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 PublishingApprovedByError.Text = metadataProblems["PublishingApprovedBy"].WBxToString();
                 CheckListError.Text = metadataProblems["CheckList"].WBxToString();
 
-                pageRenderingRequired = true;
-            }
-            else
-            {
-                pageRenderingRequired = false;
-            }
-
-            if (pageRenderingRequired)
-            {
                 WBLogging.Debug("In publishButton_OnClick(): Page render required - not publishing at this point");
                 ReRenderPage();
             }
             else
             {
+
+                Dictionary<String, String> selfApproveDetails = new Dictionary<string, string>();
+
+                List<SPUser> approvedBy = PublishingApprovedBy.WBxGetMultiResolvedUsers(SPContext.Current.Web);
+
+                selfApproveDetails.Add(WBColumn.PublishingApprovedBy.InternalName, approvedBy.WBxToString());
+                selfApproveDetails.Add(WBColumn.PublishingApprovalChecklist.InternalName, CheckBoxesCodes.Value);
+
+                process.SelfApprovalDictionary = selfApproveDetails;
+
                 WBLogging.Debug("In publishButton_OnClick(): No page render required - so moving to GoToPublishPage");
                 GoToPublishPage();
             }

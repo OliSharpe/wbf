@@ -105,7 +105,7 @@ td.wbf-task-feedback-table-cell
 <h2>Publishing the documents</h2>
 
 <p>
-The various documents selected will now get published</p>
+The document(s) selected will now be published</p>
 
 <table width="100%" cellpadding="5" cellspacing="0">
 

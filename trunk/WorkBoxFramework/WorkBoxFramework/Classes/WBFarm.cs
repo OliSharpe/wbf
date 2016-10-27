@@ -48,6 +48,9 @@ namespace WorkBoxFramework
         private const string FARM_PROPERTY__PUBLIC_EXTRANET_RECORDS_LIBRARY_URL = "wbf__farm__public_extranet_records_library_url";
 
         private const string FARM_PROPERTY__SUBJECT_TAGS_RECORDS_ROUTINGS = "wbf__farm__subject_tags_records_routings";
+        private const string FARM_PROPERTY__PUBLIC_DOCUMENT_EMAIL_ALERTS_TO = "wbf__farm__public_document_email_alerts_to";
+
+        
 
         private const string FARM_PROPERTY__RECORDS_MANAGERS_GROUP_NAME = "wbf__farm__records_managers_group_name";
         private const string FARM_PROPERTY__RECORDS_SYSTEM_ADMIN_GROUP_NAME = "wbf__farm__records_system_admin_group_name";
@@ -210,6 +213,11 @@ namespace WorkBoxFramework
             return new WBSubjectTagsRecordsRoutings(subjectTags, SubjectTagsRecordsRoutingsString);
         }
 
+        public String PublicDocumentEmailAlertsTo
+        {
+            get { return _farm.WBxGetProperty(FARM_PROPERTY__PUBLIC_DOCUMENT_EMAIL_ALERTS_TO); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__PUBLIC_DOCUMENT_EMAIL_ALERTS_TO, value); }
+        }
 
         public String OpenWorkBoxesCachedDetailsListUrl
         {
@@ -702,21 +710,37 @@ namespace WorkBoxFramework
 
             if (fileTypesList != null)
             {
-                MaybeAddFileType(site, fileTypesList, "pdf", true, true, "PDF Document", WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT);
-                MaybeAddFileType(site, fileTypesList, "doc", true, false, "Word Document 2003", WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT);
-                MaybeAddFileType(site, fileTypesList, "docx", true, false, "Word Document", WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT);
+                MaybeAddFileType(site, fileTypesList, "pdf", true, true, true, "PDF Document", WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT);
+                MaybeAddFileType(site, fileTypesList, "doc", true, false, false, "Word Document 2003", WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT);
+                MaybeAddFileType(site, fileTypesList, "docx", true, false, false, "Word Document", WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT);
+                MaybeAddFileType(site, fileTypesList, "ppt", true, false, false, "Power Point Presentation 2003", WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT);
+                MaybeAddFileType(site, fileTypesList, "pptx", true, false, false, "Power Point Presentation", WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT);
+                MaybeAddFileType(site, fileTypesList, "txt", true, false, false, "Plain Text Document", WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT);
+
+                MaybeAddFileType(site, fileTypesList, "xls", true, false, false, "Excel Spreadsheet 2003", WBColumn.DOCUMENT_TYPE__SPREADSHEET);
+                MaybeAddFileType(site, fileTypesList, "xlsx", true, false, false, "Excel Spreadsheet", WBColumn.DOCUMENT_TYPE__SPREADSHEET);
+                MaybeAddFileType(site, fileTypesList, "ods", true, false, false, "Open Document Spreadsheet", WBColumn.DOCUMENT_TYPE__SPREADSHEET);
+
+                MaybeAddFileType(site, fileTypesList, "jpg", true, false, false, "JPEG Image", WBColumn.DOCUMENT_TYPE__IMAGE_OR_VIDEO);
+                MaybeAddFileType(site, fileTypesList, "jpeg", true, false, false, "JPEG Image", WBColumn.DOCUMENT_TYPE__IMAGE_OR_VIDEO);
+                MaybeAddFileType(site, fileTypesList, "png", true, false, false, "PNG Image", WBColumn.DOCUMENT_TYPE__IMAGE_OR_VIDEO);
+                MaybeAddFileType(site, fileTypesList, "gif", true, false, false, "GIF Image", WBColumn.DOCUMENT_TYPE__IMAGE_OR_VIDEO);
+                MaybeAddFileType(site, fileTypesList, "gif", true, false, false, "GIF Image", WBColumn.DOCUMENT_TYPE__IMAGE_OR_VIDEO);
+
+                MaybeAddFileType(site, fileTypesList, "mp4", true, false, false, "MPEG-4 Video", WBColumn.DOCUMENT_TYPE__IMAGE_OR_VIDEO);
             }
 
         }
 
-        internal void MaybeAddFileType(SPSite site, SPList list, String fileTypeExtension, bool canPublish, bool canBulkPublish, String prettyName, String documentType) 
+        internal void MaybeAddFileType(SPSite site, SPList list, String fileTypeExtension, bool canPublishToPublic, bool canBulkPublish, bool canBulkPublishToPublic, String prettyName, String documentType) 
         {
             SPListItem exists = WBUtils.FindItemByColumn(site, list, WBColumn.FileTypeExtension, fileTypeExtension);
             if (exists == null) {
                 SPListItem newItem = list.AddItem();
                 newItem.WBxSet(WBColumn.FileTypeExtension, fileTypeExtension);
-                newItem.WBxSet(WBColumn.CanPublishToPublic, canPublish);
-                newItem.WBxSet(WBColumn.CanBulkPublishToPublic, canBulkPublish);
+                newItem.WBxSet(WBColumn.CanPublishToPublic, canPublishToPublic);
+                newItem.WBxSet(WBColumn.CanBulkPublish, canBulkPublish);
+                newItem.WBxSet(WBColumn.CanBulkPublishToPublic, canBulkPublishToPublic);
                 if (!String.IsNullOrEmpty(prettyName)) newItem.WBxSet(WBColumn.FileTypePrettyName, prettyName);
                 newItem.WBxSet(WBColumn.DocumentType, documentType);
 
@@ -737,6 +761,19 @@ namespace WorkBoxFramework
                 MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT, 150, "RedPerDt", "Redacted personal data including the title or filename (eg Letter to John Smith)?", true);
                 MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT, 160, "ChPrnHdFt", "Checked/Removed header or footer automatically added to a print-out?", true);
                 MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__TEXT_DOCUMENT, 170, "RedAttch", "Redacted any attachments?", true);
+
+
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__SPREADSHEET, 210, "ChHidCRW", "Checked for hidden columns/rows/worksheets?", true);
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__SPREADSHEET, 220, "ChHidMac", "Checked for hidden macros?", true);
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__SPREADSHEET, 230, "ChLnkPCF", "Checked for linked data within pivot tables, charts and formulas?", true);
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__SPREADSHEET, 240, "ChFlSize", "Checked the size of the file, as it might be larger than expect for the volume of data being disclosed?", true);
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__SPREADSHEET, 250, "RmIncMdSp", "Removed old or incorrect meta-data?", true);
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__SPREADSHEET, 260, "RedPerDtSp", "Redacted personal data including the title or filename (eg Letter to John Smith)?", true);
+
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__IMAGE_OR_VIDEO, 310, "ChkEXIF", "Checked if there is attached EXIF data?", true);
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__IMAGE_OR_VIDEO, 320, "RedPerDtIV", "Redacted personal data including the title or filename (eg Letter to John Smith)?", true);
+                MaybeAddCheckBox(site, checkBoxesList, WBColumn.DOCUMENT_TYPE__IMAGE_OR_VIDEO, 330, "ObsPerDt", "Obscured any personal data (eg faces of third-party individuals?)", true);
+
             }
         }
 
@@ -961,6 +998,7 @@ namespace WorkBoxFramework
             {             
                 WBColumn.FileTypeExtension,
                 WBColumn.CanPublishToPublic,
+                WBColumn.CanBulkPublish,
                 WBColumn.CanBulkPublishToPublic,
                 WBColumn.FileTypePrettyName,
                 WBColumn.DocumentType
@@ -970,6 +1008,7 @@ namespace WorkBoxFramework
             WBQuery viewQuery = new WBQuery();
             viewQuery.AddViewColumn(WBColumn.FileTypeExtension);
             viewQuery.AddViewColumn(WBColumn.CanPublishToPublic);
+            viewQuery.AddViewColumn(WBColumn.CanBulkPublish);
             viewQuery.AddViewColumn(WBColumn.CanBulkPublishToPublic);
             viewQuery.AddViewColumn(WBColumn.FileTypePrettyName);
             viewQuery.AddViewColumn(WBColumn.DocumentType);
@@ -1113,6 +1152,7 @@ namespace WorkBoxFramework
             {
                 WBColumn.FileTypeExtension,
                 WBColumn.CanPublishToPublic,
+                WBColumn.CanBulkPublish,
                 WBColumn.CanBulkPublishToPublic,
                 WBColumn.FileTypePrettyName,
                 WBColumn.DocumentType,

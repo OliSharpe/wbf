@@ -58,6 +58,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         protected bool showSubjectTags = true;
         protected bool showScanDate = false;
 
+        protected bool showPublishAllButton = false;
+
         
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -380,6 +382,23 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             WebPageURL.Text = process.WebPageURL;
 
+            if (process.CountStillToPublish > 1)
+            {
+                if (process.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PROTECTED)
+                {
+                    showPublishAllButton = manager.AllowBulkPublishOfFileTypes(process.DifferentFileTypesStillToPublish);
+                }
+                else
+                {
+                    showPublishAllButton = manager.AllowBulkPublishToPublicOfFileTypes(process.DifferentFileTypesStillToPublish);
+                }
+            }
+            else
+            {
+                showPublishAllButton = false;
+            }
+
+
             WBLogging.Debug("Just before serialization");
 
             // Lastly we're going to capture the state of the publishing process:
@@ -522,6 +541,28 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void CaptureChanges()
         {
+
+            if (NewRadioButton.Checked)
+            {
+                process.ReplaceAction = WBPublishingProcess.REPLACE_ACTION__CREATE_NEW_SERIES;
+            }
+            else
+            {
+                if (LeaveOnIzziCheckBox.Checked)
+                {
+                    process.ReplaceAction = WBPublishingProcess.REPLACE_ACTION__LEAVE_ON_IZZI;
+                }
+                else
+                {
+                    process.ReplaceAction = WBPublishingProcess.REPLACE_ACTION__ARCHIVE_FROM_IZZI;
+                }
+            }
+
+            if (EditShortTitle.Text != ShortTitle.Text)
+            {
+                process.CurrentShortTitle = EditShortTitle.Text;
+            }
+
 
             process.SubjectTagsUIControlValue = SubjectTagsField.Text;
 

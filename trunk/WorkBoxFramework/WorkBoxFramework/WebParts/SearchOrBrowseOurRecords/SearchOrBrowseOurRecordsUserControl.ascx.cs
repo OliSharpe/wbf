@@ -205,13 +205,21 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
                         publishedDateString = String.Format("{0:MM/dd/yyyy}", document[WBColumn.Modified]);
                     }
 
-                    String publishedByString = document.Item["Author"].WBxToString();
-
+                    String publishedByString = "<unknown>";
                     SPUser publishedBy = document.Item.WBxGetSingleUserColumn(WBColumn.PublishedBy);
 
                     if (publishedBy != null)
                     {
                         publishedByString = publishedBy.Name;
+                    }
+                    else
+                    {
+                        // If the published by column isn't set then we'll use the author column as a backup value:
+                        publishedBy = document.Item.WBxGetSingleUserColumn(WBColumn.Author);
+                        if (publishedBy != null)
+                        {
+                            publishedByString = publishedBy.Name;
+                        }
                     }
 
                     long fileLength = (document.Item.File.Length / 1024);
@@ -220,7 +228,7 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
 
 
                     html += "<tr>"
-                        + "<td class='wbf-record-series-summary-detail'><input type='checkbox'/></td>"
+                        + "<td class='wbf-record-series-summary-detail'><input type='checkbox' class='wbf-our-records-check-boxes' data-record-id='" + document.RecordID + "' onclick=\"WBF_checkbox_changed(event);\"/></td>"
                         + "<td class='wbf-record-series-summary-detail'>" + document.Title + "</td>"
                         + "<td class='wbf-record-series-summary-detail'>" + document.Filename + "</td>"
                         + "<td class='wbf-record-series-summary-detail wbf-centre'>" + document.RecordSeriesIssue + "</td>"
@@ -236,6 +244,9 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
             html += "\n</table>";
 
             FoundRecords.Text = html;
+
+            // This should attach the right function to the checkboxes
+            //ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "AttachChangeListeners", "$(function () { WBF_add_checkbox_change_function(); });", true);            
         }
 
         public static SPListItemCollection GetRecordsInFolder(SPFolder folder)

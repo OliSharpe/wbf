@@ -47,7 +47,6 @@ namespace WorkBoxFramework
 
         private bool _valuesHaveChanged = false;
 
-
         #region Constructors
 
         public WBItem(SPListItem item)
@@ -62,6 +61,25 @@ namespace WorkBoxFramework
             _listItem = null;
             _dictionary = new Dictionary<WBColumn, Object>();           
             BackingType = BackingTypes.Dictionary;
+        }
+
+        public WBItem(Dictionary<String, String> values)
+        {
+            _listItem = null;
+            _dictionary = new Dictionary<WBColumn, Object>();
+            BackingType = BackingTypes.Dictionary;
+
+            if (values != null)
+            {
+                foreach (String internalColumnName in values.Keys)
+                {
+                    WBColumn column = WBColumn.GetKnownColumnByInternalName(internalColumnName);
+                    if (column == null) throw new Exception("In WBItem(Dictionary<,>): Not yet handling situation when an unknown internal name is used: " + internalColumnName);
+                    this[column] = values[internalColumnName];
+                }
+            }
+
+            _valuesHaveChanged = false;
         }
         #endregion
 

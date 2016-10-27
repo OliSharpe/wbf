@@ -211,6 +211,9 @@ namespace WorkBoxFramework
         [JsonProperty]
         public Dictionary<String,String> SelfApprovalDictionary { get; set; }
 
+        [JsonProperty]
+        public String EmailAlertMessage { get; set; }
+
         #endregion
 
         #region Non-JSON Properties
@@ -318,8 +321,18 @@ namespace WorkBoxFramework
             }
         }
 
+        private WBItem _selfApprovalItem = null;
         [JsonIgnore]
-        public WBItem SelfApprovalItem { get; set; }
+        public WBItem SelfApprovalItem {
+            get
+            {
+                if (_selfApprovalItem == null)
+                {
+                    _selfApprovalItem = new WBItem(SelfApprovalDictionary);
+                }
+                return _selfApprovalItem;
+            }
+        }
 
 
         private WBTaxonomy _recordsTypeTaxonomy = null;
@@ -404,28 +417,45 @@ namespace WorkBoxFramework
         }
 
         [JsonIgnore]
-        public bool AllowBulkPublishAllTogether
+        public List<String> DifferentFileTypesStillToPublish
+        {
+            get
+            {
+                List<String> fileTypes = new List<string>();
+
+                foreach (String itemID in ItemIDs)
+                {
+                    if (ItemStatus[itemID] == DOCUMENT_STATUS__UNPUBLISHED)
+                    {
+                        String extension = Path.GetExtension(MappedFilenames[itemID]).WBxTrim().ToLower().Replace(".", "");
+                        if (!fileTypes.Contains(extension))
+                        {
+                            fileTypes.Add(extension);
+                        }
+                    }
+                }
+
+                return fileTypes; 
+            }
+        }
+
+        [JsonIgnore]
+        public int CountStillToPublish
         {
             get
             {
                 int countStillToPublish = 0;
-                bool allPDFs = true;
                 foreach (String itemID in ItemIDs)
                 {
                     if (ItemStatus[itemID] == DOCUMENT_STATUS__UNPUBLISHED)
                     {
                         countStillToPublish++;
-                        if (Path.GetExtension(MappedFilenames[itemID]).WBxTrim().ToLower().Replace(".", "") != "pdf")
-                        {
-                            allPDFs = false;
-                        }
                     }
                 }
 
-                return (countStillToPublish > 1 && (ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PROTECTED || allPDFs));
+                return countStillToPublish; 
             }
         }
-
 
 
         [JsonIgnore]
@@ -479,27 +509,33 @@ namespace WorkBoxFramework
             _currentItem = List.GetItemById(int.Parse(CurrentItemID));
         }
 
-        public void CurrentItemFailed()
+        private void MoveToNextItem()
         {
-            this.ItemStatus[this.CurrentItemID] = WBPublishingProcess.DOCUMENT_STATUS__ERROR;
             this.CurrentItemID = "";
 
             // You certainly wouldn't want to replace the same document again - so we revert replace action back to 'new' for the moment:
             this.ReplaceAction = REPLACE_ACTION__CREATE_NEW_SERIES;
             this.ToReplaceRecordID = null;
             this.ToReplaceRecordPath = null;
+
+            if (PublishMode != WBPublishingProcess.PUBLISH_MODE__ALL_TOGETHER)
+            {
+                this.SelfApprovalDictionary = null;
+                this._selfApprovalItem = null;
+            }
+        }
+
+        public void CurrentItemFailed()
+        {
+            this.ItemStatus[this.CurrentItemID] = WBPublishingProcess.DOCUMENT_STATUS__ERROR;
+            MoveToNextItem();
         }
 
 
         public void CurrentItemSucceeded()
         {
             this.ItemStatus[this.CurrentItemID] = WBPublishingProcess.DOCUMENT_STATUS__PUBLISHED;
-            this.CurrentItemID = "";
-
-            // You certainly wouldn't want to replace the same document again - so we revert replace action back to 'new' for the moment:
-            this.ReplaceAction = REPLACE_ACTION__CREATE_NEW_SERIES;
-            this.ToReplaceRecordID = null;
-            this.ToReplaceRecordPath = null;
+            MoveToNextItem();
         }
 
         public String GetStandardHTMLTableRows()

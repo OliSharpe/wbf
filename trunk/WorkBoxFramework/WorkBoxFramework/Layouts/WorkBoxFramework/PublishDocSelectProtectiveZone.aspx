@@ -65,7 +65,10 @@ Select Publish Out Destination for Document(s)
  
 <% if (userCanPublishToPublic)
    { %>
-    <asp:Button ID="PublicWebSiteButton" runat="server" Text="Public Web Site" OnClick="PublicWebSiteButton_onClick" />
+    <asp:Button ID="PublicWebSiteButton" runat="server" Text="Public Website" OnClick="PublicWebSiteButton_onClick" />
+    <div class="wbf-metadata-error">
+    <asp:Label ID="PublicNotAllowedMessage" runat="server" />
+    </div>
     <% }
    else
    { %>
@@ -86,6 +89,9 @@ Select Publish Out Destination for Document(s)
 <% if (userCanPublishToPublic)
    { %>
     <asp:Button ID="PublicExtranetButton" runat="server" Text="Public Extranet" OnClick="PublicExtranetButton_onClick" />
+    <div class="wbf-metadata-error">
+    <asp:Label ID="PublicExtranetNotAllowedMessage" runat="server" />
+    </div>
     <% }
    else
    { %>

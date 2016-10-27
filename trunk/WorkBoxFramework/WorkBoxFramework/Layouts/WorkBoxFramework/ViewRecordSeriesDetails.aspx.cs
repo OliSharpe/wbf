@@ -65,27 +65,24 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                         publishedDateString = String.Format("{0:MM/dd/yyyy}", document[WBColumn.Modified]);
                     }
 
-                    String publishedByString = document.Item["Author"].WBxToString();
-
+                    String publishedByString = "<unknown>";
                     SPUser publishedBy = document.Item.WBxGetSingleUserColumn(WBColumn.PublishedBy);
 
                     if (publishedBy != null)
                     {
                         publishedByString = publishedBy.Name;
                     }
-
-                    String approvedByString = ""; 
-
-                    List<SPUser> approvedBy = document.Item.WBxGetMultiUserColumn(WBColumn.PublishingApprovedBy);
-
-                    if (approvedBy != null && approvedBy.Count > 0)
+                    else
                     {
-                        foreach (SPUser approver in approvedBy)
+                        // If the published by column isn't set then we'll use the author column as a backup value:
+                        publishedBy = document.Item.WBxGetSingleUserColumn(WBColumn.Author);
+                        if (publishedBy != null)
                         {
-                            approvedByString = approvedByString + approver.Name + "; ";
+                            publishedByString = publishedBy.Name;
                         }
                     }
 
+                    String approvedByString = document.Item.WBxGetMultiUserColumn(WBColumn.PublishingApprovedBy).WBxToPrettyString();
 
                     long fileLength = (document.Item.File.Length / 1024);
                     if (fileLength == 0) fileLength = 1;
@@ -94,6 +91,31 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     
                     String status = document[WBColumn.RecordSeriesStatus].WBxToString();
                     if (String.IsNullOrEmpty(status)) status = "Latest";
+
+                    String explainStatus = "";
+                    if (status == "Latest")
+                    {
+                        if (document.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
+                        {
+                            explainStatus = "(live on the public website)";
+                        }
+                        else if (document.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
+                        {
+                            explainStatus = "(live on a public extranet website)";
+                        }
+                        else
+                        {
+                            explainStatus = "(live on izzi intranet)";
+                        }
+                    }
+                    else if (status == "Retired")
+                    {
+                        explainStatus = "(visible on izzi intranet searches)";
+                    }
+                    else if (status == "Archived")
+                    {
+                        explainStatus = "(archived in the protected, master records library)";
+                    }
 
                     html += "<tr>"
                         + "<td class='wbf-record-series-summary-issue'>" + document.RecordSeriesIssue + "</td>"
@@ -113,10 +135,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-odd'>Owning Team</td><td class='wbf-record-series-detail-odd'>" + document.OwningTeam.Name + "</td></tr>";
                     html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Involved Teams</td><td class='wbf-record-series-detail-even'>" + document.InvolvedTeams.Names() + "</td></tr>";
                     html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-odd'>Protective Zone</td><td class='wbf-record-series-detail-odd'>" + document.ProtectiveZone + "</td></tr>";
-                    html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Status</td><td class='wbf-record-series-detail-even'>" + status + "</td></tr>";
-
-                    html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Approved By</td><td class='wbf-record-series-detail-even'>" + approvedByString + "</td></tr>";
-                    html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Approval Statement</td><td class='wbf-record-series-detail-even'>" + document[WBColumn.PublishingApprovalStatement].WBxToString() + "</td></tr>";
+                    html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Status</td><td class='wbf-record-series-detail-even'>" + status + " " + explainStatus + "</td></tr>";
+                    html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-odd'>Approved By</td><td class='wbf-record-series-detail-odd'>" + approvedByString + "</td></tr>";
+                    html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Approval Checklist</td><td class='wbf-record-series-detail-even'>" + document[WBColumn.PublishingApprovalChecklist].WBxToString() + "</td></tr>";
 
                     html += "</table>\n";
                 }
