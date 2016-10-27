@@ -137,7 +137,7 @@ You must enter the following metadata for the document(s)
 </div>
 
 <div  class="wbf-publishing-replace-options" style="padding-left: 30px;">
-<asp:CheckBox id="LeaveOnIzziCheckBox" runat="server"/> Viewable on izzi search
+<asp:CheckBox id="LeaveOnIzziCheckBox" runat="server"/> Keep old version visible on izzi search
 </div>
 
 <div class="wbf-publishing-replace-options">
@@ -165,7 +165,7 @@ You must enter the following metadata for the document(s)
 </td>
 <td class="wbf-field-value-panel">
 
-<div id="wbf-show-short-title" class="wbf-field-value">
+<div id="wbf-show-short-title" class="wbf-field-read-only-title">
     <asp:Label ID="ShortTitle" runat="server"></asp:Label> | <a href='#' onclick='WBF_editShortTitle();'>edit</a>
 </div>
 
@@ -335,13 +335,13 @@ Other teams that were involved with the creation of this document.
 <td class="wbf-field-value-panel" valign="top">
 
 <div class="wbf-field-value">
-<asp:TextBox ID="WebPageURL" runat="server" Columns="60" />
+<asp:TextBox ID="WebPageURL" runat="server" Columns="55" />
 </div>
 <div class="wbf-field-error">
 <asp:Label ID="WebPageURLMessage" runat="server" Text="" ForeColor="Red"/>
 </div>
 <div class="wbf-field-description">
-If this document needs to be shown on a webpage please provide the pages full URL (address) here.
+If this document needs to be shown on a webpage please provide the page's full URL (address) here.
 </div>
 </td>
 </tr>
@@ -352,7 +352,7 @@ If this document needs to be shown on a webpage please provide the pages full UR
 <p>
         <asp:Button ID="Publish" UseSubmitBehavior="false" runat="server" Text="Publish" OnClick="publishButton_OnClick" />
 
-<% if (process.AllowBulkPublishAllTogether)
+<% if (showPublishAllButton)
    { %>
         &nbsp;
 

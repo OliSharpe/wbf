@@ -132,6 +132,17 @@ namespace WorkBoxFramework
                     {
                         return AppendCAMLClause(builder, Column.InternalName, "URL", (String)Value);
                     }
+                case WBColumn.DataTypes.Boolean:
+                    {
+                        if ((bool)Value)
+                        {
+                            return AppendCAMLClause(builder, Column.InternalName, "Integer", "1");
+                        }
+                        else
+                        {
+                            return AppendCAMLClause(builder, Column.InternalName, "Integer", "0");
+                        }
+                    }
             }
 
             throw new NotImplementedException("Creation of CAML clauses for WBColumns of data type " + WBColumn.DataTypeToString(Column.DataType) + " has not yet been implmenented");

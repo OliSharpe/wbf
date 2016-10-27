@@ -646,6 +646,11 @@ namespace WorkBoxFramework
             return lastPart;
         }
 
+        public static String GetExtension(String filename)
+        {
+            return Path.GetExtension(filename).Replace(".", "").ToLower();
+        }
+
         public static List<String> GetFolderPathWithoutFilename(String pathString)
         {
             List<String> path = new List<String>(pathString.Split('/'));

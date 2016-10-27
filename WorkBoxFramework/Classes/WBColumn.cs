@@ -1,6 +1,6 @@
 ﻿#region Copyright and License
 
-// Copyright (c) Islington Council 2010-2013
+// Copyright (c) Islington Council 2010-2016
 // Author: Oli Sharpe  (oli@gometa.co.uk)
 //
 // This file is part of the Work Box Framework.
@@ -846,6 +846,7 @@ namespace WorkBoxFramework
         public static readonly WBColumn Modified = WBColumn.DateTimeColumn("Modified");
         public static readonly WBColumn ContentType = WBColumn.TextColumn("Content Type");
         public static readonly WBColumn ID = WBColumn.CounterColumn("ID");
+        public static readonly WBColumn Author = WBColumn.UserColumn("Author", false, false);
 
         public static readonly WBColumn ServerURL = WBColumn.TextColumn("ServerUrl", "Server URL");
         public static readonly WBColumn EncodedAbsoluteURL = WBColumn.TextColumn("EncodedAbsUrl", "Absolute URL");
@@ -957,6 +958,7 @@ namespace WorkBoxFramework
 
         public static readonly WBColumn FileTypeExtension = WBColumn.UniqueTextColumn("File Type Extension");
         public static readonly WBColumn CanPublishToPublic = WBColumn.BooleanColumn("Can Publish To Public");
+        public static readonly WBColumn CanBulkPublish = WBColumn.BooleanColumn("Can Bulk Publish");
         public static readonly WBColumn CanBulkPublishToPublic = WBColumn.BooleanColumn("Can Bulk Publish To Public");
         public static readonly WBColumn FileTypePrettyName = WBColumn.TextColumn("File Type Pretty Name");
 

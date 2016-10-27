@@ -252,7 +252,7 @@ namespace WorkBoxFramework
             if (feedback != null)
             {
                 feedback.AddFeedback("Uploaded file to protected, master records library");
-                feedback.AddFeedback("Master record: " + newRecord.ProtectedMasterRecord.AbsoluteURL);
+                feedback.AddFeedback("Master record: <a href='" + newRecord.ProtectedMasterRecord.AbsoluteURL + "'>" + newRecord.ProtectedMasterRecord.AbsoluteURL + "</a>");
                 feedback.AddFeedback("In folder: " + WBUtils.GetFolderPathWithoutFilename(newRecord.ProtectedMasterRecord.AbsoluteURL));
             }
 

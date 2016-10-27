@@ -44,6 +44,23 @@ This admin page is a central place to configure some of the key locations on thi
 
 <table class="wbf-dialog-form">
 
+
+<tr>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Public Document Email Alerts To</div>
+<div class="wbf-field-description">
+Where should the alert emails for new public documents be sent to?
+</div>
+</td>
+<td class="wbf-field-value-panel">
+<div class="wbf-field-value">
+<asp:TextBox ID="PublicDocumentEmailAlertsTo" runat="server" Columns="55" />
+</div>
+
+</td>
+</tr>
+
+
 <tr>
 <td class="wbf-field-name-panel">
 <div class="wbf-field-name">Subject Tags' Records Routings</div>
@@ -56,6 +73,16 @@ Here you can configure which root subject tags will be used to determine additio
 <div class="wbf-field-read-only-value">
 <asp:Literal ID="SubjectTagsRecordsRoutings" runat="server" />
 </div>
+
+</td>
+</tr>
+
+
+<tr>
+<td colspan="2" align="center" valign="top">
+    <asp:Button ID="SaveButton" runat="server" Text="Save"  OnClick="SaveButton_OnClick"/>
+&nbsp;
+    <asp:Button ID="CancelButton" runat="server" Text="Cancel" OnClick="CancelButton_OnClick"/>
 
 </td>
 </tr>

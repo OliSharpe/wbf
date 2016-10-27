@@ -21,6 +21,7 @@
 #endregion
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
@@ -34,6 +35,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         public bool userCanPublishToPublic = false;
 
         private WBPublishingProcess process = null;
+        WBRecordsManager manager = null;
+        private List<String> fileTypes = new List<String>();
+
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -49,8 +53,11 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             if (!IsPostBack)
             {
 
+
                 if (Request.QueryString["selectedItemsIDsString"] != null && Request.QueryString["selectedListGUID"] != null)
                 {
+
+                    manager = new WBRecordsManager();
                     string selectedListGUID = Request.QueryString["selectedListGUID"];
                     string[] selectedItemsIDs = Request.QueryString["selectedItemsIDsString"].ToString().Split('|');
 
@@ -81,9 +88,24 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                             WBLogging.Debug("list through item with name: " + filename);
                             html += "<tr><td align='center'><img src='" + WBUtils.DocumentIcon16(filename) + "' alt='Icon for file " + filename + "'/></td><td align='left'>" + filename + "</td></tr>\n";
+
+                            String fileType = WBUtils.GetExtension(filename);
+                            if (!fileTypes.Contains(fileType))
+                            {
+                                fileTypes.Add(fileType);
+                            }
                         }
 
                         html += "</table>";
+
+
+                        if (!manager.AllowPublishToPublicOfFileTypes(fileTypes))
+                        {
+                            PublicWebSiteButton.Enabled = false;
+                            PublicNotAllowedMessage.Text = "One of your file types can't be published to public websites";
+                            PublicExtranetButton.Enabled = false;
+                            PublicExtranetNotAllowedMessage.Text = "One of your file types can't be published to public websites";
+                        }
                     }
 
                     DocumentsBeingPublished.Text = html;
@@ -98,6 +120,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 process = JsonConvert.DeserializeObject<WBPublishingProcess>(PublishingProcessJSON.Value);
                 process.WorkBox = WorkBox;
+            }
+        }
+
+        protected void Page_Unload(object sender, EventArgs e)
+        {
+            if (manager != null)
+            {
+                manager.Dispose();
+                manager = null;
             }
         }
 

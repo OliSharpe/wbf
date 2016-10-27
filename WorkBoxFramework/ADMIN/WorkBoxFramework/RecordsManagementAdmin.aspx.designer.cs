@@ -40,6 +40,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::Microsoft.SharePoint.WebControls.ScriptLink WBFScriptRegistration;
         
         /// <summary>
+        /// PublicDocumentEmailAlertsTo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox PublicDocumentEmailAlertsTo;
+        
+        /// <summary>
         /// SubjectTagsRecordsRoutings control.
         /// </summary>
         /// <remarks>
@@ -47,5 +56,23 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal SubjectTagsRecordsRoutings;
+        
+        /// <summary>
+        /// SaveButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button SaveButton;
+        
+        /// <summary>
+        /// CancelButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button CancelButton;
     }
 }

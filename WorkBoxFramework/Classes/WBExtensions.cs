@@ -623,6 +623,7 @@ namespace WorkBoxFramework
             return (item.Fields.ContainsField(column.DisplayName));
         }
 
+        [Obsolete("WBxColumnHasValue with WBColumn arg is deprecated, please use WBxHasValue instead.", true)]
         public static bool WBxColumnHasValue(this SPListItem item, WBColumn column)
         {
             return item.WBxHasValue(column);
@@ -635,12 +636,12 @@ namespace WorkBoxFramework
 
         public static bool WBxHasValue(this SPListItem item, WBColumn column)
         {
-            return (item.WBxGetAsString(column) != "");
+            return (item.WBxToString(column) != "");
         }
 
         public static bool WBxIsNotBlank(this SPListItem item, WBColumn column)
         {
-            return (item.WBxGetAsString(column).Trim() != "");
+            return (item.WBxToString(column).Trim() != "");
         }
 
         public static Object WBxGet(this SPListItem item, WBColumn column)
@@ -730,6 +731,44 @@ namespace WorkBoxFramework
 
         public static String WBxGetAsString(this SPListItem item, WBColumn column)
         {
+            if (item.WBxHasValue(column))
+            {
+                switch (column.DataType)
+                {
+                    case WBColumn.DataTypes.User:
+                        {
+                            if (column.AllowMultipleValues)
+                            {
+                                List<SPUser> users = item.WBxGetMultiUserColumn(column);
+                                if (users != null && users.Count > 0)
+                                {
+                                    users.WBxToString();
+                                }
+                                return "<i>(couldn't find: " + item.WBxGetAsString(column) + ")</i>";
+                            }
+                            else
+                            {
+                                SPUser user = item.WBxGetSingleUserColumn(column);
+                                if (user != null)
+                                {
+                                    return user.LoginName;
+                                }
+                                return "<i>(couldn't find: " + item.WBxGetAsString(column) + ")</i>";
+                            }
+
+                        }
+
+                    default: return WBxGetColumnAsString(item, column.DisplayName);
+                }
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        public static String WBxToString(this SPListItem item, WBColumn column)
+        {
             return WBxGetColumnAsString(item, column.DisplayName);
         }
 
@@ -748,7 +787,7 @@ namespace WorkBoxFramework
 
         public static String WBxGetAsPrettyString(this SPListItem item, WBColumn column)
         {
-            if (item.WBxColumnHasValue(column))
+            if (item.WBxHasValue(column))
             {
                 switch (column.DataType)
                 {
@@ -767,12 +806,25 @@ namespace WorkBoxFramework
                         }
                     case WBColumn.DataTypes.User:
                         {
-                            SPUser user = item.WBxGetSingleUserColumn(column);
-                            if (user != null)
+                            if (column.AllowMultipleValues)
                             {
-                                return user.Name;
+                                List<SPUser> users = item.WBxGetMultiUserColumn(column);
+                                if (users != null && users.Count > 0)
+                                {
+                                    users.WBxToPrettyString();
+                                }
+                                return "<i>(couldn't find: " + item.WBxGetAsString(column) + ")</i>";
                             }
-                            return "<i>(couldn't find: " + item.WBxGetAsString(column) + ")</i>";
+                            else
+                            {
+                                SPUser user = item.WBxGetSingleUserColumn(column);
+                                if (user != null)
+                                {
+                                    return user.Name;
+                                }
+                                return "<i>(couldn't find: " + item.WBxGetAsString(column) + ")</i>";
+                            }
+
                         }
 
                     case WBColumn.DataTypes.ManagedMetadata:
@@ -1063,6 +1115,10 @@ namespace WorkBoxFramework
                             {
                                 item[column.DisplayName] = null;
                             }
+                            else if (value is String)
+                            {
+                                item.WBxSetSingleUserColumn(item.Web, column.DisplayName, item.Web.EnsureUser((String)value));
+                            }
                             else
                             {
                                 throw new Exception("In WBxSet() for User column type: The value being saved was not an SPUser object or null: " + value + " for column: " + column.DisplayName);
@@ -1077,6 +1133,10 @@ namespace WorkBoxFramework
                             else if (value is SPFieldUserValueCollection)
                             {
                                 item[column.DisplayName] = value;
+                            }
+                            else if (value is String)
+                            {
+                                item.WBxSetMultiUserColumn(item.Web, column, ((String)value).WBxToSPUsers(item.Web));
                             }
                             else if (value == null)
                             {
@@ -1339,6 +1399,42 @@ namespace WorkBoxFramework
 
             peopleEditor.UpdateEntities(entityArrayList);
         }
+
+        public static String WBxToString(this List<SPUser> users)
+        {
+            List<String> loginNames = new List<String>();
+            foreach (SPUser user in users)
+            {
+                loginNames.Add(user.LoginName);
+            }
+            return String.Join(";", loginNames.ToArray());
+        }
+
+        public static String WBxToPrettyString(this List<SPUser> users)
+        {
+            if (users == null) return "";
+
+            List<String> loginNames = new List<String>();
+            foreach (SPUser user in users)
+            {
+                loginNames.Add(user.Name);
+            }
+            return String.Join(";", loginNames.ToArray());
+        }
+
+        public static List<SPUser> WBxToSPUsers(this String loginNamesString, SPWeb web) 
+        {
+            List<SPUser> users = new List<SPUser>();
+            if (String.IsNullOrEmpty(loginNamesString)) return users;
+            String[] loginNames = loginNamesString.Split(';');
+            foreach (String loginName in loginNames) 
+            {
+                SPUser user = web.EnsureUser(loginName);
+                users.Add(user);
+            }
+            return users;
+        }
+
 
         public static List<SPUser> WBxGetMultiResolvedUsers(this PeopleEditor peopleEditor, SPWeb web)
         {

@@ -63,7 +63,7 @@ This is a self-approval stage to ensure you have taken the document through all 
 </td>
 <td class="wbf-field-value-panel">
 
-<div class="wbf-field-value">
+<div class="wbf-field-read-only-title">
     <asp:Label ID="DocumentType" runat="server"></asp:Label>
 </div>
 </td>
@@ -76,25 +76,19 @@ This is a self-approval stage to ensure you have taken the document through all 
         <div class="wbf-field-name">Checklist<span class="wbf-required-asterisk">*</span></div>
 </td>
 <td class="wbf-field-value-panel" valign="top">
-
-<div class="wbf-field-value">
-<asp:CheckBox ID="CheckBox1" runat="server" /> Have you redacted names?
+<div class="wbf-field-description">
+        This record will be available to the public, please tick to confirm these checks have been completed.
 </div>
-
 <div class="wbf-field-value">
-<asp:CheckBox ID="CheckBox2" runat="server" /> Have you checked tabs?
+Have you:
 </div>
+<asp:HiddenField ID="CheckBoxesCodes" runat="server" />
+<asp:PlaceHolder ID="CheckBoxes" runat="server" />
 
-<div class="wbf-field-value">
-<asp:CheckBox ID="CheckBox3" runat="server" /> Have you removed macros?
-</div>
 <div class="wbf-field-error">
 <asp:Literal ID="CheckListError" runat="server" Text="" />
 </div>
 
-<div class="wbf-field-description">
-        This record will be available to the public, please tick to confirm these checks have been completed
-</div>
 
 </td>
 </tr>
@@ -105,7 +99,7 @@ This is a self-approval stage to ensure you have taken the document through all 
 </td>
 <td class="wbf-field-value-panel" valign="top">
 
-<div class="wbf-field-value">
+<div class="wbf-field-read-only-title">
 <asp:Label ID="IAO" runat="server" />
 </div>
 <div class="wbf-field-description">
@@ -125,8 +119,8 @@ This is the person who is ultimately responsible for the correct handling of thi
 <div class="wbf-field-value">
 			<SharePoint:PeopleEditor id="PublishingApprovedBy" runat="server"
 				SelectionSet="User"
-				ValidatorEnabled="true"
-				AllowEmpty = "false"
+				ValidatorEnabled="false"
+				AllowEmpty = "true"
 				MultiSelect = "true"
 				/>
 </div>

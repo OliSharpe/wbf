@@ -96,7 +96,7 @@ Selected folder: <asp:Label ID="SelectedFolderPath" runat="server" />
 
 </div>
 
-<div>
+<div style="display: none; ">
     <asp:Label ID="SelectedRecordID" runat="server" />
 </div>
 

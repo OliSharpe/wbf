@@ -34,11 +34,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             }
 
+            if (!IsPostBack)
+            {
+                PublicDocumentEmailAlertsTo.Text = farm.PublicDocumentEmailAlertsTo;
+            }
+
             String html = "<table cellpadding='6'>\n";
-
             html += "<tr><th>Subject Tag</th><th>Public Library</th><th>Extranet Library</th></tr>\n\n";
-
-
             if (routings.Count > 0)
             {
                 int index = 0;
@@ -58,10 +60,25 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
 
             html += "<tr><td colspan='5'><a href='#' onclick='WorkBoxFramework_callDialog(\"/_admin/WorkBoxFramework/EditSubjectTagRouting.aspx\");'>Add another subject tag routing rule</a></td></tr>\n\n";
-
-
             SubjectTagsRecordsRoutings.Text = html;
 
         }
+
+        protected void CancelButton_OnClick(object sender, EventArgs e)
+        {
+            SPUtility.Redirect("/applications.aspx", SPRedirectFlags.Static, Context);
+        }
+
+        protected void SaveButton_OnClick(object sender, EventArgs e)
+        {
+            WBFarm farm = WBFarm.Local;
+
+            farm.PublicDocumentEmailAlertsTo = PublicDocumentEmailAlertsTo.Text;
+
+            farm.Update();
+
+            SPUtility.Redirect("/applications.aspx", SPRedirectFlags.Static, Context);
+        }
+
     }
 }
