@@ -81,54 +81,69 @@ table.wbf-record-series-details .wbf-record-series-summary-detail
         SP.UI.ModalDialog.showModalDialog(options);
     }
 
-    function WBF_add_record_id(recordID) {
-        var soFarString = $('#test').text();
+    function WorkBoxFramework_archiveSelectedRecords() {
 
-        var soFarArray = soFarString.split(';');
+        var selectedRecords = $('#wbf-list-of-records-selected').text();
+
+        if (selectedRecords && selectedRecords != "") {
+            var urlValue = L_Menu_BaseUrl + '/_layouts/WorkBoxFramework/ArchiveSelectedRecords.aspx'
+            + '?SelectedRecords=' + selectedRecords;
+
+            var options = {
+                url: urlValue,
+                title: 'Archive Record(s)',
+                allowMaximize: false,
+                showClose: true,
+                dialogReturnValueCallback: WorkBoxFramework_callback
+            };
+
+            SP.UI.ModalDialog.showModalDialog(options);
+        } else {
+            alert("You have not selected any records");
+        }
+    }
+
+
+
+    function WBF_add_record_id(recordID) {
+        var soFarString = $('#wbf-list-of-records-selected').text();
+
+        var soFarArray = [];
+        if (soFarString && soFarString != "") soFarArray = soFarString.split('_');
+
         soFarArray.push(recordID);
-        $('#test').text(soFarArray.join(';'));
+        $('#wbf-list-of-records-selected').text(soFarArray.join('_'));
+
+
+        //var archiveRecordsButton = document.getElementById("<%=ArchiveRecordsButton.ClientID %>"); 
     }
 
     function WBF_remove_record_id(recordID) {
-        var soFarString = $('#test').text();
+        var soFarString = $('#wbf-list-of-records-selected').text();
 
-        var soFarArray = soFarString.split(';');
+        var soFarArray = [];
+        if (soFarString && soFarString != "") soFarArray = soFarString.split('_');
+
         // OK so this is crude - but it should work everywhere!
         for(var i = soFarArray.length - 1; i >= 0; i--) {
           if(soFarArray[i] == recordID) {
             soFarArray.splice(i, 1);
           }
         }
-        $('#test').text(soFarArray.join(';'));
+        $('#wbf-list-of-records-selected').text(soFarArray.join('_'));
     }
 
 
     function WBF_checkbox_changed(event) {
-        //alert('in WBF_checkbox_changed()');
-        //alert('event = ' + event);
-
         event = event || window.event;
-
-        //alert('event (now) = ' + event);
-
         var target = event.target || event.srcElement;
-
-        //alert('target = ' + target);
 
         var checkbox = $(target);
         var recordID = checkbox.data('record-id');
 
-        //alert('checkbox.get(0).tagName = ' + checkbox.get(0).tagName);
-
-        //alert('recordID = ' + recordID);
-
         if (checkbox.prop('checked')) {
-            //alert('was checked');
-
             WBF_add_record_id(recordID);
         } else {
-            //alert('was NOT checked');
-
             WBF_remove_record_id(recordID);
         }
     }
@@ -140,14 +155,11 @@ table.wbf-record-series-details .wbf-record-series-summary-detail
     }
 
     //Sys.Application.add_load(WBF_add_checkbox_change_function); 
+    //
 
     </script>
-
 <div style="display:none;">
-
-    Test below
-    <div id="test">0</div>
-    Test above
+<div id="wbf-list-of-records-selected"></div>
 </div>
 
 <table borders="1" cellpadding="20" cellspacing="0">
@@ -165,6 +177,15 @@ Search:
 </td>
 </tr>
 
+
+<tr>
+<td>
+</td>
+<td>
+<asp:Button ID="ArchiveRecordsButton" Text="Archive Records" runat="server" OnClientClick="WorkBoxFramework_archiveSelectedRecords(); return false;" UseSubmitBehavior="false" />
+
+</td>
+</tr>
 
 <tr>
 <td valign="top">

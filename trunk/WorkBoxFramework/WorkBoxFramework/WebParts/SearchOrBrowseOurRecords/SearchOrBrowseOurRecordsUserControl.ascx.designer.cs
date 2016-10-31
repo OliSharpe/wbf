@@ -31,6 +31,15 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords {
         protected global::System.Web.UI.WebControls.Button DoSearch;
         
         /// <summary>
+        /// ArchiveRecordsButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button ArchiveRecordsButton;
+        
+        /// <summary>
         /// RecordsLibraryFolders control.
         /// </summary>
         /// <remarks>

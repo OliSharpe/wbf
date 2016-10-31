@@ -211,6 +211,20 @@ namespace WorkBoxFramework
             return new WBDocument(this, recordItem);
         }
 
+        public SPListItemCollection GetLiveVersionsUpTo(String recordSeriesID, String recordID)
+        {
+            WBQuery query = new WBQuery();
+
+            query.AddFilter(WBColumn.RecordSeriesID, WBQueryClause.Comparators.Equals, recordSeriesID);
+            query.AddFilter(WBColumn.LiveOrArchived, WBQueryClause.Comparators.Equals, WBColumn.LIVE_OR_ARCHIVED__LIVE);
+            query.AddFilter(WBColumn.RecordID, WBQueryClause.Comparators.LessThanEquals, recordID);
+
+            query.OrderByDescending(WBColumn.RecordID);
+
+            return List.WBxGetItems(Site, query);
+        }
+
+
         public WBDocument this[String recordID]
         {
             get {
