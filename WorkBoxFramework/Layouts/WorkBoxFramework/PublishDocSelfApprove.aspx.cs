@@ -55,7 +55,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            WBLogging.Generic.Verbose("In Page_Load for the public doc metadata dialog");
+            WBLogging.Generic.Verbose("In Page_Load for the self approval dialog");
 
             manager = new WBRecordsManager();
 

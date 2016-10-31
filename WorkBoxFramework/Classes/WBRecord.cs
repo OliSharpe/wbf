@@ -32,10 +32,8 @@ namespace WorkBoxFramework
                     _protectedMasterRecord.DebugName = "ProtectedMasterRecord";
                 }
 
-
                 return _protectedMasterRecord;
             }
-
         }
 
         private WBDocument _metadata = null;
@@ -103,7 +101,6 @@ namespace WorkBoxFramework
         /// <param name="newMasterRecordDocument"></param>
         public WBRecord(WBRecordsLibraries libraries, SPListItem newRecordItem, String newRecordID, WBDocument originalDocument, WBItem extraMetadata)
         {
-
             _libraries = libraries;
             _protectedMasterRecord = new WBDocument(libraries.ProtectedMasterLibrary, newRecordItem);
             _recordID = newRecordID;

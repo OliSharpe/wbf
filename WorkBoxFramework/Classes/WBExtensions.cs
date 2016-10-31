@@ -2816,12 +2816,12 @@ namespace WorkBoxFramework
             }
         }
 
-        public static void WBxCreateTasksTable(this PlaceHolder placeHolder, ICollection<String> taskNames)
+        public static void WBxCreateTasksTable(this PlaceHolder placeHolder, IEnumerable<String> taskNames)
         {
             WBxCreateTasksTable(placeHolder, taskNames, null);
         }
 
-        public static void WBxCreateTasksTable(this PlaceHolder placeHolder, ICollection<String> taskNames, Dictionary<String, String> prettyNames)
+        public static void WBxCreateTasksTable(this PlaceHolder placeHolder, IEnumerable<String> taskNames, Dictionary<String, String> prettyNames)
         {
             Table table = new Table();
             table.CellPadding = 0;

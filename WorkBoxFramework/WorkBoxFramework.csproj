@@ -123,6 +123,13 @@
     <Compile Include="ADMIN\WorkBoxFramework\CheckConfiguration.aspx.designer.cs">
       <DependentUpon>CheckConfiguration.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ActuallyArchiveRecords.aspx.cs">
+      <DependentUpon>ActuallyArchiveRecords.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ActuallyArchiveRecords.aspx.designer.cs">
+      <DependentUpon>ActuallyArchiveRecords.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\WorkBoxFramework\AddAllManagersReports.aspx.cs">
       <DependentUpon>AddAllManagersReports.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -143,6 +150,13 @@
     </Compile>
     <Compile Include="Layouts\WorkBoxFramework\AddSubjectTag.aspx.designer.cs">
       <DependentUpon>AddSubjectTag.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ArchiveSelectedRecords.aspx.cs">
+      <DependentUpon>ArchiveSelectedRecords.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\ArchiveSelectedRecords.aspx.designer.cs">
+      <DependentUpon>ArchiveSelectedRecords.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\WorkBoxFramework\ChangeTeamManager.aspx.cs">
       <DependentUpon>ChangeTeamManager.aspx</DependentUpon>
@@ -1110,6 +1124,9 @@
     <Content Include="Images\WorkBoxFramework\work-box-open-24.png" />
     <Content Include="Images\WorkBoxFramework\work-box-open-32.png" />
     <Content Include="Images\WorkBoxFramework\work-box-open-64.png" />
+    <Content Include="Layouts\WorkBoxFramework\ActuallyArchiveRecords.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\AddAllManagersReports.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1117,6 +1134,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\AddSubjectTag.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\WorkBoxFramework\ArchiveSelectedRecords.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\ChangeTeamManager.aspx">

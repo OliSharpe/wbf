@@ -20,20 +20,14 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
             manager = new WBRecordsManager();
             workBox = new WorkBox(SPContext.Current);
 
-
             if (!IsPostBack)
             {
-
                 WBTermCollection<WBTerm> functionalAreas = workBox.OwningTeam.FunctionalArea(workBox.FunctionalAreasTaxonomy);
                 TreeViewLocationCollection collection = new TreeViewLocationCollection(manager, "Browse Folders", "", functionalAreas);
 
                 RecordsLibraryFolders.DataSource = collection;
                 RecordsLibraryFolders.DataBind();
-
             }
-
-
-
         }
 
 
@@ -228,7 +222,7 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
 
 
                     html += "<tr>"
-                        + "<td class='wbf-record-series-summary-detail'><input type='checkbox' class='wbf-our-records-check-boxes' data-record-id='" + document.RecordID + "' onclick=\"WBF_checkbox_changed(event);\"/></td>"
+                        + "<td class='wbf-record-series-summary-detail'><input type='checkbox' class='wbf-our-records-check-boxes' data-record-id='" + document.RecordSeriesID + "x" + document.RecordID + "' onclick=\"WBF_checkbox_changed(event);\"/></td>"
                         + "<td class='wbf-record-series-summary-detail'>" + document.Title + "</td>"
                         + "<td class='wbf-record-series-summary-detail'>" + document.Filename + "</td>"
                         + "<td class='wbf-record-series-summary-detail wbf-centre'>" + document.RecordSeriesIssue + "</td>"
