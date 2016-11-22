@@ -1,6 +1,6 @@
 ﻿#region Copyright and License
 
-// Copyright (c) Islington Council 2010-2013
+// Copyright (c) Islington Council 2010-2016
 // Author: Oli Sharpe  (oli@gometa.co.uk)
 //
 // This file is part of the Work Box Framework.
@@ -21,9 +21,11 @@
 #endregion
 
 using System;
+using System.Text;
 using System.Web;
 using System.Net;
 using System.IO;
+using System.IO.Compression;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -40,6 +42,7 @@ using Microsoft.SharePoint.Publishing;
 using Microsoft.SharePoint.Navigation;
 using Microsoft.Office.Server.UserProfiles;
 using System.Web.UI.WebControls;
+using Newtonsoft.Json;
 
 namespace WorkBoxFramework
 {
@@ -1753,5 +1756,69 @@ namespace WorkBoxFramework
             if (String.IsNullOrEmpty(value)) return "";
             return Uri.EscapeDataString(value);
         }
+
+        public static String SerializeToCompressedJSONForURI(Object obj)
+        {
+            //JsonSerializerSettings settings = new JsonSerializerSettings();
+            //settings.StringEscapeHandling = StringEscapeHandling.EscapeHtml;
+            //return JsonConvert.SerializeObject(obj, settings);
+
+            return Uri.EscapeDataString(Compress(JsonConvert.SerializeObject(obj)));
+        }
+
+        public static T DeserializeFromCompressedJSONInURI<T>(String value)
+        {
+            //JsonSerializerSettings settings = new JsonSerializerSettings();
+            //settings.StringEscapeHandling = StringEscapeHandling.EscapeHtml;
+            //return JsonConvert.DeserializeObject<T>(value, settings);
+
+            return JsonConvert.DeserializeObject<T>(Decompress(Uri.UnescapeDataString(value)));
+        }
+
+
+        // With thanks to http://madskristensen.net/post/compress-and-decompress-strings-in-c
+        public static string Compress(string text)
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(text);
+            MemoryStream ms = new MemoryStream();
+            using (GZipStream zip = new GZipStream(ms, CompressionMode.Compress, true))
+            {
+                zip.Write(buffer, 0, buffer.Length);
+            }
+
+            ms.Position = 0;
+            MemoryStream outStream = new MemoryStream();
+
+            byte[] compressed = new byte[ms.Length];
+            ms.Read(compressed, 0, compressed.Length);
+
+            byte[] gzBuffer = new byte[compressed.Length + 4];
+            System.Buffer.BlockCopy(compressed, 0, gzBuffer, 4, compressed.Length);
+            System.Buffer.BlockCopy(BitConverter.GetBytes(buffer.Length), 0, gzBuffer, 0, 4);
+            return Convert.ToBase64String(gzBuffer);
+        }
+
+        // With thanks to http://madskristensen.net/post/compress-and-decompress-strings-in-c
+        public static string Decompress(string compressedText)
+        {
+            byte[] gzBuffer = Convert.FromBase64String(compressedText);
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int msgLength = BitConverter.ToInt32(gzBuffer, 0);
+                ms.Write(gzBuffer, 4, gzBuffer.Length - 4);
+
+                byte[] buffer = new byte[msgLength];
+
+                ms.Position = 0;
+                using (GZipStream zip = new GZipStream(ms, CompressionMode.Decompress))
+                {
+                    zip.Read(buffer, 0, buffer.Length);
+                }
+
+                return Encoding.UTF8.GetString(buffer);
+            }
+        }
+
+
     }
 }

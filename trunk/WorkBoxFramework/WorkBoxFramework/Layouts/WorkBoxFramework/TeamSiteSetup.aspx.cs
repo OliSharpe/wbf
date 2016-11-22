@@ -63,6 +63,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                         InheritedFunctionalAreas.Text = "";
                     }
 
+                    InformationAssetOwner.WBxInitialise(team.InformationAssetOwner(web));
                     TeamManager.WBxInitialise(team.Manager(web));
 
                     TeamOwnersSharePointUserGroup.UpdateEntities(WBUtils.CreateEntitiesArrayList(team.OwnersGroupName));
@@ -158,6 +159,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             web.Title = TeamName.Text;
             team.Acronym = TeamAcronym.Text;
 
+            team.SetInformationAssetOwner(InformationAssetOwner.WBxGetSingleResolvedUser(web));
             team.SetManager(site, TeamManager.WBxGetSingleResolvedUser(web));
 
             team.PublishersGroupName = WBUtils.EntitiesToPropertyString(TeamPublishersSharePointUserGroup.ResolvedEntities, 1);

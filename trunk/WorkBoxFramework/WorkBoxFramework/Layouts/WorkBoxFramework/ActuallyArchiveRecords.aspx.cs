@@ -16,31 +16,33 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         private int indexOfNextRecordToArchive = 0;
         String[] recordIDs = null;
         Dictionary<String, String> mappedFilenames = new Dictionary<string, string>();
-        WBRecordsManager manager = null;
         List<String> allFilenamesToArchive = new List<String>();
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            manager = new WBRecordsManager();
 
             if (!IsPostBack)
             {
-                AllRecordIDsToArchive.Value = Request.QueryString["AllRecordIDsToArchive"];
+                using (WBRecordsManager manager = new WBRecordsManager())
+                {
+                    AllRecordIDsToArchive.Value = Request.QueryString["AllRecordIDsToArchive"];
 
-                recordIDs = AllRecordIDsToArchive.Value.Split(',');
-                foreach (String recordID in recordIDs) {
+                    recordIDs = AllRecordIDsToArchive.Value.Split(',');
+                    foreach (String recordID in recordIDs)
+                    {
 
-                    WBDocument record = manager.Libraries.ProtectedMasterLibrary.GetDocumentByID(recordID);
-                    allFilenamesToArchive.Add(record.Name);                   
+                        WBDocument record = manager.Libraries.ProtectedMasterLibrary.GetDocumentByID(recordID);
+                        allFilenamesToArchive.Add(record.Name);
+                    }
+
+                    AllRecordFilenamesToArchive.Value = String.Join(",", allFilenamesToArchive.ToArray());
+
+                    WBLogging.Debug("AllRecordIDsToArchive.Value = " + AllRecordIDsToArchive.Value);
+                    WBLogging.Debug("AllRecordFilenamesToArchive.Value = " + AllRecordFilenamesToArchive.Value);
+
+                    indexOfNextRecordToArchive = 0;
+                    NextRecordToArchive.Text = "" + indexOfNextRecordToArchive;
                 }
-
-                AllRecordFilenamesToArchive.Value = String.Join(",", allFilenamesToArchive.ToArray());
-
-                WBLogging.Debug("AllRecordIDsToArchive.Value = " + AllRecordIDsToArchive.Value);
-                WBLogging.Debug("AllRecordFilenamesToArchive.Value = " + AllRecordFilenamesToArchive.Value);
-
-                indexOfNextRecordToArchive = 0;
-                NextRecordToArchive.Text = "" + indexOfNextRecordToArchive;
             }
             else
             {
@@ -70,7 +72,6 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 }
 
                 WBLogging.Debug("Finished");
-
             }
         }
 
@@ -82,11 +83,17 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             WBTaskFeedback feedback = new WBTaskFeedback(indexOfNextRecordToArchive.ToString());
             try
             {
-                WBRecord record = manager.Libraries.GetRecordByID(recordIDs[indexOfNextRecordToArchive]);
-                record.LiveOrArchived = WBColumn.LIVE_OR_ARCHIVED__ARCHIVED;
-                record.Update();
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (WBRecordsManager elevatedManager = new WBRecordsManager())
+                    {
+                        WBRecord record = elevatedManager.Libraries.GetRecordByID(recordIDs[indexOfNextRecordToArchive]);
+                        record.LiveOrArchived = WBColumn.LIVE_OR_ARCHIVED__ARCHIVED;
+                        record.Update();
 
-                feedback.Success("Archived successfully");
+                        feedback.Success("Archived successfully");
+                    }
+                });
             }
             catch (Exception exception)
             {

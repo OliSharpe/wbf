@@ -58,6 +58,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         protected bool showSubjectTags = true;
         protected bool showScanDate = false;
 
+        protected bool showWebPageURL = false;
+
         protected bool showPublishAllButton = false;
 
         
@@ -71,12 +73,12 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             if (!IsPostBack)
             {
 
-                process = JsonConvert.DeserializeObject<WBPublishingProcess>(Request.QueryString["PublishingProcessJSON"]);
+                process = WBUtils.DeserializeFromCompressedJSONInURI<WBPublishingProcess>(Request.QueryString["PublishingProcessJSON"]);
                 process.WorkBox = WorkBox;
 
                 WBLogging.Debug("Created the WBProcessObject");
 
-                PublishingProcessJSON.Value = JsonConvert.SerializeObject(process);
+                PublishingProcessJSON.Value = WBUtils.SerializeToCompressedJSONForURI(process);
 
                 WBLogging.Debug("Serialized the WBProcessObject to hidden field");
 
@@ -87,7 +89,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
             else
             {
-                process = JsonConvert.DeserializeObject<WBPublishingProcess>(PublishingProcessJSON.Value.WBxTrim());
+                process = WBUtils.DeserializeFromCompressedJSONInURI<WBPublishingProcess>(PublishingProcessJSON.Value.WBxTrim());
                 process.WorkBox = WorkBox;
 
                 CaptureChanges();
@@ -120,10 +122,14 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 {
                     WBLogging.Generic.Unexpected("The returned value was: " + UpdatedPublishingProcessJSON.Value);
 
-                    process = JsonConvert.DeserializeObject<WBPublishingProcess>(UpdatedPublishingProcessJSON.Value.WBxTrim());
+                    process = WBUtils.DeserializeFromCompressedJSONInURI<WBPublishingProcess>(UpdatedPublishingProcessJSON.Value.WBxTrim());
                     process.WorkBox = WorkBox;
 
                     CaptureChanges();
+
+                    // Now set the title and subject tags from the record that is going to be replaced:
+                    process.CurrentShortTitle = process.ToReplaceShortTitle;
+                    process.SubjectTagsUIControlValue = process.ToReplaceSubjectTagsUIControlValue;
 
                     // Now blanking this hidden field so that it doesn't trigger a recapture each time!
                     UpdatedPublishingProcessJSON.Value = "";
@@ -378,9 +384,20 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             WBLogging.Debug("Just involved team");
 
             process.TeamsTaxonomy.InitialiseTaxonomyControl(InvolvedTeamsField, WorkBox.COLUMN_NAME__INVOLVED_TEAMS, true);
-            InvolvedTeamsField.Text = process.GetInvolvedTeamsWithoutOwningTeamAsUIControlValue();
+            InvolvedTeamsField.Text = process.InvolvedTeamsWithoutOwningTeamAsUIControlValue;
 
-            WebPageURL.Text = process.WebPageURL;
+            if (process.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
+            {
+                WebPageURL.Text = process.WebPageURL;
+                showWebPageURL = true;
+            }
+            else
+            {
+                WebPageURL.Text = "";
+                process.WebPageURL = "";
+                showWebPageURL = false;
+            }
+
 
             if (process.CountStillToPublish > 1)
             {
@@ -402,7 +419,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             WBLogging.Debug("Just before serialization");
 
             // Lastly we're going to capture the state of the publishing process:
-            PublishingProcessJSON.Value = JsonConvert.SerializeObject(process);
+            PublishingProcessJSON.Value = WBUtils.SerializeToCompressedJSONForURI(process);
         }
 
 
@@ -568,10 +585,23 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             WBLogging.Debug("Captured subject tags to be: " + SubjectTagsField.Text);
 
-            process.OwningTeamUIControlValue = OwningTeamField.Text;
-            process.SetInvolvedTeamsWithoutOwningTeamAsUIControlValue(InvolvedTeamsField.Text);
+            if (process.OwningTeamUIControlValue != OwningTeamField.Text)
+            {
+                // OK so the owning team has changed we need to change the owning team and the associated IAO:
+                process.OwningTeamUIControlValue = OwningTeamField.Text;
+
+                WBTeam owningTeam = new WBTeam(process.TeamsTaxonomy, process.OwningTeamUIControlValue);
+                process.OwningTeamsIAOAtTimeOfPublishing = owningTeam.InformationAssetOwnerLogin;
+                process.AddExtraMetadata(WBColumn.IAOAtTimeOfPublishing, process.OwningTeamsIAOAtTimeOfPublishing);
+            }
+
+            process.InvolvedTeamsWithoutOwningTeamAsUIControlValue = InvolvedTeamsField.Text;
 
             process.WebPageURL = WebPageURL.Text;
+            if (!String.IsNullOrEmpty(process.WebPageURL))
+            {
+                process.AddExtraMetadata(WBColumn.IntendedWebPageURL, process.WebPageURL);
+            }
         }
 
 
@@ -695,11 +725,11 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (process.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PROTECTED)
             {
-                redirectUrl = "WorkBoxFramework/PublishDocActuallyPublish.aspx?PublishingProcessJSON=" + JsonConvert.SerializeObject(process);
+                redirectUrl = "WorkBoxFramework/PublishDocActuallyPublish.aspx?PublishingProcessJSON=" + WBUtils.SerializeToCompressedJSONForURI(process);
             }
             else
             {
-                redirectUrl = "WorkBoxFramework/PublishDocSelfApprove.aspx?PublishingProcessJSON=" + JsonConvert.SerializeObject(process);
+                redirectUrl = "WorkBoxFramework/PublishDocSelfApprove.aspx?PublishingProcessJSON=" + WBUtils.SerializeToCompressedJSONForURI(process);
             }
 
             SPUtility.Redirect(redirectUrl, SPRedirectFlags.RelativeToLayoutsPage, Context);

@@ -45,14 +45,14 @@ table.wbf-record-series-details .wbf-record-series-summary-issue
     background: #EEE;
     font-weight: bold;
     text-align:center;
-    border-top: 1px solid #ccc;
+    border-top: 2px solid #ccc;
 }
 
 table.wbf-record-series-details .wbf-record-series-summary-detail
 {
     background: #FFF;
     text-align:center;
-    border-top: 1px solid #ccc;
+    border-top: 2px solid #ccc;
 }
 
 
@@ -91,13 +91,31 @@ table.wbf-record-series-details-panel .wbf-record-series-detail-title
 
 <script>
 
-    function revealRecordID(recordID) {
-        $(".wbf-record-details").each(function () {
-            if ($(this).data("record-id") == recordID) $(this).show();
-            else $(this).hide();
-        });        
+    function toggleRecordID(recordID) {
+
+        var currently = $("#wbf-more-or-less-" + recordID).text();
+
+        if (currently.indexOf("more") > -1) {
+            $(".wbf-record-details").each(function () {
+                if ($(this).data("record-id") == recordID) $(this).show();
+                else $(this).hide();
+            });
+
+            $("#wbf-more-or-less-" + recordID).text("less <");
+        } else {
+            $(".wbf-record-details").each(function () {
+                $(this).hide();
+            });
+
+            $("#wbf-more-or-less-" + recordID).text("more >");
+        }
+
     }
 
+    function WBF_edit_records_metadata(recordID) {
+        var editCommandString = "EditRecordsMetadata.aspx?RecordID=" + recordID;
+        WorkBoxFramework_relativeCommandAction(editCommandString, 800, 600);
+    }
 
 </script>
 

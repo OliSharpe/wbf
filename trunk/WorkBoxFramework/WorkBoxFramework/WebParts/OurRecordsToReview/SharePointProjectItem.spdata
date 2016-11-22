@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ProjectItem Type="Microsoft.VisualStudio.SharePoint.VisualWebPart" DefaultFile="OurRecordsToReviewUserControl.ascx" SupportedTrustLevels="FullTrust" SupportedDeploymentScopes="Site" xmlns="http://schemas.microsoft.com/VisualStudio/2010/SharePointTools/SharePointProjectItemModel">
+  <Files>
+    <ProjectItemFile Source="Elements.xml" Target="OurRecordsToReview\" Type="ElementManifest" />
+    <ProjectItemFile Source="OurRecordsToReview.webpart" Target="OurRecordsToReview\" Type="ElementFile" />
+    <ProjectItemFile Source="OurRecordsToReviewUserControl.ascx" Target="CONTROLTEMPLATES\WorkBoxFramework\OurRecordsToReview\" Type="TemplateFile" />
+  </Files>
+  <SafeControls>
+    <SafeControl Name="SafeControlEntry1" Assembly="$SharePoint.Project.AssemblyFullName$" Namespace="WorkBoxFramework.OurRecordsToReview" TypeName="*" IsSafe="true" IsSafeAgainstScript="false" />
+  </SafeControls>
+</ProjectItem>

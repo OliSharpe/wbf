@@ -51,6 +51,7 @@ namespace WorkBoxFramework
         public const string TEAM_TERM_PROPERTY__FUNCTIONAL_AREA = "wbf__team_term__functional_area";
         public const string TEAM_TERM_PROPERTY__ACRONYM = "wbf__team_term__acronym";
         public const string TEAM_TERM_PROPERTY__MANAGER_LOGIN = "wbf__team_term__manager_login";
+        public const string TEAM_TERM_PROPERTY__INFORMATION_ASSET_OWNER_LOGIN = "wbf__team_term__iao_login";
 
         public const string TEAM_TERM_STATUS__NEW = "New";
         public const string TEAM_TERM_STATUS__OK = "OK";
@@ -283,7 +284,16 @@ namespace WorkBoxFramework
             }
         }
 
+        public String InformationAssetOwnerLogin
+        {
+            get { return Term.WBxGetProperty(TEAM_TERM_PROPERTY__INFORMATION_ASSET_OWNER_LOGIN); }
+            private set {
+                WBLogging.Teams.Verbose("Setting the IAO (" + value + ") of the team (" + Name + ")");
+                Term.WBxSetProperty(TEAM_TERM_PROPERTY__INFORMATION_ASSET_OWNER_LOGIN, value); 
+            }
+        }
 
+        
         public bool IsPickable { get { return Term.IsAvailableForTagging; } }
 
 
@@ -330,6 +340,26 @@ namespace WorkBoxFramework
             else
             {
                 ManagerLogin = "";
+            }
+        }
+
+        public SPUser InformationAssetOwner(SPWeb web)
+        {
+            WBLogging.Teams.Verbose("Getting the IAO (" + InformationAssetOwnerLogin + ") of the team (" + Name + ")");
+            if (String.IsNullOrEmpty(InformationAssetOwnerLogin)) return null;
+
+            return web.WBxEnsureUserOrNull(InformationAssetOwnerLogin);
+        }
+
+        public void SetInformationAssetOwner(SPUser user)
+        {
+            if (user != null)
+            {
+                InformationAssetOwnerLogin = user.LoginName;
+            }
+            else
+            {
+                InformationAssetOwnerLogin = "";
             }
         }
 

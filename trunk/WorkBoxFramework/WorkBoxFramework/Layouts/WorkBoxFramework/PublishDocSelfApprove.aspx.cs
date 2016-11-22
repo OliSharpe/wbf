@@ -62,19 +62,19 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             // If this is the initial call to the page then we need to load the basic details of the document we're publishing out:
             if (!IsPostBack)
             {
-                process = JsonConvert.DeserializeObject<WBPublishingProcess>(Request.QueryString["PublishingProcessJSON"]);
+                process = WBUtils.DeserializeFromCompressedJSONInURI<WBPublishingProcess>(Request.QueryString["PublishingProcessJSON"]);
                 process.WorkBox = WorkBox;
 
 //                WBLogging.Debug("Created the WBProcessObject");
 
-                PublishingProcessJSON.Value = JsonConvert.SerializeObject(process);
+                PublishingProcessJSON.Value = WBUtils.SerializeToCompressedJSONForURI(process);
 
    //             WBLogging.Debug("Serialized the WBProcessObject to hidden field");
 
             }
             else
             {
-                process = JsonConvert.DeserializeObject<WBPublishingProcess>(PublishingProcessJSON.Value);
+                process = WBUtils.DeserializeFromCompressedJSONInURI<WBPublishingProcess>(PublishingProcessJSON.Value);
                 process.WorkBox = WorkBox;
             }
 
@@ -124,9 +124,16 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 DocumentType.Text = typeText;
                 WBLogging.Debug("The file type of the record is: " + typeText);
 
-                IAO.Text = "Bill Smith";
+                IAO.Text = "<none found>";
+                if (!String.IsNullOrEmpty(process.OwningTeamsIAOAtTimeOfPublishing))
+                {
+                    SPUser owningTeamIAO = SPContext.Current.Web.WBxEnsureUserOrNull(process.OwningTeamsIAOAtTimeOfPublishing);
+                    if (owningTeamIAO != null)
+                    {
+                        IAO.Text = owningTeamIAO.Name;
+                    }
+                }
             }
-
         }
 
         private Control CreateCheckBoxDiv(String id, String text)
@@ -201,14 +208,10 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             else
             {
 
-                Dictionary<String, String> selfApproveDetails = new Dictionary<string, string>();
-
                 List<SPUser> approvedBy = PublishingApprovedBy.WBxGetMultiResolvedUsers(SPContext.Current.Web);
 
-                selfApproveDetails.Add(WBColumn.PublishingApprovedBy.InternalName, approvedBy.WBxToString());
-                selfApproveDetails.Add(WBColumn.PublishingApprovalChecklist.InternalName, CheckBoxesCodes.Value);
-
-                process.SelfApprovalDictionary = selfApproveDetails;
+                process.AddExtraMetadata(WBColumn.PublishingApprovedBy, approvedBy.WBxToString());
+                process.AddExtraMetadata(WBColumn.PublishingApprovalChecklist, CheckBoxesCodes.Value);
 
                 WBLogging.Debug("In publishButton_OnClick(): No page render required - so moving to GoToPublishPage");
                 GoToPublishPage();
@@ -227,7 +230,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         private void GoToPublishPage()
         {
-            string redirectUrl = "WorkBoxFramework/PublishDocActuallyPublish.aspx?PublishingProcessJSON=" + JsonConvert.SerializeObject(process);
+            string redirectUrl = "WorkBoxFramework/PublishDocActuallyPublish.aspx?PublishingProcessJSON=" + WBUtils.SerializeToCompressedJSONForURI(process);
 
             SPUtility.Redirect(redirectUrl, SPRedirectFlags.RelativeToLayoutsPage, Context);
         }

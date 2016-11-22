@@ -55,6 +55,8 @@ namespace WorkBoxFramework
             this.TeamFunctionalAreasUIControlValue = workBox.OwningTeam.InheritedFunctionalAreaUIControlValue;
 
             this.OwningTeamUIControlValue = workBox.OwningTeam.UIControlValue;
+            this.OwningTeamsIAOAtTimeOfPublishing = workBox.OwningTeam.InformationAssetOwnerLogin;
+
             this.InvolvedTeamsUIControlValue = workBox.InvolvedTeams.UIControlValue;
 
             this.ReplaceAction = REPLACE_ACTION__CREATE_NEW_SERIES;
@@ -130,6 +132,9 @@ namespace WorkBoxFramework
         public String OwningTeamUIControlValue { get; set; }
 
         [JsonProperty]
+        public String OwningTeamsIAOAtTimeOfPublishing { get; set; }
+
+        [JsonProperty]
         public String InvolvedTeamsUIControlValue { get; set; }
 
         [JsonProperty]
@@ -170,7 +175,7 @@ namespace WorkBoxFramework
         {
             get
             {
-                if (_currentShortTitle == null)
+                if (String.IsNullOrEmpty(_currentShortTitle))
                 {
                     if (CurrentItem != null)
                     {
@@ -183,7 +188,7 @@ namespace WorkBoxFramework
                                 int indexOfClosingBracket = _currentShortTitle.IndexOf(')');
                                 if (indexOfClosingBracket > -1 && indexOfClosingBracket < _currentShortTitle.Length - 2)
                                 {
-                                    _currentShortTitle = _currentShortTitle.Substring(indexOfClosingBracket + 1);
+                                    _currentShortTitle = _currentShortTitle.Substring(indexOfClosingBracket + 1).WBxTrim();
                                 }
                             }
                         }
@@ -206,13 +211,37 @@ namespace WorkBoxFramework
         public String ToReplaceRecordPath { get; set; }
 
         [JsonProperty]
+        public String ToReplaceSubjectTagsUIControlValue { get; set; }
+
+        [JsonProperty]
+        public String ToReplaceShortTitle { get; set; }
+
+        [JsonProperty]
         public String ReplaceAction { get; set; }
 
+        private Dictionary<String, String> _extraMetadataDictionary = null;
         [JsonProperty]
-        public Dictionary<String,String> SelfApprovalDictionary { get; set; }
+        public Dictionary<String,String> ExtraMetadataDictionary 
+        {
+            get
+            {
+                if (_extraMetadataDictionary == null)
+                {
+                    _extraMetadataDictionary = new Dictionary<String, String>();
+                }
+                return _extraMetadataDictionary;
+            }
+            set 
+            {
+                _extraMetadataDictionary = value;
+            } 
+        }
 
         [JsonProperty]
-        public String EmailAlertMessage { get; set; }
+        public String WebteamEmailAlertMessage { get; set; }
+
+        [JsonProperty]
+        public String IAOEmailAlertMessage { get; set; }
 
         #endregion
 
@@ -321,16 +350,16 @@ namespace WorkBoxFramework
             }
         }
 
-        private WBItem _selfApprovalItem = null;
+        private WBItem _extraMetadata = null;
         [JsonIgnore]
-        public WBItem SelfApprovalItem {
+        public WBItem ExtraMetadata {
             get
             {
-                if (_selfApprovalItem == null)
+                if (_extraMetadata == null)
                 {
-                    _selfApprovalItem = new WBItem(SelfApprovalDictionary);
+                    _extraMetadata = new WBItem(ExtraMetadataDictionary);
                 }
-                return _selfApprovalItem;
+                return _extraMetadata;
             }
         }
 
@@ -470,39 +499,40 @@ namespace WorkBoxFramework
         [JsonIgnore]
         public WBTaskFeedback LastTaskFeedback { get; set; }
 
+
+        [JsonIgnore]
+        public String InvolvedTeamsWithoutOwningTeamAsUIControlValue
+        {
+            get {
+                WBTermCollection<WBTeam> involvedTeams = new WBTermCollection<WBTeam>(TeamsTaxonomy, InvolvedTeamsUIControlValue);
+
+                if (!String.IsNullOrEmpty(OwningTeamUIControlValue))
+                {
+                    WBTeam owningTeam = new WBTeam(TeamsTaxonomy, OwningTeamUIControlValue);
+
+                    involvedTeams.Remove(owningTeam);
+                }
+
+                return involvedTeams.UIControlValue;
+            }
+            set
+            {
+                WBTermCollection<WBTeam> involvedTeams = new WBTermCollection<WBTeam>(TeamsTaxonomy, value);
+                if (!String.IsNullOrEmpty(OwningTeamUIControlValue))
+                {
+                    WBTeam owningTeam = new WBTeam(TeamsTaxonomy, OwningTeamUIControlValue);
+                    involvedTeams.Add(owningTeam);
+                }
+
+                InvolvedTeamsUIControlValue = involvedTeams.UIControlValue;
+            }
+        }
+
         #endregion
 
 
         #region Methods
 
-        public String GetInvolvedTeamsWithoutOwningTeamAsUIControlValue()
-        {
-            WBTermCollection<WBTeam> involvedTeams = new WBTermCollection<WBTeam>(TeamsTaxonomy, InvolvedTeamsUIControlValue);
-
-            if (!String.IsNullOrEmpty(OwningTeamUIControlValue))
-            {
-                WBTeam owningTeam = new WBTeam(TeamsTaxonomy, OwningTeamUIControlValue);
-
-                involvedTeams.Remove(owningTeam);
-            }
-
-            return involvedTeams.UIControlValue;
-        }
-
-        public void SetInvolvedTeamsWithoutOwningTeamAsUIControlValue(String newInvolvedTeamsUIControlValue)
-        {
-            WBTermCollection<WBTeam> involvedTeams = new WBTermCollection<WBTeam>(TeamsTaxonomy, newInvolvedTeamsUIControlValue);
-            if (!String.IsNullOrEmpty(OwningTeamUIControlValue))
-            {
-                WBTeam owningTeam = new WBTeam(TeamsTaxonomy, OwningTeamUIControlValue);
-                if (!involvedTeams.Contains(owningTeam))
-                {
-                    involvedTeams.Add(owningTeam);
-                }
-            }
-
-            InvolvedTeamsUIControlValue = involvedTeams.UIControlValue;
-        }
 
         public void ReloadCurrentItem()
         {
@@ -520,8 +550,8 @@ namespace WorkBoxFramework
 
             if (PublishMode != WBPublishingProcess.PUBLISH_MODE__ALL_TOGETHER)
             {
-                this.SelfApprovalDictionary = null;
-                this._selfApprovalItem = null;
+                this._extraMetadataDictionary = null;
+                this._extraMetadata = null;
             }
         }
 
@@ -536,6 +566,34 @@ namespace WorkBoxFramework
         {
             this.ItemStatus[this.CurrentItemID] = WBPublishingProcess.DOCUMENT_STATUS__PUBLISHED;
             MoveToNextItem();
+        }
+
+        public void AddExtraMetadata(WBColumn column, Object value)
+        {
+            this.ExtraMetadataDictionary.Add(column.InternalName, value.WBxToString());
+        }
+
+        public void AddExtraMetadataIfMissing(WBColumn column, Object value)
+        {
+            if (!this.ExtraMetadataDictionary.ContainsKey(column.InternalName))
+            {
+                AddExtraMetadata(column, value);
+            }
+        }
+
+
+        // Questionnable if these versions are really needed! 
+        public void AddExtraMetadata(WBColumn column, String value)
+        {
+            this.ExtraMetadataDictionary.Add(column.InternalName, value);
+        }
+
+        public void AddExtraMetadataIfMissing(WBColumn column, String value)
+        {
+            if (!this.ExtraMetadataDictionary.ContainsKey(column.InternalName))
+            {
+                AddExtraMetadata(column, value);
+            }
         }
 
         public String GetStandardHTMLTableRows()

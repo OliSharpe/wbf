@@ -83,6 +83,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             WBLogging.Debug("In TeamManagement.updatePanelWithTeamDetails(): OwnersGroupName = " + team.OwnersGroupName);
             WBLogging.Debug("In TeamManagement.updatePanelWithTeamDetails(): MembersGroupName = " + team.MembersGroupName);
 
+            InformationAssetOwner.WBxInitialise(team.InformationAssetOwner(SPContext.Current.Web));
             TeamManager.WBxInitialise(team.Manager(SPContext.Current.Web));
 
             //TeamOwnersSharePointUserGroup.CommaSeparatedAccounts = "";
@@ -135,6 +136,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             WBLogging.Debug("About to set manager");
 
+            team.SetInformationAssetOwner(InformationAssetOwner.WBxGetSingleResolvedUser(SPContext.Current.Web));
             team.SetManager(SPContext.Current.Site, TeamManager.WBxGetSingleResolvedUser(SPContext.Current.Web));
 
             WBLogging.Debug("Set manager");

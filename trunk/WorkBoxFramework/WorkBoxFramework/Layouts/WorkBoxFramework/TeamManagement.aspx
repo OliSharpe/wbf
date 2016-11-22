@@ -225,6 +225,34 @@ td.ms-authoringcontrols td { border: 0px; }
 	</Template_InputFormControls>
 </wssuc:InputFormSection>
 
+<!-- Team IAO User Section -->
+<wssuc:InputFormSection
+	id="TeamIAOUserSection"
+	title="Team Information Asset Owner (IAO)"
+	Description="Select the name of the IAO for the team's information (optional)"
+	runat="server"
+	>
+	<Template_InputFormControls>
+		<wssuc:InputFormControl runat="server">
+			<Template_Control>
+				<table border="0" width="100%" cellspacing="0" cellpadding="2">
+					<tr>
+						<td class="ms-authoringcontrols" valign="top" align="left" width="50">
+			<SharePoint:PeopleEditor id="InformationAssetOwner" runat="server"
+				SelectionSet="User"
+				ValidatorEnabled="true"
+				AllowEmpty = "true"
+				MultiSelect = "false"
+				/>
+						</td>
+					</tr>
+				</table>
+			</Template_Control>
+		</wssuc:InputFormControl>
+	</Template_InputFormControls>
+</wssuc:InputFormSection>
+
+
 <!-- Team Manager User Section -->
 <wssuc:InputFormSection
 	id="TeamManagerUserSection"

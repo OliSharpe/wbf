@@ -169,6 +169,8 @@ namespace WorkBoxFramework
             //              SPUtility.Redirect("/", SPRedirectFlags.UseSource, Context, "");
 
 
+            returnValue = returnValue.Replace("\\", "\\\\"); // Need to double up the escaping so that it correctly survives this passback!
+
             Page.Response.Clear();
             Page.Response.Write(String.Format(CultureInfo.InvariantCulture, "<script type=\"text/javascript\">\n var returnVal = {1}; \n window.frameElement.commonModalDialogClose({0}, returnVal);</script>", new object[] { resultValue, String.IsNullOrEmpty(returnValue) ? "null" : String.Format("'{0}'", returnValue) }));
             Page.Response.End();

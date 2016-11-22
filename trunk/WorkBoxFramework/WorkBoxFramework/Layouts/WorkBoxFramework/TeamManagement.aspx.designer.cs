@@ -166,6 +166,24 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.Label TeamsSiteGUID;
         
         /// <summary>
+        /// TeamIAOUserSection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl TeamIAOUserSection;
+        
+        /// <summary>
+        /// InformationAssetOwner control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.PeopleEditor InformationAssetOwner;
+        
+        /// <summary>
         /// TeamManagerUserSection control.
         /// </summary>
         /// <remarks>

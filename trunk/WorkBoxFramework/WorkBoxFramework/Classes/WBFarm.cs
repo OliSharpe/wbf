@@ -1111,9 +1111,11 @@ namespace WorkBoxFramework
 
                 WBColumn.PublishingApprovedBy,
                 WBColumn.PublishingApprovalChecklist,
-                WBColumn.PublishingApprovalStatement,
                 WBColumn.PublishedBy,
                 WBColumn.DatePublished,
+                WBColumn.ReviewDate,
+                WBColumn.IntendedWebPageURL,
+                WBColumn.IAOAtTimeOfPublishing,
 
                 WBColumn.WorkBoxTemplateTitle,
                 WBColumn.WorkBoxTemplateStatus,
@@ -1320,9 +1322,11 @@ namespace WorkBoxFramework
             {
                 WBColumn.PublishingApprovedBy,
                 WBColumn.PublishingApprovalChecklist,
-                WBColumn.PublishingApprovalStatement,
                 WBColumn.PublishedBy,
-                WBColumn.DatePublished
+                WBColumn.DatePublished,
+                WBColumn.ReviewDate,
+                WBColumn.IntendedWebPageURL,
+                WBColumn.IAOAtTimeOfPublishing
             };
 
 

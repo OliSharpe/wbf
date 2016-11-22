@@ -8,9 +8,9 @@ using Microsoft.SharePoint.Taxonomy;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Utilities;
 
-namespace WorkBoxFramework.SearchOrBrowseOurRecords
+namespace WorkBoxFramework.OurRecordsToReview
 {
-    public partial class SearchOrBrowseOurRecordsUserControl : UserControl
+    public partial class OurRecordsToReviewUserControl : UserControl
     {
         WBRecordsManager manager = null;
         WorkBox workBox = null;
@@ -22,11 +22,21 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
 
             if (!IsPostBack)
             {
-                WBTermCollection<WBTerm> functionalAreas = workBox.OwningTeam.FunctionalArea(workBox.FunctionalAreasTaxonomy);
-                TreeViewLocationCollection collection = new TreeViewLocationCollection(manager, "Browse Folders", "", functionalAreas);
+                WBQuery query = new WBQuery();
 
-                RecordsLibraryFolders.DataSource = collection;
-                RecordsLibraryFolders.DataBind();
+                query.AddFilter(WBColumn.RecordID, WBQueryClause.Comparators.GreaterThan, 100);
+
+                query.AddEqualsFilter(WBColumn.OwningTeam, workBox.OwningTeam);
+                query.AddEqualsFilter(WBColumn.LiveOrArchived, WBColumn.LIVE_OR_ARCHIVED__LIVE);
+                query.AddEqualsFilter(WBColumn.ProtectiveZone, WBRecordsType.PROTECTIVE_ZONE__PUBLIC);
+                //query.AddFilter(WBColumn.ReviewDate, WBQueryClause.Comparators.LessThan, DateTime.Now);
+
+                query.RecursiveAll = true;
+
+                WBLogging.Debug("The query is: " + query.JustCAMLQuery(manager.Libraries.ProtectedMasterLibrary.Site));
+
+                SPListItemCollection items = manager.Libraries.ProtectedMasterLibrary.List.WBxGetItems(manager.Libraries.ProtectedMasterLibrary.Site, query);
+                RenderFoundRecords(items);
             }
         }
 
@@ -46,113 +56,6 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
             }
         }
 
-
-
-        protected void DoSearch_Click(object sender, EventArgs e)
-        {
-            string strQuery = "";
-            strQuery = "<OrderBy><FieldRef Name='Title' Ascending='FALSE' /></OrderBy>";
-            List<string> conditions = new List<string>();
-
-            String filter = "";
-
-            String searchText = SearchBox.Text;
-
-            if (searchText != "")
-            {
-                filter = "<Or><Contains><FieldRef Name='BaseName'/><Value Type='Text'>" + searchText + "</Value></Contains><Contains><FieldRef Name='Title'/><Value Type='Text'>" + searchText + "</Value></Contains></Or>";
-            }
-
-
-            if (!String.IsNullOrEmpty(filter))
-            {
-                strQuery = strQuery + "<Where>" + filter + "</Where>";
-            }
-
-            SPList List = manager.Libraries.ProtectedMasterLibrary.List;
-            SPQuery query = new SPQuery();
-
-            query.Query = string.Format(strQuery);
-
-            WBLogging.Debug("The query filter being used: \n" + query.Query);
-
-            SPFolder protectedLibraryRootFolder = manager.Libraries.ProtectedMasterLibrary.List.RootFolder;
-
-            WBTerm functionalArea = workBox.OwningTeam.FunctionalArea(workBox.FunctionalAreasTaxonomy)[0];
-
-            WBLogging.Debug("Looking for folder: \n" + functionalArea.Name);
-
-            SPFolder functionalAreaFolder = protectedLibraryRootFolder.WBxGetFolderPath(functionalArea.Name);
-
-            if (functionalAreaFolder == null) WBLogging.Debug("functionalAreaFolder == null");
-            else
-            {
-                WBLogging.Debug("Adding folder filter to query of: " + functionalAreaFolder.Name);
-            //    query.Folder = functionalAreaFolder;
-            }
-
-
-
-            SPListItemCollection items = List.Items; //  GetItems(query);
-
-            WBLogging.Debug("Found items: " + items.Count);
-
-            RenderFoundRecords(items);
-
-        }
-
-        private String GetSelectedFolderPath()
-        {
-            string selectedPath = RecordsLibraryFolders.SelectedNode.ValuePath;
-            if (string.IsNullOrEmpty(selectedPath)) selectedPath = "/";
-            return selectedPath;
-        }
-
-        protected void RecordsLibraryFolders_SelectedNodeChanged(object sender, EventArgs e)
-        {
-            if (RecordsLibraryFolders.SelectedNode != null)
-            {
-
-                // SelectedFolderPath.Text = selectedPath;
-
-                // Now for the bit where the path is analysed to pick out the selected functional area and the records type:
-
-                String selectedPath = GetSelectedFolderPath();
-
-                String[] pathSteps = selectedPath.Split('/');
-
-                // We're only interested in selections of 3rd level 'folders' that are: functional area / records type / records type  ... or below.
-                if (pathSteps.Length < 3) return;
-
-                WBTerm functionalArea = manager.FunctionalAreasTaxonomy.GetSelectedWBTermByPath(pathSteps[0]);
-                if (functionalArea == null)
-                {
-                    WBLogging.Debug("The functional area part of the selected path came back null: " + selectedPath);
-                    return;
-                }
-
-                Term recordsTypeTerm = manager.RecordsTypesTaxonomy.GetOrCreateSelectedTermByPath(pathSteps[1] + "/" + pathSteps[2]);
-                if (recordsTypeTerm == null)
-                {
-                    WBLogging.Debug("The records type part of the selected path came back null: " + selectedPath);
-                    return;
-                }
-                WBRecordsType recordsType = new WBRecordsType(manager.RecordsTypesTaxonomy, recordsTypeTerm);
-
-                RenderRecordsLibraryFoldersSelection();
-            }
-        }
-
-        private void RenderRecordsLibraryFoldersSelection()
-        {
-            SPFolder protectedLibraryRootFolder = manager.Libraries.ProtectedMasterLibrary.List.RootFolder;
-
-            SPFolder recordsTypeFolder = protectedLibraryRootFolder.WBxGetFolderPath(GetSelectedFolderPath());
-
-            SPListItemCollection items = GetRecordsInFolder(recordsTypeFolder);
-
-            RenderFoundRecords(items);
-        }
 
         private void RenderFoundRecords(SPListItemCollection items)
         {
@@ -178,7 +81,8 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
 + "<th class='wbf-record-series-even'>Protective Zone</th>"
 + "<th class='wbf-record-series-odd'>Published Date</th>"
 + "<th class='wbf-record-series-even'>Published By</th>"
-+ "<th class='wbf-record-series-even'></th>"
++ "<th class='wbf-record-series-odd'>Review Date</th>"
++ "<th class='wbf-record-series-odd'></th>"
 + "</tr>\n";
 
 
@@ -220,6 +124,12 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
                     if (fileLength == 0) fileLength = 1;
                     String fileLengthString = "" + fileLength + " KB";
 
+                    String reviewDateString = "";
+                    if (document.Item.WBxHasValue(WBColumn.ReviewDate))
+                    {
+                        reviewDateString = String.Format("{0:dd/MM/yyyy}", document[WBColumn.ReviewDate]);
+                    }
+
 
                     html += "<tr>"
                         + "<td class='wbf-record-series-summary-detail'><input type='checkbox' class='wbf-our-records-check-boxes' data-record-id='" + document.RecordSeriesID + "x" + document.RecordID + "' onclick=\"WBF_checkbox_changed(event);\"/></td>"
@@ -229,6 +139,7 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
                         + "<td class='wbf-record-series-summary-detail'>" + document.ProtectiveZone + "</td>"
                         + "<td class='wbf-record-series-summary-detail wbf-centre'>" + publishedDateString + "</td>"
                         + "<td class='wbf-record-series-summary-detail'>" + publishedByString + "</td>"
+                        + "<td class='wbf-record-series-summary-detail'>" + reviewDateString + "</td>"
                         + "<td class='wbf-record-series-summary-detail'><a href='#' onclick='WorkBoxFramework_viewRecordSeriesDetails(\"" + document.RecordSeriesID + "\", \"" + document.RecordID + "\");'>view details</a></td>"
                         + "</tr>";
                 }
