@@ -426,7 +426,10 @@ namespace WorkBoxFramework
         {
             WBTermCollection<WBTeam> involvedTeams = this.InvolvedTeams;
 
-            involvedTeams.Add(OwningTeam);
+            if (!involvedTeams.Contains(OwningTeam))
+            {
+                involvedTeams.Add(OwningTeam);
+            }
 
             // It's a little inefficient but we'll just call the Proerty set:
             this.InvolvedTeams = involvedTeams;
@@ -436,7 +439,7 @@ namespace WorkBoxFramework
         {
             get {
                 Object value = this[WBColumn.InvolvedTeams];
-                if (value == null) return new WBTermCollection<WBTeam>(null, ""); ;
+                if (value == null) return new WBTermCollection<WBTeam>(TeamsTaxonomy, ""); ;
                 return new WBTermCollection<WBTeam>(TeamsTaxonomy, value.ToString());
             }
             set
@@ -445,6 +448,39 @@ namespace WorkBoxFramework
                 this[WBColumn.InvolvedTeams] = value;
             }
         }
+
+        public WBTermCollection<WBTeam> InvolvedTeamsWithoutOwningTeam
+        {
+            get
+            {
+                WBTermCollection<WBTeam> involvedTeams = new WBTermCollection<WBTeam>(InvolvedTeams);
+                involvedTeams.Remove(OwningTeam);
+
+                return involvedTeams;
+            }
+            set
+            {
+                // The set of this property adds the owning team already:
+                InvolvedTeams = value;
+            }
+        }
+
+
+        public String InvolvedTeamsWithoutOwningTeamAsUIControlValue
+        {
+            get
+            {
+                return InvolvedTeamsWithoutOwningTeam.UIControlValue;
+            }
+            set
+            {
+                WBTermCollection<WBTeam> involvedTeams = new WBTermCollection<WBTeam>(TeamsTaxonomy, value);
+                // The set of this property adds the owning team already:
+                InvolvedTeams = involvedTeams; 
+            }
+        }
+
+
 
         public Stream OpenBinaryStream()
         {

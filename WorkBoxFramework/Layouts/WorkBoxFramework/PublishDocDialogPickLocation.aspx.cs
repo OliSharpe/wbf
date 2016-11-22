@@ -45,7 +45,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (!IsPostBack)
             {
-                process = JsonConvert.DeserializeObject<WBPublishingProcess>(Request.QueryString["PublishingProcessJSON"]);
+                process = WBUtils.DeserializeFromCompressedJSONInURI<WBPublishingProcess>(Request.QueryString["PublishingProcessJSON"]);
                 process.WorkBox = WorkBox;
 
                 WBLogging.Debug("Created the WBProcessObject");
@@ -70,7 +70,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                 WBLogging.Debug("Captured replace action as: " + process.ReplaceAction);
 
-                PublishingProcessJSON.Value = JsonConvert.SerializeObject(process);
+                PublishingProcessJSON.Value = WBUtils.SerializeToCompressedJSONForURI(process);
 
                 WBLogging.Debug("Serialized the WBProcessObject to hidden field");
 
@@ -90,7 +90,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
             else
             {
-                process = JsonConvert.DeserializeObject<WBPublishingProcess>(PublishingProcessJSON.Value);
+                process = WBUtils.DeserializeFromCompressedJSONInURI<WBPublishingProcess>(PublishingProcessJSON.Value);
                 process.WorkBox = WorkBox;
             }
 
@@ -166,10 +166,12 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     SelectedRecordID.Text = record.RecordID;
                     process.ToReplaceRecordID = record.RecordID;
                     process.ToReplaceRecordPath = selectedPath;
+                    process.ToReplaceShortTitle = record.Title;
+                    process.ToReplaceSubjectTagsUIControlValue = record.SubjectTagsUIControlValue;
                 }
 
 
-                PublishingProcessJSON.Value = JsonConvert.SerializeObject(process);
+                PublishingProcessJSON.Value = WBUtils.SerializeToCompressedJSONForURI(process);
 
             }
         }
@@ -177,7 +179,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void selectButton_OnClick(object sender, EventArgs e)
         {
-            String postBackValue = JsonConvert.SerializeObject(process); 
+            String postBackValue = WBUtils.SerializeToCompressedJSONForURI(process); 
 
             WBLogging.Debug("About to post back with: " + postBackValue);
 

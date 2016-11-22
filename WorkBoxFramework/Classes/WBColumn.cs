@@ -950,10 +950,14 @@ namespace WorkBoxFramework
 
         public static readonly WBColumn PublishingApprovedBy = WBColumn.UserColumn("Publishing Approved By", INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, true);
         public static readonly WBColumn PublishingApprovalChecklist = WBColumn.TextColumn("Publishing Approval Checklist");
-        public static readonly WBColumn PublishingApprovalStatement = WBColumn.MultiLineTextColumn("Publishing Approval Statement");
+//        public static readonly WBColumn PublishingApprovalStatement = WBColumn.MultiLineTextColumn("Publishing Approval Statement");
+
+        public static readonly WBColumn IntendedWebPageURL = WBColumn.TextColumn("Intended Web Page URL");
+        public static readonly WBColumn IAOAtTimeOfPublishing = WBColumn.UserColumn("IAO At Time Of Publishing", INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, false);
 
         public static readonly WBColumn PublishedBy = WBColumn.UserColumn("Published By", INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, false);
         public static readonly WBColumn DatePublished = WBColumn.DateTimeColumn("Date Published", "DatePublished", "Published Date");
+        public static readonly WBColumn ReviewDate = WBColumn.DateTimeColumn("Review Date", "ReviewDate", "Review Date");
 
 
         public static readonly WBColumn FileTypeExtension = WBColumn.UniqueTextColumn("File Type Extension");

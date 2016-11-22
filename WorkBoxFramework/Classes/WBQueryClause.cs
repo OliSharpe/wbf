@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.Taxonomy;
 
 
@@ -126,7 +127,17 @@ namespace WorkBoxFramework
                     }
                 case WBColumn.DataTypes.DateTime:
                     {
-                        return AppendCAMLClause(builder, Column.InternalName, "DateTime", (String)Value);
+                        String dateTimeString = null;
+                        if (Value is DateTime)
+                        {
+                            dateTimeString = SPUtility.CreateISO8601DateTimeFromSystemDateTime((DateTime)Value);
+                        }
+                        else
+                        {
+                            dateTimeString = Value.WBxToString();
+                        }
+
+                        return AppendCAMLClause(builder, Column.InternalName, "DateTime", dateTimeString);
                     }
                 case WBColumn.DataTypes.URL:
                     {

@@ -310,8 +310,10 @@ namespace WorkBoxFramework
 
                 if (feedback != null)
                 {
-                    feedback.Created("Created copy: " + recordCopyDocument.AbsoluteURL);
-                    feedback.Created("In folder: " + WBUtils.GetFolderPathWithoutFilename(recordCopyDocument.AbsoluteURL));
+                    String folderURL = recordCopyDocument.AbsoluteURL.Replace(recordCopyDocument.Name, "");
+
+                    feedback.Created("Created copy: <a href='" + recordCopyDocument.AbsoluteURL + "' target='_blank'>" + recordCopyDocument.AbsoluteURL + "</a>");
+                    feedback.Created("In folder: <a href='" + folderURL + "' target='_blank'>" + folderURL + "</a>");
                 }
             }
 

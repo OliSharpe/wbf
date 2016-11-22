@@ -121,6 +121,33 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.Label InheritedFunctionalAreas;
         
         /// <summary>
+        /// TeamIAOSharePointUserSection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl TeamIAOSharePointUserSection;
+        
+        /// <summary>
+        /// InformationAssetOwner control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.PeopleEditor InformationAssetOwner;
+        
+        /// <summary>
+        /// TeamIAOMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label TeamIAOMessage;
+        
+        /// <summary>
         /// TeamManagerSharePointUserSection control.
         /// </summary>
         /// <remarks>

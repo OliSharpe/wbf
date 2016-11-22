@@ -26,9 +26,13 @@ namespace WorkBoxFramework
             {
                 if (_protectedMasterRecord == null)
                 {
+                    if (_libraries == null) WBLogging.Debug("_libraries == null");
                     WBRecordsLibrary masterLibrary = _libraries.ProtectedMasterLibrary;
 
+                    if (masterLibrary == null) WBLogging.Debug("masterLibrary == null");
                     _protectedMasterRecord = masterLibrary[_recordID];
+
+                    if (_protectedMasterRecord == null) WBLogging.Debug("_protectedMasterRecord == null");
                     _protectedMasterRecord.DebugName = "ProtectedMasterRecord";
                 }
 
@@ -299,9 +303,11 @@ namespace WorkBoxFramework
                                         WBColumn.LiveOrArchived,
                                         WBColumn.PublishingApprovedBy,
                                         WBColumn.PublishingApprovalChecklist,
-                                        WBColumn.PublishingApprovalStatement,
                                         WBColumn.PublishedBy,
-                                        WBColumn.DatePublished
+                                        WBColumn.DatePublished,
+                                        WBColumn.ReviewDate,
+                                        WBColumn.IntendedWebPageURL,
+                                        WBColumn.IAOAtTimeOfPublishing
                                       };
 
 
@@ -384,8 +390,7 @@ namespace WorkBoxFramework
 
         public String Name
         {
-            get { return Metadata.Name; }
-            set { Metadata.Name = value; }
+            get { return ProtectedMasterRecord.Name; }
         }
 
         public String Title
@@ -457,12 +462,36 @@ namespace WorkBoxFramework
             set { Metadata.OwningTeam = value; }
         }
 
+        public String OwningTeamUIControlValue
+        {
+            get { return OwningTeam.UIControlValue; }
+            set { Metadata[WBColumn.OwningTeam] = value; }
+        }
 
         public WBTermCollection<WBTeam> InvolvedTeams
         {
             get { return Metadata.InvolvedTeams; }
             set { Metadata.InvolvedTeams = value; }
         }
+
+        public String InvolvedTeamsWithoutOwningTeamAsUIControlValue
+        {
+            get
+            {
+                WBTermCollection<WBTeam> involvedTeams = new WBTermCollection<WBTeam>(InvolvedTeams);
+                involvedTeams.Remove(OwningTeam);
+
+                return involvedTeams.UIControlValue;
+            }
+            set
+            {
+                WBTermCollection<WBTeam> involvedTeams = new WBTermCollection<WBTeam>(ProtectedMasterRecord.TeamsTaxonomy, value);
+                involvedTeams.Add(OwningTeam);
+
+                InvolvedTeams = involvedTeams;
+            }
+        }
+
 
     }
 }

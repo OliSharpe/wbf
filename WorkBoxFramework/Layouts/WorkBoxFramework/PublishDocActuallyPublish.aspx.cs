@@ -26,12 +26,12 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (!IsPostBack)
             {
-                process = JsonConvert.DeserializeObject<WBPublishingProcess>(Request.QueryString["PublishingProcessJSON"]);
+                process = WBUtils.DeserializeFromCompressedJSONInURI<WBPublishingProcess>(Request.QueryString["PublishingProcessJSON"]);
                 process.WorkBox = WorkBox;
 
                 WBLogging.Debug("Created the WBProcessObject");
 
-                PublishingProcessJSON.Text = JsonConvert.SerializeObject(process);
+                PublishingProcessJSON.Text = WBUtils.SerializeToCompressedJSONForURI(process);
 
                 WBLogging.Debug("Serialized the WBProcessObject to hidden field");
             }
@@ -39,7 +39,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 WBLogging.Debug("About to deserialise: " + PublishingProcessJSON.Text);
 
-                process = JsonConvert.DeserializeObject<WBPublishingProcess>(PublishingProcessJSON.Text);
+                process = WBUtils.DeserializeFromCompressedJSONInURI<WBPublishingProcess>(PublishingProcessJSON.Text);
                 process.WorkBox = WorkBox;
             }
 
@@ -77,7 +77,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             DocumentPublishingProgress.WBxUpdateTask(process.LastTaskFeedback);
 
-            PublishingProcessJSON.Text = JsonConvert.SerializeObject(process);
+            PublishingProcessJSON.Text = WBUtils.SerializeToCompressedJSONForURI(process);
 
             WBLogging.Debug("Serialized to: " + PublishingProcessJSON.Text);
 
@@ -117,7 +117,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 else
                 {
                     // If we're here then someone wants to go on to publish the next document
-                    string redirectUrl = "WorkBoxFramework/PublishDocRequiredMetadata.aspx?PublishingProcessJSON=" + JsonConvert.SerializeObject(process);
+                    string redirectUrl = "WorkBoxFramework/PublishDocRequiredMetadata.aspx?PublishingProcessJSON=" + WBUtils.SerializeToCompressedJSONForURI(process);
                     SPUtility.Redirect(redirectUrl, SPRedirectFlags.RelativeToLayoutsPage, Context);
                 }
             }

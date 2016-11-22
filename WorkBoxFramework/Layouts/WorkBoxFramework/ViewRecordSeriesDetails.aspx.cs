@@ -58,11 +58,11 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                     String publishedDateString = "";
                     if (document.Item.WBxHasValue(WBColumn.DatePublished)) {
-                       publishedDateString = String.Format("{0:MM/dd/yyyy}", document[WBColumn.DatePublished]);
+                       publishedDateString = String.Format("{0:dd/MM/yyyy}", document[WBColumn.DatePublished]);
                     }
                     if (publishedDateString == "" && document.Item.WBxHasValue(WBColumn.Modified))
                     {
-                        publishedDateString = String.Format("{0:MM/dd/yyyy}", document[WBColumn.Modified]);
+                        publishedDateString = String.Format("{0:dd/MM/yyyy}", document[WBColumn.Modified]);
                     }
 
                     String publishedByString = "<unknown>";
@@ -83,6 +83,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     }
 
                     String approvedByString = document.Item.WBxGetMultiUserColumn(WBColumn.PublishingApprovedBy).WBxToPrettyString();
+                    String iaoString = document.Item.WBxGetMultiUserColumn(WBColumn.IAOAtTimeOfPublishing).WBxToPrettyString();
 
                     long fileLength = (document.Item.File.Length / 1024);
                     if (fileLength == 0) fileLength = 1;
@@ -117,13 +118,20 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                         explainStatus = "(archived in the protected, master records library)";
                     }
 
+                    String reviewDateString = "";
+                    if (document.Item.WBxHasValue(WBColumn.ReviewDate))
+                    {
+                        reviewDateString = String.Format("{0:dd/MM/yyyy}", document[WBColumn.ReviewDate]);
+                    }
+
+
                     html += "<tr>"
                         + "<td class='wbf-record-series-summary-issue'>" + document.RecordSeriesIssue + "</td>"
                         + "<td class='wbf-record-series-summary-detail'>" + publishedDateString + "</td>"
                         + "<td class='wbf-record-series-summary-detail'>" + publishedByString + "</td>"
                         + "<td class='wbf-record-series-summary-detail'>" + status + "</td>"
                         + "<td class='wbf-record-series-summary-detail'>" + fileLengthString + "</td>"
-                        + "<td class='wbf-record-series-summary-detail'><a href='#' onclick='revealRecordID(\"" + document.RecordID + "\");'>more &gt;</a></td>"
+                        + "<td class='wbf-record-series-summary-detail'><a href='#' id='wbf-more-or-less-" + document.RecordID + "' onclick='toggleRecordID(\"" + document.RecordID + "\");'>more &gt;</a></td>"
                         + "</tr>\n";
 
                     html += "<tr class='wbf-record-details' data-record-id='" + document.RecordID + "' style=' display: none;' ><td colspan=6 class='wbf-record-series-details-panel-cell'><table class='wbf-record-series-details-panel'>";
@@ -133,11 +141,16 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-odd'>Location</td><td class='wbf-record-series-detail-odd'>" + document.LibraryLocation + "</td></tr>";
                     html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Subject Tags</td><td class='wbf-record-series-detail-even'>" + document.SubjectTags.Names() + "</td></tr>";
                     html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-odd'>Owning Team</td><td class='wbf-record-series-detail-odd'>" + document.OwningTeam.Name + "</td></tr>";
-                    html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Involved Teams</td><td class='wbf-record-series-detail-even'>" + document.InvolvedTeams.Names() + "</td></tr>";
+                    html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Involved Teams</td><td class='wbf-record-series-detail-even'>" + document.InvolvedTeamsWithoutOwningTeam.Names() + "</td></tr>";
                     html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-odd'>Protective Zone</td><td class='wbf-record-series-detail-odd'>" + document.ProtectiveZone + "</td></tr>";
                     html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Status</td><td class='wbf-record-series-detail-even'>" + status + " " + explainStatus + "</td></tr>";
                     html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-odd'>Approved By</td><td class='wbf-record-series-detail-odd'>" + approvedByString + "</td></tr>";
                     html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Approval Checklist</td><td class='wbf-record-series-detail-even'>" + document[WBColumn.PublishingApprovalChecklist].WBxToString() + "</td></tr>";
+                    html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-odd'>IAO At Time Of Publishing</td><td class='wbf-record-series-detail-odd'>" + iaoString + "</td></tr>";
+                    html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Intended Web Page URL</td><td class='wbf-record-series-detail-even'>" + document[WBColumn.IntendedWebPageURL].WBxToString() + "</td></tr>";
+                    html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-odd'>Review Date</td><td class='wbf-record-series-detail-odd'>" + reviewDateString + "</td></tr>";
+
+                    html += "<tr><td class='wbf-record-series-detail-even' colspan='2' align='center'><input type='button' value='View Document' onclick='window.open(\"" + document.AbsoluteURL + "\", \"_blank\");' />&nbsp;<input type='button' value='Edit Metadata' onclick='WBF_edit_records_metadata(\"" + document.RecordID + "\");'/></td></tr>";
 
                     html += "</table>\n";
                 }

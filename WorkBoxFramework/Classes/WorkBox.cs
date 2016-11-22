@@ -3068,8 +3068,13 @@ namespace WorkBoxFramework
 
                 sourceDocAsItem["Name"] = newFilename;
             }
+            else
+            {
+                WBLogging.Debug("Not setting new name as justName.Contains(name): " + justName + " contains " + name);
+            }
 
             WBLogging.WorkBoxes.Verbose("The generated name was: " + newFilename);
+            WBLogging.Debug("The generated name was: " + newFilename);
 
             if (!sourceDocAsItem.WBxColumnHasValue(WorkBox.COLUMN_NAME__ORIGINAL_FILENAME))
             {
@@ -3080,7 +3085,6 @@ namespace WorkBoxFramework
             {
                 sourceDocAsItem["Title"] = justName;
             }
-
         }
 
         public String MakeFilenameUnique(SPFolder folder, String suggestedName)

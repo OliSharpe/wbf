@@ -141,6 +141,43 @@
 	</Template_InputFormControls>
 </wssuc:InputFormSection>
 
+<!-- Team IAO Section -->
+<wssuc:InputFormSection
+	id="TeamIAOSharePointUserSection"
+	title="Team's Information Asset Owner (IAO)"
+	description="Specify which user is the IAO for the team's information (if any)."
+	runat="server"
+	>
+	<Template_InputFormControls>
+		<wssuc:InputFormControl runat="server">
+			<Template_Control>
+				<table border="0" width="100%" cellspacing="0" cellpadding="2">
+					<tr>
+						<td class="ms-authoringcontrols" valign="top" align="left" width="50">
+			<SharePoint:PeopleEditor id="InformationAssetOwner" runat="server"
+				SelectionSet="User"
+				ValidatorEnabled="true"
+				AllowEmpty = "true"
+				MultiSelect = "false"
+				/>
+                        </td>
+                    </tr>
+
+					<tr>
+						<td class="ms-authoringcontrols" valign="top" align="left" width="50">
+                            <asp:Label ID="TeamIAOMessage" runat="server" Text=""/>
+                        </td>
+                    </tr>
+
+				</table>
+			</Template_Control>
+		</wssuc:InputFormControl>
+	</Template_InputFormControls>
+</wssuc:InputFormSection>
+
+
+
+
 <!-- Team Manager Section -->
 <wssuc:InputFormSection
 	id="TeamManagerSharePointUserSection"

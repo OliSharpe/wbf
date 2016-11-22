@@ -129,7 +129,6 @@ namespace WorkBoxFramework
 
         public WBRecord DeclareNewRecord(WBTaskFeedback feedback, WBDocument document, WBRecord recordToReplace, String replacingAction, WBItem extraMetadata)
         {
-
             WBTerm functionalArea = document.FunctionalArea[0];
             WBRecordsType recordsType = document.RecordsType;
 
@@ -160,6 +159,7 @@ namespace WorkBoxFramework
             else datePath = String.Format("{0}-{1}", (year - 1).ToString("D4"), year.ToString("D4"));
 
             dateForName = String.Format("{0}-{1}-{2}",
+
                         referenceDate.Year.ToString("D4"),
                         referenceDate.Month.ToString("D2"),
                         referenceDate.Day.ToString("D2"));
@@ -248,12 +248,21 @@ namespace WorkBoxFramework
 
             SPListItem uploadedItem = uploadedFile.Item;
 
+            if (extraMetadata == null) extraMetadata = new WBItem();
+            if (!extraMetadata.IsUsingColumn(WBColumn.DatePublished)) extraMetadata[WBColumn.DatePublished] = DateTime.Now;
+            if (!extraMetadata.IsUsingColumn(WBColumn.PublishedBy) && SPContext.Current != null)
+            {
+                extraMetadata[WBColumn.PublishedBy] = SPContext.Current.Web.CurrentUser;
+            }
+
             WBRecord newRecord = new WBRecord(this, uploadedItem, uploadedItem.ID.ToString(), document, extraMetadata);
             if (feedback != null)
             {
+                String urlToFolder = newRecord.ProtectedMasterRecord.AbsoluteURL.Replace(newRecord.Name, "");
+
                 feedback.AddFeedback("Uploaded file to protected, master records library");
-                feedback.AddFeedback("Master record: <a href='" + newRecord.ProtectedMasterRecord.AbsoluteURL + "'>" + newRecord.ProtectedMasterRecord.AbsoluteURL + "</a>");
-                feedback.AddFeedback("In folder: " + WBUtils.GetFolderPathWithoutFilename(newRecord.ProtectedMasterRecord.AbsoluteURL));
+                feedback.AddFeedback("Master record: <a href='" + newRecord.ProtectedMasterRecord.AbsoluteURL + "' target='_blank'>" + newRecord.ProtectedMasterRecord.AbsoluteURL + "</a>");
+                feedback.AddFeedback("In folder: <a href='" + urlToFolder + "' target='_blank'>" + urlToFolder + "</a>");
             }
 
             if (recordToReplace != null)
@@ -269,7 +278,7 @@ namespace WorkBoxFramework
                     {
                         WBRecord elevatedRecordToReplace = manager.Libraries.GetRecordByID(recordToReplace.RecordID);
 
-                        if (replacingAction == WBRecordsManager.REPLACING_ACTION__ARCHIVE)
+                        if (replacingAction == WBPublishingProcess.REPLACE_ACTION__ARCHIVE_FROM_IZZI)
                         {
                             elevatedRecordToReplace.LiveOrArchived = WBColumn.LIVE_OR_ARCHIVED__ARCHIVED;
                             elevatedRecordToReplace.RecordSeriesStatus = WBColumn.RECORD_SERIES_STATUS__ARCHIVED;

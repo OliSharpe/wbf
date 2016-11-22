@@ -328,6 +328,9 @@ Other teams that were involved with the creation of this document.
 </td>
 </tr>
 
+<% if (showWebPageURL)
+   {
+%>
 <tr>
 <td class="wbf-field-name-panel">
         <div class="wbf-field-name">Web Page URL</div>
@@ -345,7 +348,7 @@ If this document needs to be shown on a webpage please provide the page's full U
 </div>
 </td>
 </tr>
-
+<% } %>
 
 <tr>
 <td colspan="2" class="wbf-buttons-panel">

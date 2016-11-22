@@ -65,9 +65,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                     process = new WBPublishingProcess(WorkBox, selectedListGUID, selectedItemsIDs);
 
-                    WBLogging.Debug("Created the WBProcessObject");
-                    
-                    PublishingProcessJSON.Value = JsonConvert.SerializeObject(process);
+                    WBLogging.Debug("Created the WBProcessObject");                   
+
+                    PublishingProcessJSON.Value = WBUtils.SerializeToCompressedJSONForURI(process);
 
                     String html = "";
 
@@ -118,7 +118,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
             else
             {
-                process = JsonConvert.DeserializeObject<WBPublishingProcess>(PublishingProcessJSON.Value);
+                process = WBUtils.DeserializeFromCompressedJSONInURI<WBPublishingProcess>(PublishingProcessJSON.Value);
                 process.WorkBox = WorkBox;
             }
         }
@@ -134,8 +134,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         private void GoToMetadataPage()
         {
-            string redirectUrl = "WorkBoxFramework/PublishDocRequiredMetadata.aspx?PublishingProcessJSON=" + JsonConvert.SerializeObject(process);
-            //string redirectUrl = "WorkBoxFramework/PublishDocActuallyPublish.aspx?PublishingProcessJSON=" + JsonConvert.SerializeObject(process);
+            string redirectUrl = "WorkBoxFramework/PublishDocRequiredMetadata.aspx?PublishingProcessJSON=" + WBUtils.SerializeToCompressedJSONForURI(process);
+            //string redirectUrl = "WorkBoxFramework/PublishDocActuallyPublish.aspx?PublishingProcessJSON=" + WBUtils.SerializeToJSON(process);
 
             SPUtility.Redirect(redirectUrl, SPRedirectFlags.RelativeToLayoutsPage, Context);
         }

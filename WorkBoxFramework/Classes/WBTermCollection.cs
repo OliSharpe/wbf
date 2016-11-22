@@ -147,6 +147,7 @@ namespace WorkBoxFramework
 
         public void Add(WBTermCollection<T> collection)
         {
+            if (collection == null) return;
             foreach (T term in collection)
             {
                 Add(term);
@@ -155,6 +156,7 @@ namespace WorkBoxFramework
 
         public void Add(T term)
         {
+            if (term == null) return;
             if (!List.Contains(term))
             {
                 List.Add(term);
@@ -164,6 +166,7 @@ namespace WorkBoxFramework
 
         public void Remove(T term)
         {
+            if (term == null) return;
             if (List.Contains(term))
             {
                 List.Remove(term);
@@ -173,6 +176,7 @@ namespace WorkBoxFramework
 
         public void Remove(WBTermCollection<T> collection)
         {
+            if (collection == null) return;
             foreach (T term in collection)
             {
                 Remove(term);
@@ -197,6 +201,7 @@ namespace WorkBoxFramework
 
         public bool Contains(WBTerm term)
         {
+            if (term == null) return false;
             string termGUIDString = term.Id.WBxToString();
 
             if (termGUIDString == "") return false;

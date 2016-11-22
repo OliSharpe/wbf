@@ -36,13 +36,6 @@ namespace WorkBoxFramework
             _farm = WBFarm.Local;
             _libraries = new WBRecordsLibraries(this);
 
-            WBLogging.Debug("In WBRecordsManager() about to setup taxonomies");
-            RecordsTypesTaxonomy = WBTaxonomy.GetRecordsTypes(_libraries.ProtectedMasterLibrary.Site);
-            TeamsTaxonomy = WBTaxonomy.GetTeams(RecordsTypesTaxonomy);
-            SeriesTagsTaxonomy = WBTaxonomy.GetSeriesTags(RecordsTypesTaxonomy);
-            SubjectTagsTaxonomy = WBTaxonomy.GetSubjectTags(RecordsTypesTaxonomy);
-            FunctionalAreasTaxonomy = WBTaxonomy.GetFunctionalAreas(RecordsTypesTaxonomy);
-
             WBLogging.Debug("Finished WBRecordsManager() constructor");
         }
 
@@ -55,11 +48,11 @@ namespace WorkBoxFramework
             get { return _libraries; }
         }
 
-        public WBTaxonomy RecordsTypesTaxonomy { get; private set; }
-        public WBTaxonomy TeamsTaxonomy { get; private set; }
-        public WBTaxonomy SeriesTagsTaxonomy { get; private set; }
-        public WBTaxonomy SubjectTagsTaxonomy { get; private set; }
-        public WBTaxonomy FunctionalAreasTaxonomy { get; private set; }
+        public WBTaxonomy RecordsTypesTaxonomy { get { return Libraries.ProtectedMasterLibrary.RecordsTypesTaxonomy; } }
+        public WBTaxonomy TeamsTaxonomy { get { return Libraries.ProtectedMasterLibrary.TeamsTaxonomy; } }
+        public WBTaxonomy SeriesTagsTaxonomy { get { return Libraries.ProtectedMasterLibrary.SeriesTagsTaxonomy; } }
+        public WBTaxonomy SubjectTagsTaxonomy { get { return Libraries.ProtectedMasterLibrary.SubjectTagsTaxonomy; } }
+        public WBTaxonomy FunctionalAreasTaxonomy { get { return Libraries.ProtectedMasterLibrary.FunctionalAreasTaxonomy; } }
             
         #endregion
 
@@ -127,6 +120,16 @@ namespace WorkBoxFramework
 
             process.LastTaskFeedback = feedback;
 
+            // Just check that the IAO at time of publishing is captured:
+            process.AddExtraMetadata(WBColumn.IAOAtTimeOfPublishing, process.OwningTeamsIAOAtTimeOfPublishing);
+
+            process.AddExtraMetadataIfMissing(WBColumn.DatePublished, DateTime.Now);
+            if (SPContext.Current != null)
+            {
+                process.AddExtraMetadataIfMissing(WBColumn.PublishedBy, SPContext.Current.Web.CurrentUser);
+            }
+
+
             if (process.RecordsTypeTaxonomy == null)
             {
                 WBLogging.Debug("Yeah - the process.RecordsTypeTaxonomy == null !! ");
@@ -147,6 +150,8 @@ namespace WorkBoxFramework
                 document.InvolvedTeams = new WBTermCollection<WBTeam>(process.TeamsTaxonomy, process.InvolvedTeamsUIControlValue);
                 document.ProtectiveZone = process.ProtectiveZone;
                 document.Title = process.CurrentShortTitle;
+
+                WBLogging.Debug("Set document.Title = " + document.Title);
 
                 document.Update();
                 document.Reload();
@@ -201,7 +206,7 @@ namespace WorkBoxFramework
             WBRecord newRecord = null;
             try
             {
-                newRecord = Libraries.DeclareNewRecord(feedback, document, recordToReplace, process.ReplaceAction, process.SelfApprovalItem);
+                newRecord = Libraries.DeclareNewRecord(feedback, document, recordToReplace, process.ReplaceAction, process.ExtraMetadata);
             }
             catch (Exception e)
             {
@@ -217,13 +222,33 @@ namespace WorkBoxFramework
             feedback.Success();
             process.CurrentItemSucceeded();
 
-            if (newRecord != null && !String.IsNullOrEmpty(process.WebPageURL))
+            if (newRecord != null)
             {
-                WBLogging.Debug("WBRecordsManager.PublishDocument(): process.WebPageURL has been set - so creating or updating alert email");
+                //WBLogging.Debug("WBRecordsManager.PublishDocument(): process.WebPageURL has been set - so creating or updating alert email");
 
-                if (String.IsNullOrEmpty(process.EmailAlertMessage))
+                SPUser publisehdByUser = newRecord.ProtectedMasterRecord[WBColumn.PublishedBy] as SPUser;
+                String publishedByString = "Published by: <unknown>";
+                if (publisehdByUser != null)
                 {
-                    process.EmailAlertMessage = "One or more documents have been published that should be put on a web page.\n\nThe web page url is: " + process.WebPageURL + "\n\nThe documents are: \n\n";
+                    publishedByString = "Published by: " + publisehdByUser.Name;
+                }
+
+                List<SPUser> approvedByUsers = newRecord.ProtectedMasterRecord[WBColumn.PublishingApprovedBy] as List<SPUser>;
+                String approvedByString = "Approved by: <unknown>";
+                if (approvedByUsers != null)
+                {
+                    approvedByString = "Approved by: " + approvedByUsers.WBxToPrettyString();
+                }
+
+
+                if (String.IsNullOrEmpty(process.WebteamEmailAlertMessage))
+                {
+                    process.WebteamEmailAlertMessage = "One or more documents have been published that should be put on a web page.\n\nThe web page url is: " + process.WebPageURL + "\n\n" + publishedByString + "\n" + approvedByString + "\n\nThe documents are: \n\n";
+                }
+
+                if (String.IsNullOrEmpty(process.IAOEmailAlertMessage))
+                {
+                    process.IAOEmailAlertMessage = "One or more documents have been published by a team for which you are the assigned IAO.\n\n" + publishedByString + "\n" + approvedByString + "\n\nThe documents are: \n\n";
                 }
 
                 String functionalAreaString = "";
@@ -232,15 +257,27 @@ namespace WorkBoxFramework
                     functionalAreaString = newRecord.FunctionalArea[0].FullPath;
                 }
 
-                process.EmailAlertMessage += newRecord.ProtectedMasterRecord.Name + "\n(" + newRecord.ProtectiveZone + "): " + functionalAreaString + "/" + newRecord.RecordsType.FullPath + "\n";
-
-                WBLogging.Debug("WBRecordsManager.PublishDocument(): Email Alert Message: " + process.EmailAlertMessage);
-
+                process.WebteamEmailAlertMessage += newRecord.ProtectedMasterRecord.Name + "\n(" + newRecord.ProtectiveZone + "): " + functionalAreaString + "/" + newRecord.RecordsType.FullPath + "\n";
+                process.IAOEmailAlertMessage += newRecord.ProtectedMasterRecord.Name + "\n(" + newRecord.ProtectiveZone + "): " + functionalAreaString + "/" + newRecord.RecordsType.FullPath + "\n";
 
                 if (process.PublishMode != WBPublishingProcess.PUBLISH_MODE__ALL_TOGETHER || !process.HasMoreDocumentsToPublish)
                 {
-                    WBUtils.SendEmail(Libraries.ProtectedMasterLibrary.Web, WBFarm.Local.PublicDocumentEmailAlertsTo, "New documents published for a web page", process.EmailAlertMessage, false);
-                    process.EmailAlertMessage = null;
+                    if (!String.IsNullOrEmpty(process.WebPageURL))
+                    {
+                        WBLogging.Debug("WBRecordsManager.PublishDocument(): Webteam Email Alert Message: " + process.WebteamEmailAlertMessage);
+
+                        WBUtils.SendEmail(Libraries.ProtectedMasterLibrary.Web, WBFarm.Local.PublicDocumentEmailAlertsTo, "New documents published for a web page", process.WebteamEmailAlertMessage, false);
+                    }
+                    process.WebteamEmailAlertMessage = null;
+
+                    WBLogging.Debug("WBRecordsManager.PublishDocument(): Webteam Email Alert Message: " + process.WebteamEmailAlertMessage);
+
+                    SPUser teamsIAO = Libraries.ProtectedMasterLibrary.Web.WBxEnsureUserOrNull(process.OwningTeamsIAOAtTimeOfPublishing);
+                    if (teamsIAO != null)
+                    {
+                        WBUtils.SendEmail(Libraries.ProtectedMasterLibrary.Web, teamsIAO.Email, "New documents published for which you are IAO", process.IAOEmailAlertMessage, false);
+                    }
+                    process.IAOEmailAlertMessage = null;
                 }
             }
             else

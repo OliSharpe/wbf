@@ -128,7 +128,7 @@ This is the person who is ultimately responsible for the correct handling of thi
 <asp:Label ID="PublishingApprovedByError" runat="server" Text="" ForeColor="Red"/>
 </div>
 <div class="wbf-field-description">
-Please enter the name of the person approving the publication of this document.
+Please name the person approving publication of this document and, if applicable, the business owner approving it to go on a webpage.
 </div>
 </td>
 </tr>
