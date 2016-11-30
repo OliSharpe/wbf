@@ -198,7 +198,6 @@ Search:
         ShowLines="true"
         ExpandDepth="1"
         SelectedNodeStyle-CssClass="ms-tvselected"
-        OnSelectedNodeChanged="RecordsLibraryFolders_SelectedNodeChanged"
         NodeStyle-CssClass="ms-navitem"
         NodeStyle-HorizontalPadding="0"
         NodeStyle-VerticalPadding="0"

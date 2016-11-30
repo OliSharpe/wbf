@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -574,7 +575,8 @@ namespace WorkBoxFramework
                 }
 
 
-                WBFunctionalAreaTreeNode node = new WBFunctionalAreaTreeNode(functionalArea, folder);
+                WBFunctionalAreaTreeNode functionalAreaTreeNode = new WBFunctionalAreaTreeNode(functionalArea, folder);
+                TreeNode node = functionalAreaTreeNode.AsTreeNode();
 
                 node.Expanded = expandNodes;
                 node.PopulateOnDemand = false;
@@ -612,8 +614,8 @@ namespace WorkBoxFramework
 
                     if (viewMode == VIEW_MODE__NEW || folder != null)
                     {
-                        WBRecordsTypeTreeNode node = new WBRecordsTypeTreeNode(functionalArea, recordsType, folder);
-                        treeNodeCollection.Add(node);
+                        WBRecordsTypeTreeNode recordsTypeTreeNode = new WBRecordsTypeTreeNode(functionalArea, recordsType, folder);
+                        TreeNode node = recordsTypeTreeNode.AsTreeNode();
 
                         if (recordsType.Term.TermsCount > 0 || viewMode != VIEW_MODE__NEW)
                         {
@@ -625,6 +627,8 @@ namespace WorkBoxFramework
                             node.Expanded = true;
                             node.PopulateOnDemand = false;
                         }
+
+                        treeNodeCollection.Add(node);
 
                     }
                 }
@@ -640,10 +644,22 @@ namespace WorkBoxFramework
                 foreach (SPFolder folder in subFolders)
                 {
                     WBFolderTreeNode folderNode = new WBFolderTreeNode(folder);
-                    folderNode.Expanded = false;
-                    folderNode.PopulateOnDemand = true;
-                    folderNode.SelectAction = TreeNodeSelectAction.Expand;
-                    treeNodeCollection.Add(folderNode);
+                    TreeNode node = folderNode.AsTreeNode();
+
+                    if (folder.SubFolders.Count > 0 || viewMode == VIEW_MODE__REPLACE)
+                    {
+                        node.Expanded = false;
+                        node.PopulateOnDemand = true;
+                        node.SelectAction = TreeNodeSelectAction.Expand;
+                    }
+                    else
+                    {
+                        node.Expanded = true;
+                        node.PopulateOnDemand = false;
+                        node.SelectAction = TreeNodeSelectAction.Select;
+                    }
+
+                    treeNodeCollection.Add(node);
                 }
             }
             else
@@ -657,7 +673,12 @@ namespace WorkBoxFramework
 
         internal void PopulateWithDocuments(WBLocationTreeState treeState, TreeNodeCollection treeNodeCollection, String viewMode, SPFolder folder)
         {
+            WBLogging.Debug("In PopulateWithDocuments()");
+
             SPListItemCollection items = GetItemsRecursive(folder);
+
+            WBLogging.Debug("In PopulateWithDocuments() items.Count = " + items.Count);
+
             foreach (SPListItem item in items)
             {
                 if (ItemCanBePicked(treeState, item))
@@ -794,6 +815,21 @@ namespace WorkBoxFramework
             else
             {
                 WBLogging.Debug("NOT expanding an unrecognised node: " + node.Text + " of type: " + node.GetType());
+            }
+        }
+
+        internal String GetSelectedPath(HttpRequest request)
+        {
+            String eventArgument = request["__EVENTARGUMENT"];
+            if (!String.IsNullOrEmpty(eventArgument) && eventArgument[0] == 's')
+            {
+                String selectedPath = eventArgument.Substring(1);
+                selectedPath = selectedPath.Replace("\\", "/");
+                return selectedPath;
+            }
+            else
+            {
+                return null;
             }
         }
     }

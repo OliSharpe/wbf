@@ -11,19 +11,24 @@ namespace WorkBoxFramework
     {
         public WBRecordsType RecordsType;
         public WBTerm FunctionalArea;
-        //public TreeNode ParentNode;
 
         public WBRecordsTypeTreeNode(WBTerm functionalArea, WBRecordsType recordsType, SPFolder folder)
-            : base(folder, false)
+            : base(folder)
         {
             FunctionalArea = functionalArea;
             RecordsType = recordsType;
-            //ParentNode = parent;
-
-            this.Text = RecordsType.Name;
-            this.Value = RecordsType.Name;
-            this.ImageUrl = "/_layouts/Images/FOLDER.GIF";
         }
+
+        public TreeNode AsTreeNode()
+        {
+            TreeNode node = new TreeNode();
+            node.Text = RecordsType.Name;
+            node.Value = RecordsType.Name;
+            node.ImageUrl = "/_layouts/Images/FOLDER.GIF";
+
+            return node;
+        }
+
 
     }
 }

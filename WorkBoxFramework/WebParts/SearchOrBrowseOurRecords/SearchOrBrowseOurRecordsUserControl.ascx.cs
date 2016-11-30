@@ -17,6 +17,7 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
         WBTeam team = null;
         WBTaxonomy teamsTaxonomy = null;
         WBTaxonomy functionalAreasTaxonomy = null;
+        WBLocationTreeState treeState = null;
 
         bool masterLibraryHasVersions = false;
 
@@ -48,13 +49,35 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
 
             masterLibraryHasVersions = manager.Libraries.ProtectedMasterLibrary.List.EnableVersioning;
 
+            RecordsLibraryFolders.TreeNodePopulate += new TreeNodeEventHandler(RecordsLibraryFolders_TreeNodePopulate);
+
+            RecordsLibraryFolders.PopulateNodesFromClient = true;
+            RecordsLibraryFolders.EnableClientScript = true;
+
+            treeState = new WBLocationTreeState(SPContext.Current.Web, "Browse Folders", "Public");
+
+
             if (!IsPostBack)
             {
                 WBTermCollection<WBTerm> functionalAreas = team.FunctionalArea(functionalAreasTaxonomy);
-                TreeViewLocationCollection collection = new TreeViewLocationCollection(manager, "Browse Folders", "", functionalAreas);
+
+
+                /*
+                TreeViewLocationCollection collection = new TreeViewLocationCollection(manager, , "", functionalAreas);
 
                 RecordsLibraryFolders.DataSource = collection;
                 RecordsLibraryFolders.DataBind();
+                */
+
+                manager.PopulateWithFunctionalAreas(treeState, RecordsLibraryFolders.Nodes, "Browse Folders", functionalAreas);
+            }
+            else
+            {
+                String selectedPath = manager.GetSelectedPath(Request);
+                if (!String.IsNullOrEmpty(selectedPath))
+                {
+                    ProcessSelection(selectedPath);
+                }
             }
         }
 
@@ -129,23 +152,29 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
 
         }
 
+        /*
         private String GetSelectedFolderPath()
         {
             string selectedPath = RecordsLibraryFolders.SelectedNode.ValuePath;
             if (string.IsNullOrEmpty(selectedPath)) selectedPath = "/";
             return selectedPath;
         }
+         */ 
 
-        protected void RecordsLibraryFolders_SelectedNodeChanged(object sender, EventArgs e)
+        protected void RecordsLibraryFolders_TreeNodePopulate(object sender, TreeNodeEventArgs e)
         {
-            if (RecordsLibraryFolders.SelectedNode != null)
+            WBLogging.Debug("Call to RecordsLibraryFolders_TreeNodePopulate");
+
+            manager.PopulateTreeNode(treeState, e.Node, treeState.ViewMode);
+        }
+
+
+        protected void ProcessSelection(String selectedPath)
+        {
+            if (!String.IsNullOrEmpty(selectedPath))
             {
 
-                // SelectedFolderPath.Text = selectedPath;
-
                 // Now for the bit where the path is analysed to pick out the selected functional area and the records type:
-
-                String selectedPath = GetSelectedFolderPath();
 
                 String[] pathSteps = selectedPath.Split('/');
 
@@ -167,15 +196,15 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
                 }
                 WBRecordsType recordsType = new WBRecordsType(manager.RecordsTypesTaxonomy, recordsTypeTerm);
 
-                RenderRecordsLibraryFoldersSelection();
+                RenderRecordsLibraryFoldersSelection(selectedPath);
             }
         }
 
-        private void RenderRecordsLibraryFoldersSelection()
+        private void RenderRecordsLibraryFoldersSelection(String selectedPath)
         {
             SPFolder protectedLibraryRootFolder = manager.Libraries.ProtectedMasterLibrary.List.RootFolder;
 
-            SPFolder recordsTypeFolder = protectedLibraryRootFolder.WBxGetFolderPath(GetSelectedFolderPath());
+            SPFolder recordsTypeFolder = protectedLibraryRootFolder.WBxGetFolderPath(selectedPath);
 
             SPListItemCollection items = GetRecordsInFolder(recordsTypeFolder);
 
