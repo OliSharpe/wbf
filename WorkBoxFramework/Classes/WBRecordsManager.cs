@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.Specialized;
+using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Taxonomy;
 using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint.Utilities;
 using Microsoft.Office.Server.UserProfiles;
 
 namespace WorkBoxFramework
@@ -21,6 +24,11 @@ namespace WorkBoxFramework
         public const String FILE_TYPES_LIST_TITLE = "File Types";
         public const String CHECK_BOXES_LIST_TITLE = "Check Boxes";
 
+        public const string VIEW_MODE__NEW = "New";
+        public const string VIEW_MODE__REPLACE = "Replace";
+        public const string VIEW_MODE__BROWSE_FOLDERS = "Browse Folders";
+        public const string VIEW_MODE__BROWSE_DOCUMENTS = "Browse Documents";
+
         #endregion
 
 
@@ -29,12 +37,15 @@ namespace WorkBoxFramework
         private WBFarm _farm;
         private WBRecordsLibraries _libraries;
 
-        public WBRecordsManager()
+        private String _callingUserLogin = null;
+
+        public WBRecordsManager(String callingUserLogin)
         {
             WBLogging.Debug("In WBRecordsManager() constructor");
 
             _farm = WBFarm.Local;
             _libraries = new WBRecordsLibraries(this);
+            _callingUserLogin = callingUserLogin;
 
             WBLogging.Debug("Finished WBRecordsManager() constructor");
         }
@@ -123,12 +134,16 @@ namespace WorkBoxFramework
             // Just check that the IAO at time of publishing is captured:
             process.AddExtraMetadata(WBColumn.IAOAtTimeOfPublishing, process.OwningTeamsIAOAtTimeOfPublishing);
 
-            process.AddExtraMetadataIfMissing(WBColumn.DatePublished, DateTime.Now);
             if (SPContext.Current != null)
             {
                 process.AddExtraMetadataIfMissing(WBColumn.PublishedBy, SPContext.Current.Web.CurrentUser);
             }
-
+            process.AddExtraMetadataIfMissing(WBColumn.DatePublished, DateTime.Now);
+            if (process.ProtectiveZone != WBRecordsType.PROTECTIVE_ZONE__PROTECTED)
+            {
+                // If the document is going on the public or public extranet zones then let's set a review date for 2 years from now:
+                process.AddExtraMetadataIfMissing(WBColumn.ReviewDate, DateTime.Now.AddYears(2));
+            }
 
             if (process.RecordsTypeTaxonomy == null)
             {
@@ -156,7 +171,7 @@ namespace WorkBoxFramework
                 document.Update();
                 document.Reload();
 
-                process.WorkBox.GenerateFilename(recordsType, document.Item);
+                process.WorkBox.GenerateAndSetFilename(recordsType, document);
 
                 document.Update();
                 document.Reload();
@@ -206,7 +221,7 @@ namespace WorkBoxFramework
             WBRecord newRecord = null;
             try
             {
-                newRecord = Libraries.DeclareNewRecord(feedback, document, recordToReplace, process.ReplaceAction, process.ExtraMetadata);
+                newRecord = Libraries.DeclareNewRecord(feedback, _callingUserLogin, document, recordToReplace, process.ReplaceAction, process.ExtraMetadata);
             }
             catch (Exception e)
             {
@@ -222,63 +237,107 @@ namespace WorkBoxFramework
             feedback.Success();
             process.CurrentItemSucceeded();
 
-            if (newRecord != null)
+            if (newRecord != null && newRecord.ProtectiveZone != WBRecordsType.PROTECTIVE_ZONE__PROTECTED)
             {
-                //WBLogging.Debug("WBRecordsManager.PublishDocument(): process.WebPageURL has been set - so creating or updating alert email");
+                String documentType = GetDocumentType(newRecord.ProtectedMasterRecord);
+                bool needsEmailToIAONow = (documentType == WBColumn.DOCUMENT_TYPE__SPREADSHEET);
+                bool needsEmailToWebteamNow = !String.IsNullOrEmpty(process.WebPageURL);
 
-                SPUser publisehdByUser = newRecord.ProtectedMasterRecord[WBColumn.PublishedBy] as SPUser;
-                String publishedByString = "Published by: <unknown>";
-                if (publisehdByUser != null)
+                if (needsEmailToIAONow || needsEmailToWebteamNow)
                 {
-                    publishedByString = "Published by: " + publisehdByUser.Name;
-                }
+                    //WBLogging.Debug("WBRecordsManager.PublishDocument(): process.WebPageURL has been set - so creating or updating alert email");
 
-                List<SPUser> approvedByUsers = newRecord.ProtectedMasterRecord[WBColumn.PublishingApprovedBy] as List<SPUser>;
-                String approvedByString = "Approved by: <unknown>";
-                if (approvedByUsers != null)
-                {
-                    approvedByString = "Approved by: " + approvedByUsers.WBxToPrettyString();
-                }
-
-
-                if (String.IsNullOrEmpty(process.WebteamEmailAlertMessage))
-                {
-                    process.WebteamEmailAlertMessage = "One or more documents have been published that should be put on a web page.\n\nThe web page url is: " + process.WebPageURL + "\n\n" + publishedByString + "\n" + approvedByString + "\n\nThe documents are: \n\n";
-                }
-
-                if (String.IsNullOrEmpty(process.IAOEmailAlertMessage))
-                {
-                    process.IAOEmailAlertMessage = "One or more documents have been published by a team for which you are the assigned IAO.\n\n" + publishedByString + "\n" + approvedByString + "\n\nThe documents are: \n\n";
-                }
-
-                String functionalAreaString = "";
-                if (newRecord.FunctionalArea.Count > 0)
-                {
-                    functionalAreaString = newRecord.FunctionalArea[0].FullPath;
-                }
-
-                process.WebteamEmailAlertMessage += newRecord.ProtectedMasterRecord.Name + "\n(" + newRecord.ProtectiveZone + "): " + functionalAreaString + "/" + newRecord.RecordsType.FullPath + "\n";
-                process.IAOEmailAlertMessage += newRecord.ProtectedMasterRecord.Name + "\n(" + newRecord.ProtectiveZone + "): " + functionalAreaString + "/" + newRecord.RecordsType.FullPath + "\n";
-
-                if (process.PublishMode != WBPublishingProcess.PUBLISH_MODE__ALL_TOGETHER || !process.HasMoreDocumentsToPublish)
-                {
-                    if (!String.IsNullOrEmpty(process.WebPageURL))
+                    SPUser publisehdByUser = newRecord.ProtectedMasterRecord[WBColumn.PublishedBy] as SPUser;
+                    String publishedByString = "Published by: <unknown>";
+                    if (publisehdByUser != null)
                     {
+                        publishedByString = "Published by: " + publisehdByUser.Name;
+                    }
+
+                    List<SPUser> approvedByUsers = newRecord.ProtectedMasterRecord[WBColumn.PublishingApprovedBy] as List<SPUser>;
+                    String approvedByString = "Approved by: <unknown>";
+                    if (approvedByUsers != null)
+                    {
+                        approvedByString = "Approved by: " + approvedByUsers.WBxToPrettyString();
+                    }
+
+                    if (needsEmailToWebteamNow && String.IsNullOrEmpty(process.WebteamEmailAlertMessage))
+                    {
+                        process.WebteamEmailAlertMessage = @"<p>Dear Webteam,</p>
+
+<p>One or more documents have been published to the Public Records Library that should be put on a web page.</p>
+
+<p>Web page URL: " + process.WebPageURL + @"</p>
+
+<p>Please find details of the published documents below.</p>
+ 
+<p>" + publishedByString + "<br/>\n" + approvedByString + "</p>\n\n<p><b>Published Documents:</b></p>\n\n";
+                    }
+
+                    if (needsEmailToIAONow && String.IsNullOrEmpty(process.IAOEmailAlertMessage))
+                    {
+                        process.IAOEmailAlertMessage = @"<p>Dear Information Asset Owner,</p>
+
+<p>An Excel document has been published to the Public Records Library by a member of your team.</p>
+
+<p>As the responsible Information Asset Owner for this document, please find details of the publication below along with a link.</p>
+ 
+<p>" + publishedByString + "<br/>\n" + approvedByString + "</p>\n\n<p><b>Published Documents:</b></p>\n\n";
+                    }
+
+                    String functionalAreaString = "";
+                    if (newRecord.FunctionalArea.Count > 0)
+                    {
+                        functionalAreaString = newRecord.FunctionalArea[0].FullPath;
+                    }
+
+                    if (needsEmailToWebteamNow) process.WebteamEmailAlertMessage += "<p><a href=\"" + newRecord.ProtectedMasterRecord.AbsoluteURL + "\">" + newRecord.ProtectedMasterRecord.Name + "</a><br/>\n(" + newRecord.ProtectiveZone + "): " + functionalAreaString + "/" + newRecord.RecordsType.FullPath + "</p>\n";
+                    if (needsEmailToIAONow) process.IAOEmailAlertMessage += "<p><a href=\"" + newRecord.ProtectedMasterRecord.AbsoluteURL + "\">" + newRecord.ProtectedMasterRecord.Name + "</a><br/>\nLocation: (" + newRecord.ProtectiveZone + "): " + functionalAreaString + "/" + newRecord.RecordsType.FullPath + "</p>\n";
+
+                    if (process.PublishMode != WBPublishingProcess.PUBLISH_MODE__ALL_TOGETHER || !process.HasMoreDocumentsToPublish)
+                    {
+                        if (needsEmailToWebteamNow)
+                        {
+                            WBLogging.Debug("WBRecordsManager.PublishDocument(): Webteam Email Alert Message: " + process.WebteamEmailAlertMessage);
+
+                            StringDictionary headers = new StringDictionary();
+
+                            headers.Add("to", WBFarm.Local.PublicDocumentEmailAlertsTo);
+                            headers.Add("content-type", "text/html");
+                            headers.Add("bcc", WBFarm.Local.SendErrorReportEmailsTo);
+                            headers.Add("subject", "New documents published for a web page");
+
+                            WBUtils.SendEmail(Libraries.ProtectedMasterLibrary.Web, headers, process.WebteamEmailAlertMessage);
+                        }
+                        process.WebteamEmailAlertMessage = null;
+
                         WBLogging.Debug("WBRecordsManager.PublishDocument(): Webteam Email Alert Message: " + process.WebteamEmailAlertMessage);
 
-                        WBUtils.SendEmail(Libraries.ProtectedMasterLibrary.Web, WBFarm.Local.PublicDocumentEmailAlertsTo, "New documents published for a web page", process.WebteamEmailAlertMessage, false);
-                    }
-                    process.WebteamEmailAlertMessage = null;
+                        if (needsEmailToIAONow)
+                        {
+                            StringDictionary headers = new StringDictionary();
 
-                    WBLogging.Debug("WBRecordsManager.PublishDocument(): Webteam Email Alert Message: " + process.WebteamEmailAlertMessage);
+                            SPUser teamsIAO = Libraries.ProtectedMasterLibrary.Web.WBxEnsureUserOrNull(process.OwningTeamsIAOAtTimeOfPublishing);
+                            if (teamsIAO != null)
+                            {
+                                headers.Add("to", teamsIAO.Email);
+                                headers.Add("cc", WBFarm.Local.PublicDocumentEmailAlertsTo);
+                            }
+                            else
+                            {
+                                headers.Add("to", WBFarm.Local.PublicDocumentEmailAlertsTo);
+                            }
 
-                    SPUser teamsIAO = Libraries.ProtectedMasterLibrary.Web.WBxEnsureUserOrNull(process.OwningTeamsIAOAtTimeOfPublishing);
-                    if (teamsIAO != null)
-                    {
-                        WBUtils.SendEmail(Libraries.ProtectedMasterLibrary.Web, teamsIAO.Email, "New documents published for which you are IAO", process.IAOEmailAlertMessage, false);
+                            headers.Add("content-type", "text/html");
+                            headers.Add("bcc", WBFarm.Local.SendErrorReportEmailsTo);
+                            headers.Add("subject", "New Excel documents published for which you are IAO");
+                            
+                            WBUtils.SendEmail(Libraries.ProtectedMasterLibrary.Web, headers, process.IAOEmailAlertMessage);
+                            process.IAOEmailAlertMessage = null;
+                        }
                     }
-                    process.IAOEmailAlertMessage = null;
                 }
+
             }
             else
             {
@@ -331,6 +390,12 @@ namespace WorkBoxFramework
             _fileTypeInfo[fileType] = fileTypeInfo;
 
             return fileTypeInfo;
+        }
+
+        internal String GetDocumentType(WBDocument document)
+        {
+            SPListItem fileTypeInfo = GetFileTypeInfo(document.FileType);
+            return fileTypeInfo.WBxGetAsString(WBColumn.DocumentType);
         }
 
         internal bool AllowPublishToPublicOfFileTypes(IEnumerable<String> fileTypes)
@@ -398,6 +463,338 @@ namespace WorkBoxFramework
             }
 
             return checkBoxDetails;
+        }
+
+        internal Dictionary<string, string> GetChecklistTextMap()
+        {
+            SPList checkBoxDetailsList = Libraries.ProtectedMasterLibrary.Web.Lists.TryGetList(CHECK_BOXES_LIST_TITLE);
+            SPListItemCollection items = checkBoxDetailsList.Items;
+
+            Dictionary<String, String> checklistTextMap = new Dictionary<String, String>();
+            foreach (SPListItem item in items)
+            {
+                checklistTextMap.Add(item.WBxGetAsString(WBColumn.CheckBoxCode), item.WBxGetAsString(WBColumn.CheckBoxText));
+            }
+
+            return checklistTextMap;
+        }
+
+
+
+        // This should be a farm variable!
+        internal const int _weeksBetweenReviewDateAndAutoArchival = 4;
+        internal WBQuery GetQueryForTeamsPublicRecordsToArchiveInFutureWeek(WBTeam team, int weekInFuture, bool limitToJustOneWeek)
+        {
+            WBQuery query = new WBQuery();
+
+            if (team != null) query.AddEqualsFilter(WBColumn.OwningTeam, team);
+            query.AddEqualsFilter(WBColumn.LiveOrArchived, WBColumn.LIVE_OR_ARCHIVED__LIVE);
+            query.AddEqualsFilter(WBColumn.ProtectiveZone, WBRecordsType.PROTECTIVE_ZONE__PUBLIC);
+            query.AddEqualsFilter(WBColumn.RecordSeriesStatus, WBColumn.RECORD_SERIES_STATUS__LATEST);
+
+            query.OrderByAscending(WBColumn.ReviewDate);
+
+            if (limitToJustOneWeek && weekInFuture > 1)
+            {
+                query.AddFilter(WBColumn.ReviewDate, WBQueryClause.Comparators.GreaterThanEquals, DateTime.Now.AddDays((-_weeksBetweenReviewDateAndAutoArchival + weekInFuture-1)*7));
+            }
+
+            query.AddFilter(WBColumn.ReviewDate, WBQueryClause.Comparators.LessThan, DateTime.Now.AddDays((-_weeksBetweenReviewDateAndAutoArchival + weekInFuture)*7));
+            query.RecursiveAll = true;
+
+            return query;
+        }
+
+        internal WBQuery GetQueryForTeamsPublicRecordsToArchiveInFutureWeek(WBTeam team, int weekInFuture)
+        {
+            return GetQueryForTeamsPublicRecordsToArchiveInFutureWeek(team, weekInFuture, true);
+        }
+
+        internal WBQuery GetQueryForTeamsPublicRecordsToArchive(WBTeam team)
+        {
+            return GetQueryForTeamsPublicRecordsToArchiveInFutureWeek(team, 0, false);
+        }
+
+        internal WBQuery GetQueryForAllPublicRecordsToArchiveInFutureWeek(int weeksBeforeBeingArchived)
+        {
+            return GetQueryForTeamsPublicRecordsToArchiveInFutureWeek(null, weeksBeforeBeingArchived);
+        }
+
+        internal WBQuery GetQueryForTeamsPublicRecordsToReview(WBTeam team)
+        {
+            // We can use the 'in next weeks' query generator - with the week set as the maximum gap between review and archive!
+            return GetQueryForTeamsPublicRecordsToArchiveInFutureWeek(team, _weeksBetweenReviewDateAndAutoArchival, false);
+        }
+
+        internal WBQuery GetQueryForAllPublicRecordsToReview()
+        {
+            return GetQueryForTeamsPublicRecordsToReview(null);
+        }
+
+        // This should be a farm variable!
+        internal const int _daysToIncludeNewlyPublishedPublicDocsInEmailAlerts = 14;
+        internal WBQuery GetQueryForNewlyPublishedPublicDocsThatNeedEmailAlert()
+        {
+            WBQuery query = new WBQuery();
+
+            query.AddEqualsFilter(WBColumn.LiveOrArchived, WBColumn.LIVE_OR_ARCHIVED__LIVE);
+            query.AddEqualsFilter(WBColumn.ProtectiveZone, WBRecordsType.PROTECTIVE_ZONE__PUBLIC);
+            query.AddEqualsFilter(WBColumn.RecordSeriesStatus, WBColumn.RECORD_SERIES_STATUS__LATEST);
+            query.AddIsNullFilter(WBColumn.SentNewlyPublishedAlert);
+            query.AddFilter(WBColumn.DatePublished, WBQueryClause.Comparators.GreaterThan, DateTime.Now.AddDays(-_daysToIncludeNewlyPublishedPublicDocsInEmailAlerts));
+            query.RecursiveAll = true;
+
+            return query;
+        }
+
+        internal void PopulateWithFunctionalAreas(WBLocationTreeState treeState, TreeNodeCollection treeNodeCollection, String viewMode, WBTermCollection<WBTerm> teamFunctionalAreas)
+        {
+            bool expandNodes = true;
+            if (teamFunctionalAreas.Count > 2) {
+                expandNodes = false;
+            }
+
+            foreach (WBTerm functionalArea in teamFunctionalAreas)
+            {
+                SPFolder folder = null;
+
+                if (viewMode != VIEW_MODE__NEW)
+                {
+                    folder = this.Libraries.GetMasterFolderByPath(functionalArea.Name);
+
+                    if (folder == null)
+                    {
+                        WBLogging.Debug("Couldn't find folder for functional area: " + functionalArea.Name);
+                        continue;
+                    }
+                }
+                else
+                {
+                    WBLogging.Debug("View mode = " + viewMode);
+                }
+
+
+                WBFunctionalAreaTreeNode node = new WBFunctionalAreaTreeNode(functionalArea, folder);
+
+                node.Expanded = expandNodes;
+                node.PopulateOnDemand = false;
+                node.SelectAction = TreeNodeSelectAction.Expand;
+
+                treeNodeCollection.Add(node);
+
+                WBTaxonomy recordsTypes = this.RecordsTypesTaxonomy;
+                TermCollection terms = recordsTypes.TermSet.Terms;
+
+                PopulateWithRecordsTypes(treeState, node.ChildNodes, viewMode, folder, functionalArea, recordsTypes, terms);
+            }          
+        }
+
+        internal void PopulateWithRecordsTypes(WBLocationTreeState treeState, TreeNodeCollection treeNodeCollection, String viewMode, SPFolder parentFolder, WBTerm functionalArea, WBTaxonomy recordsTypesTaxonomy, TermCollection recordsTypeTerms)
+        {
+            foreach (Term term in recordsTypeTerms)
+            {
+                WBRecordsType recordsType = new WBRecordsType(recordsTypesTaxonomy, term);
+
+                bool protectiveZoneOK = true;
+                //if (!String.IsNullOrEmpty(_minimumProtectiveZone))
+                //{
+                //   protectiveZoneOK = (recordsType.IsZoneAtLeastMinimum(_minimumProtectiveZone));
+                // }
+
+                if (recordsType.BranchCanHaveDocuments() && recordsType.IsRelevantToFunctionalArea(functionalArea) && protectiveZoneOK)
+                {
+                    SPFolder folder = null;
+                    if (viewMode != VIEW_MODE__NEW && parentFolder != null)
+                    {
+                        folder = parentFolder.WBxGetSubFolder(recordsType.Name);
+                        if (folder == null) WBLogging.Debug("Did not find folder for: " + recordsType.Name);
+                    }
+
+                    if (viewMode == VIEW_MODE__NEW || folder != null)
+                    {
+                        WBRecordsTypeTreeNode node = new WBRecordsTypeTreeNode(functionalArea, recordsType, folder);
+                        treeNodeCollection.Add(node);
+
+                        if (recordsType.Term.TermsCount > 0 || viewMode != VIEW_MODE__NEW)
+                        {
+                            node.SelectAction = TreeNodeSelectAction.Expand;
+                            node.Expanded = false;
+                            node.PopulateOnDemand = true;
+                        } else {
+                            node.SelectAction = TreeNodeSelectAction.Select;
+                            node.Expanded = true;
+                            node.PopulateOnDemand = false;
+                        }
+
+                    }
+                }
+            }            
+        }
+
+        internal void PopulateWithSubFolders(WBLocationTreeState treeState, TreeNodeCollection treeNodeCollection, String viewMode, SPFolder parentFolder)
+        {
+            SPFolderCollection subFolders = parentFolder.SubFolders;
+
+            if (subFolders.Count > 0)
+            {
+                foreach (SPFolder folder in subFolders)
+                {
+                    WBFolderTreeNode folderNode = new WBFolderTreeNode(folder);
+                    folderNode.Expanded = false;
+                    folderNode.PopulateOnDemand = true;
+                    folderNode.SelectAction = TreeNodeSelectAction.Expand;
+                    treeNodeCollection.Add(folderNode);
+                }
+            }
+            else
+            {
+                if (viewMode == VIEW_MODE__REPLACE)
+                {
+                    PopulateWithDocuments(treeState, treeNodeCollection, viewMode, parentFolder);
+                }
+            }
+        }
+
+        internal void PopulateWithDocuments(WBLocationTreeState treeState, TreeNodeCollection treeNodeCollection, String viewMode, SPFolder folder)
+        {
+            SPListItemCollection items = GetItemsRecursive(folder);
+            foreach (SPListItem item in items)
+            {
+                if (ItemCanBePicked(treeState, item))
+                {
+                    TreeNode node = new TreeNode();
+
+                    node.Text = item.Name;
+                    node.Value = item.Name;
+                    node.Expanded = true;
+                    node.PopulateOnDemand = false;
+                    node.SelectAction = TreeNodeSelectAction.Select;
+
+
+                    node.ImageUrl = SPUtility.ConcatUrls("/_layouts/images/",
+                        SPUtility.MapToIcon(treeState.Web,
+                        SPUtility.ConcatUrls(treeState.Web.Url, node.Text), "", IconSize.Size16));
+
+                    // No need to add this to the tree state as we'll never come looking for it:
+                    treeNodeCollection.Add(node);
+                }
+            }
+        }
+
+        private bool ItemCanBePicked(WBLocationTreeState treeState, SPListItem item)
+        {
+            if (item == null) return false;
+
+            if (String.IsNullOrEmpty(item.WBxGetAsString(WBColumn.RecordID))) return false;
+            if (item.WBxGetAsString(WBColumn.LiveOrArchived) == WBColumn.LIVE_OR_ARCHIVED__ARCHIVED) return false;
+
+            String recordSeriesStatus = item.WBxGetAsString(WBColumn.RecordSeriesStatus);
+            if (recordSeriesStatus != "Latest" && !String.IsNullOrEmpty(recordSeriesStatus)) return false;
+
+            String itemProtectiveZone = item.WBxGetAsString(WBColumn.ProtectiveZone);
+            if (itemProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC) return true;
+
+            if (treeState.MinimumProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET && itemProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET) return true;
+
+            if (treeState.MinimumProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PROTECTED) return true;
+
+            return false;
+        }
+
+        public static SPListItemCollection GetItemsRecursive(SPFolder folder)
+        {
+            SPList list = folder.ParentWeb.Lists[folder.ParentListId];
+            SPQuery query = new SPQuery();
+            query.Folder = folder;                        //set folder for seaching;
+            query.ViewAttributes = "Scope=\"Recursive\""; //set recursive mode for items seaching;
+            return list.GetItems(query);
+        }
+
+        internal WBFolderTreeNode GetFolderTreeNode(String path)
+        {
+            List<String> steps = WBUtils.GetPathStepsFromNormalisedPath(path);
+            String normalisedPath = String.Join("/", steps.ToArray());
+
+            SPFolder folder =  this.Libraries.GetMasterFolderByPath(normalisedPath);
+
+            WBLogging.Debug("In GetFolderTreeNode(): steps.Count = " + steps.Count);
+            if (folder == null)
+            {
+                WBLogging.Debug("In GetFolderTreeNode(): folder is NULL");
+            }
+            else
+            {
+                WBLogging.Debug("In GetFolderTreeNode(): folder = " + folder.Name);
+            }
+
+            if (steps.Count == 0) return null;
+
+            WBTerm functionalArea = this.FunctionalAreasTaxonomy.GetSelectedWBTermByPath(steps[0]);
+
+            if (steps.Count == 1)
+            {
+                return new WBFunctionalAreaTreeNode(functionalArea, folder);
+            }
+
+            // Now let's remove the functional area bit from the list of steps so that we just have a potential records type path:
+            steps.RemoveAt(0);
+
+            Term deepestRecordsTypeTerm = this.RecordsTypesTaxonomy.GetDeepestTermBySteps(steps);
+            if (deepestRecordsTypeTerm == null) return null;
+
+            String deepestRecordsTypeLocationPath = functionalArea.Name + "/" + deepestRecordsTypeTerm.WBxFullPath();
+            if (deepestRecordsTypeLocationPath == normalisedPath)
+            {
+                // OK so the path was to a records type - not a folder below the records type:
+                return new WBRecordsTypeTreeNode(functionalArea, new WBRecordsType(this.RecordsTypesTaxonomy, deepestRecordsTypeTerm), folder);
+            }
+
+            // Otherwise - if we've got here then the path is to an actual folder within the master records library:
+            return new WBFolderTreeNode(folder);
+        }
+
+        internal void PopulateTreeNode(WBLocationTreeState treeState, TreeNode node, String viewMode)
+        {
+            WBLogging.Debug("Looking for WBFolderTreeNode with path: " + node.ValuePath);
+
+            WBFolderTreeNode folderTreeNode = this.GetFolderTreeNode(node.ValuePath);
+
+            if (folderTreeNode == null)
+            {
+                WBLogging.Debug("Did not find WBFolderTreeNode at: " + node.ValuePath);
+                return;
+            }
+
+            if (folderTreeNode is WBRecordsTypeTreeNode)
+            {
+                WBLogging.Debug("Expanding a records type node: " + node.Text);
+
+                WBRecordsTypeTreeNode recordsTypeNode = (WBRecordsTypeTreeNode)folderTreeNode;
+                WBRecordsType recordsType = recordsTypeNode.RecordsType;
+                TermCollection childTerms = recordsType.Term.Terms;
+                if (childTerms.Count > 0)
+                {
+                    PopulateWithRecordsTypes(treeState, node.ChildNodes, viewMode, recordsTypeNode.Folder, recordsTypeNode.FunctionalArea, recordsType.Taxonomy, childTerms);
+                }
+                else
+                {
+                    if (viewMode != VIEW_MODE__NEW)
+                    {
+                        PopulateWithSubFolders(treeState, node.ChildNodes, viewMode, recordsTypeNode.Folder);
+                    }
+                }
+            }
+            else if (folderTreeNode is WBFolderTreeNode)
+            {
+                WBLogging.Debug("Expanding a folder node: " + node.Text);
+
+                // You shouldn't be here if the view mode was NEW !
+                PopulateWithSubFolders(treeState, node.ChildNodes, viewMode, folderTreeNode.Folder);
+            }
+            else
+            {
+                WBLogging.Debug("NOT expanding an unrecognised node: " + node.Text + " of type: " + node.GetType());
+            }
         }
     }
 }

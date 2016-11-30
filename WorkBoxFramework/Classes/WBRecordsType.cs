@@ -803,60 +803,75 @@ namespace WorkBoxFramework
             return new WBTermCollection<WBTerm>(functionalAreas, DefaultFunctionalAreaUIControlValue);
         }
 
-        public String GenerateCorrectDocumentName(WorkBox workBox, SPListItem sourceDocAsItem)            
+        [Obsolete]
+        public String GenerateCorrectDocumentName(WorkBox workBox, SPListItem sourceDocAsItem)
         {
-            WBTaxonomy seriesTagsTaxonomy = WBTaxonomy.GetSeriesTags(workBox.RecordsTypes);
+            return GenerateCorrectDocumentName(new WBDocument(workBox, sourceDocAsItem));
+        }
+
+        public String GenerateCorrectDocumentName(WBDocument document)            
+        {
+            WBTaxonomy seriesTagsTaxonomy = document.SeriesTagsTaxonomy; 
 
             string seriesTagName = "";
-            if (sourceDocAsItem.WBxColumnHasValue(WorkBox.COLUMN_NAME__SERIES_TAG))
+            if (document.HasValue(WBColumn.SeriesTag))
             {
-                WBTerm seriesTag = sourceDocAsItem.WBxGetSingleTermColumn<WBTerm>(seriesTagsTaxonomy, WorkBox.COLUMN_NAME__SERIES_TAG);
+                WBTerm seriesTag = document.SeriesTag; 
                 if (seriesTagName != null) seriesTagName = seriesTag.Name;
             }
 
-            string filename = sourceDocAsItem.Name;
+            string filename = document.Name;
 
             string extension = Path.GetExtension(filename);
             string justName = Path.GetFileNameWithoutExtension(filename);
 
-            string title = sourceDocAsItem.Title.WBxTrim();
+            string title = document.Title.WBxTrim();
             if (title == "")
             {
                 title = justName;
-                sourceDocAsItem["Title"] = title;
+                document.Title = title;
             }
 
-            string referenceID = sourceDocAsItem.WBxGetColumnAsString(WorkBox.COLUMN_NAME__REFERENCE_ID);
+            string referenceID = document.ReferenceID;
 
             DateTime referenceDate = DateTime.Now;
 
-            if (sourceDocAsItem[WorkBox.COLUMN_NAME__REFERENCE_DATE] != null)
+            if (document.HasReferenceDate && this.DocumentReferenceDateRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN)
             {
-                referenceDate = (DateTime)sourceDocAsItem[WorkBox.COLUMN_NAME__REFERENCE_DATE];
+                referenceDate = document.ReferenceDate;
+            }
+            else
+            {
+                document.ReferenceDate = referenceDate;
+            }
+
+            String workBoxID = "";
+            if (document.WorkBox != null)
+            {
+                workBoxID = document.WorkBox.UniqueID.WBxTrim();
             }
 
             WBLogging.WorkBoxes.Verbose(string.Format("OK prepared all the bits: {0}, {1}, {2}, {3}, {4}",
                 referenceDate,
                 title,
                 seriesTagName,
-                workBox.UniqueID,
+                workBoxID,
                 referenceID));
 
             WBUtils.logMessage("Making a document name for " + this.Name + " using: " + DocumentNamingConvention);
 
             title = title.WBxTrim();
-            string workBoxID = workBox.UniqueID.WBxTrim();
             referenceID = referenceID.WBxTrim();
 
-            string referenceDateString = string.Format("{0}-{1}-{2}",
+            string dateForFilenameString = string.Format("{0}-{1}-{2}",
                             referenceDate.Year.ToString("D4"),
                             referenceDate.Month.ToString("D2"),
                             referenceDate.Day.ToString("D2"));
 
-            WBUtils.logMessage("The referenceDateString: " + referenceDateString);
+            WBUtils.logMessage("The dateForFilenameString: " + dateForFilenameString);
 
             if (referenceID == "") referenceID = "(Reference ID)";
-            if (referenceDateString == "") referenceDateString = "(YYYY-MM-DD)";
+            if (dateForFilenameString == "") dateForFilenameString = "(YYYY-MM-DD)";
             if (seriesTagName == "") seriesTagName = "(Series Tag)";
 
             switch (this.DocumentNamingConvention)
@@ -865,7 +880,7 @@ namespace WorkBoxFramework
                     {
                         if (title == "") return "";
                         return string.Format("({0}) {1}",
-                            referenceDateString,
+                            dateForFilenameString,
                             title);
                     }
 
@@ -874,7 +889,7 @@ namespace WorkBoxFramework
                         if (seriesTagName == "") return "";
 
                         return string.Format("{0} - {1}",
-                            referenceDateString,
+                            dateForFilenameString,
                             seriesTagName);
                     }
 
@@ -885,7 +900,7 @@ namespace WorkBoxFramework
                         if (seriesTagName == "") return "";
 
                         return string.Format("{0} - {1} - {2}",
-                            referenceDateString,
+                            dateForFilenameString,
                             seriesTagName,
                             title);
                     }
@@ -896,7 +911,7 @@ namespace WorkBoxFramework
                         if (referenceID == "") return "";
 
                         return string.Format("{0} - {1} - {2}",
-                            referenceDateString,
+                            dateForFilenameString,
                             seriesTagName,
                             referenceID);
                     }                    
@@ -908,7 +923,7 @@ namespace WorkBoxFramework
                         if (referenceID == "") return "";
 
                         return string.Format("{0} - {1} - {2} - {3}",
-                            referenceDateString,
+                            dateForFilenameString,
                             seriesTagName,
                             referenceID,
                             title);
@@ -919,7 +934,7 @@ namespace WorkBoxFramework
                         if (workBoxID == "") return "";
 
                         return string.Format("{0} - {1} - {2}",
-                            referenceDateString,
+                            dateForFilenameString,
                             workBoxID,
                             title);
                     }
@@ -930,7 +945,7 @@ namespace WorkBoxFramework
                         if (referenceID == "") return "";
 
                         return string.Format("{0} - {1} - {2}",
-                            referenceDateString,
+                            dateForFilenameString,
                             referenceID,
                             title);
                     }
@@ -1244,11 +1259,11 @@ namespace WorkBoxFramework
             {
                 case FILING_RULE__BY_FINANCIAL_YEAR: 
                     {
-                        if (!document.HasReferenceDate) return "NO DATE SET";
-                        DateTime referenceDate = document.ReferenceDate;
+                        if (!document.HasDateForFiling) return "NO DATE SET";
+                        DateTime dateForFiling = document.DateForFiling;
 
-                        int year = referenceDate.Year;
-                        int month = referenceDate.Month;
+                        int year = dateForFiling.Year;
+                        int month = dateForFiling.Month;
                         
                         if (month >= 4) return string.Format("{0}-{1}", year.ToString("D4"), (year+1).ToString("D4"));
                         else return string.Format("{0}-{1}", (year-1).ToString("D4"), year.ToString("D4"));
@@ -1256,34 +1271,34 @@ namespace WorkBoxFramework
 
                 case FILING_RULE__BY_CALENDAR_YEAR:
                     {
-                        if (!document.HasReferenceDate) return "NO DATE SET";
-                        DateTime referenceDate = document.ReferenceDate;
+                        if (!document.HasDateForFiling) return "NO DATE SET";
+                        DateTime dateForFiling = document.DateForFiling;
 
-                        return referenceDate.Year.ToString("D4");
+                        return dateForFiling.Year.ToString("D4");
                     }
                 case FILING_RULE__BY_MONTH:
                     {
-                        if (!document.HasReferenceDate) return "NO DATE SET";
-                        DateTime referenceDate = document.ReferenceDate;
+                        if (!document.HasDateForFiling) return "NO DATE SET";
+                        DateTime dateForFiling = document.DateForFiling;
 
-                        return referenceDate.Month.ToString("D2");
+                        return dateForFiling.Month.ToString("D2");
                     }
                 case FILING_RULE__BY_DAY_OF_MONTH:
                     {
-                        if (!document.HasReferenceDate) return "NO DATE SET";
-                        DateTime referenceDate = document.ReferenceDate;
+                        if (!document.HasDateForFiling) return "NO DATE SET";
+                        DateTime dateForFiling = document.DateForFiling;
 
-                        return referenceDate.Day.ToString("D2");
+                        return dateForFiling.Day.ToString("D2");
                     }
                 case FILING_RULE__BY_FULL_DATE:
                     {
-                        if (!document.HasReferenceDate) return "NO DATE SET";
-                        DateTime referenceDate = document.ReferenceDate;
+                        if (!document.HasDateForFiling) return "NO DATE SET";
+                        DateTime dateForFiling = document.DateForFiling;
 
                         return string.Format("{0}-{1}-{2}",
-                            referenceDate.Year.ToString("D4"),
-                            referenceDate.Month.ToString("D2"),
-                            referenceDate.Day.ToString("D2"));
+                            dateForFiling.Year.ToString("D4"),
+                            dateForFiling.Month.ToString("D2"),
+                            dateForFiling.Day.ToString("D2"));
                     }
                 case FILING_RULE__BY_FUNCTIONAL_AREA:
                     {
@@ -1569,6 +1584,7 @@ namespace WorkBoxFramework
             return metadataProblems;
         }
 
+        [Obsolete("WBRecordsType.PublishDocument() is deprecated, please use WBRecordsManager.PublishDocument() instead.", true)]
         public SPListItem PublishDocument(WBDocument document, Stream binaryStream)
         {
             WBFarm farm = WBFarm.Local;
@@ -1589,7 +1605,7 @@ namespace WorkBoxFramework
 
         }
 
-
+        [Obsolete("WBRecordsType.PublishDocument() is deprecated, please use WBRecordsManager.PublishDocument() instead.")]
         public SPListItem PublishDocument(
             SPWeb protectedLibraryWeb,
             SPFolder protectedLibraryRootFolder,
@@ -1607,32 +1623,35 @@ namespace WorkBoxFramework
             string oldDateFormat = "YYYYMMDD-";
 
             // If nothing else we'll use the time now (which will be roughly the date / time declared as the date for the naming convention:
-            DateTime referenceDate = DateTime.Now;
+            DateTime dateForFilename = DateTime.Now;
             if (document.HasReferenceDate)
             {
                 // But ideally we'll be taking the reference date from the metadata of the document being declared:
-                referenceDate = document.ReferenceDate;
+                dateForFilename = document.ReferenceDate;
             }
+
+            /* We're no longer storing the published date as a reference date by default:
             else
             {
                 document.ReferenceDate = referenceDate;
             }
+             */ 
 
-            int year = referenceDate.Year;
-            int month = referenceDate.Month;
+            int year = dateForFilename.Year;
+            int month = dateForFilename.Month;
 
             if (month >= 4) datePath = String.Format("{0}-{1}", year.ToString("D4"), (year + 1).ToString("D4"));
             else datePath = String.Format("{0}-{1}", (year - 1).ToString("D4"), year.ToString("D4"));
 
             dateForName = String.Format("{0}-{1}-{2}",
-                        referenceDate.Year.ToString("D4"),
-                        referenceDate.Month.ToString("D2"),
-                        referenceDate.Day.ToString("D2"));
+                        dateForFilename.Year.ToString("D4"),
+                        dateForFilename.Month.ToString("D2"),
+                        dateForFilename.Day.ToString("D2"));
 
             oldDateFormat = String.Format("{0}{1}{2}-",
-                        referenceDate.Year.ToString("D4"),
-                        referenceDate.Month.ToString("D2"),
-                        referenceDate.Day.ToString("D2"));
+                        dateForFilename.Year.ToString("D4"),
+                        dateForFilename.Month.ToString("D2"),
+                        dateForFilename.Day.ToString("D2"));
 
 
             string fullFilingPath = String.Join("/", FilingPathForDocument(document).ToArray());

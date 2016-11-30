@@ -718,7 +718,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 {
                     // WBRecordsType recordsType = new WBRecordsType(recordsTypeTaxonomy, document[WBColumn.RecordsType].WBxToString());
 
-                    using (WBRecordsManager manager = new WBRecordsManager())
+                    using (WBRecordsManager manager = new WBRecordsManager(SPContext.Current.Web.CurrentUser.LoginName))
                     {
                         try
                         {

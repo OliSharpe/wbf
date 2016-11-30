@@ -57,7 +57,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 if (Request.QueryString["selectedItemsIDsString"] != null && Request.QueryString["selectedListGUID"] != null)
                 {
 
-                    manager = new WBRecordsManager();
+                    manager = new WBRecordsManager(SPContext.Current.Web.CurrentUser.LoginName);
                     string selectedListGUID = Request.QueryString["selectedListGUID"];
                     string[] selectedItemsIDs = Request.QueryString["selectedItemsIDsString"].ToString().Split('|');
 

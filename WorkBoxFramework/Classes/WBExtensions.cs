@@ -1004,6 +1004,10 @@ namespace WorkBoxFramework
                                 item[column.DisplayName] = dateTimeControl.SelectedDate;
                             }
                         }
+                        else if (value is String && !String.IsNullOrEmpty((String)value))
+                        {
+                            item[column.DisplayName] = WBUtils.DateTimeFromISO8601Format((String)value);
+                        }
                         else
                         {
                             WBUtils.shouldThrowError("You can only set DateTime columns with null or with DateTime objects. Column: " + column.DisplayName + " Value: " + value);
@@ -1365,6 +1369,369 @@ namespace WorkBoxFramework
 
         #endregion
 
+
+        #region SPListItemVersion Get Extensions 
+
+        public static SPUser WBxGetSingleUserColumn(this SPListItemVersion item, WBColumn column)
+        {
+            if (!item.WBxHasValue(column)) return null;
+
+            Object value = item[column.DisplayName];
+
+            SPFieldUser fieldUser = (SPFieldUser)item.Fields.GetField(column.DisplayName);
+            SPFieldUserValue fieldUserValue = (SPFieldUserValue)fieldUser.GetFieldValue(item[column.DisplayName].ToString());
+
+            if (fieldUserValue.User == null)
+            {
+                WBLogging.Generic.Unexpected("Debug: found that fieldUserValue.User was null but LoginName: " + fieldUserValue.LookupValue);
+            }
+
+            return fieldUserValue.User;
+        }
+
+        public static List<SPUser> WBxGetMultiUserColumn(this SPListItemVersion item, WBColumn column)
+        {
+            return item.WBxGetMultiUserColumn(column.DisplayName);
+        }
+
+        public static List<SPUser> WBxGetMultiUserColumn(this SPListItemVersion item, String columnName)
+        {
+            SPFieldUserValueCollection userValueCollection = item[columnName] as SPFieldUserValueCollection;
+            List<SPUser> users = new List<SPUser>();
+
+            if (userValueCollection != null)
+            {
+                foreach (SPFieldUserValue userValue in userValueCollection)
+                {
+                    users.Add(userValue.User);
+                }
+            }
+
+            return users;
+        }
+
+
+        public static T WBxGetSingleTermColumn<T>(this SPListItemVersion item, WBTaxonomy taxonomy, WBColumn column) where T : WBTerm, new()
+        {
+            return WBxGetSingleTermColumn<T>(item, taxonomy, column.DisplayName);
+        }
+
+        public static T WBxGetSingleTermColumn<T>(this SPListItemVersion item, WBTaxonomy taxonomy, String columnName) where T : WBTerm, new()
+        {
+            TaxonomyFieldValue taxonomyFieldValue = item[columnName] as TaxonomyFieldValue;
+
+            if (taxonomyFieldValue == null || taxonomyFieldValue.TermGuid == null || taxonomyFieldValue.TermGuid == "") return null;
+
+            //WBUtils.logMessage("Getting a single term from a column with guid = " + taxonomyFieldValue.TermGuid);
+
+            T term = new T();
+            term.Initialise(taxonomy, taxonomyFieldValue.Label, new Guid(taxonomyFieldValue.TermGuid));
+
+            return term;
+        }
+
+        public static WBTermCollection<T> WBxGetMultiTermColumn<T>(this SPListItemVersion item, WBTaxonomy taxonomy, String columnName) where T : WBTerm, new()
+        {
+            TaxonomyFieldValueCollection taxonomyFieldValueCollection = item[columnName] as TaxonomyFieldValueCollection;
+
+            if (taxonomyFieldValueCollection == null) return null;
+
+            List<T> terms = new List<T>();
+
+            foreach (TaxonomyFieldValue value in taxonomyFieldValueCollection)
+            {
+                T term = new T();
+                term.Initialise(taxonomy, value.Label, new Guid(value.TermGuid));
+                terms.Add(term);
+            }
+
+            return new WBTermCollection<T>(taxonomy, terms);
+        }
+
+
+        public static bool WBxColumnExists(this SPListItemVersion item, String columnName)
+        {
+            return (item.Fields.ContainsField(columnName));
+        }
+
+        public static bool WBxColumnExists(this SPListItemVersion item, WBColumn column)
+        {
+            return item.WBxExists(column);
+        }
+
+        public static bool WBxExists(this SPListItemVersion item, WBColumn column)
+        {
+            return (item.Fields.ContainsField(column.DisplayName));
+        }
+
+        [Obsolete("WBxColumnHasValue with WBColumn arg is deprecated, please use WBxHasValue instead.", true)]
+        public static bool WBxColumnHasValue(this SPListItemVersion item, WBColumn column)
+        {
+            return item.WBxHasValue(column);
+        }
+
+        public static bool WBxColumnHasValue(this SPListItemVersion item, String columnName)
+        {
+            return (item.WBxGetColumnAsString(columnName) != "");
+        }
+
+        public static bool WBxHasValue(this SPListItemVersion item, WBColumn column)
+        {
+            return (item.WBxToString(column) != "");
+        }
+
+        public static bool WBxIsNotBlank(this SPListItemVersion item, WBColumn column)
+        {
+            return (item.WBxToString(column).Trim() != "");
+        }
+
+        public static Object WBxGet(this SPListItemVersion item, WBColumn column)
+        {
+            WBLogging.Generic.Verbose("Trying to call WBxGet");
+            WBLogging.Generic.Verbose("Trying to get with WBxGet column: " + column.DisplayName);
+
+
+            if (item == null)
+            {
+                WBUtils.shouldThrowError("Calling WBxGet with a null item!");
+                return null;
+            }
+
+            if (column == null)
+            {
+                WBUtils.shouldThrowError("Calling WBxGet with a null column!");
+                return null;
+            }
+
+            if (String.IsNullOrEmpty(column.DisplayName))
+            {
+                WBUtils.shouldThrowError("Calling WBxGet with a column object that has no display name!");
+                return null;
+            }
+
+
+            if (!item.WBxExists(column)) return null;
+
+            switch (column.DataType)
+            {
+                case WBColumn.DataTypes.Text:
+                    {
+                        return item[column.DisplayName];
+                    }
+                case WBColumn.DataTypes.MultiLineText:
+                    {
+                        return item[column.DisplayName];
+                    }
+                case WBColumn.DataTypes.Integer:
+                    {
+                        return item[column.DisplayName];
+                    }
+                case WBColumn.DataTypes.Counter:
+                    {
+                        return item[column.DisplayName];
+                    }
+                case WBColumn.DataTypes.DateTime:
+                    {
+                        return item[column.DisplayName];
+                    }
+                case WBColumn.DataTypes.ManagedMetadata:
+                    {
+                        if (column.AllowMultipleValues)
+                        {
+                            WBTermCollection<WBTerm> terms = item.WBxGetMultiTermColumn<WBTerm>(null, column.DisplayName);
+                            return terms.WBxToString();
+                        }
+                        else
+                        {
+                            WBTerm term = item.WBxGetSingleTermColumn<WBTerm>(null, column.DisplayName);
+                            return term.WBxToString();
+                        }
+                    }
+
+                case WBColumn.DataTypes.Choice:
+                    {
+                        return item[column.DisplayName];
+                    }
+                case WBColumn.DataTypes.User:
+                    {
+                        if (column.AllowMultipleValues)
+                        {
+                            return item.WBxGetMultiUserColumn(column);
+                        }
+                        else
+                        {
+                            return item.WBxGetSingleUserColumn(column);
+                        }
+                    }
+
+
+                default: throw new Exception("There is no WBxGet implementation (yet) for WBColumn of type : " + column.DataType);
+            }
+        }
+
+
+        public static String WBxGetAsString(this SPListItemVersion item, WBColumn column)
+        {
+            if (item.WBxHasValue(column))
+            {
+                switch (column.DataType)
+                {
+                    case WBColumn.DataTypes.User:
+                        {
+                            if (column.AllowMultipleValues)
+                            {
+                                List<SPUser> users = item.WBxGetMultiUserColumn(column);
+                                if (users != null && users.Count > 0)
+                                {
+                                    users.WBxToString();
+                                }
+                                return "<i>(couldn't find: " + item.WBxGetAsString(column) + ")</i>";
+                            }
+                            else
+                            {
+                                SPUser user = item.WBxGetSingleUserColumn(column);
+                                if (user != null)
+                                {
+                                    return user.LoginName;
+                                }
+                                return "<i>(couldn't find: " + item.WBxGetAsString(column) + ")</i>";
+                            }
+
+                        }
+
+                    default: return WBxGetColumnAsString(item, column.DisplayName);
+                }
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        public static String WBxToString(this SPListItemVersion item, WBColumn column)
+        {
+            return WBxGetColumnAsString(item, column.DisplayName);
+        }
+
+        public static String WBxGetColumnAsString(this SPListItemVersion item, String columnName)
+        {
+            if (!item.WBxColumnExists(columnName)) return "";
+
+            string value = "";
+            try
+            {
+                value = item[columnName].WBxToString();
+            }
+            catch { }
+
+            return value;
+        }
+
+        public static String WBxGetAsPrettyString(this SPListItemVersion item, WBColumn column)
+        {
+            if (item.WBxHasValue(column))
+            {
+                switch (column.DataType)
+                {
+                    case WBColumn.DataTypes.DateTime:
+                        {
+                            DateTime date = (DateTime)item.WBxGet(column);
+
+                            if (column.UseDateAndTime)
+                            {
+                                return date.ToShortDateString() + " " + date.ToShortTimeString();
+                            }
+                            else
+                            {
+                                return date.ToShortDateString();
+                            }
+                        }
+                    case WBColumn.DataTypes.User:
+                        {
+                            if (column.AllowMultipleValues)
+                            {
+                                List<SPUser> users = item.WBxGetMultiUserColumn(column);
+                                if (users != null && users.Count > 0)
+                                {
+                                    users.WBxToPrettyString();
+                                }
+                                return "<i>(couldn't find: " + item.WBxGetAsString(column) + ")</i>";
+                            }
+                            else
+                            {
+                                SPUser user = item.WBxGetSingleUserColumn(column);
+                                if (user != null)
+                                {
+                                    return user.Name;
+                                }
+                                return "<i>(couldn't find: " + item.WBxGetAsString(column) + ")</i>";
+                            }
+
+                        }
+
+                    case WBColumn.DataTypes.ManagedMetadata:
+                        {
+                            WBTerm term = item.WBxGetSingleTermColumn<WBTerm>(null, column);
+                            if (term != null)
+                            {
+                                return term.Name;
+                            }
+                            else
+                            {
+                                return "";
+                            }
+                        }
+
+                    case WBColumn.DataTypes.Lookup:
+                        {
+                            SPFieldLookup fieldLookup = (SPFieldLookup)item.Fields.GetField(column.DisplayName);
+                            SPFieldLookupValue fieldLookupValue = (SPFieldLookupValue)fieldLookup.GetFieldValue(item[column.DisplayName].ToString());
+
+                            return fieldLookupValue.LookupValue;
+                        }
+
+                    default: return item.WBxGetAsString(column);
+                }
+            }
+            else
+            {
+                return "";
+            }
+
+        }
+
+
+        public static bool WBxGetAsBool(this SPListItemVersion item, WBColumn column)
+        {
+            return item.WBxGetColumnAsBool(column.DisplayName);
+        }
+
+        public static bool WBxGetColumnAsBool(this SPListItemVersion item, String columnName)
+        {
+            return (item.WBxGetColumnAsString(columnName) == "True");
+        }
+
+
+        public static int WBxGetAsInt(this SPListItemVersion item, WBColumn column, int defaultValue)
+        {
+            return item.WBxGetColumnAsInt(column.DisplayName, defaultValue);
+        }
+
+        // This one is slightly out of sync with the naming convention used by others in this series of methods.
+        public static int WBxGetColumnAsInt(this SPListItemVersion item, WBColumn column, int defaultValue)
+        {
+            return item.WBxGetColumnAsInt(column.DisplayName, defaultValue);
+        }
+
+        public static int WBxGetColumnAsInt(this SPListItemVersion item, String columnName, int defaultValue)
+        {
+            if (!item.WBxColumnHasValue(columnName)) return defaultValue;
+            return (Convert.ToInt32(item.WBxGetColumnAsString(columnName)));
+        }
+
+        #endregion
+
+
         #region PeopleEditor
 
         public static void WBxInitialise(this PeopleEditor peopleEditor, List<SPUser> users)
@@ -1414,13 +1781,21 @@ namespace WorkBoxFramework
         {
             if (users == null) return "";
 
-            List<String> loginNames = new List<String>();
+            List<String> names = new List<String>();
             foreach (SPUser user in users)
             {
-                loginNames.Add(user.Name);
+                names.Add(user.Name);
             }
-            return String.Join(";", loginNames.ToArray());
+            return String.Join(";", names.ToArray());
         }
+
+
+        public static String WBxToPrettyString(this SPUser user)
+        {
+            if (user == null) return "";
+            return user.Name;
+        }
+
 
         public static List<SPUser> WBxToSPUsers(this String loginNamesString, SPWeb web) 
         {
@@ -1631,6 +2006,35 @@ namespace WorkBoxFramework
 
 
         #region SPFile Extensions
+        public static void WBxCheckInAs(this SPFile file, String comment, String userLogin)
+        {
+            SPUser user = file.Item.Web.WBxEnsureUserOrNull(userLogin);
+            file.WBxCheckInAs(comment, user);
+        }
+
+        public static void WBxCheckInAs(this SPFile file, String comment, SPCheckinType checkInType, String userLogin)
+        {
+            SPUser user = file.Item.Web.WBxEnsureUserOrNull(userLogin);
+            file.WBxCheckInAs(comment, checkInType, user);
+        }
+
+
+        public static void WBxCheckInAs(this SPFile file, String comment, SPUser user)
+        {
+            file.WBxCheckInAs(comment, SPCheckinType.MajorCheckIn, user);
+        }
+
+        public static void WBxCheckInAs(this SPFile file, String comment, SPCheckinType checkInType, SPUser user)
+        {
+            if (user == null)
+            {
+                file.CheckIn(comment, checkInType);
+            }
+            else
+            {
+                WBUtils.CheckInFileByUser(file, comment, checkInType, user);
+            }
+        }
 
         public static string WBxCopyTo(this SPFile sourceFile, String destinationRootFolderUrlString, String folderPathString)
         {
@@ -2363,6 +2767,7 @@ namespace WorkBoxFramework
 
         public static SPUser WBxEnsureUserOrNull(this SPWeb web, String loginName)
         {
+            if (String.IsNullOrEmpty(loginName)) return null;
             SPUser user = null;
 
             bool previousSettingForAllowUnsafeUpdates = web.AllowUnsafeUpdates;

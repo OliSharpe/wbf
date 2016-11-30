@@ -3027,7 +3027,13 @@ namespace WorkBoxFramework
 
         }
 
+        [Obsolete]
         internal void GenerateFilename(WBRecordsType documentRecordsType, SPListItem sourceDocAsItem)
+        {
+            GenerateAndSetFilename(documentRecordsType, new WBDocument(this, sourceDocAsItem));
+        }
+
+        internal void GenerateAndSetFilename(WBRecordsType documentRecordsType, WBDocument document)
         {
             if (documentRecordsType == null)
             {
@@ -3039,18 +3045,23 @@ namespace WorkBoxFramework
                 WBLogging.Debug("No the documentRecordsType was NOT null!");
             }
 
-            if (sourceDocAsItem == null)
+            if (document == null)
             {
-                WBLogging.Debug("The sourceDocAsItem was null!");
+                WBLogging.Debug("The document was null!");
                 return;
             }
 
-            string filename = sourceDocAsItem.Name;
+            if (document.WorkBox != this)
+            {
+                WBUtils.shouldThrowError("The document's work box was not the work box that was called !!");
+            }
+
+            string filename = document.Name;
 
             string extension = Path.GetExtension(filename);
             string justName = Path.GetFileNameWithoutExtension(filename);
 
-            string name = documentRecordsType.GenerateCorrectDocumentName(this, sourceDocAsItem);
+            string name = documentRecordsType.GenerateCorrectDocumentName(document);
 
             if (name == null || name == "")
             {
@@ -3064,9 +3075,9 @@ namespace WorkBoxFramework
             if (!justName.Contains(name))
             {
                 // If we're changing the name then we'd better check that this file name is unique:
-                newFilename = sourceDocAsItem.Web.WBxMakeFilenameUnique(sourceDocAsItem.File.ParentFolder, newFilename);
+                newFilename = document.Web.WBxMakeFilenameUnique(document.Item.File.ParentFolder, newFilename);
 
-                sourceDocAsItem["Name"] = newFilename;
+                document.Name = newFilename;
             }
             else
             {
@@ -3076,14 +3087,14 @@ namespace WorkBoxFramework
             WBLogging.WorkBoxes.Verbose("The generated name was: " + newFilename);
             WBLogging.Debug("The generated name was: " + newFilename);
 
-            if (!sourceDocAsItem.WBxColumnHasValue(WorkBox.COLUMN_NAME__ORIGINAL_FILENAME))
+            if (!document.HasValue(WBColumn.OriginalFilename))
             {
-                sourceDocAsItem.WBxSetColumnAsString(WorkBox.COLUMN_NAME__ORIGINAL_FILENAME, filename);
+                document.OriginalFilename = filename;
             }
-            string title = sourceDocAsItem.Title.WBxTrim();
+            string title = document.Title.WBxTrim();
             if (title == "")
             {
-                sourceDocAsItem["Title"] = justName;
+                document.Title = justName;
             }
         }
 

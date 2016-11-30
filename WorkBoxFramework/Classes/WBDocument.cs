@@ -48,6 +48,14 @@ namespace WorkBoxFramework
             DebugName = "<WBDocument>";
         }
 
+        public WBDocument(WBRecordsLibrary library, SPListItemVersion item)
+            : base(item)
+        {
+            RecordsLibrary = library;
+            WorkBox = null;
+            DebugName = "<WBDocument>";
+        }
+
         public WBDocument(WorkBox workBox, SPListItem item)
             : base(item)
         {
@@ -55,6 +63,15 @@ namespace WorkBoxFramework
             WorkBox = workBox;
             DebugName = "<WBDocument>";
         }
+
+        public WBDocument(WorkBox workBox, SPListItemVersion item)
+            : base(item)
+        {
+            RecordsLibrary = null;
+            WorkBox = workBox;
+            DebugName = "<WBDocument>";
+        }
+
 
         public WBDocument() : base()
         {
@@ -158,7 +175,7 @@ namespace WorkBoxFramework
         {
             get
             {
-                if (IsSPListItem) return Item.Web.Url + "/" + Item.Url;
+                if (IsSPListItem || IsSPListItemVersion) return Item.Web.Url + "/" + Item.Url;
                 return "";
             }
         }
@@ -167,7 +184,7 @@ namespace WorkBoxFramework
         {
             get
             {
-                if (IsSPListItem && RecordsLibrary != null)
+                if ((IsSPListItem || IsSPListItemVersion) && RecordsLibrary != null)
                 {
                     WBLogging.Debug("AbsoluteURL = " + AbsoluteURL);
                     WBLogging.Debug("RecordsLibrary.URL = " + RecordsLibrary.URL);
@@ -243,6 +260,48 @@ namespace WorkBoxFramework
                 return new WBTerm(SeriesTagsTaxonomy, value.ToString());
             }
             set { this[WBColumn.SeriesTag] = value; }
+        }
+
+        public bool HasDateForFiling
+        {
+            get {
+                //if (HasReferenceDate) return true;
+                //if (HasDatePublished) return true;
+
+                // In the absence of a metadata set value - we'll just use the current date - so we 'have' a usable date:
+                return true;
+            }
+        }
+
+        public DateTime DateForFiling
+        {
+            get
+            {
+                if (HasReferenceDate) return ReferenceDate;
+                if (HasDatePublished) return DatePublished;
+
+                // In the absence of any other appropriate date we'll just return today's date:
+                return DateTime.Now;
+            }
+        }
+
+        public bool HasDatePublished { get { return this.IsNotEmpty(WBColumn.DatePublished); } }
+        public DateTime DatePublished
+        {
+            get
+            {
+                if (this.IsNullOrEmpty(WBColumn.DatePublished))
+                {
+                    WBLogging.Generic.Unexpected("Trying to read a 'DatePublished' value of a WBDocument that hasn't been set!!");
+                    return DateTime.Now;
+                }
+
+                return (DateTime)this[WBColumn.DatePublished];
+            }
+            set
+            {
+                this[WBColumn.DatePublished] = value;
+            }
         }
 
 
@@ -505,7 +564,7 @@ namespace WorkBoxFramework
 
 
 
-        public bool MaybeUpdateRecordColumns(WBDocument documentToCopy, IEnumerable<WBColumn> columnsToCopy)
+        public bool MaybeUpdateRecordColumns(String callingUserLogin, WBDocument documentToCopy, IEnumerable<WBColumn> columnsToCopy, String reasonForUpdate)
         {
             WBLogging.Debug("In MaybeUpdateRecordColumns() for " + DebugName);
             bool updateRequired = false;
@@ -536,8 +595,21 @@ namespace WorkBoxFramework
 
                 if (updateRequired)
                 {
+                    SPUser callingUser = item.Web.WBxEnsureUserOrNull(callingUserLogin);
+
+                    if (callingUserLogin != null)
+                    {
+                        WBLogging.Debug("Updating with callingUserLogin = " + callingUserLogin + " and callingUser = " + callingUser.Name);
+                        item.WBxSet(WBColumn.ModifiedBy, callingUserLogin);
+                        item.WBxSet(WBColumn.Modified, DateTime.Now);
+                    }
+                    else
+                    {
+                        WBLogging.Debug("Updating withtout a calling user (callingUserLogin = " + callingUserLogin + ")");
+                    }
+
                     item.Update();
-                    item.File.CheckIn("Metadata updated");
+                    item.File.WBxCheckInAs(reasonForUpdate, callingUser);
                 }
                 else
                 {
@@ -549,7 +621,6 @@ namespace WorkBoxFramework
 
             return updateRequired;
         }
-
 
     }
 }

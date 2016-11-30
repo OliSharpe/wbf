@@ -36,12 +36,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         WBPublishingProcess process = null;
         String newOrReplace = null;
         String archiveOrLeave = null;
-
+        WBLocationTreeState treeState = null;
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            WBLogging.Debug("In Page_Load");
 
-            manager = new WBRecordsManager();
+            WBLogging.Debug("EventArgs type: " + e.GetType().Name);
+
+            manager = new WBRecordsManager(SPContext.Current.Web.CurrentUser.LoginName);
 
             if (!IsPostBack)
             {
@@ -78,13 +81,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                 SPFolder rootFolder = masterLibrary.List.RootFolder;
 
-                WBTermCollection<WBTerm> teamFunctionalAreas = new WBTermCollection<WBTerm>(manager.FunctionalAreasTaxonomy, process.TeamFunctionalAreasUIControlValue);
-
-                String viewMode = process.IsReplaceActionToCreateNewSeries ? "New" : "Replace";
+               
+                /*
                 TreeViewLocationCollection collection = new TreeViewLocationCollection(manager, viewMode, process.ProtectiveZone, teamFunctionalAreas);
 
                 LibraryLocations.DataSource = collection;
                 LibraryLocations.DataBind();
+                */
 
                 SelectedFolderPath.Text = "/";
             }
@@ -94,7 +97,20 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 process.WorkBox = WorkBox;
             }
 
+            LibraryLocations.TreeNodePopulate += new TreeNodeEventHandler(LibraryLocations_TreeNodePopulate);
+            LibraryLocations.SelectedNodeChanged += new EventHandler(LibraryLocations_SelectedNodeChanged);
+            LibraryLocations.PopulateNodesFromClient = true;
+            //LibraryLocations.EnableClientScript = false;
 
+            WBTermCollection<WBTerm> teamFunctionalAreas = new WBTermCollection<WBTerm>(manager.FunctionalAreasTaxonomy, process.TeamFunctionalAreasUIControlValue);
+            String viewMode = process.IsReplaceActionToCreateNewSeries ? "New" : "Replace";
+
+            treeState = new WBLocationTreeState(SPContext.Current.Web, viewMode, process.ProtectiveZone);
+
+            if (!IsPostBack)
+            {
+                manager.PopulateWithFunctionalAreas(treeState, LibraryLocations.Nodes, viewMode, teamFunctionalAreas);
+            }
         }
 
         protected void Page_Unload(object sender, EventArgs e)
@@ -106,22 +122,29 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
         }
 
-        protected void LibraryLocations_Bound(object sender, TreeNodeEventArgs e)
-        {
-            if (e.Node.Text.Contains("."))
-            {
-                e.Node.ImageUrl = SPUtility.ConcatUrls("/_layouts/images/",
-                            SPUtility.MapToIcon(WorkBox.Web,
-                            SPUtility.ConcatUrls(WorkBox.Web.Url, e.Node.Text), "", IconSize.Size16));
-            }
-
-        }
-        
         protected void LibraryLocations_SelectedNodeChanged(object sender, EventArgs e)
         {
-            if (LibraryLocations.SelectedNode != null)
+            WBLogging.Debug("In LibraryLocations_SelectedNodeChanged():");
+
+            String selectedPath = "";
+            if (e is TreeNodeEventArgs && ((TreeNodeEventArgs)e).Node != null)
             {
-                string selectedPath = LibraryLocations.SelectedNode.ValuePath;
+                TreeNode node = ((TreeNodeEventArgs)e).Node;
+                WBLogging.Debug("event was a TreeNodeEventArgs with : " + node.ValuePath);
+                selectedPath = node.ValuePath;
+            }
+            else
+            {
+                if (LibraryLocations.SelectedNode != null)
+                {
+                    WBLogging.Debug("In LibraryLocations_SelectedNodeChanged(): LibraryLocations.SelectedNode.ValuePath with : " + LibraryLocations.SelectedNode.ValuePath);
+                    selectedPath = LibraryLocations.SelectedNode.ValuePath;
+                }
+
+            }
+
+            if (!String.IsNullOrEmpty(selectedPath))
+            {
                 if (string.IsNullOrEmpty(selectedPath)) selectedPath = "/";
 
                 selectedPath = selectedPath.Replace("(root)", "");
@@ -174,8 +197,110 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 PublishingProcessJSON.Value = WBUtils.SerializeToCompressedJSONForURI(process);
 
             }
+            else
+            {
+                WBLogging.Debug("In LibraryLocations_SelectedNodeChanged(): Selected path was null");
+            }
         }
 
+        protected void LibraryLocations_TreeNodePopulate(object sender, TreeNodeEventArgs e)
+        {
+            WBLogging.Debug("Call to LibraryLocations_TreeNodePopulate");
+
+            String viewMode = process.IsReplaceActionToCreateNewSeries ? "New" : "Replace";
+
+            manager.PopulateTreeNode(treeState, e.Node, viewMode);
+
+            /*
+            TreeNode newNode = new TreeNode();
+            newNode.Text = "Test1";
+            newNode.Value = "Test1";
+            newNode.PopulateOnDemand = false;
+
+            // Add the new node to the ChildNodes collection of the parent node.
+            e.Node.ChildNodes.Add(newNode);
+            */
+
+            /*
+            WBLogging.Debug("Looking for tree node in state at: " + e.Node.ValuePath);
+            TreeNode foundNode = LibraryLocations.FindNode(e.Node.ValuePath);
+
+            WBLogging.Debug("foundNode.GetType() = " + foundNode.GetType());
+            if (foundNode is WBRecordsTypeTreeNode) WBLogging.Debug("foundNode is WBRecordsTypeTreeNode");
+            else WBLogging.Debug("foundNode is NOT WBRecordsTypeTreeNode");
+            */
+        }
+
+
+        /*
+        private void PopulateNode(TreeNode node)
+        {
+            WBLogging.Debug("Call to PopulateNode");
+
+            WBLogging.Debug("Call came from node: " + node.Text);
+
+            if (node.Value != "Test2")
+            {
+                TreeNode newNode = new TreeNode();
+                newNode.Text = "Test1";
+                newNode.Value = "Test1";
+                newNode.PopulateOnDemand = false;
+
+                // Add the new node to the ChildNodes collection of the parent node.
+                node.ChildNodes.Add(newNode);
+
+                newNode = new TreeNode();
+                newNode.Text = "Test2";
+                newNode.Value = "Test2";
+
+                newNode.PopulateOnDemand = true;
+
+                // Add the new node to the ChildNodes collection of the parent node.
+                node.ChildNodes.Add(newNode);
+
+
+                newNode = new TreeNode();
+                newNode.Text = "Test3";
+                newNode.Value = "Test3";
+
+                newNode.PopulateOnDemand = false;
+
+                // Add the new node to the ChildNodes collection of the parent node.
+                node.ChildNodes.Add(newNode);
+            }
+            else
+            {
+                TreeNode newNode = new TreeNode();
+                newNode.Text = "Test2-1";
+                newNode.Value = "Test2-1";
+                newNode.PopulateOnDemand = false;
+
+                // Add the new node to the ChildNodes collection of the parent node.
+                node.ChildNodes.Add(newNode);
+
+                newNode = new TreeNode();
+                newNode.Text = "Test2-2";
+                newNode.Value = "Test2-2";
+
+                newNode.PopulateOnDemand = false;
+
+                // Add the new node to the ChildNodes collection of the parent node.
+                node.ChildNodes.Add(newNode);
+
+
+                newNode = new TreeNode();
+                newNode.Text = "Test2-3";
+                newNode.Value = "Test2-3";
+
+                newNode.PopulateOnDemand = false;
+
+                // Add the new node to the ChildNodes collection of the parent node.
+                node.ChildNodes.Add(newNode);
+            }
+
+
+        }
+        */
 
         protected void selectButton_OnClick(object sender, EventArgs e)
         {

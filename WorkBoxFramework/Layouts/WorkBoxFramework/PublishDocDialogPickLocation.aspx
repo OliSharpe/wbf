@@ -53,15 +53,13 @@ Select the folder into which to publish the document
 
 <div id="" style="overflow:scroll; height:400px; width: 400px; border: 1px solid #ccc; ">
 
-  <SharePoint:SPTreeView
+  <asp:TreeView
         id="LibraryLocations"
-        UseInternalDataBindings="false"
         runat="server"
         ShowLines="true"
         ExpandDepth="1"
         SelectedNodeStyle-CssClass="ms-tvselected"
         OnSelectedNodeChanged="LibraryLocations_SelectedNodeChanged"
-        OnTreeNodeDataBound="LibraryLocations_Bound"
         NodeStyle-CssClass="ms-navitem"
         NodeStyle-HorizontalPadding="0"
         NodeStyle-VerticalPadding="0"

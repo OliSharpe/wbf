@@ -1114,6 +1114,7 @@ namespace WorkBoxFramework
                 WBColumn.PublishedBy,
                 WBColumn.DatePublished,
                 WBColumn.ReviewDate,
+                WBColumn.SentNewlyPublishedAlert,
                 WBColumn.IntendedWebPageURL,
                 WBColumn.IAOAtTimeOfPublishing,
 
@@ -1325,6 +1326,7 @@ namespace WorkBoxFramework
                 WBColumn.PublishedBy,
                 WBColumn.DatePublished,
                 WBColumn.ReviewDate,
+                WBColumn.SentNewlyPublishedAlert,
                 WBColumn.IntendedWebPageURL,
                 WBColumn.IAOAtTimeOfPublishing
             };

@@ -59,12 +59,12 @@ As a records manager you have the right to modify the following metadata fields.
 
 <tr>
 <td class="wbf-field-name-panel">
-<div class="wbf-field-name">Record's Title</div>
+<div class="wbf-field-name">Update Record's Title</div>
 </td>
 <td class="wbf-field-value-panel">
 
 <div class="wbf-field-read-only-title">
-<asp:Label ID="Title" runat="server" Text=""></asp:Label>
+<asp:TextBox ID="RecordTitle" runat="server" Text=""></asp:TextBox>
 </div>
 
 </td>
@@ -104,6 +104,8 @@ As a records manager you have the right to modify the following metadata fields.
 
 <div class="wbf-field-read-only-title">
 <asp:Label ID="RecordSeriesStatus" runat="server" />
+
+<asp:Label ID="ExplainStatus" runat="server" />
 
 <span style="padding-left: 20px; ">
 Change: 

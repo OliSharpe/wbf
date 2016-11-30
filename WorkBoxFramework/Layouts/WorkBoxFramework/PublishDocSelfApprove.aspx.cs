@@ -57,7 +57,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             WBLogging.Generic.Verbose("In Page_Load for the self approval dialog");
 
-            manager = new WBRecordsManager();
+            manager = new WBRecordsManager(SPContext.Current.Web.CurrentUser.LoginName);
 
             // If this is the initial call to the page then we need to load the basic details of the document we're publishing out:
             if (!IsPostBack)

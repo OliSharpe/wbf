@@ -109,6 +109,7 @@ The records(s) selected will now be archived</p>
 <asp:LinkButton ID="HiddenSubmitLink" Text="Archive Next" OnClick="ArchiveNextDocument" runat="server" style="display:none;" />
 <asp:HiddenField ID="AllRecordIDsToArchive" runat="server" />
 <asp:HiddenField ID="AllRecordFilenamesToArchive" runat="server" />
+<asp:HiddenField ID="ReasonToArchiveRecords" runat="server" />
 
 <asp:UpdatePanel ID="ArchivingRecordsPanel" runat="server" UpdateMode="Always">
 

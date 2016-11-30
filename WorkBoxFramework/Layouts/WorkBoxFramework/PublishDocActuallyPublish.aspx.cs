@@ -22,7 +22,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            manager = new WBRecordsManager();
+            manager = new WBRecordsManager(SPContext.Current.Web.CurrentUser.LoginName);
 
             if (!IsPostBack)
             {

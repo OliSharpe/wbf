@@ -55,7 +55,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Microsoft.SharePoint.WebControls.SPTreeView LibraryLocations;
+        protected global::System.Web.UI.WebControls.TreeView LibraryLocations;
         
         /// <summary>
         /// ShowSelectionPanel control.

@@ -21,6 +21,7 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,7 +29,9 @@ using Microsoft.SharePoint;
 using Microsoft.Office.Server;
 using Microsoft.Office.Server.Administration;
 using Microsoft.Office.Server.UserProfiles;
-
+using Microsoft.SharePoint.Taxonomy;
+using System.Collections.Specialized;
+using Microsoft.Office.RecordsManagement.RecordsRepository;
 
 namespace WorkBoxFramework
 {
@@ -47,6 +50,9 @@ namespace WorkBoxFramework
         internal const string COMMAND__UPDATE_RECENTLY_VISITED_WORK_BOXES = "Update Recently Visited Work Boxes ([] | [All])";
         internal const string COMMAND__UPDATE_WORK_BOX_DOCUMENTS_METADATA = "Update Work Box Documents Metadata ([] | [All])";
         internal const string COMMAND__PRECREATE_WORK_BOXES = "Precreate Work Boxes (Work Box Collection)";
+        internal const string COMMAND__SEND_PUBLIC_RECORDS_REVIEW_EMAILS = "Send Public Records Review Emails ([] | [DayOfWeek])";
+        internal const string COMMAND__AUTO_ARCHIVE_OLD_PUBLIC_RECORDS = "Auto Archive Old Public Records ([] | [DayOfWeek])";
+        internal const string COMMAND__SEND_NEW_PUBLIC_RECORDS_ALERTS = "Send New Public Records Alerts";
 
 
         private const string DEFAULT_LIST_NAME__COMPOSITE_TEAMS = "Composite Teams";
@@ -117,7 +123,22 @@ namespace WorkBoxFramework
                         break;
 
                     }
+                case COMMAND__SEND_PUBLIC_RECORDS_REVIEW_EMAILS:
+                    {
+                        doSendPublicRecordsReviewEmails(targetUrl, argument1);
+                        break;
+                    }
 
+                case COMMAND__AUTO_ARCHIVE_OLD_PUBLIC_RECORDS:
+                    {
+                        doAutoArchiveOldPublicRecords(targetUrl, argument1);
+                        break;
+                    }
+                case COMMAND__SEND_NEW_PUBLIC_RECORDS_ALERTS:
+                    {
+                        doSendNewPublicRecordsAlerts(targetUrl, argument1);
+                        break;
+                    }
 
                 default:
                     {
@@ -628,8 +649,545 @@ namespace WorkBoxFramework
             WBLogging.TimerTasks.Monitorable("Finished doPrecreateWorkBoxes command");
         }
 
-        
-        
+        private static void doSendPublicRecordsReviewEmails(String workBoxCollectionURL, String dayOfWeek)
+        {
+            WBLogging.TimerTasks.Monitorable("Running doSendPublicRecordsReviewEmails command");
+
+            if (!String.IsNullOrEmpty(dayOfWeek))
+            {
+                String today = DateTime.Now.ToString("dddd");
+                if (dayOfWeek == today)
+                {
+                    WBLogging.Debug("As today is " + today + " therefore running doSendPublicRecordsReviewEmails");
+                }
+                else
+                {
+                    WBLogging.Debug("As today (" + today + ") is not " + dayOfWeek + " therefore NOT running doSendPublicRecordsReviewEmails");
+                    WBLogging.TimerTasks.Monitorable("Finished doSendPublicRecordsReviewEmails command");
+                    return;
+                }
+            }
+
+            try
+            {
+                using (WBRecordsManager manager = new WBRecordsManager(null))
+                {
+                    WBTaxonomy teams = manager.TeamsTaxonomy;
+
+                    foreach (Term term in teams.TermSet.Terms)
+                    {
+                        SendPublicRecordsReviewEmailsToTeams(manager, new WBTeam(teams, term));
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                WBLogging.TimerTasks.Unexpected("An error occurred during execution of doSendPublicRecordsReviewEmails", e);
+            }
+
+            WBLogging.TimerTasks.Monitorable("Finished doSendPublicRecordsReviewEmails command");
+        }
+
+        private static void SendPublicRecordsReviewEmailsToTeams(WBRecordsManager manager, WBTeam team)
+        {
+            // We'll only look for records to review for teams that have their IAO set:
+            if (!String.IsNullOrEmpty(team.InformationAssetOwnerLogin))
+            {
+                SendPublicRecordsReviewEmailsToTeam(manager, team);
+            }
+
+            // But we'll still look at all child teams as they might be relevant:
+            foreach (Term term in team.Term.Terms)
+            {
+                SendPublicRecordsReviewEmailsToTeams(manager, new WBTeam(manager.TeamsTaxonomy, term));
+            }
+            
+        }
+
+        private static void SendPublicRecordsReviewEmailsToTeam(WBRecordsManager manager, WBTeam team)
+        {
+            WBLogging.Debug("In SendPublicRecordsReviewEmailsToTeam for team: " + team.Name);
+
+            WBFarm farm = WBFarm.Local;
+
+            WBQuery query = manager.GetQueryForTeamsPublicRecordsToReview(team);
+            WBRecordsLibrary masterLibrary = manager.Libraries.ProtectedMasterLibrary;
+
+            SPListItemCollection items = masterLibrary.List.WBxGetItems(masterLibrary.Site, query);
+
+            if (items.Count > 0)
+            {
+                WBLogging.Debug("In SendPublicRecordsReviewEmailsToTeam. Found items.Count = " + items.Count);
+
+                StringDictionary headers = new StringDictionary();
+
+                List<String> emailAddresses = new List<String>();
+
+                foreach (SPUser user in team.MembersGroup(masterLibrary.Site).Users)
+                {
+                    if (!emailAddresses.Contains(user.Email))
+                    {
+                        emailAddresses.Add(user.Email);
+                    }
+                }
+
+                headers.Add("to", String.Join(";", emailAddresses.ToArray()));
+                headers.Add("content-type", "text/html");
+
+                headers.Add("cc", WBFarm.Local.PublicDocumentEmailAlertsTo);
+                headers.Add("bcc", WBFarm.Local.SendErrorReportEmailsTo);
+
+                String urlToGoTo = team.TeamSiteUrl + "/_layouts/WorkBoxFramework/OurRecordsToReview.aspx";
+                urlToGoTo = urlToGoTo.Replace("//_layouts/", "/_layouts/");
+
+                String subject = "You have " + items.Count + " public document/s to review (" + team.Name + ")";
+                String body = @"<p>Dear " + team.Name + @",</p>
+
+<p>The following record/s within the Public Records Library are due to be archived.</p>
+
+<p>As the owning team you will need to mark these records as ‘keep’ for them to remain visible on the council website; if no action is taken the records will be archived and no longer visible to the public.</p>
+
+<p>Your team can review these documents here: <a href=""" + urlToGoTo + @""">" + urlToGoTo + @"</a></p>
+
+";
+
+                for (int weeksTime = 1; weeksTime <= 4; weeksTime++)
+                {
+                    WBQuery queryToArchiveSoon = manager.GetQueryForTeamsPublicRecordsToArchiveInFutureWeek(team, weeksTime);
+                    SPListItemCollection toArchiveSoon = masterLibrary.List.WBxGetItems(masterLibrary.Site, queryToArchiveSoon);
+
+                    if (toArchiveSoon.Count > 0)
+                    {
+                        if (weeksTime == 1)
+                        {
+                            body += "<p><b>Documents Being Archived Next Week:</b><br/>\n";
+                        }
+                        else
+                        {
+                            body += "<p><b>Documents Being Archived In " + weeksTime + " Weeks:</b><br/>\n";
+                        }
+
+                        foreach (SPListItem item in toArchiveSoon)
+                        {
+                            WBDocument document = new WBDocument(masterLibrary, item);
+
+                            String functionalAreaString = "";
+                            if (document.FunctionalArea.Count > 0)
+                            {
+                                functionalAreaString = document.FunctionalArea[0].FullPath;
+                            }
+
+                            body += "<a href=\"" + document.AbsoluteURL + "\">" + document.Name + "</a><br/>\n";
+                            body += "Location: (" + document.ProtectiveZone + "): " + functionalAreaString + "/" + document.RecordsType.FullPath + "<br/>\n";
+                            body += "<br/>\n";
+                        }
+                        body += "</p>\n";
+                    }
+                }
+
+                body += "\n\n<p>Many Thanks,<br/>\nWebteam.</p>";
+                headers.Add("subject", subject);
+
+                WBUtils.SendEmail(masterLibrary.Web, headers, body);
+            }
+            else
+            {
+                WBLogging.Debug("In SendPublicRecordsReviewEmailsToTeam. Found items.Count = 0 for team " + team.Name);
+            }
+
+        }
+
+
+        private static void doAutoArchiveOldPublicRecords(String workBoxCollectionURL, String dayOfWeek)
+        {
+            WBLogging.TimerTasks.Monitorable("Running doAutoArchiveOldPublicRecords command");
+
+            if (!String.IsNullOrEmpty(dayOfWeek))
+            {
+                String today = DateTime.Now.ToString("dddd");
+                if (dayOfWeek == today)
+                {
+                    WBLogging.Debug("As today is " + today + " therefore running doAutoArchiveOldPublicRecords");
+                }
+                else
+                {
+                    WBLogging.Debug("As today (" + today + ") is not " + dayOfWeek + " therefore NOT running doAutoArchiveOldPublicRecords");
+                    WBLogging.TimerTasks.Monitorable("Finished doSendPublicRecordsReviewEmails command");
+                    return;
+                }
+            }
+
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (WBRecordsManager elevatedManager = new WBRecordsManager(null))
+                    {
+                        WBTaxonomy teams = elevatedManager.TeamsTaxonomy;
+
+                        foreach (Term term in teams.TermSet.Terms)
+                        {
+                            ArchiveOldPublicDocumentsForTeams(elevatedManager, new WBTeam(teams, term));
+                        }
+                    }
+                });
+
+            }
+            catch (Exception e)
+            {
+                WBLogging.TimerTasks.Unexpected("An error occurred during execution of doAutoArchiveOldPublicRecords", e);
+            }
+
+            WBLogging.TimerTasks.Monitorable("Finished doAutoArchiveOldPublicRecords command");
+        }
+
+        private static void ArchiveOldPublicDocumentsForTeams(WBRecordsManager elevatedManager, WBTeam team)
+        {
+            // We'll only look for records to archive for teams that have their IAO set:
+            if (!String.IsNullOrEmpty(team.InformationAssetOwnerLogin))
+            {
+                ArchiveOldPublicDocumentsForTeam(elevatedManager, team);
+            }
+
+            // But we'll still look at all child teams as they might be relevant:
+            foreach (Term term in team.Term.Terms)
+            {
+                ArchiveOldPublicDocumentsForTeams(elevatedManager, new WBTeam(elevatedManager.TeamsTaxonomy, term));
+            }
+        }
+
+        private static void ArchiveOldPublicDocumentsForTeam(WBRecordsManager elevatedManager, WBTeam team)
+        {
+            WBLogging.Debug("In ArchiveOldPublicDocumentsForTeam for team " + team.Name);
+
+            WBFarm farm = WBFarm.Local;
+
+            WBQuery query = elevatedManager.GetQueryForTeamsPublicRecordsToArchive(team);
+
+            WBRecordsLibrary masterLibrary = elevatedManager.Libraries.ProtectedMasterLibrary;
+            SPListItemCollection items = masterLibrary.List.WBxGetItems(masterLibrary.Site, query);
+
+            if (items.Count > 0)
+            {
+                WBLogging.Debug("In ArchiveOldPublicDocumentsForTeam. items.Count = " + items.Count);
+
+
+                List<SPListItem> success = new List<SPListItem>();
+                List<SPListItem> failure = new List<SPListItem>();
+
+                Dictionary<SPListItem, String> failureMessages = new Dictionary<SPListItem, string>();
+
+                foreach (SPListItem item in items)
+                {
+                    try
+                    {
+                        WBRecord record = new WBRecord(elevatedManager.Libraries, item);
+                        record.LiveOrArchived = WBColumn.LIVE_OR_ARCHIVED__ARCHIVED;
+                        record.Update(null, "Auto Archived");
+
+                        success.Add(item);
+                    }
+                    catch (Exception e)
+                    {
+                        failure.Add(item);
+                        failureMessages.Add(item, e.WBxFlatten());
+                    }
+                }
+
+                if (success.Count > 0)
+                {
+                    StringDictionary headers = new StringDictionary();
+                    List<String> emailAddresses = new List<String>();
+
+                    foreach (SPUser user in team.MembersGroup(masterLibrary.Site).Users)
+                    {
+                        if (!emailAddresses.Contains(user.Email))
+                        {
+                            emailAddresses.Add(user.Email);
+                        }
+                    }
+
+                    // Send an email to the team about the documents that were archived:
+                    headers.Add("to", String.Join(";", emailAddresses.ToArray()));
+                    headers.Add("content-type", "text/html");
+
+                    headers.Add("cc", WBFarm.Local.PublicDocumentEmailAlertsTo);
+                    headers.Add("bcc", WBFarm.Local.SendErrorReportEmailsTo);
+
+                    String subject = success.Count + " public document/s have been auto archived (" + team.Name + ")";
+                    String body = "<p>Dear " + team.Name + @",</p>
+
+<p>The following record/s within the Public Records Library have now been archived.</p>
+
+<p><b>Recently Archived Documents:</b></p>
+
+";
+
+                    foreach (SPListItem item in success)
+                    {
+                        WBDocument document = new WBDocument(masterLibrary, item);
+
+                        String functionalAreaString = "";
+                        if (document.FunctionalArea.Count > 0)
+                        {
+                            functionalAreaString = document.FunctionalArea[0].FullPath;
+                        }
+
+                        body += "<p><a href=\"" + document.AbsoluteURL + "\">" + document.Name + "</a><br/>\n";
+                        body += "Old Location: (" + document.ProtectiveZone + "): " + functionalAreaString + "/" + document.RecordsType.FullPath + "<br/>\n";
+                        body += "</p>\n";
+
+                    }
+
+                    body += "\n\n<p>Many Thanks,<br/>\nWebteam.</p>";
+                    headers.Add("subject", subject);
+
+                    WBUtils.SendEmail(masterLibrary.Web, headers, body);
+                }
+
+                if (failure.Count > 0)
+                {
+                    StringDictionary headers = new StringDictionary();
+                    // Now send another email about the failures to webteam
+                    headers.Add("to", WBFarm.Local.PublicDocumentEmailAlertsTo);
+                    headers.Add("content-type", "text/html");
+                    headers.Add("bcc", WBFarm.Local.SendErrorReportEmailsTo);
+
+                    String subject = failure.Count + " public document/s failed to auto archive";
+                    String body = @"<p>Dear Webteam,</p>
+
+<p>The following public document(s) failed to auto archive:</p>
+
+<p><b>Failed Documents:</b></p>
+
+";
+
+
+                    foreach (SPListItem item in failure)
+                    {
+                        WBDocument document = new WBDocument(masterLibrary, item);
+
+                        String functionalAreaString = "";
+                        if (document.FunctionalArea.Count > 0)
+                        {
+                            functionalAreaString = document.FunctionalArea[0].FullPath;
+                        }
+
+                        body += "<p><a href=\"" + document.AbsoluteURL + "\">" + document.Name + "</a><br/>\n";
+                        body += "Location: (" + document.ProtectiveZone + "): " + functionalAreaString + "/" + document.RecordsType.FullPath + "<br/>\n";
+                        body += "Error: " + failureMessages[item];
+                        body += "</p>\n\n";
+                    }
+
+                    body += "\n\n<p>Many Thanks,<br/>\nWebteam.</p>";
+                    headers.Add("subject", subject);
+
+                    WBUtils.SendEmail(masterLibrary.Web, headers, body);
+                }
+
+            }
+            else
+            {
+                WBLogging.Debug("In ArchiveOldPublicDocumentsForTeam. items.Count = 0 for team " + team.Name);
+            }
+        }
+
+
+        private static void doSendNewPublicRecordsAlerts(String workBoxCollectionURL, String flag)
+        {
+            WBLogging.TimerTasks.Monitorable("Running doSendNewPublicRecordsAlerts command");
+
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (WBRecordsManager elevatedManager = new WBRecordsManager(null))
+                    {
+                        WBQuery query = elevatedManager.GetQueryForNewlyPublishedPublicDocsThatNeedEmailAlert();
+
+                        WBRecordsLibrary masterLibrary = elevatedManager.Libraries.ProtectedMasterLibrary;
+
+                        SPListItemCollection needEmailAlert = masterLibrary.List.WBxGetItems(masterLibrary.Site, query);
+
+                        List<SPListItem> itemsForWebteamAsBackupIAO = new List<SPListItem>();
+                        Dictionary<SPUser, List<SPListItem>> itemsForIAO = new Dictionary<SPUser, List<SPListItem>>();
+                        Dictionary<String, SPUser> IAOs = new Dictionary<string, SPUser>();
+
+                        if (needEmailAlert.Count == 0)
+                        {
+                            WBLogging.Debug("Found no newly published items with query: \n" + query.JustCAMLQuery(masterLibrary.Site));
+                        }
+
+                        foreach (SPListItem item in needEmailAlert)
+                        {
+                            WBLogging.Debug("Found newly published item that needs alert: " + item.Name);
+
+                            String iaoLogin = item.WBxGetAsString(WBColumn.IAOAtTimeOfPublishing);
+                            WBTeam owningTeam = item.WBxGetSingleTermColumn<WBTeam>(elevatedManager.TeamsTaxonomy, WBColumn.OwningTeam);
+                            String owningTeamIAOLogin = owningTeam.InformationAssetOwnerLogin;
+
+                            if (!String.IsNullOrEmpty(owningTeamIAOLogin) && owningTeamIAOLogin != iaoLogin)
+                            {
+                                iaoLogin = owningTeamIAOLogin;
+                            }
+
+                            SPUser iaoUser = null;
+
+                            if (!String.IsNullOrEmpty(iaoLogin))
+                            {
+                                if (!IAOs.ContainsKey(iaoLogin))
+                                {
+                                    iaoUser = masterLibrary.Web.WBxEnsureUserOrNull(iaoLogin);
+                                    if (iaoUser != null) IAOs.Add(iaoLogin, iaoUser);
+                                }
+                                else
+                                {
+                                    iaoUser = IAOs[iaoLogin];
+                                }
+                            }
+
+                            if (iaoUser != null)
+                            {
+                                List<SPListItem> listOfItemsForIAO = null;
+                                if (!itemsForIAO.ContainsKey(iaoUser))
+                                {
+                                    listOfItemsForIAO = new List<SPListItem>();
+                                    itemsForIAO.Add(iaoUser, listOfItemsForIAO);
+                                }
+                                else
+                                {
+                                    listOfItemsForIAO = itemsForIAO[iaoUser];
+                                }
+
+                                WBLogging.Debug("Adding: " + item.Name +" to list for user: " + iaoUser.Name);
+
+                                listOfItemsForIAO.Add(item);
+                            }
+                            else
+                            {
+                                WBLogging.Debug("Adding: " + item.Name + " to default list");
+
+                                itemsForWebteamAsBackupIAO.Add(item);
+                            }
+                        }
+
+                        // Now actually put together and send out the email to each IAO
+                        foreach (SPUser iaoUser in itemsForIAO.Keys)
+                        {
+                            String body = MakeBodyOfEmailToIAO(masterLibrary, itemsForIAO[iaoUser]);
+
+                            StringDictionary headers = new StringDictionary();
+
+                            headers.Add("to", iaoUser.Email);
+                            headers.Add("content-type", "text/html"); 
+
+                            headers.Add("cc", WBFarm.Local.PublicDocumentEmailAlertsTo);
+                            headers.Add("bcc", WBFarm.Local.SendErrorReportEmailsTo);
+
+                            headers.Add("subject", "New documents published today for which you are IAO");
+
+                            WBUtils.SendEmail(masterLibrary.Web, headers, body);
+                        }
+
+                        if (itemsForWebteamAsBackupIAO.Count > 0)
+                        {
+                            WBLogging.Debug("We've got to send an email for some docs that didn't have an IAO");
+                            // Then we'll send an email to webteam with all of the documents that didn't have an assigned IAO
+                            String bodyToWebteam = MakeBodyOfEmailToIAO(masterLibrary, itemsForWebteamAsBackupIAO);
+                            StringDictionary headersToWebteam = new StringDictionary();
+
+                            headersToWebteam.Add("to", WBFarm.Local.PublicDocumentEmailAlertsTo);
+                            headersToWebteam.Add("content-type", "text/html"); 
+
+                            headersToWebteam.Add("bcc", WBFarm.Local.SendErrorReportEmailsTo);
+
+                            headersToWebteam.Add("subject", "New documents published today for which there is no assigned IAO");
+
+                            WBUtils.SendEmail(masterLibrary.Web, headersToWebteam, bodyToWebteam);
+                        }
+                        else
+                        {
+                            WBLogging.Debug("Found no newly published docs that didn't have an assigned IAO");
+                        }
+
+                        // And finally we'll mark all of the documents as having had an email sent to them:
+                        foreach (SPUser iaoUser in itemsForIAO.Keys)
+                        {
+                            List<SPListItem> items = itemsForIAO[iaoUser];
+                            foreach (SPListItem item in items)
+                            {
+                                Records.BypassLocks(item, delegate(SPListItem bypassedItem)
+                                {
+                                    bypassedItem.WBxSet(WBColumn.SentNewlyPublishedAlert, DateTime.Now);
+                                    bypassedItem.SystemUpdate();
+                                });
+                            }
+                        }
+
+                        foreach (SPListItem item in itemsForWebteamAsBackupIAO)
+                        {
+                            Records.BypassLocks(item, delegate(SPListItem bypassedItem)
+                            {
+                                bypassedItem.WBxSet(WBColumn.SentNewlyPublishedAlert, DateTime.Now);
+                                bypassedItem.SystemUpdate();
+                            });
+                        }
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                WBLogging.TimerTasks.Unexpected("An error occurred during execution of doSendNewPublicRecordsAlerts", e);
+            }
+
+            WBLogging.TimerTasks.Monitorable("Finished doSendNewPublicRecordsAlerts command");
+        }
+
+        private static String MakeBodyOfEmailToIAO(WBRecordsLibrary masterLibrary, List<SPListItem> items)
+        {
+            String body = @"<p>Dear Information Asset Owner,</p>
+
+<p>One or more documents have been published to the Public Records Library by a member of your team.</p>
+
+<p>As the responsible Information Asset Owner for this document, please find details of their publication below along with a link.</p>
+ 
+<p><b>Published Documents:</b></p>"; 
+
+            foreach (SPListItem item in items)
+            {
+                WBDocument document = new WBDocument(masterLibrary, item);
+                
+                String functionalAreaString = "";
+                if (document.FunctionalArea.Count > 0)
+                {
+                    functionalAreaString = document.FunctionalArea[0].FullPath;
+                }
+
+                SPUser publisehdByUser = document[WBColumn.PublishedBy] as SPUser;
+                String publishedByString = "<unknown>";
+                if (publisehdByUser != null)
+                {
+                    publishedByString = publisehdByUser.Name;
+                }
+
+                List<SPUser> approvedByUsers = document[WBColumn.PublishingApprovedBy] as List<SPUser>;
+                String approvedByString = "<unknown>";
+                if (approvedByUsers != null)
+                {
+                    approvedByString = approvedByUsers.WBxToPrettyString();
+                }
+
+                body += "<p><a href=\"" + document.AbsoluteURL + "\">" + document.Name + "</a><br/>\n";
+                body += "Location: (" + document.ProtectiveZone + "): " + functionalAreaString + "/" + document.RecordsType.FullPath + "<br/>\n";
+                body += "Published by: " + publishedByString  + "<br/>\n";
+                body += "Approved by: " + approvedByString + "<br/>\n";
+                body += "</p>\n";
+            }
+
+            return body;
+        }
+
         #endregion
 
     }

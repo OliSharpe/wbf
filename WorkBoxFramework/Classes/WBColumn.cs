@@ -184,6 +184,12 @@ namespace WorkBoxFramework
             return textColumn;
         }
 
+        public static WBColumn TextColumn(String displayName, String internalName, String prettyName)
+        {
+            WBColumn textColumn = new WBColumn(displayName, internalName, prettyName, DataTypes.Text);
+            return textColumn;
+        }
+
         public static WBColumn UniqueTextColumn(String displayName)
         {
             WBColumn newColumn = new WBColumn(displayName, INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, DataTypes.Text);
@@ -346,6 +352,15 @@ namespace WorkBoxFramework
             column.AllowMultipleValues = allowMultipleValues;
             return column;
         }
+
+
+        public static WBColumn UserColumn(String displayName, String internalName, bool allowMultipleValues)
+        {
+            WBColumn column = new WBColumn(displayName, internalName, DataTypes.User);
+            column.AllowMultipleValues = allowMultipleValues;
+            return column;
+        }
+
 
         public static WBColumn LookupColumn(String displayName, bool internalNameHasSpaceCharacters, String lookupListName)
         {
@@ -848,6 +863,9 @@ namespace WorkBoxFramework
         public static readonly WBColumn ID = WBColumn.CounterColumn("ID");
         public static readonly WBColumn Author = WBColumn.UserColumn("Author", false, false);
 
+        public static readonly WBColumn ModifiedBy = WBColumn.UserColumn("Modified By", "Editor", false);
+        public static readonly WBColumn CheckInComment = WBColumn.TextColumn("Check In Comment", "_CheckinComment", "Check In Comment");
+
         public static readonly WBColumn ServerURL = WBColumn.TextColumn("ServerUrl", "Server URL");
         public static readonly WBColumn EncodedAbsoluteURL = WBColumn.TextColumn("EncodedAbsUrl", "Absolute URL");
 
@@ -958,6 +976,7 @@ namespace WorkBoxFramework
         public static readonly WBColumn PublishedBy = WBColumn.UserColumn("Published By", INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, false);
         public static readonly WBColumn DatePublished = WBColumn.DateTimeColumn("Date Published", "DatePublished", "Published Date");
         public static readonly WBColumn ReviewDate = WBColumn.DateTimeColumn("Review Date", "ReviewDate", "Review Date");
+        public static readonly WBColumn SentNewlyPublishedAlert = WBColumn.DateTimeColumn("Sent Newly Published Alert", "SentNewlyPublishedAlert", "Sent Newly Published Alert");
 
 
         public static readonly WBColumn FileTypeExtension = WBColumn.UniqueTextColumn("File Type Extension");
@@ -1024,7 +1043,10 @@ namespace WorkBoxFramework
             WBTimerTask.COMMAND__CACHE_WORK_BOX_DETAILS,
             WBTimerTask.COMMAND__UPDATE_RECENTLY_VISITED_WORK_BOXES,
             WBTimerTask.COMMAND__UPDATE_WORK_BOX_DOCUMENTS_METADATA,
-            WBTimerTask.COMMAND__PRECREATE_WORK_BOXES
+            WBTimerTask.COMMAND__PRECREATE_WORK_BOXES,
+            WBTimerTask.COMMAND__SEND_PUBLIC_RECORDS_REVIEW_EMAILS,
+            WBTimerTask.COMMAND__AUTO_ARCHIVE_OLD_PUBLIC_RECORDS,
+            WBTimerTask.COMMAND__SEND_NEW_PUBLIC_RECORDS_ALERTS
         };
 
         public static readonly WBColumn Command = WBColumn.ChoiceColumn(WBTimerTask.COLUMN_NAME__COMMAND, commands);

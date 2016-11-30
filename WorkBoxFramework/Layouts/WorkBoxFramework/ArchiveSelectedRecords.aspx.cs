@@ -17,7 +17,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             WBLogging.Generic.Verbose("In Page_Load for the archival of selected records");
 
-            manager = new WBRecordsManager();
+            manager = new WBRecordsManager(SPContext.Current.Web.CurrentUser.LoginName);
 
             // If this is the initial call to the page then we need to load the basic details of the document we're publishing out:
             if (!IsPostBack)
@@ -102,6 +102,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             string redirectUrl = "WorkBoxFramework/ActuallyArchiveRecords.aspx";
             string queryString = "AllRecordIDsToArchive=" + AllRecordIDsToArchive.Value;
+            queryString += "&ReasonToArchiveRecords=" + WBUtils.UrlDataEncode(ArchiveReason.Text);
 
             SPUtility.Redirect(redirectUrl, SPRedirectFlags.RelativeToLayoutsPage, Context, queryString);
         }

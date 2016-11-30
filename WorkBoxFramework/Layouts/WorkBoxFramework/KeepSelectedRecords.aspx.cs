@@ -18,7 +18,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             WBLogging.Generic.Verbose("In Page_Load for the keeping of selected records");
 
-            manager = new WBRecordsManager();
+            manager = new WBRecordsManager(SPContext.Current.Web.CurrentUser.LoginName);
 
             // If this is the initial call to the page then we need to load the basic details of the document we're publishing out:
             if (!IsPostBack)
@@ -89,6 +89,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             string redirectUrl = "WorkBoxFramework/ActuallyKeepRecords.aspx";
             string queryString = "AllRecordIDsToKeep=" + AllRecordIDsToKeep.Value;
+            queryString += "&ReasonToKeepRecords=" + WBUtils.UrlDataEncode(KeepReason.Text);
 
             SPUtility.Redirect(redirectUrl, SPRedirectFlags.RelativeToLayoutsPage, Context, queryString);
         }

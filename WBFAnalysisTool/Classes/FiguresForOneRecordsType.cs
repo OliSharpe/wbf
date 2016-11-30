@@ -49,7 +49,7 @@ namespace WBFAnalysisTool
             if (Details == null) return;
 
             if (!String.IsNullOrEmpty(Details["Auto-Close Trigger Date"] as String))
-            {
+            { 
                 WBAutoCloseRule = "" + Details["Auto-Close Time Scalar"] + " "+  Details["Auto-Close Time Unit"] + " after " + Details["Auto-Close Trigger Date"];
             }
             if (!String.IsNullOrEmpty(Details["Retention Trigger Date"] as String))

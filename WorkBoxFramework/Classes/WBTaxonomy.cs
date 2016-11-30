@@ -387,6 +387,36 @@ namespace WorkBoxFramework
             return GetSelectedTermByPath(path, false);
         }
 
+        public Term GetDeepestTermBySteps(IEnumerable<String> steps)
+        {
+            TermCollection nextLevelTerms = TermSet.Terms;
+            WBLogging.Generic.Verbose("In GetDeepestTermBySteps(): got top level terms");
+            Term nextTerm = null;
+            Term foundTerm = null;
+            foreach (string step in steps)
+            {
+                if (String.IsNullOrEmpty(step)) continue;
+                if (step.Equals(TermSet.Name)) continue;
+
+                try
+                {
+                    nextTerm = nextLevelTerms[step];
+                }
+                catch (ArgumentOutOfRangeException exception)
+                {
+                    WBLogging.Generic.Verbose("WBTaxonomy.GetDeepestTermBySteps(): The next step in path clearly doesn't exist: " + step + " Exception message: " + exception.Message);
+
+                    nextTerm = null;
+                    break;
+                }
+
+                foundTerm = nextTerm;
+                nextLevelTerms = nextTerm.Terms;
+            }
+
+            return foundTerm;
+        }
+
         public Term GetSelectedTermByPath(String path, bool createIfNew)
         {
             WBLogging.Generic.Verbose("In GetSelectedTermByPath(): started");

@@ -260,6 +260,13 @@
     <Compile Include="Layouts\WorkBoxFramework\KeepSelectedRecords.aspx.designer.cs">
       <DependentUpon>KeepSelectedRecords.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\OurRecordsToReview.aspx.cs">
+      <DependentUpon>OurRecordsToReview.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\WorkBoxFramework\OurRecordsToReview.aspx.designer.cs">
+      <DependentUpon>OurRecordsToReview.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\WorkBoxFramework\PublishDocActuallyPublish.aspx.cs">
       <DependentUpon>PublishDocActuallyPublish.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -305,14 +312,10 @@
       <DependentUpon>ViewRecordSeriesDetails.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\WBPublishingProcess.cs" />
-    <Compile Include="WebParts\OurRecordsToReview\OurRecordsToReview.cs" />
-    <Compile Include="WebParts\OurRecordsToReview\OurRecordsToReviewUserControl.ascx.cs">
-      <DependentUpon>OurRecordsToReviewUserControl.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="WebParts\OurRecordsToReview\OurRecordsToReviewUserControl.ascx.designer.cs">
-      <DependentUpon>OurRecordsToReviewUserControl.ascx.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Classes\WBFolderTreeNode.cs" />
+    <Compile Include="Classes\WBFunctionalAreaTreeNode.cs" />
+    <Compile Include="Classes\WBLocationTreeState.cs" />
+    <Compile Include="Classes\WBRecordsTypeTreeNode.cs" />
     <Compile Include="WebParts\SearchOrBrowseOurRecords\SearchOrBrowseOurRecords.cs" />
     <Compile Include="WebParts\SearchOrBrowseOurRecords\SearchOrBrowseOurRecordsUserControl.ascx.cs">
       <DependentUpon>SearchOrBrowseOurRecordsUserControl.ascx</DependentUpon>
@@ -898,10 +901,6 @@
     <None Include="CustomActions\LinkedCalendarSettingsCustomAction\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{1e23a6c4-0355-4468-ae40-72b4eceaa13f}</SharePointProjectItemId>
     </None>
-    <None Include="WebParts\OurRecordsToReview\OurRecordsToReview.webpart" />
-    <None Include="WebParts\OurRecordsToReview\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{31b7c264-f8df-4199-8bbd-89af1f5a04d7}</SharePointProjectItemId>
-    </None>
     <None Include="WebParts\SearchOrBrowseOurRecords\SearchOrBrowseOurRecords.webpart" />
     <None Include="WebParts\SearchOrBrowseOurRecords\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{55b6b29a-9cbb-40e4-a870-43749db2c4b9}</SharePointProjectItemId>
@@ -1213,6 +1212,9 @@
     <Content Include="Layouts\WorkBoxFramework\KeepSelectedRecords.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
+    <Content Include="Layouts\WorkBoxFramework\OurRecordsToReview.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\WorkBoxFramework\PublishDocActuallyPublish.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1233,10 +1235,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\WorkBoxFramework\ViewRecordSeriesDetails.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="WebParts\OurRecordsToReview\Elements.xml" />
-    <Content Include="WebParts\OurRecordsToReview\OurRecordsToReviewUserControl.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="WebParts\SearchOrBrowseOurRecords\Elements.xml" />

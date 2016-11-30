@@ -22,9 +22,10 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (!IsPostBack)
             {
-                using (WBRecordsManager manager = new WBRecordsManager())
+                using (WBRecordsManager manager = new WBRecordsManager(SPContext.Current.Web.CurrentUser.LoginName))
                 {
                     AllRecordIDsToKeep.Value = Request.QueryString["AllRecordIDsToKeep"];
+                    ReasonToKeepRecords.Value = Request.QueryString["ReasonToKeepRecords"];
 
                     recordIDs = AllRecordIDsToKeep.Value.Split(',');
                     foreach (String recordID in recordIDs)
@@ -79,16 +80,17 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             WBLogging.Debug("Attempting to keep the next document with index: " + indexOfNextRecordToKeep + " and filename: " + mappedFilenames[indexOfNextRecordToKeep.ToString()]);
 
+            String callingUserLogin = SPContext.Current.Web.CurrentUser.LoginName;
             WBTaskFeedback feedback = new WBTaskFeedback(indexOfNextRecordToKeep.ToString());
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    using (WBRecordsManager elevatedManager = new WBRecordsManager())
+                    using (WBRecordsManager elevatedManager = new WBRecordsManager(callingUserLogin))
                     {
                         WBRecord record = elevatedManager.Libraries.GetRecordByID(recordIDs[indexOfNextRecordToKeep]);
                         record[WBColumn.ReviewDate] = DateTime.Now.AddYears(2);
-                        record.Update();
+                        record.Update(callingUserLogin, ReasonToKeepRecords.Value);
 
                         feedback.Success("Kept successfully");
                     }

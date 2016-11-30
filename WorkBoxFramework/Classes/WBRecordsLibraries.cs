@@ -127,7 +127,7 @@ namespace WorkBoxFramework
         }
 
 
-        public WBRecord DeclareNewRecord(WBTaskFeedback feedback, WBDocument document, WBRecord recordToReplace, String replacingAction, WBItem extraMetadata)
+        public WBRecord DeclareNewRecord(WBTaskFeedback feedback, String callingUserLogin, WBDocument document, WBRecord recordToReplace, String replacingAction, WBItem extraMetadata)
         {
             WBTerm functionalArea = document.FunctionalArea[0];
             WBRecordsType recordsType = document.RecordsType;
@@ -142,9 +142,8 @@ namespace WorkBoxFramework
 
             // If nothing else we'll use the time now (which will be roughly the date / time declared as the date for the naming convention:
             DateTime referenceDate = DateTime.Now;
-            if (document.HasReferenceDate)
+            if (document.HasReferenceDate && recordsType.DocumentReferenceDateRequirement != WBRecordsType.METADATA_REQUIREMENT__HIDDEN)
             {
-                // But ideally we'll be taking the reference date from the metadata of the document being declared:
                 referenceDate = document.ReferenceDate;
             }
             else
@@ -274,7 +273,7 @@ namespace WorkBoxFramework
             //{
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    using (WBRecordsManager manager = new WBRecordsManager())
+                    using (WBRecordsManager manager = new WBRecordsManager(callingUserLogin))
                     {
                         WBRecord elevatedRecordToReplace = manager.Libraries.GetRecordByID(recordToReplace.RecordID);
 
@@ -288,7 +287,7 @@ namespace WorkBoxFramework
                             elevatedRecordToReplace.RecordSeriesStatus = WBColumn.RECORD_SERIES_STATUS__RETIRED;
                         }
 
-                        elevatedRecordToReplace.Update();
+                        elevatedRecordToReplace.Update(callingUserLogin, "Record was " + elevatedRecordToReplace.RecordSeriesStatus + " because it was replaced through publishing process");
 
                         if (feedback != null) feedback.AddFeedback("Archived record being replaced");
                         WBLogging.Debug("WBRecordsLibraries.DeclareNewRecord(): Archived the record being replaced Record ID = " + recordToReplace.RecordID);
@@ -311,7 +310,7 @@ namespace WorkBoxFramework
 
             newRecord.LiveOrArchived = WBColumn.LIVE_OR_ARCHIVED__LIVE;
 
-            newRecord.UpdateMasterAndCreateCopies(feedback);
+            newRecord.UpdateMasterAndCreateCopies(feedback, callingUserLogin);
 
             bool beforeForDocument = document.Web.AllowUnsafeUpdates;
             document.Web.AllowUnsafeUpdates = true;
@@ -328,7 +327,7 @@ namespace WorkBoxFramework
 
             if (uploadedFile.CheckOutType != SPFile.SPCheckOutType.None)
             {
-                uploadedFile.CheckIn("Automatically checked in", SPCheckinType.MajorCheckIn);
+                uploadedFile.WBxCheckInAs("Declared new major version of record.", SPCheckinType.MajorCheckIn, callingUserLogin);
             }
             else
             {

@@ -34,12 +34,12 @@ namespace WBFAnalysisTool
 
             if (!_workbook.xSheetExists(sheetName))
             {
-                Worksheet = _workbook.Worksheets.Add(Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+                Worksheet = (Excel.Worksheet)_workbook.Worksheets.Add(Missing.Value, Missing.Value, Missing.Value, Missing.Value);
                 Worksheet.Name = sheetName;
             }
             else
             {
-                Worksheet = _workbook.Worksheets[sheetName];
+                Worksheet = (Excel.Worksheet)_workbook.Worksheets[sheetName];
             }
 
             TitleRow = new T();
