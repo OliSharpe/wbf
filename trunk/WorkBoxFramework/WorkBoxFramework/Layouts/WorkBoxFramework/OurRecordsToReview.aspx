@@ -1,11 +1,13 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
-<%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %> 
-<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %> 
+<%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
+<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
-<%@ Import Namespace="Microsoft.SharePoint" %> 
-<%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SearchOrBrowseOurRecordsUserControl.ascx.cs" Inherits="WorkBoxFramework.SearchOrBrowseOurRecords.SearchOrBrowseOurRecordsUserControl" %>
+<%@ Import Namespace="Microsoft.SharePoint" %>
+<%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="OurRecordsToReview.aspx.cs" Inherits="WorkBoxFramework.Layouts.WorkBoxFramework.OurRecordsToReview" DynamicMasterPageFile="~masterurl/default.master" %>
+
+<asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
 <style>
 
@@ -103,6 +105,28 @@ table.wbf-record-series-details .wbf-record-series-summary-detail
         }
     }
 
+    function WorkBoxFramework_keepSelectedRecords() {
+
+        var selectedRecords = $('#wbf-list-of-records-selected').text();
+
+        if (selectedRecords && selectedRecords != "") {
+            var urlValue = L_Menu_BaseUrl + '/_layouts/WorkBoxFramework/KeepSelectedRecords.aspx'
+            + '?SelectedRecords=' + selectedRecords;
+
+            var options = {
+                url: urlValue,
+                title: 'Keep Record(s)',
+                allowMaximize: false,
+                showClose: true,
+                dialogReturnValueCallback: WorkBoxFramework_callback
+            };
+
+            SP.UI.ModalDialog.showModalDialog(options);
+        } else {
+            alert("You have not selected any records");
+        }
+    }
+
 
 
     function WBF_add_record_id(recordID) {
@@ -114,8 +138,6 @@ table.wbf-record-series-details .wbf-record-series-summary-detail
         soFarArray.push(recordID);
         $('#wbf-list-of-records-selected').text(soFarArray.join('_'));
 
-
-        //var archiveRecordsButton = document.getElementById("<%=ArchiveRecordsButton.ClientID %>"); 
     }
 
     function WBF_remove_record_id(recordID) {
@@ -125,10 +147,10 @@ table.wbf-record-series-details .wbf-record-series-summary-detail
         if (soFarString && soFarString != "") soFarArray = soFarString.split('_');
 
         // OK so this is crude - but it should work everywhere!
-        for(var i = soFarArray.length - 1; i >= 0; i--) {
-          if(soFarArray[i] == recordID) {
-            soFarArray.splice(i, 1);
-          }
+        for (var i = soFarArray.length - 1; i >= 0; i--) {
+            if (soFarArray[i] == recordID) {
+                soFarArray.splice(i, 1);
+            }
         }
         $('#wbf-list-of-records-selected').text(soFarArray.join('_'));
     }
@@ -148,16 +170,13 @@ table.wbf-record-series-details .wbf-record-series-summary-detail
         }
     }
 
-    function WBF_add_checkbox_change_function() {
-        
-        $('.wbf-our-records-check-boxes').change(WBF_checkbox_changed());
-        alert('attempted to connect');
-    }
-
-    //Sys.Application.add_load(WBF_add_checkbox_change_function); 
-    //
 
     </script>
+
+</asp:Content>
+
+<asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
+
 <div style="display:none;">
 <div id="wbf-list-of-records-selected"></div>
 </div>
@@ -165,63 +184,20 @@ table.wbf-record-series-details .wbf-record-series-summary-detail
 <table borders="1" cellpadding="20" cellspacing="0">
 
 <tr>
-<td colspan="2">
-<div style="display:none;">
-<span>
-Search: 
-<asp:TextBox ID="SearchBox" runat="server" Enabled="false"/>
-<asp:Button ID="DoSearch" Text="Go" OnClick="DoSearch_Click" Width="70px" runat="server" Enabled="false"/>
-</span>
-</div>
-
-</td>
-</tr>
-
-
-<tr>
-<td>
-</td>
 <td>
 <asp:Button ID="ArchiveRecordsButton" Text="Archive Selected Records" runat="server" OnClientClick="WorkBoxFramework_archiveSelectedRecords(); return false;" UseSubmitBehavior="false" />
 
+&nbsp;
+
+<asp:Button ID="KeepRecordsButton" Text="Keep Selected Records" runat="server" OnClientClick="WorkBoxFramework_keepSelectedRecords(); return false;" UseSubmitBehavior="false" />
+
 </td>
 </tr>
 
 <tr>
-<td valign="top">
-<!-- Tree panel -->
-
-  <SharePoint:SPTreeView
-        id="RecordsLibraryFolders"
-        UseInternalDataBindings="false"
-        runat="server"
-        ShowLines="true"
-        ExpandDepth="1"
-        SelectedNodeStyle-CssClass="ms-tvselected"
-        OnSelectedNodeChanged="RecordsLibraryFolders_SelectedNodeChanged"
-        NodeStyle-CssClass="ms-navitem"
-        NodeStyle-HorizontalPadding="0"
-        NodeStyle-VerticalPadding="0"
-        NodeStyle-ImageUrl="/_layouts/Images/FOLDER.GIF"
-        SkipLinkText=""
-        NodeIndent="20"
-        ExpandImageUrl="/_layouts/images/tvplus.gif"
-        CollapseImageUrl="/_layouts/images/tvminus.gif"
-        NoExpandImageUrl="/_layouts/images/tvblank.gif" />
-
-
-</td>
-
 
 <td valign="top">
 <!-- View panel -->
-
-
-<asp:UpdatePanel ID="ShowSelectionPanel" runat="server">
-    <Triggers>
-        <asp:AsyncPostBackTrigger ControlID="RecordsLibraryFolders" EventName="SelectedNodeChanged" />
-    </Triggers>
-    <ContentTemplate>
 
 <div>
 
@@ -229,14 +205,19 @@ Search:
 
 </div>
 
-    </ContentTemplate>
-</asp:UpdatePanel>
-
-
-
 </td>
 
 
 </tr>
 
 </table>
+
+</asp:Content>
+
+<asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
+Our Records To Review
+</asp:Content>
+
+<asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
+Our Records To Review
+</asp:Content>

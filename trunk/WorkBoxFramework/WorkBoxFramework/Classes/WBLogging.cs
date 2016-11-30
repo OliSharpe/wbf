@@ -111,7 +111,7 @@ namespace WorkBoxFramework
 
         public static void Debug(String message)
         {
-            if (WBFarm.Local.FarmInstance == WBFarm.FARM_INSTANCE__DEVELOPMENT_FARM)
+            if (WBFarm.Local.FarmInstance == WBFarm.FARM_INSTANCE__DEVELOPMENT_FARM || WBFarm.Local.FarmInstance == WBFarm.FARM_INSTANCE__UAT_FARM)
             {
                 WriteTrace(CATEGORY__DEBUG, TraceSeverity.High, message);
             }

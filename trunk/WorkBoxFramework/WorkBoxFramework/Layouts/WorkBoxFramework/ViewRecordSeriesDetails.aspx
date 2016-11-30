@@ -40,9 +40,17 @@ table.wbf-record-series-details .wbf-record-series-even
     text-align:center;
 }
 
-table.wbf-record-series-details .wbf-record-series-summary-issue
+table.wbf-record-series-details .wbf-record-series-summary-issue-odd
 {
     background: #EEE;
+    font-weight: bold;
+    text-align:center;
+    border-top: 2px solid #ccc;
+}
+
+table.wbf-record-series-details .wbf-record-series-summary-issue-even
+{
+    background: #DDD;
     font-weight: bold;
     text-align:center;
     border-top: 2px solid #ccc;
@@ -55,10 +63,25 @@ table.wbf-record-series-details .wbf-record-series-summary-detail
     border-top: 2px solid #ccc;
 }
 
+table.wbf-record-series-details .wbf-record-series-detail-left
+{
+    text-align:left;
+}
+
+table.wbf-record-series-details .wbf-record-series-detail-right
+{
+    text-align:right;
+}
+
 
 table.wbf-record-series-details .wbf-record-series-details-panel-cell
 {
     padding: 0px;
+}
+
+table.wbf-record-series-details .wbf-old-metadata
+{
+    color: #DDD;
 }
 
 table.wbf-record-series-details-panel
@@ -84,32 +107,31 @@ table.wbf-record-series-details-panel .wbf-record-series-detail-odd
 table.wbf-record-series-details-panel .wbf-record-series-detail-title
 {
     font-weight: bold;
-    width: 130px;
+    width: 170px;
 }
 
 </style>
 
 <script>
 
-    function toggleRecordID(recordID) {
+    function WBF_toggleByID(toggleID) {
 
-        var currently = $("#wbf-more-or-less-" + recordID).text();
+        var currently = $("#wbf-more-or-less-" + toggleID).text();
 
         if (currently.indexOf("more") > -1) {
-            $(".wbf-record-details").each(function () {
-                if ($(this).data("record-id") == recordID) $(this).show();
-                else $(this).hide();
-            });
-
-            $("#wbf-more-or-less-" + recordID).text("less <");
+            $(".wbf-record-details").hide();
+            $(".wbf-more-or-less").html("<nobr>more &gt;</nobr>");
+            $("#wbf-more-or-less-" + toggleID).html("<nobr>less &lt;</nobr>");
+            $("#wbf-record-details-" + toggleID).show();
         } else {
-            $(".wbf-record-details").each(function () {
-                $(this).hide();
-            });
-
-            $("#wbf-more-or-less-" + recordID).text("more >");
+            $("#wbf-more-or-less-" + toggleID).html("<nobr>more &gt;</nobr>");
+            $("#wbf-record-details-" + toggleID).hide();
         }
 
+    }
+
+    function WBF_toggleChecklist(toggleID) {
+        $("#wbf-checklist-" + toggleID).toggle();
     }
 
     function WBF_edit_records_metadata(recordID) {

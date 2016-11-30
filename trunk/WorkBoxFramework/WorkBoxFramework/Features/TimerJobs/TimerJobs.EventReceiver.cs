@@ -189,6 +189,7 @@ namespace WorkBoxFramework.Features.TimerJobs
 
         public override void FeatureDeactivating(SPFeatureReceiverProperties properties)
         {
+            /*
             SPWebApplication webApplication = properties.Feature.Parent as SPWebApplication;
 
             // Delete the job
@@ -203,6 +204,7 @@ namespace WorkBoxFramework.Features.TimerJobs
                 if (job.Name == WBMigrationTimerJob.MIGRATION_TIMER_JOB__TIMER_JOB_NAME)
                     job.Delete();
             }
+             */ 
         }
 
 

@@ -50,7 +50,7 @@ namespace WorkBoxFramework
                     _metadata = new WBDocument(_libraries.ProtectedMasterLibrary);
                     _metadata.DebugName = "Metadata";
 
-                    _metadata.CopyColumns(ProtectedMasterRecord, WBRecord.DefaultColumnsToCopy);
+                    _metadata.CopyColumns(ProtectedMasterRecord, WBRecord.DefaultMasterColumnsToSave);
 
                     WBLogging.Debug("On creation we have: _metadata.RecordID = " + _metadata.RecordID  + " when _recordID = " + _recordID);
 
@@ -221,15 +221,10 @@ namespace WorkBoxFramework
             }
         }
 
-        public void UpdateMasterAndCreateCopies()
-        {
-            UpdateMasterAndCreateCopies(null);
-        }
-
-        public void UpdateMasterAndCreateCopies(WBTaskFeedback feedback)
+        public void UpdateMasterAndCreateCopies(WBTaskFeedback feedback, String callingUser)
         {
             ProtectedMasterRecord.MaybeCopyColumns(Metadata, WBRecord.DefaultMasterColumnsToSave);
-            ProtectedMasterRecord.Update();
+            ProtectedMasterRecord.UpdateAs(callingUser);
             if (feedback != null)
             {
                 feedback.AddFeedback("Updated metadata in protected, master records library");
@@ -239,11 +234,11 @@ namespace WorkBoxFramework
             CheckAllCopiesAreCreatedAndLoaded(feedback);
         }
 
-        public void Update()
+        public void Update(String callingUserLogin, String reasonForUpdate)
         {
             if (Metadata.ValuesHaveChanged)
             {
-                ProtectedMasterRecord.MaybeUpdateRecordColumns(Metadata, WBRecord.DefaultMasterColumnsToSave);
+                ProtectedMasterRecord.MaybeUpdateRecordColumns(callingUserLogin, Metadata, WBRecord.DefaultMasterColumnsToSave, reasonForUpdate);
                 
                 UpdateWhichLibrariesNeedACopy();
                 CheckNoCopiesInWrongLibraries();
@@ -251,7 +246,7 @@ namespace WorkBoxFramework
 
                 foreach (WBDocument recordCopy in _recordCopies.Values)
                 {
-                    recordCopy.MaybeUpdateRecordColumns(Metadata, WBRecord.DefaultColumnsToCopy);
+                    recordCopy.MaybeUpdateRecordColumns(callingUserLogin, Metadata, WBRecord.DefaultColumnsToCopy, reasonForUpdate);
                 }
             }
         }
@@ -364,15 +359,15 @@ namespace WorkBoxFramework
         public bool HasDeclaredRecord { get { return Metadata.HasDeclaredRecord; } }
         public DateTime DeclaredRecord
         {
-            get { return Metadata.ReferenceDate; }
-            set { Metadata.ReferenceDate = value; }
+            get { return Metadata.DeclaredRecord; }
+            set { Metadata.DeclaredRecord = value; }
         }
 
         public bool HasScanDate { get { return this.IsNotEmpty(WBColumn.ScanDate); } }
         public DateTime ScanDate
         {
-            get { return Metadata.ReferenceDate; }
-            set { Metadata.ReferenceDate = value; }
+            get { return Metadata.ScanDate; }
+            set { Metadata.ScanDate = value; }
         }
 
 

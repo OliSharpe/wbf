@@ -23,9 +23,10 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (!IsPostBack)
             {
-                using (WBRecordsManager manager = new WBRecordsManager())
+                using (WBRecordsManager manager = new WBRecordsManager(SPContext.Current.Web.CurrentUser.LoginName))
                 {
                     AllRecordIDsToArchive.Value = Request.QueryString["AllRecordIDsToArchive"];
+                    ReasonToArchiveRecords.Value = Request.QueryString["ReasonToArchiveRecords"];
 
                     recordIDs = AllRecordIDsToArchive.Value.Split(',');
                     foreach (String recordID in recordIDs)
@@ -79,17 +80,17 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         protected void ArchiveNextDocument(object sender, EventArgs e)
         {
             WBLogging.Debug("Attempting to archive the next document with index: " + indexOfNextRecordToArchive + " and filename: " + mappedFilenames[indexOfNextRecordToArchive.ToString()]);
-
+            String callingUserLogin = SPContext.Current.Web.CurrentUser.LoginName;
             WBTaskFeedback feedback = new WBTaskFeedback(indexOfNextRecordToArchive.ToString());
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    using (WBRecordsManager elevatedManager = new WBRecordsManager())
+                    using (WBRecordsManager elevatedManager = new WBRecordsManager(callingUserLogin))
                     {
                         WBRecord record = elevatedManager.Libraries.GetRecordByID(recordIDs[indexOfNextRecordToArchive]);
                         record.LiveOrArchived = WBColumn.LIVE_OR_ARCHIVED__ARCHIVED;
-                        record.Update();
+                        record.Update(callingUserLogin, ReasonToArchiveRecords.Value);
 
                         feedback.Success("Archived successfully");
                     }

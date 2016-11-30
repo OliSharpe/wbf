@@ -109,6 +109,7 @@ The records(s) selected will now be marked to review at a later date</p>
 <asp:LinkButton ID="HiddenSubmitLink" Text="Keep Next" OnClick="KeepNextDocument" runat="server" style="display:none;" />
 <asp:HiddenField ID="AllRecordIDsToKeep" runat="server" />
 <asp:HiddenField ID="AllRecordFilenamesToKeep" runat="server" />
+<asp:HiddenField ID="ReasonToKeepRecords" runat="server" />
 
 <asp:UpdatePanel ID="KeepingRecordsPanel" runat="server" UpdateMode="Always">
 

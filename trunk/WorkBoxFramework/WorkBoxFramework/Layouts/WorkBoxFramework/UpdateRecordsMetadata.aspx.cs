@@ -174,11 +174,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         {
             bool digestOK = SPContext.Current.Web.ValidateFormDigest();
 
+            String callingUserLogin = SPContext.Current.Web.CurrentUser.LoginName;
+
             if (digestOK)
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    using (WBRecordsManager manager = new WBRecordsManager())
+                    using (WBRecordsManager manager = new WBRecordsManager(callingUserLogin))
                     {
                         WBRecord record = manager.Libraries.GetRecordByID(RecordID.Text);
 
@@ -186,7 +188,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                         record.ProtectiveZone = ProtectiveZone.SelectedValue;
                         record.SubjectTagsUIControlValue = SubjectTags.Text;
 
-                        record.Update();
+                        record.Update(callingUserLogin, ReasonForChange.Text);
                     }
                 });
 

@@ -33,6 +33,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Reflection;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Utilities;
@@ -1819,6 +1820,37 @@ namespace WorkBoxFramework
             }
         }
 
+        public static DateTime DateTimeFromISO8601Format(String value)
+        {
+            return DateTime.Parse(value, null, System.Globalization.DateTimeStyles.RoundtripKind);
+        }
+
+        // With thanks to: https://hristopavlov.wordpress.com/2008/06/17/preserving-the-last-modified-by-when-checking-in-a-file/
+        public static void CheckInFileByUser(
+            SPFile file,
+            string checkinComment,
+            SPCheckinType checkinType,
+            SPUser modifiedByUser)
+        {
+            MethodInfo mi = typeof(SPFile).GetMethod(
+                "CheckIn",
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                null,
+                new Type[] { typeof(string), typeof(SPCheckinType), typeof(bool), typeof(SPUser) },
+                null);
+
+            try
+            {
+                mi.Invoke(
+                    file,
+                    new object[] { checkinComment, checkinType, false, modifiedByUser }
+                );
+            }
+            catch (TargetInvocationException invokeEx)
+            {
+                throw invokeEx.InnerException;
+            }
+        }
 
     }
 }

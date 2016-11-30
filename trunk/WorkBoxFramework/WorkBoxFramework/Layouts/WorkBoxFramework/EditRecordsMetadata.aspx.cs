@@ -18,12 +18,12 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 RecordID.Text = Request.QueryString["RecordID"];
                 WBLogging.Debug("Record ID is found to be: " + RecordID.Text);
 
-                using (WBRecordsManager manager = new WBRecordsManager())
+                using (WBRecordsManager manager = new WBRecordsManager(currentUserLoginName))
                 {
                     WBRecord record = manager.Libraries.GetRecordByID(RecordID.Text);
 
                     Filename.Text = record.Name;
-                    Title.Text = record.Title;
+                    RecordTitle.Text = record.Title;
 
                     String location = "<unknown>";
                     if (record.FunctionalArea != null && record.FunctionalArea.Count > 0)
@@ -39,13 +39,40 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                     RecordsLocation.Text = "<b>" + location + "</b> " + folders;
 
-                    RecordSeriesStatus.Text = record.RecordSeriesStatus;
+                    String status = record.RecordSeriesStatus;
+                    RecordSeriesStatus.Text = status;
+
+                    String explainStatus = "";
+                    if (status == "Latest")
+                    {
+                        if (record.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC)
+                        {
+                            explainStatus = "(live on the public website)";
+                        }
+                        else if (record.ProtectiveZone == WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET)
+                        {
+                            explainStatus = "(live on a public extranet website)";
+                        }
+                        else
+                        {
+                            explainStatus = "(live on izzi intranet)";
+                        }
+                    }
+                    else if (status == "Retired")
+                    {
+                        explainStatus = "(visible on izzi intranet searches)";
+                    }
+                    else if (status == "Archived")
+                    {
+                        explainStatus = "(archived in the protected, master records library)";
+                    }
+                    ExplainStatus.Text = explainStatus;
 
                     RecordSeriesStatusChange.DataSource = new String[] { "", "Retire", "Archive" };
                     RecordSeriesStatusChange.DataBind();
                     RecordSeriesStatusChange.SelectedValue = "";
 
-                    ProtectiveZone.DataSource = WBRecordsType.getProtectiveZones();
+                    ProtectiveZone.DataSource = new String[] { WBRecordsType.PROTECTIVE_ZONE__PROTECTED, WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET, WBRecordsType.PROTECTIVE_ZONE__PUBLIC };
                     ProtectiveZone.DataBind();
                     ProtectiveZone.SelectedValue = record.ProtectiveZone;
 
@@ -65,12 +92,12 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
         protected void updateButton_OnClick(object sender, EventArgs e)
         {
             bool digestOK = SPContext.Current.Web.ValidateFormDigest();
-
+            String callingUserLogin = SPContext.Current.Web.CurrentUser.LoginName;
             if (digestOK)
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    using (WBRecordsManager elevatedManager = new WBRecordsManager())
+                    using (WBRecordsManager elevatedManager = new WBRecordsManager(callingUserLogin))
                     {
                         WBRecord record = elevatedManager.Libraries.GetRecordByID(RecordID.Text);
 
@@ -84,12 +111,20 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                             record.LiveOrArchived = "Archived";
                         }
 
+                        record.Title = RecordTitle.Text;
                         record.ProtectiveZone = ProtectiveZone.SelectedValue;
                         record.SubjectTagsUIControlValue = SubjectTags.Text;
                         record.OwningTeamUIControlValue = OwningTeam.Text;
                         record.InvolvedTeamsWithoutOwningTeamAsUIControlValue = InvolvedTeams.Text;
 
-                        record.Update();
+                        if (record.ProtectiveZone != WBRecordsType.PROTECTIVE_ZONE__PROTECTED && record.Metadata.IsNullOrEmpty(WBColumn.ReviewDate))
+                        {
+                            record[WBColumn.ReviewDate] = DateTime.Now.AddYears(2);
+                        }
+
+                        WBLogging.Debug("About to udpate with callingUser = " + callingUserLogin);
+
+                        record.Update(callingUserLogin, ReasonForChange.Text);
                     }
                 });
 

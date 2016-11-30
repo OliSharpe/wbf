@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Utilities;
 using Newtonsoft.Json;
 
 
@@ -570,7 +571,14 @@ namespace WorkBoxFramework
 
         public void AddExtraMetadata(WBColumn column, Object value)
         {
-            this.ExtraMetadataDictionary.Add(column.InternalName, value.WBxToString());
+            if (value is DateTime)
+            {
+                this.ExtraMetadataDictionary[column.InternalName] = SPUtility.CreateISO8601DateTimeFromSystemDateTime((DateTime)value);
+            }
+            else
+            {
+                this.ExtraMetadataDictionary[column.InternalName] = value.WBxToString();
+            } 
         }
 
         public void AddExtraMetadataIfMissing(WBColumn column, Object value)
@@ -585,7 +593,7 @@ namespace WorkBoxFramework
         // Questionnable if these versions are really needed! 
         public void AddExtraMetadata(WBColumn column, String value)
         {
-            this.ExtraMetadataDictionary.Add(column.InternalName, value);
+            this.ExtraMetadataDictionary[column.InternalName] = value;
         }
 
         public void AddExtraMetadataIfMissing(WBColumn column, String value)

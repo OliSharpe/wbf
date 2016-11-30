@@ -58,13 +58,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.Label Filename;
         
         /// <summary>
-        /// Title control.
+        /// RecordTitle control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label Title;
+        protected global::System.Web.UI.WebControls.TextBox RecordTitle;
         
         /// <summary>
         /// RecordsLocation control.
@@ -92,6 +92,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label RecordSeriesStatus;
+        
+        /// <summary>
+        /// ExplainStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label ExplainStatus;
         
         /// <summary>
         /// RecordSeriesStatusChange control.

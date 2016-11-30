@@ -38,11 +38,13 @@ namespace WorkBoxFramework
         public enum BackingTypes
         {
             SPListItem,
+            SPListItemVersion,
             Dictionary
         }
 
         private Dictionary<WBColumn, Object> _dictionary = null;
         private SPListItem _listItem = null;
+        private SPListItemVersion _listItemVersion = null;
         private List<WBColumn> _usedColumns = new List<WBColumn>();
 
         private bool _valuesHaveChanged = false;
@@ -52,13 +54,23 @@ namespace WorkBoxFramework
         public WBItem(SPListItem item)
         {
             _listItem = item;
+            _listItemVersion = null;
             _dictionary = null;
             BackingType = BackingTypes.SPListItem;
+        }
+
+        public WBItem(SPListItemVersion version)
+        {
+            _listItem = null;
+            _listItemVersion = version;
+            _dictionary = null;
+            BackingType = BackingTypes.SPListItemVersion;
         }
 
         public WBItem()
         {
             _listItem = null;
+            _listItemVersion = null;
             _dictionary = new Dictionary<WBColumn, Object>();           
             BackingType = BackingTypes.Dictionary;
         }
@@ -66,6 +78,7 @@ namespace WorkBoxFramework
         public WBItem(Dictionary<String, String> values)
         {
             _listItem = null;
+            _listItemVersion = null;
             _dictionary = new Dictionary<WBColumn, Object>();
             BackingType = BackingTypes.Dictionary;
 
@@ -90,6 +103,7 @@ namespace WorkBoxFramework
 
 
         public bool IsSPListItem { get { return (_listItem != null && BackingType == BackingTypes.SPListItem); } }
+        public bool IsSPListItemVersion { get { return (_listItemVersion != null && BackingType == BackingTypes.SPListItemVersion); } }
         public bool IsDictionaryItem { get { return (_dictionary != null && BackingType == BackingTypes.Dictionary); } }
 
         public bool ValuesHaveChanged { get { return _valuesHaveChanged; } }
@@ -99,9 +113,21 @@ namespace WorkBoxFramework
             get 
             {
                 if (IsSPListItem) return _listItem;
+                if (IsSPListItemVersion) return _listItemVersion.ListItem;
                 return null;
             }
         }
+
+
+        public SPListItemVersion ItemVersion
+        {
+            get
+            {
+                if (IsSPListItemVersion) return _listItemVersion;
+                return null;
+            }
+        }
+
 
         #endregion
 
@@ -119,6 +145,8 @@ namespace WorkBoxFramework
 
         public bool IsUsingColumn(WBColumn column)
         {
+            if (IsSPListItem) return _listItem.WBxExists(column);
+            if (IsSPListItemVersion) return _listItemVersion.WBxExists(column);
             return _usedColumns.Contains(column);
         }
 
@@ -136,6 +164,12 @@ namespace WorkBoxFramework
                     case BackingTypes.SPListItem:
                         {
                             value = _listItem.WBxGet(column);
+                            // WBLogging.Debug("Got value: " + value + " for column: " + column.DisplayName);
+                            break;
+                        }
+                    case BackingTypes.SPListItemVersion:
+                        {
+                            value = _listItemVersion.WBxGet(column);
                             // WBLogging.Debug("Got value: " + value + " for column: " + column.DisplayName);
                             break;
                         }
@@ -177,6 +211,10 @@ namespace WorkBoxFramework
                             _listItem.WBxSet(column, processedValue);
                             break;
                         }
+                    case BackingTypes.SPListItemVersion:
+                        {
+                            throw new Exception("In call to set column value for a WBItem backed by SPListItemVersion which are read only so cannot have any value set");
+                        }
                     case BackingTypes.Dictionary:
                         {
                             _dictionary[column] = processedValue;
@@ -187,11 +225,16 @@ namespace WorkBoxFramework
             }
         }
 
+        public bool HasValue(WBColumn column)
+        {
+            if (IsSPListItem) return _listItem.WBxHasValue(column);
+            if (IsSPListItemVersion) return _listItemVersion.WBxHasValue(column);
+            return IsUsingColumn(column) && !IsNullOrEmpty(column); 
+        }
+
         public bool IsNotEmpty(WBColumn column)
         {
-            UseColumn(column);
-
-            return !IsNullOrEmpty(column);
+            return HasValue(column);
         }
 
         public bool IsNullOrEmpty(WBColumn column)
@@ -203,6 +246,10 @@ namespace WorkBoxFramework
                 case BackingTypes.SPListItem:
                     {
                         return _listItem.WBxGetAsString(column).Trim() == "";
+                    }
+                case BackingTypes.SPListItemVersion:
+                    {
+                        return _listItemVersion.WBxGetAsString(column).Trim() == "";
                     }
                 case BackingTypes.Dictionary:
                     {
@@ -216,6 +263,12 @@ namespace WorkBoxFramework
 
         public void Update()
         {
+            UpdateAs(null);
+        }
+
+
+        public void UpdateAs(String callingUserLogin)
+        {
             switch (BackingType)
             {
                 case BackingTypes.SPListItem:
@@ -223,8 +276,25 @@ namespace WorkBoxFramework
 
                         bool before = _listItem.Web.AllowUnsafeUpdates;
                         _listItem.Web.AllowUnsafeUpdates = true;
-                        WBLogging.Generic.Verbose("Calling WBItem.Update() on item backed by SPListItem");
+
+                        SPUser callingUser = _listItem.Web.WBxEnsureUserOrNull(callingUserLogin);
+
+                        if (callingUser != null)
+                        {
+                            WBLogging.Debug("Calling WBItem.Update() on item backed by callingUserLogin = " + callingUserLogin + " and SPUser = " + callingUser.Name);
+                            WBLogging.Generic.Verbose("Calling WBItem.Update() on item backed by callingUserLogin = " + callingUserLogin + " and SPUser = " + callingUser.Name);
+
+                            _listItem.WBxSet(WBColumn.ModifiedBy, callingUser);
+                            _listItem.WBxSet(WBColumn.Modified, DateTime.Now);
+                        }
+                        else
+                        {
+                            WBLogging.Generic.Verbose("Calling WBItem.Update() on item backed by SPListItem with no passed in user");
+                            WBLogging.Debug("Calling WBItem.Update() on item backed by SPListItem with no passed in user");
+                        }
+
                         _listItem.Update();
+
                         _listItem.Web.AllowUnsafeUpdates = before;
                         return;
                     }
@@ -286,6 +356,39 @@ namespace WorkBoxFramework
 
             return allCorrect;
         }
+
+        public SPUser GetSingleUserColumn(WBColumn column)
+        {
+            switch (BackingType)
+            {
+                case BackingTypes.SPListItem:
+                    {
+                        return _listItem.WBxGetSingleUserColumn(column);
+                    }
+                case BackingTypes.SPListItemVersion:
+                    {
+                        return _listItemVersion.WBxGetSingleUserColumn(column);
+                    }
+                default: throw new NotImplementedException("The backing type selected has no implementation for GetSingleUserColumn");
+            }            
+        }
+
+        public List<SPUser> GetMultiUserColumn(WBColumn column)
+        {
+            switch (BackingType)
+            {
+                case BackingTypes.SPListItem:
+                    {
+                        return _listItem.WBxGetMultiUserColumn(column);
+                    }
+                case BackingTypes.SPListItemVersion:
+                    {
+                        return _listItemVersion.WBxGetMultiUserColumn(column);
+                    }
+                default: throw new NotImplementedException("The backing type selected has no implementation for GetMultiUserColumn");
+            }
+        }
+
 
         #endregion
     }

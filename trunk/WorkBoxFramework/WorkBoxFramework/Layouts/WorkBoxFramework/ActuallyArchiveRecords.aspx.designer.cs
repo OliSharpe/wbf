@@ -67,6 +67,15 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.HiddenField AllRecordFilenamesToArchive;
         
         /// <summary>
+        /// ReasonToArchiveRecords control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField ReasonToArchiveRecords;
+        
+        /// <summary>
         /// ArchivingRecordsPanel control.
         /// </summary>
         /// <remarks>
