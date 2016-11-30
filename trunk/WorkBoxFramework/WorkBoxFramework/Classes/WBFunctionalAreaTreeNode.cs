@@ -12,13 +12,20 @@ namespace WorkBoxFramework
         public WBTerm FunctionalArea;
 
         public WBFunctionalAreaTreeNode(WBTerm functionalArea, SPFolder folder)
-            : base(folder, false)
+            : base(folder)
         {
             FunctionalArea = functionalArea;
-
-            this.Text = functionalArea.Name;
-            this.Value = functionalArea.Name;
-            this.ImageUrl = "/_layouts/Images/FOLDER.GIF";
         }
+
+        public TreeNode AsTreeNode()
+        {
+            TreeNode node = new TreeNode();
+            node.Text = FunctionalArea.Name;
+            node.Value = FunctionalArea.Name;
+            node.ImageUrl = "/_layouts/Images/FOLDER.GIF";
+
+            return node;
+        }
+
     }
 }

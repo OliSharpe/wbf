@@ -7,7 +7,7 @@ using Microsoft.SharePoint;
 
 namespace WorkBoxFramework
 {
-    public class WBFolderTreeNode : TreeNode
+    public class WBFolderTreeNode
     {
         public SPFolder Folder;
 
@@ -15,25 +15,16 @@ namespace WorkBoxFramework
             : base()
         {
             Folder = folder;
-            //ParentNode = parent;
-
-            this.Text = Folder.Name;
-            this.Value = Folder.Name;
-            this.ImageUrl = "/_layouts/Images/FOLDER.GIF";
         }
 
-        public WBFolderTreeNode(SPFolder folder, bool setNodeDetails)
-            : base()
+        public TreeNode AsTreeNode()
         {
-            Folder = folder;
-            //ParentNode = parent;
+            TreeNode node = new TreeNode();
+            node.Text = Folder.Name;
+            node.Value = Folder.Name;
+            node.ImageUrl = "/_layouts/Images/FOLDER.GIF";
 
-            if (setNodeDetails)
-            {
-                this.Text = Folder.Name;
-                this.Value = Folder.Name;
-                this.ImageUrl = "/_layouts/Images/FOLDER.GIF";
-            }
+            return node;
         }
 
     }

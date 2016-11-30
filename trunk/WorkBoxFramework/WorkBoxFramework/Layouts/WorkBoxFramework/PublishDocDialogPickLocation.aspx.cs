@@ -43,6 +43,9 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             WBLogging.Debug("In Page_Load");
 
             WBLogging.Debug("EventArgs type: " + e.GetType().Name);
+            
+            WBLogging.Debug("Request[\"__EVENTARGUMENT\"] = " + Request["__EVENTARGUMENT"]);
+
 
             manager = new WBRecordsManager(SPContext.Current.Web.CurrentUser.LoginName);
 
@@ -76,19 +79,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 PublishingProcessJSON.Value = WBUtils.SerializeToCompressedJSONForURI(process);
 
                 WBLogging.Debug("Serialized the WBProcessObject to hidden field");
-
-                WBRecordsLibrary masterLibrary = manager.Libraries.ProtectedMasterLibrary;
-
-                SPFolder rootFolder = masterLibrary.List.RootFolder;
-
                
-                /*
-                TreeViewLocationCollection collection = new TreeViewLocationCollection(manager, viewMode, process.ProtectiveZone, teamFunctionalAreas);
-
-                LibraryLocations.DataSource = collection;
-                LibraryLocations.DataBind();
-                */
-
                 SelectedFolderPath.Text = "/";
             }
             else
@@ -98,19 +89,38 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
 
             LibraryLocations.TreeNodePopulate += new TreeNodeEventHandler(LibraryLocations_TreeNodePopulate);
-            LibraryLocations.SelectedNodeChanged += new EventHandler(LibraryLocations_SelectedNodeChanged);
+            //LibraryLocations.SelectedNodeChanged += new EventHandler(LibraryLocations_SelectedNodeChanged);
+
             LibraryLocations.PopulateNodesFromClient = true;
-            //LibraryLocations.EnableClientScript = false;
+            LibraryLocations.EnableClientScript = true;
 
-            WBTermCollection<WBTerm> teamFunctionalAreas = new WBTermCollection<WBTerm>(manager.FunctionalAreasTaxonomy, process.TeamFunctionalAreasUIControlValue);
             String viewMode = process.IsReplaceActionToCreateNewSeries ? "New" : "Replace";
-
             treeState = new WBLocationTreeState(SPContext.Current.Web, viewMode, process.ProtectiveZone);
 
             if (!IsPostBack)
             {
+                if (viewMode == "New")
+                {
+                    Description.Text = "Select the folder into which to publish the document";
+                }
+                else
+                {
+                    Description.Text = "Select the document to replace";
+                }
+
+                WBTermCollection<WBTerm> teamFunctionalAreas = new WBTermCollection<WBTerm>(manager.FunctionalAreasTaxonomy, process.TeamFunctionalAreasUIControlValue);
+
                 manager.PopulateWithFunctionalAreas(treeState, LibraryLocations.Nodes, viewMode, teamFunctionalAreas);
             }
+            else
+            {
+                String selectedPath = manager.GetSelectedPath(Request);
+                if (!String.IsNullOrEmpty(selectedPath))
+                {
+                    ProcessSelection(selectedPath);
+                }
+            }
+
         }
 
         protected void Page_Unload(object sender, EventArgs e)
@@ -122,26 +132,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             }
         }
 
-        protected void LibraryLocations_SelectedNodeChanged(object sender, EventArgs e)
-        {
-            WBLogging.Debug("In LibraryLocations_SelectedNodeChanged():");
-
-            String selectedPath = "";
-            if (e is TreeNodeEventArgs && ((TreeNodeEventArgs)e).Node != null)
-            {
-                TreeNode node = ((TreeNodeEventArgs)e).Node;
-                WBLogging.Debug("event was a TreeNodeEventArgs with : " + node.ValuePath);
-                selectedPath = node.ValuePath;
-            }
-            else
-            {
-                if (LibraryLocations.SelectedNode != null)
-                {
-                    WBLogging.Debug("In LibraryLocations_SelectedNodeChanged(): LibraryLocations.SelectedNode.ValuePath with : " + LibraryLocations.SelectedNode.ValuePath);
-                    selectedPath = LibraryLocations.SelectedNode.ValuePath;
-                }
-
-            }
+        protected void ProcessSelection(String selectedPath) {
+            WBLogging.Debug("In ProcessSelection(): selectedPath = " + selectedPath);
 
             if (!String.IsNullOrEmpty(selectedPath))
             {
@@ -211,96 +203,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             manager.PopulateTreeNode(treeState, e.Node, viewMode);
 
-            /*
-            TreeNode newNode = new TreeNode();
-            newNode.Text = "Test1";
-            newNode.Value = "Test1";
-            newNode.PopulateOnDemand = false;
-
-            // Add the new node to the ChildNodes collection of the parent node.
-            e.Node.ChildNodes.Add(newNode);
-            */
-
-            /*
-            WBLogging.Debug("Looking for tree node in state at: " + e.Node.ValuePath);
-            TreeNode foundNode = LibraryLocations.FindNode(e.Node.ValuePath);
-
-            WBLogging.Debug("foundNode.GetType() = " + foundNode.GetType());
-            if (foundNode is WBRecordsTypeTreeNode) WBLogging.Debug("foundNode is WBRecordsTypeTreeNode");
-            else WBLogging.Debug("foundNode is NOT WBRecordsTypeTreeNode");
-            */
         }
-
-
-        /*
-        private void PopulateNode(TreeNode node)
-        {
-            WBLogging.Debug("Call to PopulateNode");
-
-            WBLogging.Debug("Call came from node: " + node.Text);
-
-            if (node.Value != "Test2")
-            {
-                TreeNode newNode = new TreeNode();
-                newNode.Text = "Test1";
-                newNode.Value = "Test1";
-                newNode.PopulateOnDemand = false;
-
-                // Add the new node to the ChildNodes collection of the parent node.
-                node.ChildNodes.Add(newNode);
-
-                newNode = new TreeNode();
-                newNode.Text = "Test2";
-                newNode.Value = "Test2";
-
-                newNode.PopulateOnDemand = true;
-
-                // Add the new node to the ChildNodes collection of the parent node.
-                node.ChildNodes.Add(newNode);
-
-
-                newNode = new TreeNode();
-                newNode.Text = "Test3";
-                newNode.Value = "Test3";
-
-                newNode.PopulateOnDemand = false;
-
-                // Add the new node to the ChildNodes collection of the parent node.
-                node.ChildNodes.Add(newNode);
-            }
-            else
-            {
-                TreeNode newNode = new TreeNode();
-                newNode.Text = "Test2-1";
-                newNode.Value = "Test2-1";
-                newNode.PopulateOnDemand = false;
-
-                // Add the new node to the ChildNodes collection of the parent node.
-                node.ChildNodes.Add(newNode);
-
-                newNode = new TreeNode();
-                newNode.Text = "Test2-2";
-                newNode.Value = "Test2-2";
-
-                newNode.PopulateOnDemand = false;
-
-                // Add the new node to the ChildNodes collection of the parent node.
-                node.ChildNodes.Add(newNode);
-
-
-                newNode = new TreeNode();
-                newNode.Text = "Test2-3";
-                newNode.Value = "Test2-3";
-
-                newNode.PopulateOnDemand = false;
-
-                // Add the new node to the ChildNodes collection of the parent node.
-                node.ChildNodes.Add(newNode);
-            }
-
-
-        }
-        */
 
         protected void selectButton_OnClick(object sender, EventArgs e)
         {

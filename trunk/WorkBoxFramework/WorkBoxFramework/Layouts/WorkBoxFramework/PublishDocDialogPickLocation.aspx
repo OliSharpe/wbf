@@ -30,11 +30,8 @@
 <table cellpadding="8" cellspacing="0" class="wbf-title-table">
 <tr>
 <td valign="middle" class="wbf-create-new-title">
-<div class="wbf-publish-out-title">
-Publish Document to: <asp:Label ID="DestinationTitle" runat="server" />
-</div>
 <div>
-Select the folder into which to publish the document
+<asp:Label ID="Description" runat="server" />
 </div>
 </td>
 </tr>
@@ -53,13 +50,12 @@ Select the folder into which to publish the document
 
 <div id="" style="overflow:scroll; height:400px; width: 400px; border: 1px solid #ccc; ">
 
-  <asp:TreeView
+  <SharePoint:SPTreeView
         id="LibraryLocations"
         runat="server"
         ShowLines="true"
         ExpandDepth="1"
         SelectedNodeStyle-CssClass="ms-tvselected"
-        OnSelectedNodeChanged="LibraryLocations_SelectedNodeChanged"
         NodeStyle-CssClass="ms-navitem"
         NodeStyle-HorizontalPadding="0"
         NodeStyle-VerticalPadding="0"
@@ -77,7 +73,7 @@ Select the folder into which to publish the document
 
 <tr>
 <td class="wbf-field-name-panel">
-        <div class="wbf-field-name">Selected Folder Path</div>
+        <div class="wbf-field-name">Selection:</div>
 <div class="wbf-field-description"></div>
 </td>
 <td class="wbf-field-value-panel">
@@ -90,7 +86,7 @@ Select the folder into which to publish the document
 
 <div>
 
-Selected folder: <asp:Label ID="SelectedFolderPath" runat="server" />
+<asp:Label ID="SelectedFolderPath" runat="server" />
 
 </div>
 

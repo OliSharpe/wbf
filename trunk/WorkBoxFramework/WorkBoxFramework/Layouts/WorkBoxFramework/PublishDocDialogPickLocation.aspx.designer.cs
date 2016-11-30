@@ -31,13 +31,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         protected global::System.Web.UI.WebControls.Label ErrorMessageLabel;
         
         /// <summary>
-        /// DestinationTitle control.
+        /// Description control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label DestinationTitle;
+        protected global::System.Web.UI.WebControls.Label Description;
         
         /// <summary>
         /// DocumentsBeingPublished control.
@@ -55,7 +55,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TreeView LibraryLocations;
+        protected global::Microsoft.SharePoint.WebControls.SPTreeView LibraryLocations;
         
         /// <summary>
         /// ShowSelectionPanel control.
