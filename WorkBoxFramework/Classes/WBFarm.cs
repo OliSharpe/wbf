@@ -49,9 +49,9 @@ namespace WorkBoxFramework
 
         private const string FARM_PROPERTY__SUBJECT_TAGS_RECORDS_ROUTINGS = "wbf__farm__subject_tags_records_routings";
         private const string FARM_PROPERTY__PUBLIC_DOCUMENT_EMAIL_ALERTS_TO = "wbf__farm__public_document_email_alerts_to";
+        private const string FARM_PROPERTY__PUBLIC_WEBSITE_TEAM_EMAIL = "wbf__farm__public_website_team_email";
 
         
-
         private const string FARM_PROPERTY__RECORDS_MANAGERS_GROUP_NAME = "wbf__farm__records_managers_group_name";
         private const string FARM_PROPERTY__RECORDS_SYSTEM_ADMIN_GROUP_NAME = "wbf__farm__records_system_admin_group_name";
 
@@ -218,6 +218,15 @@ namespace WorkBoxFramework
             get { return _farm.WBxGetProperty(FARM_PROPERTY__PUBLIC_DOCUMENT_EMAIL_ALERTS_TO); }
             set { _farm.WBxSetProperty(FARM_PROPERTY__PUBLIC_DOCUMENT_EMAIL_ALERTS_TO, value); }
         }
+
+        public String PublicWebsiteTeamEmail
+        {
+            get { return _farm.WBxGetProperty(FARM_PROPERTY__PUBLIC_WEBSITE_TEAM_EMAIL); }
+            set { _farm.WBxSetProperty(FARM_PROPERTY__PUBLIC_WEBSITE_TEAM_EMAIL, value); }
+        }
+
+
+        
 
         public String OpenWorkBoxesCachedDetailsListUrl
         {

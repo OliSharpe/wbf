@@ -42,7 +42,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                 teams.InitialiseTaxonomyControl(TeamTerm, "Select Team Term", false);
                 teams.InitialiseTaxonomyControl(ParentTeamTerm, "Select the Parent Team Term", false);
-                functionalAreas.InitialiseTaxonomyControl(TeamFunctionalAreas, "Select the functional area", false);
+                functionalAreas.InitialiseTaxonomyControl(TeamFunctionalAreas, "Select the functional area", true);
 
                 TeamName.Text = web.Title;
 
@@ -53,6 +53,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     TeamAcronym.Text = team.Acronym;
 
                     TeamFunctionalAreas.Text = team.FunctionalAreaUIControlValue;
+                    UseAllFunctionalAreas.Checked = team.UseAllFunctionalAreas;
 
                     if (TeamFunctionalAreas.Text == "")
                     {
@@ -169,6 +170,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             {
                 team.FunctionalAreaUIControlValue = TeamFunctionalAreas.Text;
             }
+            team.UseAllFunctionalAreas = UseAllFunctionalAreas.Checked;
+
 
             // This will actually update the web as well as the term.
             team.UpdateWithTeamSiteWeb(web);           

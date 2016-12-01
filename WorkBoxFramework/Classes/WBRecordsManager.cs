@@ -303,7 +303,8 @@ namespace WorkBoxFramework
 
                             StringDictionary headers = new StringDictionary();
 
-                            headers.Add("to", WBFarm.Local.PublicDocumentEmailAlertsTo);
+                            headers.Add("to", WBFarm.Local.PublicWebsiteTeamEmail);
+                            headers.Add("cc", WBFarm.Local.PublicDocumentEmailAlertsTo);
                             headers.Add("content-type", "text/html");
                             headers.Add("bcc", WBFarm.Local.SendErrorReportEmailsTo);
                             headers.Add("subject", "New documents published for a web page");
@@ -555,7 +556,11 @@ namespace WorkBoxFramework
                 expandNodes = false;
             }
 
-            foreach (WBTerm functionalArea in teamFunctionalAreas)
+            List<WBTerm> sortedTerms = new List<WBTerm>();
+            foreach (WBTerm term in teamFunctionalAreas) sortedTerms.Add(term);
+            sortedTerms = sortedTerms.OrderBy(o => o.Name).ToList();
+
+            foreach (WBTerm functionalArea in sortedTerms)
             {
                 SPFolder folder = null;
 
@@ -593,15 +598,19 @@ namespace WorkBoxFramework
 
         internal void PopulateWithRecordsTypes(WBLocationTreeState treeState, TreeNodeCollection treeNodeCollection, String viewMode, SPFolder parentFolder, WBTerm functionalArea, WBTaxonomy recordsTypesTaxonomy, TermCollection recordsTypeTerms)
         {
-            foreach (Term term in recordsTypeTerms)
+            List<Term> sortedTerms = new List<Term>();
+            foreach (Term term in recordsTypeTerms) sortedTerms.Add(term);
+            sortedTerms = sortedTerms.OrderBy(o => o.Name).ToList();
+
+            foreach (Term term in sortedTerms)
             {
                 WBRecordsType recordsType = new WBRecordsType(recordsTypesTaxonomy, term);
 
                 bool protectiveZoneOK = true;
-                //if (!String.IsNullOrEmpty(_minimumProtectiveZone))
+                //if (!String.IsNullOrEmpty(treeState.MinimumProtectiveZone))
                 //{
-                //   protectiveZoneOK = (recordsType.IsZoneAtLeastMinimum(_minimumProtectiveZone));
-                // }
+                //    protectiveZoneOK = (recordsType.IsZoneAtLeastMinimum(treeState.MinimumProtectiveZone));
+                //}
 
                 if (recordsType.BranchCanHaveDocuments() && recordsType.IsRelevantToFunctionalArea(functionalArea) && protectiveZoneOK)
                 {
@@ -619,7 +628,14 @@ namespace WorkBoxFramework
 
                         if (recordsType.Term.TermsCount > 0 || viewMode != VIEW_MODE__NEW)
                         {
-                            node.SelectAction = TreeNodeSelectAction.Expand;
+                            if (viewMode == VIEW_MODE__BROWSE_FOLDERS && recordsType.Term.TermsCount == 0)
+                            {
+                                node.SelectAction = TreeNodeSelectAction.Select;
+                            }
+                            else
+                            {
+                                node.SelectAction = TreeNodeSelectAction.Expand;
+                            }
                             node.Expanded = false;
                             node.PopulateOnDemand = true;
                         } else {
@@ -641,7 +657,11 @@ namespace WorkBoxFramework
 
             if (subFolders.Count > 0)
             {
-                foreach (SPFolder folder in subFolders)
+                List<SPFolder> folders = new List<SPFolder>();
+                foreach (SPFolder folder in subFolders) folders.Add(folder);
+                folders = folders.OrderBy(o => o.Name).ToList();
+
+                foreach (SPFolder folder in folders)
                 {
                     WBFolderTreeNode folderNode = new WBFolderTreeNode(folder);
                     TreeNode node = folderNode.AsTreeNode();
@@ -650,7 +670,14 @@ namespace WorkBoxFramework
                     {
                         node.Expanded = false;
                         node.PopulateOnDemand = true;
-                        node.SelectAction = TreeNodeSelectAction.Expand;
+                        if (viewMode == VIEW_MODE__BROWSE_FOLDERS)
+                        {
+                            node.SelectAction = TreeNodeSelectAction.Select;
+                        }
+                        else
+                        {
+                            node.SelectAction = TreeNodeSelectAction.Expand;
+                        }
                     }
                     else
                     {
@@ -678,6 +705,10 @@ namespace WorkBoxFramework
             SPListItemCollection items = GetItemsRecursive(folder);
 
             WBLogging.Debug("In PopulateWithDocuments() items.Count = " + items.Count);
+
+            List<SPListItem> sortedItems = new List<SPListItem>();
+            foreach (SPListItem item in items) sortedItems.Add(item);
+            sortedItems = sortedItems.OrderBy(o => o.Name).ToList();
 
             foreach (SPListItem item in items)
             {

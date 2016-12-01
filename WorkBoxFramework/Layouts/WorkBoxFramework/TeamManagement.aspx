@@ -192,6 +192,13 @@ td.ms-authoringcontrols td { border: 0px; }
                     <div class="wbf-details-panel">
                             <asp:Label ID="InheritedFunctionalAreas" runat="server" />
                     </div>
+                    <div class="wbf-details-panel">
+                            <span>
+                            <asp:CheckBox ID="UseAllFunctionalAreas" runat="server"/>
+                            Use all functional areas?
+                            </span>
+                    </div>
+
 			</Template_Control>
 		</wssuc:InputFormControl>
 	</Template_InputFormControls>

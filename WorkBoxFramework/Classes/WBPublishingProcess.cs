@@ -53,8 +53,6 @@ namespace WorkBoxFramework
 
             this.ProtectiveZone = WBRecordsType.PROTECTIVE_ZONE__PROTECTED;
 
-            this.TeamFunctionalAreasUIControlValue = workBox.OwningTeam.InheritedFunctionalAreaUIControlValue;
-
             this.OwningTeamUIControlValue = workBox.OwningTeam.UIControlValue;
             this.OwningTeamsIAOAtTimeOfPublishing = workBox.OwningTeam.InformationAssetOwnerLogin;
 
@@ -119,9 +117,6 @@ namespace WorkBoxFramework
 
         [JsonProperty]
         public String FunctionalAreaUIControlValue { get; set; }
-
-        [JsonProperty]
-        public String TeamFunctionalAreasUIControlValue { get; set; }
 
         [JsonProperty]
         public String RecordsTypeUIControlValue { get; set; }
