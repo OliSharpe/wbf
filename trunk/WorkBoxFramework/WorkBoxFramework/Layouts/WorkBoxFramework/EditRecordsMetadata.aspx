@@ -34,6 +34,9 @@
 <div class="wbf-dialog-message">
 You do not have permissions to make changes to the metadata of this record.
 </div>
+<div class="wbf-dialog-message">
+<asp:Label ID="AccessDeniedReason" runat="server" />
+</div>
 </asp:Panel>
 
 <asp:Panel ID="UpdateRecordsMetadataPanel" runat="server">

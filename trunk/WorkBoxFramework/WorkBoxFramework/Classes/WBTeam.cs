@@ -49,6 +49,8 @@ namespace WorkBoxFramework
         public const string TEAM_TERM_PROPERTY__COMMON_ACTIVITIES_LIST_URL = "wbf__team_term__common_activities_list_url";
         public const string TEAM_TERM_PROPERTY__FUNCTIONAL_ACTIVITIES_LIST_URL = "wbf__team_term__functional_activities_list_url";
         public const string TEAM_TERM_PROPERTY__FUNCTIONAL_AREA = "wbf__team_term__functional_area";
+        public const string TEAM_TERM_PROPERTY__MANY_FUNCTIONAL_AREAS = "team_term__many_functional_areas";
+        public const string TEAM_TERM_PROPERTY__ALL_FUNCTIONAL_AREAS = "wbf__team_term__all_functional_areas";
         public const string TEAM_TERM_PROPERTY__ACRONYM = "wbf__team_term__acronym";
         public const string TEAM_TERM_PROPERTY__MANAGER_LOGIN = "wbf__team_term__manager_login";
         public const string TEAM_TERM_PROPERTY__INFORMATION_ASSET_OWNER_LOGIN = "wbf__team_term__iao_login";
@@ -254,10 +256,36 @@ namespace WorkBoxFramework
 
         public String FunctionalAreaUIControlValue
         {
-            get { return Term.WBxGetProperty(TEAM_TERM_PROPERTY__FUNCTIONAL_AREA); }
-            set { Term.WBxSetProperty(TEAM_TERM_PROPERTY__FUNCTIONAL_AREA, value); }
+            get {
+                String functionalAreaUIControlValue = Term.WBxGetProperty(TEAM_TERM_PROPERTY__FUNCTIONAL_AREA);
+                if (functionalAreaUIControlValue == "BIG") {
+                    functionalAreaUIControlValue = Term.WBxGetBigProperty(TEAM_TERM_PROPERTY__MANY_FUNCTIONAL_AREAS);
+                }
+
+                return functionalAreaUIControlValue;
+            }
+            set {
+
+                if (value.Length > WBExtensions.CUSTOM_PROPERTIES__MAXIMUM_LENGTH)
+                {
+                    Term.WBxSetProperty(TEAM_TERM_PROPERTY__FUNCTIONAL_AREA, "BIG");
+                    Term.WBxSetBigProperty(TEAM_TERM_PROPERTY__MANY_FUNCTIONAL_AREAS, value);
+                }
+                else
+                {
+                    Term.WBxSetProperty(TEAM_TERM_PROPERTY__FUNCTIONAL_AREA, value);
+                    Term.WBxSetBigProperty(TEAM_TERM_PROPERTY__MANY_FUNCTIONAL_AREAS, "");
+                }
+            }
         }
 
+        public bool UseAllFunctionalAreas
+        {
+            get { return Term.WBxGetBoolProperty(TEAM_TERM_PROPERTY__ALL_FUNCTIONAL_AREAS); }
+            set { Term.WBxSetBoolProperty(TEAM_TERM_PROPERTY__ALL_FUNCTIONAL_AREAS, value); }
+        }
+
+        /*
         public String InheritedFunctionalAreaUIControlValue
         {
             get {
@@ -268,6 +296,7 @@ namespace WorkBoxFramework
                 return UIControlValue; 
             }            
         }
+         */ 
 
         public String Acronym
         {
@@ -315,10 +344,22 @@ namespace WorkBoxFramework
 
         public WBTermCollection<WBTerm> FunctionalArea(WBTaxonomy functionalAreas)
         {
+            if (UseAllFunctionalAreas)
+            {
+                List<WBTerm> allTerms = new List<WBTerm>();
+                foreach (Term term in functionalAreas.TermSet.Terms) {
+                    WBTerm functionalArea = new WBTerm(functionalAreas, term);
+                    allTerms.Add(functionalArea);
+                }
+                    
+                return new WBTermCollection<WBTerm>(functionalAreas, allTerms);
+            }
+
+            // Otherwise if we get here then this team has specific terms set:
             string UIControlValue = FunctionalAreaUIControlValue;
             if ((UIControlValue == null || UIControlValue == "") && Parent != null) 
                 return Parent.FunctionalArea(functionalAreas);
-
+           
             return new WBTermCollection<WBTerm>(functionalAreas, FunctionalAreaUIControlValue);
         }
 

@@ -69,7 +69,7 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
                 RecordsLibraryFolders.DataBind();
                 */
 
-                manager.PopulateWithFunctionalAreas(treeState, RecordsLibraryFolders.Nodes, "Browse Folders", functionalAreas);
+                manager.PopulateWithFunctionalAreas(treeState, RecordsLibraryFolders.Nodes, WBRecordsManager.VIEW_MODE__BROWSE_FOLDERS, functionalAreas);
             }
             else
             {
@@ -129,6 +129,7 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
 
             SPFolder protectedLibraryRootFolder = manager.Libraries.ProtectedMasterLibrary.List.RootFolder;
 
+            /*
             WBTerm functionalArea = workBox.OwningTeam.FunctionalArea(workBox.FunctionalAreasTaxonomy)[0];
 
             WBLogging.Debug("Looking for folder: \n" + functionalArea.Name);
@@ -141,10 +142,10 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
                 WBLogging.Debug("Adding folder filter to query of: " + functionalAreaFolder.Name);
             //    query.Folder = functionalAreaFolder;
             }
+            */
 
 
-
-            SPListItemCollection items = List.Items; //  GetItems(query);
+            SPListItemCollection items = List.GetItems(query);
 
             WBLogging.Debug("Found items: " + items.Count);
 

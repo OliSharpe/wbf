@@ -106,6 +106,22 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                             PublicExtranetButton.Enabled = false;
                             PublicExtranetNotAllowedMessage.Text = "One of your file types can't be published to public websites";
                         }
+
+                        if (String.IsNullOrEmpty(WorkBox.OwningTeam.InformationAssetOwnerLogin))
+                        {
+                            PublicWebSiteButton.Enabled = false;
+                            PublicNotAllowedMessage.Text = "You cannot publish to the public website because the owning team of this work box does not have an assigned Information Asset Owner(IAO)";
+                            PublicExtranetButton.Enabled = false;
+                            PublicExtranetNotAllowedMessage.Text = "You cannot publish to the public website because the owning team of this work box does not have an assigned Information Asset Owner(IAO)";
+                        }
+
+                        if (!WorkBox.OwningTeam.IsCurrentUserTeamMember())
+                        {
+                            PublicWebSiteButton.Enabled = false;
+                            PublicNotAllowedMessage.Text = "You cannot publish to the public website from here because you are not a member of this work box's owning team";
+                            PublicExtranetButton.Enabled = false;
+                            PublicExtranetNotAllowedMessage.Text = "You cannot publish to the public website from here because you are not a member of this work box's owning team";
+                        }
                     }
 
                     DocumentsBeingPublished.Text = html;

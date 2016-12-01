@@ -134,7 +134,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     if (functionalAreaInitialValue == null || functionalAreaInitialValue == "")
                     {
                         if (owningTeam != null)
-                            functionalAreaInitialValue = owningTeam.InheritedFunctionalAreaUIControlValue;
+                            functionalAreaInitialValue = owningTeam.FunctionalArea(functionalAreas).UIControlValue;
                     }
                 }
                 else

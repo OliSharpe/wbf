@@ -7,9 +7,30 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
     public partial class EditRecordsMetadata : WBDialogPageBase
     {
         private String currentUserLoginName = "";
+        private WBTaxonomy teams = null;
+        private WBTeam team = null;
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            teams = WBTaxonomy.GetTeams(SPContext.Current.Site);
+            team = WBTeam.GetFromTeamSite(teams, SPContext.Current.Web);
+            if (team == null)
+            {
+                WorkBox workBox = WorkBox.GetIfWorkBox(SPContext.Current);
+                if (workBox != null)
+                {
+                    team = workBox.OwningTeam;
+                }
+            }
+
+            // Check if this user has permission - checking basic team membership:
+            if (team == null || !team.IsCurrentUserTeamMember())
+            {
+                AccessDeniedPanel.Visible = true;
+                UpdateRecordsMetadataPanel.Visible = false;
+                AccessDeniedReason.Text = "You are not a member of this team";
+                return;
+            }
 
             currentUserLoginName = SPContext.Current.Web.CurrentUser.LoginName;
 
@@ -29,9 +50,20 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     if (record.FunctionalArea != null && record.FunctionalArea.Count > 0)
                     {
                         WBLogging.Debug("Found functional area = " + record.FunctionalArea);
-                        location = record.FunctionalArea[0].FullPath;
-
+                        WBTerm functionalArea = record.FunctionalArea[0];
+                        location = functionalArea.FullPath;
                         WBLogging.Debug("location = " + location);
+
+                        WBTermCollection<WBTerm> teamsFunctionalAreas = team.FunctionalArea(teams);
+
+                        if (!teamsFunctionalAreas.Contains(functionalArea))
+                        {
+                            AccessDeniedPanel.Visible = true;
+                            UpdateRecordsMetadataPanel.Visible = false;
+                            AccessDeniedReason.Text = "The team " + team.Name + " does not have permission to edit this functional area: " + functionalArea.Name;
+                            return;
+                        }
+
                     }
                     location += "/" + record.RecordsType.FullPath;
 
@@ -72,7 +104,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     RecordSeriesStatusChange.DataBind();
                     RecordSeriesStatusChange.SelectedValue = "";
 
-                    ProtectiveZone.DataSource = new String[] { WBRecordsType.PROTECTIVE_ZONE__PROTECTED, WBRecordsType.PROTECTIVE_ZONE__PUBLIC_EXTRANET, WBRecordsType.PROTECTIVE_ZONE__PUBLIC };
+                    ProtectiveZone.DataSource = new String[] { WBRecordsType.PROTECTIVE_ZONE__PROTECTED, WBRecordsType.PROTECTIVE_ZONE__PUBLIC };
                     ProtectiveZone.DataBind();
                     ProtectiveZone.SelectedValue = record.ProtectiveZone;
 
@@ -91,15 +123,31 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void updateButton_OnClick(object sender, EventArgs e)
         {
-            bool digestOK = SPContext.Current.Web.ValidateFormDigest();
+            if (team == null || !team.IsCurrentUserTeamMember())
+            {
+                return;
+            }
+            WBTermCollection<WBTerm> teamsFunctionalAreas = team.FunctionalArea(teams);
+
             String callingUserLogin = SPContext.Current.Web.CurrentUser.LoginName;
-            if (digestOK)
+            if (true)
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     using (WBRecordsManager elevatedManager = new WBRecordsManager(callingUserLogin))
                     {
                         WBRecord record = elevatedManager.Libraries.GetRecordByID(RecordID.Text);
+
+                        // Let's just double check the permissions to edit:
+                        WBTermCollection<WBTerm> recordsFunctionalAreas = record.FunctionalArea;
+                        if (recordsFunctionalAreas != null && recordsFunctionalAreas.Count > 0)
+                        {
+                            WBTerm functionalArea = record.FunctionalArea[0];
+                            if (!teamsFunctionalAreas.Contains(functionalArea))
+                            {
+                                throw new Exception("You are trying to edit a record (" + record.RecordID + ") which has a functional area (" + functionalArea.Name + ") that your team (" + team.Name + ") doesn't have permission to edit!");
+                            }
+                        }
 
                         if (RecordSeriesStatusChange.SelectedValue == "Retire")
                         {

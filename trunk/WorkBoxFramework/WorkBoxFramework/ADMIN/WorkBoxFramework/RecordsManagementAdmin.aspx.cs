@@ -37,6 +37,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             if (!IsPostBack)
             {
                 PublicDocumentEmailAlertsTo.Text = farm.PublicDocumentEmailAlertsTo;
+                PublicWebsiteTeamEmail.Text = farm.PublicWebsiteTeamEmail;
             }
 
             String html = "<table cellpadding='6'>\n";
@@ -74,6 +75,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             WBFarm farm = WBFarm.Local;
 
             farm.PublicDocumentEmailAlertsTo = PublicDocumentEmailAlertsTo.Text;
+            farm.PublicWebsiteTeamEmail = PublicWebsiteTeamEmail.Text;
 
             farm.Update();
 

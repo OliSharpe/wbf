@@ -108,7 +108,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     Description.Text = "Select the document to replace";
                 }
 
-                WBTermCollection<WBTerm> teamFunctionalAreas = new WBTermCollection<WBTerm>(manager.FunctionalAreasTaxonomy, process.TeamFunctionalAreasUIControlValue);
+                WBTermCollection<WBTerm> teamFunctionalAreas = WorkBox.OwningTeam.FunctionalArea(manager.FunctionalAreasTaxonomy);
 
                 manager.PopulateWithFunctionalAreas(treeState, LibraryLocations.Nodes, viewMode, teamFunctionalAreas);
             }

@@ -43,7 +43,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             teams = WBTaxonomy.GetTeams(site);
             functionalAreas = WBTaxonomy.GetFunctionalAreas(teams);
 
-            functionalAreas.InitialiseTaxonomyControl(TeamFunctionalAreas, "Select Functional Area(s)", false, false, this);
+            functionalAreas.InitialiseTaxonomyControl(TeamFunctionalAreas, "Select Functional Area(s)", true, false, this);
 
 
             if (!IsPostBack)
@@ -64,6 +64,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             TeamName.Text = team.Name;
             TeamGUID.Text = team.Id.ToString();
             TeamAcronym.Text = team.Acronym;
+
+            UseAllFunctionalAreas.Checked = team.UseAllFunctionalAreas;
 
             TeamFunctionalAreas.Text = team.FunctionalAreaUIControlValue;
 
@@ -130,6 +132,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             WBLogging.Debug("Set name and acronym");
 
+            team.UseAllFunctionalAreas = UseAllFunctionalAreas.Checked;
             team.FunctionalAreaUIControlValue = TeamFunctionalAreas.Text;
 
             team.TeamSiteUrl = TeamsSiteURL.Text;

@@ -49,7 +49,7 @@ This admin page is a central place to configure some of the key locations on thi
 <td class="wbf-field-name-panel">
 <div class="wbf-field-name">Public Document Email Alerts To</div>
 <div class="wbf-field-description">
-Where should the alert emails for new public documents be sent to?
+Where should copies of the alert emails for new public documents be sent to?
 </div>
 </td>
 <td class="wbf-field-value-panel">
@@ -59,6 +59,22 @@ Where should the alert emails for new public documents be sent to?
 
 </td>
 </tr>
+
+<tr>
+<td class="wbf-field-name-panel">
+<div class="wbf-field-name">Public Website Team Email</div>
+<div class="wbf-field-description">
+Where should email alerts be sent to about new documents that need to go onto a web page.
+</div>
+</td>
+<td class="wbf-field-value-panel">
+<div class="wbf-field-value">
+<asp:TextBox ID="PublicWebsiteTeamEmail" runat="server" Columns="55" />
+</div>
+
+</td>
+</tr>
+
 
 
 <tr>

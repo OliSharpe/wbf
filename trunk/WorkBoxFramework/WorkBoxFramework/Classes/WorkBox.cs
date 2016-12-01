@@ -704,7 +704,7 @@ namespace WorkBoxFramework
                 _updateMustRedoPermissions = true;
 
                 // Now to update the functional area of this work box according to the new owning team:
-                Item.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, _owningTeam.InheritedFunctionalAreaUIControlValue);
+                Item.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, _owningTeam.FunctionalArea(FunctionalAreasTaxonomy));
             }
 
         }
@@ -2958,7 +2958,7 @@ namespace WorkBoxFramework
                     {
                         if (!sourceDocAsItem.WBxColumnHasValue(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA))
                         {
-                            sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, this.OwningTeam.InheritedFunctionalAreaUIControlValue);
+                            sourceDocAsItem.WBxSetMultiTermColumn(WorkBox.COLUMN_NAME__FUNCTIONAL_AREA, this.OwningTeam.FunctionalArea(FunctionalAreasTaxonomy));
                             updateRequired = true;
                         }
                     }
