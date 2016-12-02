@@ -44,7 +44,7 @@ namespace WorkBoxFramework
 {
     public static class WBExtensions
     {
-        public const int CUSTOM_PROPERTIES__MAXIMUM_LENGTH = 1000;
+        public const int TERM_PROPERTIES__MAXIMUM_LENGTH = 255;
         public const int BIG_CUSTOM_PROPERTIES__MAXIMUM_LENGTH = 10000;
         public const int BIG_CUSTOM_PROPERTIES__CHUNK_SIZE = 254;
 
