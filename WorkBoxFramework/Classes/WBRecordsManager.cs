@@ -607,10 +607,10 @@ namespace WorkBoxFramework
                 WBRecordsType recordsType = new WBRecordsType(recordsTypesTaxonomy, term);
 
                 bool protectiveZoneOK = true;
-                //if (!String.IsNullOrEmpty(treeState.MinimumProtectiveZone))
-                //{
-                //    protectiveZoneOK = (recordsType.IsZoneAtLeastMinimum(treeState.MinimumProtectiveZone));
-                //}
+                if (!String.IsNullOrEmpty(treeState.MinimumProtectiveZone))
+                {
+                    protectiveZoneOK = (recordsType.IsZoneAtLeastMinimum(treeState.MinimumProtectiveZone));
+                }
 
                 if (recordsType.BranchCanHaveDocuments() && recordsType.IsRelevantToFunctionalArea(functionalArea) && protectiveZoneOK)
                 {

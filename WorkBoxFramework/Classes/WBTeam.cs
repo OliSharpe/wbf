@@ -266,7 +266,7 @@ namespace WorkBoxFramework
             }
             set {
 
-                if (value.Length > WBExtensions.CUSTOM_PROPERTIES__MAXIMUM_LENGTH)
+                if (value.Length > WBExtensions.TERM_PROPERTIES__MAXIMUM_LENGTH)
                 {
                     Term.WBxSetProperty(TEAM_TERM_PROPERTY__FUNCTIONAL_AREA, "BIG");
                     Term.WBxSetBigProperty(TEAM_TERM_PROPERTY__MANY_FUNCTIONAL_AREAS, value);

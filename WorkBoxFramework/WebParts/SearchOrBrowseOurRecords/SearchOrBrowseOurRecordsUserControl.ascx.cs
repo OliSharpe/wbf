@@ -54,8 +54,7 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
             RecordsLibraryFolders.PopulateNodesFromClient = true;
             RecordsLibraryFolders.EnableClientScript = true;
 
-            treeState = new WBLocationTreeState(SPContext.Current.Web, "Browse Folders", "Public");
-
+            treeState = new WBLocationTreeState(SPContext.Current.Web, WBRecordsManager.VIEW_MODE__BROWSE_FOLDERS, WBRecordsType.PROTECTIVE_ZONE__PUBLIC);
 
             if (!IsPostBack)
             {
