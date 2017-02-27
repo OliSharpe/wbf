@@ -1009,6 +1009,7 @@ namespace WorkBoxFramework
                 WBColumn.CanPublishToPublic,
                 WBColumn.CanBulkPublish,
                 WBColumn.CanBulkPublishToPublic,
+                WBColumn.OnlyTeamsCanPublishToPublic,
                 WBColumn.FileTypePrettyName,
                 WBColumn.DocumentType
             };
@@ -1019,6 +1020,7 @@ namespace WorkBoxFramework
             viewQuery.AddViewColumn(WBColumn.CanPublishToPublic);
             viewQuery.AddViewColumn(WBColumn.CanBulkPublish);
             viewQuery.AddViewColumn(WBColumn.CanBulkPublishToPublic);
+            viewQuery.AddViewColumn(WBColumn.OnlyTeamsCanPublishToPublic);
             viewQuery.AddViewColumn(WBColumn.FileTypePrettyName);
             viewQuery.AddViewColumn(WBColumn.DocumentType);
 
@@ -1166,6 +1168,7 @@ namespace WorkBoxFramework
                 WBColumn.CanPublishToPublic,
                 WBColumn.CanBulkPublish,
                 WBColumn.CanBulkPublishToPublic,
+                WBColumn.OnlyTeamsCanPublishToPublic,
                 WBColumn.FileTypePrettyName,
                 WBColumn.DocumentType,
                 WBColumn.Order,

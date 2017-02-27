@@ -304,6 +304,24 @@ namespace WorkBoxFramework
             }
         }
 
+        public bool HasReviewDate { get { return this.IsNotEmpty(WBColumn.ReviewDate); } }
+        public DateTime ReviewDate
+        {
+            get
+            {
+                if (this.IsNullOrEmpty(WBColumn.ReviewDate))
+                {
+                    WBLogging.Generic.Unexpected("Trying to read a 'ReviewDate' value of a WBDocument that hasn't been set!!");
+                    return DateTime.Now;
+                }
+
+                return (DateTime)this[WBColumn.ReviewDate];
+            }
+            set
+            {
+                this[WBColumn.ReviewDate] = value;
+            }
+        }
 
         public bool HasReferenceDate { get { return this.IsNotEmpty(WBColumn.ReferenceDate); } }
         public DateTime ReferenceDate
@@ -449,10 +467,80 @@ namespace WorkBoxFramework
 
         public String RecordSeriesID
         {
-            get { return this[WBColumn.RecordSeriesID].WBxToString(); }
+            get { 
+                String recordSeriesID = this[WBColumn.RecordSeriesID].WBxToString();
+
+                if (String.IsNullOrEmpty(recordSeriesID))
+                {
+                    recordSeriesID = RecordID;
+                    SetupNewRecordSeriesColumns();
+                }
+
+                return recordSeriesID;
+            }
             set { this[WBColumn.RecordSeriesID] = value; }
         }
 
+        public bool CheckAndFixMetadataForRecord()
+        {
+            if (this.IsNullOrEmpty(WBColumn.RecordSeriesID) && !this.IsSPListItemVersion)
+            {
+                SetupNewRecordSeriesColumns();
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        private void SetupNewRecordSeriesColumns()
+        {
+            // We can't change the underlying values if this is a list item version:
+            if (this.IsSPListItemVersion) return;
+
+            // OK so this record hasn't been set up with the latest metadata model so:
+            ReplacesRecordID = null;
+            RecordSeriesID = RecordID;
+            RecordSeriesIssue = "1";
+
+            if (LiveOrArchived == WBColumn.LIVE_OR_ARCHIVED__ARCHIVED)
+            {
+                this[WBColumn.RecordSeriesStatus] = WBColumn.RECORD_SERIES_STATUS__ARCHIVED;
+            }
+            else
+            {
+                this[WBColumn.RecordSeriesStatus] = WBColumn.RECORD_SERIES_STATUS__LATEST;
+            }
+
+            if (!HasDatePublished)
+            {
+                if (HasDeclaredRecord)
+                {
+                    DatePublished = DeclaredRecord;
+                }
+                else
+                {
+                    if (HasModified)
+                    {
+                        DatePublished = Modified;
+                        this[WBColumn.ReviewDate] = DatePublished.AddYears(2);
+                    }
+                }
+            }
+
+            if (HasDatePublished && !HasReviewDate)
+            {
+                ReviewDate = DatePublished.AddYears(2);
+            }
+
+            if (this.IsNullOrEmpty(WBColumn.PublishedBy))
+            {
+                this[WBColumn.PublishedBy] = this[WBColumn.Author];
+            }
+        }
+
+        
         public String ReplacesRecordID
         {
             get { return this[WBColumn.ReplacesRecordID].WBxToString(); }

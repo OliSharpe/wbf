@@ -262,7 +262,7 @@ function WorkBoxFramework_PublishDoc_enabled() {
 
     return WorkBoxFramework_actionIsEnabled('publish_document');
 
-    // We're no longer restricted the selection to just one document to publish!
+    // We should only show this button as enabled when at least one item is selected:
     //var items = SP.ListOperation.Selection.getSelectedItems();
     //var itemCount = CountDictionary(items);
     //return (itemCount == 1) && WorkBoxFramework_actionIsEnabled('publish_document');

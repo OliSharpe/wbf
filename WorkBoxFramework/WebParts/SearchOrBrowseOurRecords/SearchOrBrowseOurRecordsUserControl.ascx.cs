@@ -238,12 +238,16 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
 + "<th class='wbf-record-series-even'></th>"
 + "</tr>\n";
 
+            int countViewableItems = 0;
 
             foreach (SPListItem item in items)
             {
                 if (ItemCanBePicked(item))
                 {
+                    countViewableItems++;
+
                     WBDocument document = new WBDocument(manager.Libraries.ProtectedMasterLibrary, item);
+                    document.CheckAndFixMetadataForRecord();
 
                     String publishedDateString = "";
                     if (document.Item.WBxHasValue(WBColumn.DatePublished))
@@ -295,6 +299,11 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
                 }
             }
 
+            if (countViewableItems == 0)
+            {
+                FoundRecords.Text = "<i>No suitable records found</i><!-- number of unsuitable records = " + items.Count + " -->";
+                return;
+            }
 
             html += "\n</table>";
 

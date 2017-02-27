@@ -1217,6 +1217,11 @@ namespace WorkBoxFramework
             return term;
         }
 
+        public static WBTermCollection<T> WBxGetMultiTermColumn<T>(this SPListItem item, WBTaxonomy taxonomy, WBColumn column) where T : WBTerm, new()
+        {
+            return WBxGetMultiTermColumn<T>(item, taxonomy, column.DisplayName);
+        }
+
         public static WBTermCollection<T> WBxGetMultiTermColumn<T>(this SPListItem item, WBTaxonomy taxonomy, String columnName) where T : WBTerm, new()
         {
             TaxonomyFieldValueCollection taxonomyFieldValueCollection = item[columnName] as TaxonomyFieldValueCollection;

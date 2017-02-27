@@ -215,9 +215,17 @@ namespace WorkBoxFramework
         {
             WBQuery query = new WBQuery();
 
-            query.AddFilter(WBColumn.RecordSeriesID, WBQueryClause.Comparators.Equals, recordSeriesID);
-            query.AddFilter(WBColumn.LiveOrArchived, WBQueryClause.Comparators.Equals, WBColumn.LIVE_OR_ARCHIVED__LIVE);
-            query.AddFilter(WBColumn.RecordID, WBQueryClause.Comparators.LessThanEquals, recordID);
+            if (String.IsNullOrEmpty(recordSeriesID) || recordSeriesID == recordID)
+            {
+                query.AddFilter(WBColumn.LiveOrArchived, WBQueryClause.Comparators.Equals, WBColumn.LIVE_OR_ARCHIVED__LIVE);
+                query.AddFilter(WBColumn.RecordID, WBQueryClause.Comparators.Equals, recordID);
+            }
+            else
+            {
+                query.AddFilter(WBColumn.RecordSeriesID, WBQueryClause.Comparators.Equals, recordSeriesID);
+                query.AddFilter(WBColumn.LiveOrArchived, WBQueryClause.Comparators.Equals, WBColumn.LIVE_OR_ARCHIVED__LIVE);
+                query.AddFilter(WBColumn.RecordID, WBQueryClause.Comparators.LessThanEquals, recordID);
+            }
 
             query.OrderByDescending(WBColumn.RecordID);
 

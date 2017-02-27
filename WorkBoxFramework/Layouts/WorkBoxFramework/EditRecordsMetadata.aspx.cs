@@ -6,42 +6,41 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 {
     public partial class EditRecordsMetadata : WBDialogPageBase
     {
-        private String currentUserLoginName = "";
-        private WBTaxonomy teams = null;
-        private WBTeam team = null;
-
         protected void Page_Load(object sender, EventArgs e)
         {
-            teams = WBTaxonomy.GetTeams(SPContext.Current.Site);
-            team = WBTeam.GetFromTeamSite(teams, SPContext.Current.Web);
-            if (team == null)
-            {
-                WorkBox workBox = WorkBox.GetIfWorkBox(SPContext.Current);
-                if (workBox != null)
-                {
-                    team = workBox.OwningTeam;
-                }
-            }
-
-            // Check if this user has permission - checking basic team membership:
-            if (team == null || !team.IsCurrentUserTeamMember())
-            {
-                AccessDeniedPanel.Visible = true;
-                UpdateRecordsMetadataPanel.Visible = false;
-                AccessDeniedReason.Text = "You are not a member of this team";
-                return;
-            }
-
-            currentUserLoginName = SPContext.Current.Web.CurrentUser.LoginName;
-
             if (!IsPostBack)
             {
+                String currentUserLoginName = SPContext.Current.Web.CurrentUser.LoginName;
+
+                WBTaxonomy teams = WBTaxonomy.GetTeams(SPContext.Current.Site);
+                WBTaxonomy functionalAreas = WBTaxonomy.GetFunctionalAreas(teams);
+                WBTeam team = WBTeam.GetFromTeamSite(teams, SPContext.Current.Web);
+                if (team == null)
+                {
+                    WorkBox workBox = WorkBox.GetIfWorkBox(SPContext.Current);
+                    if (workBox != null)
+                    {
+                        team = workBox.OwningTeam;
+                    }
+                }
+
+                // Check if this user has permission - checking basic team membership:
+                if (team == null || !team.IsCurrentUserTeamMember())
+                {
+                    AccessDeniedPanel.Visible = true;
+                    UpdateRecordsMetadataPanel.Visible = false;
+                    AccessDeniedReason.Text = "You are not a member of this team";
+                    return;
+                }
+
                 RecordID.Text = Request.QueryString["RecordID"];
                 WBLogging.Debug("Record ID is found to be: " + RecordID.Text);
 
                 using (WBRecordsManager manager = new WBRecordsManager(currentUserLoginName))
                 {
                     WBRecord record = manager.Libraries.GetRecordByID(RecordID.Text);
+
+                    record.CheckMetadata();
 
                     Filename.Text = record.Name;
                     RecordTitle.Text = record.Title;
@@ -54,10 +53,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                         location = functionalArea.FullPath;
                         WBLogging.Debug("location = " + location);
 
-                        WBTermCollection<WBTerm> teamsFunctionalAreas = team.FunctionalArea(teams);
+                        WBTermCollection<WBTerm> teamsFunctionalAreas = team.FunctionalArea(functionalAreas);
 
                         if (!teamsFunctionalAreas.Contains(functionalArea))
                         {
+                            WBLogging.Debug("Team functional areas UIControlValue: " + teamsFunctionalAreas.UIControlValue);
+                            WBLogging.Debug("Record's functional area UIControlValue: " + functionalArea);
+
                             AccessDeniedPanel.Visible = true;
                             UpdateRecordsMetadataPanel.Visible = false;
                             AccessDeniedReason.Text = "The team " + team.Name + " does not have permission to edit this functional area: " + functionalArea.Name;
@@ -123,11 +125,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
         protected void updateButton_OnClick(object sender, EventArgs e)
         {
+            /* Something here appears to be causing an authentication error
             if (team == null || !team.IsCurrentUserTeamMember())
             {
                 return;
             }
             WBTermCollection<WBTerm> teamsFunctionalAreas = team.FunctionalArea(teams);
+            */
 
             String callingUserLogin = SPContext.Current.Web.CurrentUser.LoginName;
             if (true)
@@ -138,6 +142,10 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                     {
                         WBRecord record = elevatedManager.Libraries.GetRecordByID(RecordID.Text);
 
+                        // Just making sure that any old records have any missing metadata filled in before the update is applied:
+                        record.CheckMetadata();
+
+                        /* Something here appears to be causing an authentication error
                         // Let's just double check the permissions to edit:
                         WBTermCollection<WBTerm> recordsFunctionalAreas = record.FunctionalArea;
                         if (recordsFunctionalAreas != null && recordsFunctionalAreas.Count > 0)
@@ -148,6 +156,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                                 throw new Exception("You are trying to edit a record (" + record.RecordID + ") which has a functional area (" + functionalArea.Name + ") that your team (" + team.Name + ") doesn't have permission to edit!");
                             }
                         }
+                        */
 
                         if (RecordSeriesStatusChange.SelectedValue == "Retire")
                         {
