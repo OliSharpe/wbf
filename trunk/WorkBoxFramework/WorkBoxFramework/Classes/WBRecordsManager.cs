@@ -389,7 +389,11 @@ namespace WorkBoxFramework
             }
 
             SPListItem fileTypeInfo = WBUtils.FindItemByColumn(Libraries.ProtectedMasterLibrary.Site, _fileTypesList, WBColumn.FileTypeExtension, fileType);
-            _fileTypeInfo[fileType] = fileTypeInfo;
+
+            if (fileTypeInfo != null)
+            {
+                _fileTypeInfo[fileType] = fileTypeInfo;
+            }
 
             return fileTypeInfo;
         }
@@ -400,20 +404,105 @@ namespace WorkBoxFramework
             return fileTypeInfo.WBxGetAsString(WBColumn.DocumentType);
         }
 
-        internal bool AllowPublishToPublicOfFileTypes(IEnumerable<String> fileTypes)
+        internal List<String> GetFileTypesDisallowedFromBeingPublishedToPublic(IEnumerable<String> fileTypes)
         {
-            bool publicAllowed = true;
+            List<String> disallowedFileTypes = new List<string>();
+
             foreach (String fileType in fileTypes)
             {
                 SPListItem fileTypeInfoItem = GetFileTypeInfo(fileType);
 
-                if (!fileTypeInfoItem.WBxGetAsBool(WBColumn.CanPublishToPublic))
+                if (fileTypeInfoItem == null)
                 {
-                    publicAllowed = false;
+                    disallowedFileTypes.Add(fileType);
                 }
+                else
+                {
+                    if (!fileTypeInfoItem.WBxGetAsBool(WBColumn.CanPublishToPublic))
+                    {
+                        disallowedFileTypes.Add(fileType);
+                    }
+                    else
+                    {
+                        WBTermCollection<WBTeam> teams = fileTypeInfoItem.WBxGetMultiTermColumn<WBTeam>(this.TeamsTaxonomy, WBColumn.OnlyTeamsCanPublishToPublic);
+                        if (teams != null && teams.Count > 0)
+                        {
+                            WBLogging.RecordsTypes.Verbose("Found this many teams: " + teams.Count);
+
+                            // OK so if we're here then a team restriction has been set for this file type:
+                            SPUser callingUser = null;
+
+                            SPWeb web = null;
+                            SPSite site = null;
+
+                            if (SPContext.Current != null)
+                            {
+                                web = SPContext.Current.Web;
+                                site = SPContext.Current.Site;
+                            }
+
+                            if (web == null)
+                            {
+                                WBLogging.RecordsTypes.Verbose("SPContext.Current.Web was null !");
+                                web = this.Libraries.ProtectedMasterLibrary.Web;
+                                site = this.Libraries.ProtectedMasterLibrary.Site;
+                            }
+
+                            bool isAMemberOfAtLeastOneTeam = false;
+                            if (web == null)
+                            {
+                                WBLogging.RecordsTypes.Verbose("this.Libraries.ProtectedMasterLibrary.Web was null !");
+                            }
+                            else
+                            {
+                                WBLogging.RecordsTypes.Verbose("We have an SPWeb with web.Url = " + web.Url);
+
+                                if (!String.IsNullOrEmpty(this._callingUserLogin))
+                                {
+                                    callingUser = web.WBxEnsureUserOrNull(this._callingUserLogin);
+                                }
+
+                                if (callingUser == null)
+                                {
+                                    WBLogging.RecordsTypes.Verbose("Wasn't able to find calling user: " + this._callingUserLogin);
+                                }
+                                else
+                                {
+                                    WBLogging.RecordsTypes.Verbose("Found calling user: " + callingUser.Email);
+                                }
+
+
+                                if (callingUser != null)
+                                {
+                                    foreach (WBTeam team in teams)
+                                    {
+                                        if (team.IsUserTeamMember(callingUser, site))
+                                        {
+                                            WBLogging.RecordsTypes.Verbose("Calling user is a member of team : " + team.Name);
+                                            isAMemberOfAtLeastOneTeam = true;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            WBLogging.RecordsTypes.Verbose("Calling user is NOT a member of team : " + team.Name);
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            if (!isAMemberOfAtLeastOneTeam)
+                            {
+                                disallowedFileTypes.Add(fileType + " (you're not a member of an allowed team)");
+                            }
+
+                        }
+                    }
+                }
+
             }
 
-            return publicAllowed;
+            return disallowedFileTypes;
         }
 
         internal bool AllowBulkPublishOfFileTypes(IEnumerable<String> fileTypes)

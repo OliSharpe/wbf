@@ -52,8 +52,6 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
             if (!IsPostBack)
             {
-
-
                 if (Request.QueryString["selectedItemsIDsString"] != null && Request.QueryString["selectedListGUID"] != null)
                 {
 
@@ -98,14 +96,7 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
                         html += "</table>";
 
-
-                        if (!manager.AllowPublishToPublicOfFileTypes(fileTypes))
-                        {
-                            PublicWebSiteButton.Enabled = false;
-                            PublicNotAllowedMessage.Text = "One of your file types can't be published to public websites";
-                            PublicExtranetButton.Enabled = false;
-                            PublicExtranetNotAllowedMessage.Text = "One of your file types can't be published to public websites";
-                        }
+                        List<string> disallowedFileTypes = manager.GetFileTypesDisallowedFromBeingPublishedToPublic(fileTypes);
 
                         if (String.IsNullOrEmpty(WorkBox.OwningTeam.InformationAssetOwnerLogin))
                         {
@@ -113,15 +104,21 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                             PublicNotAllowedMessage.Text = "You cannot publish to the public website because the owning team of this work box does not have an assigned Information Asset Owner(IAO)";
                             PublicExtranetButton.Enabled = false;
                             PublicExtranetNotAllowedMessage.Text = "You cannot publish to the public website because the owning team of this work box does not have an assigned Information Asset Owner(IAO)";
-                        }
-
-                        if (!WorkBox.OwningTeam.IsCurrentUserTeamMember())
+                        } 
+                        else if (!WorkBox.OwningTeam.IsCurrentUserTeamMember())
                         {
                             PublicWebSiteButton.Enabled = false;
                             PublicNotAllowedMessage.Text = "You cannot publish to the public website from here because you are not a member of this work box's owning team";
                             PublicExtranetButton.Enabled = false;
                             PublicExtranetNotAllowedMessage.Text = "You cannot publish to the public website from here because you are not a member of this work box's owning team";
-                        }
+                        } 
+                        else if (disallowedFileTypes.Count > 0)
+                        {
+                            PublicWebSiteButton.Enabled = false;
+                            PublicNotAllowedMessage.Text = "The following file types have not been approved for publishing to a public website: " + String.Join(", ", disallowedFileTypes.ToArray());
+                            PublicExtranetButton.Enabled = false;
+                            PublicExtranetNotAllowedMessage.Text = "The following file types have not been approved for publishing to a public website: " + String.Join(", ", disallowedFileTypes.ToArray());
+                        } 
                     }
 
                     DocumentsBeingPublished.Text = html;

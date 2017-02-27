@@ -25,15 +25,23 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             
             
             String recordSeriesID = Request.QueryString["RecordSeriesID"];
+            String recordID = Request.QueryString["RecordID"];
 
             using (WBRecordsManager manager = new WBRecordsManager(SPContext.Current.Web.CurrentUser.LoginName))
             {
                 WBRecordsLibrary masterLibrary = manager.Libraries.ProtectedMasterLibrary;
                 SPList masterLibraryList = masterLibrary.List;
                 WBQuery query = new WBQuery();
-                query.AddEqualsFilter(WBColumn.RecordSeriesID, recordSeriesID);
-                query.OrderBy(WBColumn.RecordSeriesIssue, false);
-
+                if (String.IsNullOrEmpty(recordSeriesID) || recordSeriesID == recordID)
+                {
+                    query.AddEqualsFilter(WBColumn.RecordID, recordID);
+                }
+                else
+                {
+                    query.AddEqualsFilter(WBColumn.RecordSeriesID, recordSeriesID);
+                    query.OrderBy(WBColumn.RecordSeriesIssue, false);
+                }
+ 
                 SPListItemCollection items = masterLibraryList.WBxGetItems(SPContext.Current.Site, query);
 
                 /*
@@ -53,8 +61,6 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                  * */
 
                 Dictionary<String, String> checklistTextMap = manager.GetChecklistTextMap();
-
-
 
                 if (masterLibrary.List.EnableVersioning)
                 {
@@ -244,7 +250,14 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                 checklistDiv = "<div id='wbf-checklist-" + versionAsToggleID + "' style='display: none;'>";
                 foreach (String code in codes)
                 {
-                    checklistDiv += "<input type='checkbox' enabled='false' checked disabled/>" + checklistTextMap[code] + "<br/>";
+                    if (checklistTextMap.ContainsKey(code))
+                    {
+                        checklistDiv += "<input type='checkbox' enabled='false' checked disabled/>" + checklistTextMap[code] + "<br/>";
+                    }
+                    else
+                    {
+                        checklistDiv += "<input type='checkbox' enabled='false' checked disabled/>" + code + " (couldn't decode this checklist item)<br/>";
+                    }
                 }
                 checklistDiv += "</div>";
 
@@ -283,6 +296,8 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
             html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Modified By</td><td class='wbf-record-series-detail-even'>" + modifiedByString + "</td></tr>";
             html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-odd'>Modified On</td><td class='wbf-record-series-detail-odd'>" + modifiedOnString + "</td></tr>";
             html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Reason for Change</td><td class='wbf-record-series-detail-even'>" + checkInComments + "</td></tr>";
+            html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-odd'>Record Series ID</td><td class='wbf-record-series-detail-odd'>" + document.RecordSeriesID + "</td></tr>";
+            html += "<tr><td class='wbf-record-series-detail-title wbf-record-series-detail-even'>Record ID</td><td class='wbf-record-series-detail-even'>" + document.RecordID + "</td></tr>";
 
             html += "<tr><td class='wbf-record-series-detail-even' colspan='2' align='center'><input type='button' value='View Document' onclick='window.open(\"" + document.AbsoluteURL + "\", \"_blank\");' />";
             if (minorVersionIndex <= 0 && status != "Archived")

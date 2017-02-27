@@ -246,7 +246,9 @@ namespace WorkBoxFramework
 
                 foreach (WBDocument recordCopy in _recordCopies.Values)
                 {
-                    recordCopy.MaybeUpdateRecordColumns(callingUserLogin, Metadata, WBRecord.DefaultColumnsToCopy, reasonForUpdate);
+                    // Were getting IIS bin permissions problems when saving as callingUserLogin on the copied libraries.
+                    // Now just going to save all copies with the system details.
+                    recordCopy.MaybeUpdateRecordColumns(null, Metadata, WBRecord.DefaultColumnsToCopy, reasonForUpdate);
                 }
             }
         }
@@ -487,6 +489,13 @@ namespace WorkBoxFramework
             }
         }
 
+        /// <summary>
+        /// This method just checks that the metadata of the record is in a sensible state. 
+        /// </summary>
+        public void CheckMetadata()
+        {
+            Metadata.CheckAndFixMetadataForRecord();
+        }
 
     }
 }

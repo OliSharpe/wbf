@@ -562,7 +562,12 @@ namespace WorkBoxFramework
 
         public bool IsUserTeamMember(SPUser user)
         {
-            SPGroup members = MembersGroup(SPContext.Current.Site);
+            return IsUserTeamMember(user, SPContext.Current.Site);
+        }
+
+        public bool IsUserTeamMember(SPUser user, SPSite site)
+        {
+            SPGroup members = MembersGroup(site);
             if (members == null) return false;
             return members.WBxContainsUser(user);
         }

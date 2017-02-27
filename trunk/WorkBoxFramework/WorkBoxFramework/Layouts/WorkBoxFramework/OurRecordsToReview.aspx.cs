@@ -89,11 +89,16 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
 
 
 
+            int countViewableItems = 0;
+
             foreach (SPListItem item in items)
             {
                 if (ItemCanBePicked(item))
                 {
+                    countViewableItems++;
+
                     WBDocument document = new WBDocument(manager.Libraries.ProtectedMasterLibrary, item);
+                    document.CheckAndFixMetadataForRecord();
 
                     String publishedDateString = "";
                     if (document.Item.WBxHasValue(WBColumn.DatePublished))
@@ -153,6 +158,13 @@ namespace WorkBoxFramework.Layouts.WorkBoxFramework
                         + "<td class='wbf-record-series-summary-detail'><a href='#' onclick='WorkBoxFramework_viewRecordSeriesDetails(\"" + document.RecordSeriesID + "\", \"" + document.RecordID + "\");'>view details</a></td>"
                         + "</tr>";
                 }
+            }
+
+
+            if (countViewableItems == 0)
+            {
+                FoundRecords.Text = "<i>No suitable records found</i><!-- number of unsuitable records = " + items.Count + " -->";
+                return;
             }
 
 

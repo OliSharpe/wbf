@@ -983,6 +983,7 @@ namespace WorkBoxFramework
         public static readonly WBColumn CanPublishToPublic = WBColumn.BooleanColumn("Can Publish To Public");
         public static readonly WBColumn CanBulkPublish = WBColumn.BooleanColumn("Can Bulk Publish");
         public static readonly WBColumn CanBulkPublishToPublic = WBColumn.BooleanColumn("Can Bulk Publish To Public");
+        public static readonly WBColumn OnlyTeamsCanPublishToPublic = WBColumn.ManagedMedataColumn("Only Teams Can Publish To Public", INTERNAL_NAME_HAS_NO_SPACE_CHARACTERS, WorkBox.TERM_SET_NAME__TEAMS, true);
         public static readonly WBColumn FileTypePrettyName = WBColumn.TextColumn("File Type Pretty Name");
 
         public static readonly String DOCUMENT_TYPE__TEXT_DOCUMENT = "Text Document";
