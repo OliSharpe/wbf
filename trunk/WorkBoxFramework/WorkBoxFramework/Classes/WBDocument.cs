@@ -25,6 +25,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Security.Principal;
 using Microsoft.SharePoint;
 using Microsoft.Office.RecordsManagement.RecordsRepository;
 
@@ -649,65 +650,87 @@ namespace WorkBoxFramework
             return file.OpenBinaryStream();
         }
 
-
-
-
         public bool MaybeUpdateRecordColumns(String callingUserLogin, WBDocument documentToCopy, IEnumerable<WBColumn> columnsToCopy, String reasonForUpdate)
         {
-            WBLogging.Debug("In MaybeUpdateRecordColumns() for " + DebugName);
-            bool updateRequired = false;
+            WBLogging.RecordsTypes.Verbose("In WBDocument.MaybeUpdateRecordColumns() for " + DebugName);
 
+            bool updateRequired = false;
+            foreach (WBColumn column in columnsToCopy)
+            {
+                if (Item.WBxGet(column) != documentToCopy[column])
+                {
+                    updateRequired = true;
+                }
+            }
+
+            if (updateRequired)
+            {
+                WBLogging.RecordsTypes.Verbose("In WBDocument.MaybeUpdateRecordColumns() An update is required.");
+                UpdateRecordColumns(callingUserLogin, documentToCopy, columnsToCopy, reasonForUpdate);
+            }
+            else
+            {
+                WBLogging.RecordsTypes.Verbose("In WBDocument.MaybeUpdateRecordColumns() There is no need for an update.");
+            }
+
+            return updateRequired;
+        }
+
+
+        public void UpdateRecordColumns(String callingUserLogin, WBDocument documentToCopy, IEnumerable<WBColumn> columnsToCopy, String reasonForUpdate)
+        {
+            // WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            WBLogging.RecordsTypes.Verbose("In WBDocument.UpdateRecordColumns() running as: " + Web.CurrentUser.Name);
+            WBLogging.RecordsTypes.Verbose("In WBDocument.UpdateRecordColumns() SPSite system account: " + Site.SystemAccount.Name);
+
+            WBLogging.RecordsTypes.Verbose("In WBDocument.UpdateRecordColumns() for " + DebugName);
+
+            bool previousSetting = RecordsLibrary.Web.AllowUnsafeUpdates;
             RecordsLibrary.Web.AllowUnsafeUpdates = true;
 
+            WBLogging.RecordsTypes.Verbose("In WBDocument.UpdateRecordColumns() About to bypass locks on " + DebugName);
             Records.BypassLocks(this.Item, delegate(SPListItem item)
             {
-                WBLogging.Debug("In MaybeUpdateRecordColumns() inside BypassLocks() for " + DebugName);
+                WBLogging.RecordsTypes.Verbose("In WBDocument.UpdateRecordColumns() inside BypassLocks() for " + DebugName);
                 if (item.File.CheckOutType != SPFile.SPCheckOutType.None)
                 {
-                    WBLogging.RecordsTypes.Unexpected("Somehow the record being updated (Record ID = " + this.RecordID + ") was checked out to: " + item.File.CheckedOutByUser.LoginName);
+                    WBLogging.RecordsTypes.Verbose("In WBDocument.UpdateRecordColumns() Somehow the record being updated (Record ID = " + this.RecordID + ") was checked out to: " + item.File.CheckedOutByUser.LoginName);
                     item.File.UndoCheckOut();
                 }
 
+                WBLogging.RecordsTypes.Verbose("In WBDocument.UpdateRecordColumns(): Checkingout the record copy");
                 item.File.CheckOut();
-
-                WBLogging.Debug("In MaybeUpdateRecordColumns() done check out for " + DebugName);
+                WBLogging.RecordsTypes.Verbose("In WBDocument.UpdateRecordColumns(): done check out for " + DebugName);
 
                 foreach (WBColumn column in columnsToCopy)
                 {
-                    if (item.WBxGet(column) != documentToCopy[column])
+                    if (Item.WBxGet(column) != documentToCopy[column])
                     {
                         item.WBxSet(column, documentToCopy[column]);
-                        updateRequired = true;
                     }
                 }
+                WBLogging.RecordsTypes.Verbose("In WBDocument.UpdateRecordColumns(): Finished setting all of the columns that needed to be set");
+               
+                SPUser callingUser = item.Web.WBxEnsureUserOrNull(callingUserLogin);
 
-                if (updateRequired)
+                if (callingUserLogin != null)
                 {
-                    SPUser callingUser = item.Web.WBxEnsureUserOrNull(callingUserLogin);
-
-                    if (callingUserLogin != null)
-                    {
-                        WBLogging.Debug("Updating with callingUserLogin = " + callingUserLogin + " and callingUser = " + callingUser.Name);
-                        item.WBxSet(WBColumn.ModifiedBy, callingUserLogin);
-                        item.WBxSet(WBColumn.Modified, DateTime.Now);
-                    }
-                    else
-                    {
-                        WBLogging.Debug("Updating withtout a calling user (callingUserLogin = " + callingUserLogin + ")");
-                    }
-
-                    item.Update();
-                    item.File.WBxCheckInAs(reasonForUpdate, callingUser);
+                    WBLogging.RecordsTypes.Verbose("In WBDocument.UpdateRecordColumns(): Updating with callingUserLogin = " + callingUserLogin + " and callingUser = " + callingUser.Name);
+                    item.WBxSet(WBColumn.ModifiedBy, callingUserLogin);
+                    item.WBxSet(WBColumn.Modified, DateTime.Now);
                 }
                 else
                 {
-                    item.File.UndoCheckOut();
+                    WBLogging.RecordsTypes.Verbose("In WBDocument.UpdateRecordColumns(): Updating withtout a calling user (callingUserLogin = " + callingUserLogin + ")");
                 }
+
+                item.Update();
+                WBLogging.RecordsTypes.Verbose("In WBDocument.UpdateRecordColumns(): Done the actual item.Update()");
+                item.File.WBxCheckInAs(reasonForUpdate, callingUser);
+                WBLogging.RecordsTypes.Verbose("In WBDocument.UpdateRecordColumns(): Done the check in with user from callingUserLogin = " + callingUserLogin);                
             });
 
-            RecordsLibrary.Web.AllowUnsafeUpdates = false;
-
-            return updateRequired;
+            RecordsLibrary.Web.AllowUnsafeUpdates = previousSetting;
         }
 
     }

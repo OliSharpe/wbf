@@ -165,6 +165,20 @@ namespace WorkBoxFramework
 
             _site = new SPSite(_url);
             _web = _site.OpenWeb();
+
+            // Let's check that we are running with the correct elevated priviledge user:
+            if (_web.CurrentUser.ID != _site.SystemAccount.ID)
+            {
+                SPSite correctlyElevatedSite = new SPSite(_site.ID, _site.SystemAccount.UserToken);
+                SPWeb correctlyElevatedWeb = correctlyElevatedSite.OpenWeb(_web.ID);
+
+                _web.Dispose();
+                _site.Dispose();
+
+                _site = correctlyElevatedSite;
+                _web = correctlyElevatedWeb;
+            }
+
             _list = _web.GetList(_url);
 
             _openedByThisObject = true;
