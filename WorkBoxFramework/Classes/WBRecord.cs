@@ -238,17 +238,25 @@ namespace WorkBoxFramework
         {
             if (Metadata.ValuesHaveChanged)
             {
+                WBLogging.RecordsTypes.Verbose("In WBRecords.Update() With changed metadata values - so saving the update");
                 ProtectedMasterRecord.MaybeUpdateRecordColumns(callingUserLogin, Metadata, WBRecord.DefaultMasterColumnsToSave, reasonForUpdate);
-                
+
+                WBLogging.RecordsTypes.Verbose("In WBRecords.Update() Updated the master record.");
+
                 UpdateWhichLibrariesNeedACopy();
+                WBLogging.RecordsTypes.Verbose("In WBRecords.Update() Updated list of libraries that need a copy: " + String.Join(";", _librariesNeedingACopy.ToArray()));
+
                 CheckNoCopiesInWrongLibraries();
+                WBLogging.RecordsTypes.Verbose("In WBRecords.Update() Removed any copies from libraries that don't need a copy: " + String.Join(";", this._librariesMustNotHaveCopy.ToArray()));
+
                 CheckAllCopiesAreCreatedAndLoaded(null);
+                WBLogging.RecordsTypes.Verbose("In WBRecords.Update() Checked that there at least exists a copy in each library that needs a copy");
 
                 foreach (WBDocument recordCopy in _recordCopies.Values)
                 {
-                    // Were getting IIS bin permissions problems when saving as callingUserLogin on the copied libraries.
-                    // Now just going to save all copies with the system details.
-                    recordCopy.MaybeUpdateRecordColumns(null, Metadata, WBRecord.DefaultColumnsToCopy, reasonForUpdate);
+                    WBLogging.RecordsTypes.Verbose("In WBRecords.Update() About to update metadata in record copy in: " + recordCopy.RecordsLibrary.URL);
+                    recordCopy.MaybeUpdateRecordColumns(callingUserLogin, Metadata, WBRecord.DefaultColumnsToCopy, reasonForUpdate);
+                    WBLogging.RecordsTypes.Verbose("In WBRecords.Update() Finished updating metadata in record copy in: " + recordCopy.RecordsLibrary.URL);
                 }
             }
         }
