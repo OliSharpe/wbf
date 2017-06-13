@@ -940,7 +940,13 @@ namespace WorkBoxFramework
 
         internal String GetSelectedPath(HttpRequest request)
         {
-            String eventArgument = request["__EVENTARGUMENT"];
+            String eventArgument = request.Params["__EVENTARGUMENT"];
+
+            if (String.IsNullOrEmpty(eventArgument))
+            {
+                eventArgument = request.Params["HiddenSelectedPath"];
+            }
+
             if (!String.IsNullOrEmpty(eventArgument) && eventArgument[0] == 's')
             {
                 String selectedPath = eventArgument.Substring(1);

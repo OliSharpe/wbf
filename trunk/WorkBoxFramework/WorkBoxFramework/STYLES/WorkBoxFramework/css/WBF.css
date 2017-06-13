@@ -1,5 +1,10 @@
 ﻿/* CSS Styles for the Work Box Framework */
 
+body.v4master
+{
+    overflow:hidden !important;
+}
+
 /* Styling for standard WBF dialogs: */
 
 .wbf-dialog 

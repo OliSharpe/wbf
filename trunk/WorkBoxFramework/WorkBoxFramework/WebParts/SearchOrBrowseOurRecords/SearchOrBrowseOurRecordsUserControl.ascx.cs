@@ -19,6 +19,11 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
         WBTaxonomy functionalAreasTaxonomy = null;
         WBLocationTreeState treeState = null;
 
+        String selectedPath = null;
+
+        private WBColumn sortColumn = null;
+        private bool ascending = false;
+
         bool masterLibraryHasVersions = false;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -50,6 +55,7 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
             masterLibraryHasVersions = manager.Libraries.ProtectedMasterLibrary.List.EnableVersioning;
 
             RecordsLibraryFolders.TreeNodePopulate += new TreeNodeEventHandler(RecordsLibraryFolders_TreeNodePopulate);
+            // RecordsLibraryFolders.SelectedNodeChanged += new EventHandler(RecordsLibraryFolders_SelectedNodeChanged);
 
             RecordsLibraryFolders.PopulateNodesFromClient = true;
             RecordsLibraryFolders.EnableClientScript = true;
@@ -60,6 +66,8 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
             {
                 WBTermCollection<WBTerm> functionalAreas = team.FunctionalArea(functionalAreasTaxonomy);
 
+                ViewState["SortColumn"] = WBColumn.DatePublished.InternalName;
+                ViewState["SortDirection"] = "Descending";
 
                 /*
                 TreeViewLocationCollection collection = new TreeViewLocationCollection(manager, , "", functionalAreas);
@@ -72,7 +80,7 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
             }
             else
             {
-                String selectedPath = manager.GetSelectedPath(Request);
+                SetSelectedPath();
                 if (!String.IsNullOrEmpty(selectedPath))
                 {
                     ProcessSelection(selectedPath);
@@ -80,6 +88,20 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
             }
         }
 
+        protected void SetSelectedPath()
+        {
+            String eventArgument = Request.Params["__EVENTARGUMENT"];
+
+            if (!String.IsNullOrEmpty(eventArgument) && eventArgument[0] == 's')
+            {
+                selectedPath = eventArgument.Substring(1);
+                selectedPath = selectedPath.Replace("\\", "/");
+            }
+            else
+            {
+                selectedPath = HiddenSelectedPath.Value;
+            }
+        }
 
         protected void Page_Unload(object sender, EventArgs e)
         {
@@ -96,7 +118,13 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
             }
         }
 
+        protected void HiddenSubmitLink_OnClick(object sender, EventArgs e)
+        {
+            WBLogging.Debug(" HiddenSelectedPath = " + HiddenSelectedPath.Value);
+            WBLogging.Debug(" HiddenSortColumn = " + HiddenSortColumn.Value);
+            WBLogging.Debug(" HiddenSortDirection = " + HiddenSortDirection.Value);
 
+        }
 
         protected void DoSearch_Click(object sender, EventArgs e)
         {
@@ -168,11 +196,31 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
             manager.PopulateTreeNode(treeState, e.Node, treeState.ViewMode);
         }
 
+        /*
+        protected void RecordsLibraryFolders_SelectedNodeChanged(object sender, EventArgs e)
+        {
+            WBLogging.Debug("Call to RecordsLibraryFolders_SelectedNodeChanged");
+
+            String selectedPath = manager.GetSelectedPath(Request);
+            if (!String.IsNullOrEmpty(selectedPath))
+            {
+                ProcessSelection(selectedPath);
+            }
+        }
+         */ 
+
+
 
         protected void ProcessSelection(String selectedPath)
         {
             if (!String.IsNullOrEmpty(selectedPath))
             {
+
+                if (!String.IsNullOrEmpty(HiddenSortColumn.Value))
+                {
+                    ViewState["SortColumn"] = HiddenSortColumn.Value;
+                    ViewState["SortDirection"] = HiddenSortDirection.Value; 
+                }
 
                 // Now for the bit where the path is analysed to pick out the selected functional area and the records type:
 
@@ -202,14 +250,37 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
 
         private void RenderRecordsLibraryFoldersSelection(String selectedPath)
         {
-            SPFolder protectedLibraryRootFolder = manager.Libraries.ProtectedMasterLibrary.List.RootFolder;
-
-            SPFolder recordsTypeFolder = protectedLibraryRootFolder.WBxGetFolderPath(selectedPath);
-
-            SPListItemCollection items = GetRecordsInFolder(recordsTypeFolder);
+            SPListItemCollection items = GetRecordsInFolder(selectedPath);
 
             RenderFoundRecords(items);
         }
+
+        private String RenderColumnTitle(String title, WBColumn column)
+        {
+            String directionArrow = "";
+            String newDirectionParameter = "Ascending";
+
+            if (ViewState["SortColumn"].WBxToString() == column.InternalName)
+            {
+                if (ViewState["SortDirection"].WBxToString() == "Descending")
+                {
+                    directionArrow = " <nobr>\\/</nobr>";
+                    newDirectionParameter = "Ascending";
+                }
+                else
+                {
+                    directionArrow = " <nobr>/\\</nobr>";
+                    newDirectionParameter = "Descending";
+                }
+            }
+
+            String javascript = "WBF_sort_our_records('" + selectedPath + "', '" + column.InternalName + "', '" + newDirectionParameter + "'); "; 
+
+            String html = "<a href=\"#\" onclick=\"" + javascript + "\">" + title + directionArrow + "</a>";
+
+            return html;
+        }
+
 
         private void RenderFoundRecords(SPListItemCollection items)
         {
@@ -229,12 +300,12 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
 
             html += "<tr>"
 + "<th class='wbf-record-series-odd'></th>"
-+ "<th class='wbf-record-series-odd'>Title</th>"
-+ "<th class='wbf-record-series-even'>Filename</th>"
++ "<th class='wbf-record-series-odd'>" + RenderColumnTitle("Title", WBColumn.Title) + "</th>"
++ "<th class='wbf-record-series-even'>" + RenderColumnTitle("Filename", WBColumn.Name) + "</th>"
 + "<th class='wbf-record-series-odd'>Version</th>"
-+ "<th class='wbf-record-series-even'>Protective Zone</th>"
-+ "<th class='wbf-record-series-odd'>Published Date</th>"
-+ "<th class='wbf-record-series-even'>Published By</th>"
++ "<th class='wbf-record-series-even'>" + RenderColumnTitle("Protective Zone", WBColumn.ProtectiveZone) + "</th>"
++ "<th class='wbf-record-series-odd'>" + RenderColumnTitle("Published Date", WBColumn.DatePublished) + "</th>"
++ "<th class='wbf-record-series-even'>" + RenderColumnTitle("Published By", WBColumn.PublishedBy) + "</th>"
 + "<th class='wbf-record-series-even'></th>"
 + "</tr>\n";
 
@@ -280,7 +351,12 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
                     if (fileLength == 0) fileLength = 1;
                     String fileLengthString = "" + fileLength + " KB";
 
-                    String version = document.RecordSeriesIssue;
+                    String version = document.RecordSeriesIssue.WBxTrim();
+                    if (String.IsNullOrEmpty(version))
+                    {
+                        version = "1";
+                    }
+
                     if (masterLibraryHasVersions)
                     {
                         version += "." + (item.Versions.Count - 1).ToString();
@@ -313,13 +389,26 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords
             //ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "AttachChangeListeners", "$(function () { WBF_add_checkbox_change_function(); });", true);            
         }
 
-        public static SPListItemCollection GetRecordsInFolder(SPFolder folder)
+        public SPListItemCollection GetRecordsInFolder(String folderPath)
         {
-            SPList list = folder.ParentWeb.Lists[folder.ParentListId];
-            SPQuery query = new SPQuery();
-            query.Folder = folder;                        //set folder for seaching;
-            query.ViewAttributes = "Scope=\"Recursive\""; //set recursive mode for items seaching;
-            return list.GetItems(query);
+            WBColumn sortColumn = WBColumn.GetKnownColumnByInternalName(ViewState["SortColumn"].WBxToString());
+
+            WBQuery workBoxQuery = new WBQuery();
+            workBoxQuery.FilterByFolderPath = folderPath;
+
+            if (sortColumn != null)
+            {
+                bool ascending = true;
+                if (ViewState["SortDirection"].WBxToString() == "Descending") ascending = false;
+
+                workBoxQuery.OrderBy(sortColumn, ascending);
+            }
+
+            workBoxQuery.RecursiveAll = true;
+
+            SPList list = manager.Libraries.ProtectedMasterLibrary.List;
+
+            return list.WBxGetItems(manager.Libraries.ProtectedMasterLibrary.Site, workBoxQuery);
         }
 
         private bool ItemCanBePicked(SPListItem item)

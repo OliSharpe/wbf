@@ -13,6 +13,15 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords {
     public partial class SearchOrBrowseOurRecordsUserControl {
         
         /// <summary>
+        /// HiddenSubmitLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton HiddenSubmitLink;
+        
+        /// <summary>
         /// SearchBox control.
         /// </summary>
         /// <remarks>
@@ -49,6 +58,15 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords {
         protected global::Microsoft.SharePoint.WebControls.SPTreeView RecordsLibraryFolders;
         
         /// <summary>
+        /// imgUpdateProgress control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Image imgUpdateProgress;
+        
+        /// <summary>
         /// ShowSelectionPanel control.
         /// </summary>
         /// <remarks>
@@ -65,5 +83,32 @@ namespace WorkBoxFramework.SearchOrBrowseOurRecords {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal FoundRecords;
+        
+        /// <summary>
+        /// HiddenSelectedPath control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField HiddenSelectedPath;
+        
+        /// <summary>
+        /// HiddenSortColumn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField HiddenSortColumn;
+        
+        /// <summary>
+        /// HiddenSortDirection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField HiddenSortDirection;
     }
 }
