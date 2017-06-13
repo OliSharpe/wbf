@@ -59,6 +59,11 @@ table.wbf-record-series-details .wbf-record-series-summary-detail
     text-align:center;
 }
 
+#HiddenSubmitLink
+{
+    color: White !important;
+}
+
 </style>
 
 <script>
@@ -154,9 +159,47 @@ table.wbf-record-series-details .wbf-record-series-summary-detail
         alert('attempted to connect');
     }
 
+    var wbf__id_of_hidden_submit_link = "<%= HiddenSubmitLink.ClientID %>";
+    var wbf__id_of_hidden_selected_path_field = "<%= HiddenSelectedPath.ClientID %>";
+    var wbf__id_of_hidden_sort_column_field = "<%= HiddenSortColumn.ClientID %>";
+    var wbf__id_of_hidden_sort_direction_field = "<%= HiddenSortDirection.ClientID %>";
+
+    function WBF_sort_our_records(path, column, direction) {
+
+        var link = document.getElementById(wbf__id_of_hidden_submit_link);
+
+        var selectedPathField = document.getElementById(wbf__id_of_hidden_selected_path_field);
+        var sortColumnField = document.getElementById(wbf__id_of_hidden_sort_column_field);
+        var sortDirectionField = document.getElementById(wbf__id_of_hidden_sort_direction_field);
+
+        selectedPathField.value = path;
+        sortColumnField.value = column;
+        sortDirectionField.value = direction;
+
+        link.click();
+    }
+
     //Sys.Application.add_load(WBF_add_checkbox_change_function); 
     //
 
+    // With thanks to: http://www.dotnetcurry.com/ShowArticle.aspx?ID=227
+    // Get the instance of PageRequestManager.
+    var prm = Sys.WebForms.PageRequestManager.getInstance();
+    // Add initializeRequest and endRequest
+    prm.add_initializeRequest(prm_InitializeRequest);
+    prm.add_endRequest(prm_EndRequest);
+
+    // Called when async postback begins
+    function prm_InitializeRequest(sender, args) {
+        $("#wbf-progress-div").show();
+        $("#wbf-results-div").hide();
+    }
+
+    // Called when async postback ends
+    function prm_EndRequest(sender, args) {
+        $("#wbf-progress-div").hide();
+        $("#wbf-results-div").show();
+    }
     </script>
 <div style="display:none;">
 <div id="wbf-list-of-records-selected"></div>
@@ -167,6 +210,8 @@ table.wbf-record-series-details .wbf-record-series-summary-detail
 <tr>
 <td colspan="2">
 <div style="display:none;">
+<asp:LinkButton ID="HiddenSubmitLink" Text="Reload" OnClick="HiddenSubmitLink_OnClick" runat="server" Style="color: White; "/>
+
 <span>
 Search: 
 <asp:TextBox ID="SearchBox" runat="server" Enabled="false"/>
@@ -213,20 +258,32 @@ Search:
 
 
 <td valign="top">
+
 <!-- View panel -->
 
+        <div id="wbf-progress-div" style="text-align: center; display: none;">
+            <asp:Image ID="imgUpdateProgress" runat="server" ImageUrl="/_layouts/images/WorkBoxFramework/processing-task-32.gif" AlternateText="Loading ..." ToolTip="Loading ..." Style="vertical-align:middle; padding-left: 10px;" />
+            <span style="font-size: 24px; padding-left: 10px; display:inline-block; vertical-align:middle;">
+            Loading ...
+            </span>
+        </div>
 
 <asp:UpdatePanel ID="ShowSelectionPanel" runat="server">
     <Triggers>
         <asp:AsyncPostBackTrigger ControlID="RecordsLibraryFolders" EventName="SelectedNodeChanged" />
+        <asp:AsyncPostBackTrigger ControlID="HiddenSubmitLink" EventName="Click" />
     </Triggers>
     <ContentTemplate>
 
-<div>
+<div id="wbf-results-div">
 
 <asp:Literal ID="FoundRecords" runat="server" />
 
 </div>
+<asp:HiddenField ID="HiddenSelectedPath" Value="" runat="server" />
+<asp:HiddenField ID="HiddenSortColumn" Value="" runat="server" />
+<asp:HiddenField ID="HiddenSortDirection" Value="" runat="server" />
+
 
     </ContentTemplate>
 </asp:UpdatePanel>

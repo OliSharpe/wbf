@@ -317,6 +317,17 @@ namespace WorkBoxFramework
 
             // And now just copy back to the original document any metadata changes:
             document.MaybeCopyColumns(newRecord.Metadata, WBRecord.DefaultColumnsToCopy);
+
+            // And let's make sure that the original document is using the work box document content type:
+            if (document.IsSPListItem)
+            {
+                SPContentType workBoxDocumentType = document.Item.ParentList.ContentTypes[WBFarm.Local.WorkBoxDocumentContentTypeName];
+                if (workBoxDocumentType != null)
+                {
+                    document.Item["ContentTypeId"] = workBoxDocumentType.Id;
+                }
+            }
+
             document.Update();
 
 //            uploadedItem.Update();
