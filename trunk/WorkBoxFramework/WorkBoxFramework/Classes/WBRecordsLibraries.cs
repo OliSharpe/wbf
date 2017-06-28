@@ -238,6 +238,42 @@ namespace WorkBoxFramework
             protectedLibraryRootFolder.WBxGetOrCreateFolderPath(fullClassPath, classFolderType.Id);
             SPFolder actualDestinationFolder = protectedLibraryRootFolder.WBxGetOrCreateFolderPath(fullFilingPath, filePartFolderType.Id);
 
+            /*
+            // This next bit is all because we've been having problems when new folders had to be created:
+            if (actualDestinationFolder == null)
+            {
+                WBLogging.RecordsTypes.HighLevel("We have to create part of the folder path: " + fullFilingPath); 
+                actualDestinationFolder = protectedLibraryRootFolder.WBxGetOrCreateFolderPath(fullFilingPath, filePartFolderType.Id);
+
+                WBLogging.RecordsTypes.HighLevel("Now we're going to add a dummy first file:");
+
+                MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes("Please ignore this file."));
+                SPFile dummyFile = actualDestinationFolder.Files.Add("FirstFile.txt", memoryStream);
+
+                WBLogging.RecordsTypes.HighLevel("Now we're going to try to update the file");
+                try
+                {
+                    dummyFile.Item.Update();
+                }
+                catch (Exception e)
+                {
+                    WBLogging.RecordsTypes.Unexpected("And exception did occur while updating the dummy item", e);
+                }
+
+                memoryStream.Dispose();
+
+                WBLogging.RecordsTypes.HighLevel("Now re-opening the whole ProtectedMasterLibrary object");
+
+                ProtectedMasterLibrary.ReOpen();
+
+                WBLogging.RecordsTypes.HighLevel("Have re-opened the whole ProtectedMasterLibrary object - now re-getting the SPFolder:");
+
+                protectedLibraryRootFolder = ProtectedMasterLibrary.List.RootFolder;
+                actualDestinationFolder = protectedLibraryRootFolder.WBxGetFolderPath(fullFilingPath);
+            }
+              */
+            
+     
             if (ProtectedMasterLibrary.Web.WBxFileExists(actualDestinationFolder, filename))
             {
                 filename = ProtectedMasterLibrary.Web.WBxMakeFilenameUnique(actualDestinationFolder, filename);

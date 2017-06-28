@@ -343,6 +343,9 @@ namespace WorkBoxFramework
 
         public bool MaybeCopyColumns(WBItem itemToCopy, IEnumerable<WBColumn> columnsToCopy)
         {
+            // Let's pick up the item again before copying across the metadata:
+            this.Reload();
+
             bool allCorrect = false;
             foreach (WBColumn column in columnsToCopy)
             {

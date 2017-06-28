@@ -226,13 +226,29 @@ namespace WorkBoxFramework
             }
             catch (Exception e)
             {
-                feedback.Failed("Something went wrong with the publishing process", e);
-                WBLogging.Debug("Something went wrong with the publishing process");
+                feedback.AddFeedback("Something went wrong with first attempt to publish document");
+                feedback.AddException(e);
 
-                process.CurrentItemFailed();
-                return process;
+                WBLogging.RecordsTypes.Unexpected("Something went wrong with first attempt to publish document", e);
             }
 
+            if (newRecord == null)
+            {
+                WBLogging.RecordsTypes.Unexpected("Making a second attempt to publish document");
+
+                try
+                {
+                    newRecord = Libraries.DeclareNewRecord(feedback, _callingUserLogin, document, recordToReplace, process.ReplaceAction, process.ExtraMetadata);
+                }
+                catch (Exception e)
+                {
+                    feedback.Failed("Something went wrong with the second attempt to publish document", e);
+                    WBLogging.RecordsTypes.Unexpected("Something went wrong with the second attempt to publish document", e);
+
+                    process.CurrentItemFailed();
+                    return process;
+                }
+            }
 
             WBLogging.Debug("WBRecordsManager.PublishDocument(): Declared new record");
             feedback.Success();

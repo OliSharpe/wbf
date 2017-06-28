@@ -152,6 +152,26 @@ namespace WorkBoxFramework
 
 
         #region Methods
+
+        public void ReOpen()
+        {
+            if (!IsOpen || !_openedByThisObject || _site == null || _web == null || String.IsNullOrEmpty(_url))
+            {
+                WBLogging.RecordsTypes.Unexpected("You can't re-open a WBRecordsLibrary if it is not already open - and opened by this object");
+                throw new Exception("You can't re-open a WBRecordsLibrary if it is not already open");
+            }
+
+            _web.Dispose();
+            _web = null;
+
+            _site.Dispose();
+            _site = null;
+
+            _isOpen = false;
+
+            Open();
+        }
+
         public bool Open()
         {
             if (IsOpen) return false;
