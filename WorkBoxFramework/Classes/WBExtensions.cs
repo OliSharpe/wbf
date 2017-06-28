@@ -2252,13 +2252,21 @@ namespace WorkBoxFramework
 
             if (found == null)
             {
+//                WBLogging.Generic.Unexpected("About to create a child folder with name : " + childName);
+
                 found = parent.SubFolders.Add(childName);
+
+//                WBLogging.Generic.Unexpected("Added child folder with name : " + childName);
 
                 found.Item.SystemUpdate();
                 found.Update();
 
+//                WBLogging.Generic.Unexpected("Done initial update of child folder with name : " + childName);
+
                 found.Item[SPBuiltInFieldId.ContentTypeId] = contentTypeId;
                 found.Item.SystemUpdate();
+
+//                WBLogging.Generic.Unexpected("Updated content type of child folder with name: " + childName);
             }
 
             return found;
